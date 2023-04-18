@@ -1,13 +1,17 @@
-A gamemode based off of Blue Beyond's concept.
+A gamemode based off of Blue Beyond's concept. Hunters stop Runners from clearing the game!
 
-Hunters stop Runners from clearing the game!
 
 Main Programming by EmilyEmmi, and TroopaParaKoopa
+
 Automatic Doors and Disable Star Spawn Cutscenes by Blocky, and Sunk
+
 Spectator mod by Sprinter05
 
+
 Spanish Translation made with help from TroopaParaKoopa (I've gotten mixed feedback on the quality, so please report any inaccuracies)
+
 German Translation made with help from N64 Mario
+
 
 HOW TO USE:
 Install like a regular mod. The main rules of the game will appear first. To change rules, start the game, and select players, the following commands are available:
@@ -39,6 +43,7 @@ Important commands are denoted by "***"
 /mh spectator [ON|OFF] - Toggles hunters' ability to use spectator
 
 /mh pause [NAME|ID|ALL] - Freezes or unfreezes the specified player, yourself if not specified, or all players if specified.
+
 
 In addition, the following commands are available:
 
