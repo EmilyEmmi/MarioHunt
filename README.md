@@ -1,21 +1,27 @@
+# MarioHunt (v1.1)
 A gamemode based off of Blue Beyond's concept. Hunters stop Runners from clearing the game!
-
-
+<br/>
+<br/>
+<br/>
 Main Programming by EmilyEmmi, and TroopaParaKoopa
 
 Automatic Doors and Disable Star Spawn Cutscenes by Blocky, and Sunk
 
 Spectator mod by Sprinter05
-
-
+<br/>
+<br/>
+<br/>
 Spanish Translation made with help from TroopaParaKoopa (I've gotten mixed feedback on the quality, so please report any inaccuracies)
 
 German Translation made with help from N64 Mario
-
-
-HOW TO USE:
+<br/>
+<br/>
+<br/>
+# HOW TO USE:
 Install like a regular mod. The main rules of the game will appear first. To change rules, start the game, and select players, the following commands are available:
-
+<br/>
+<br/>
+<br/>
 Important commands are denoted by "***"
 
 *** /mh: Displays command list. Do /mh [COMMAND] to run the specified command. Do /mh [COMMAND] [PARAMETER] to add parameters. Host/moderator/developer (me) only
@@ -43,8 +49,9 @@ Important commands are denoted by "***"
 /mh spectator [ON|OFF] - Toggles hunters' ability to use spectator
 
 /mh pause [NAME|ID|ALL] - Freezes or unfreezes the specified player, yourself if not specified, or all players if specified.
-
-
+<br/>
+<br/>
+<br/>
 In addition, the following commands are available:
 
 /tc [MSG|ON|OFF] - Send message to team only. ON enables this without having to type /tc every time.
@@ -52,5 +59,7 @@ In addition, the following commands are available:
 /lang [EN|ES|DE] - Switches language. Some command feedback and descriptions are not translated.
 
 /spectate [NAME|ID|OFF] - Hunters only. Spectate the specified player, or unspectate.
-
+<br/>
+<br/>
+<br/>
 Have fun, and please report any bugs.
