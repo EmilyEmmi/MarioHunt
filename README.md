@@ -1,4 +1,13 @@
-# MarioHunt (v1.1)
+<img src="logo.png" alt="MarioHunt" width="800"/>
+
+### v1.1
+
+## [Trailer](https://www.youtube.com/watch?v=hyuXu4Bzugs&ab_channel=N64Mario)
+
+Trailer by N64 Mario, logo by N64 Mario and Beyond
+<br/>
+<br/>
+<br/>
 A gamemode based off of Blue Beyond's concept. Hunters stop Runners from clearing the game!
 <br/>
 <br/>
