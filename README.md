@@ -9,6 +9,8 @@ Trailer by N64 Mario, logo by N64 Mario and Beyond
 <br/>
 <br/>
 A gamemode based off of Blue Beyond's concept. Hunters stop Runners from clearing the game!
+
+Mod for sm64ex-coop
 <br/>
 <br/>
 <br/>
@@ -27,7 +29,7 @@ German Translation made with help from N64 Mario
 <br/>
 <br/>
 # HOW TO USE:
-Install like a regular mod. The main rules of the game will appear first. To change rules, start the game, and select players, the following commands are available:
+Install like a regular mod (place the MarioHunt folder in either mods folder). The main rules of the game will appear first. To change rules, start the game, and select players, the following commands are available:
 <br/>
 <br/>
 <br/>
