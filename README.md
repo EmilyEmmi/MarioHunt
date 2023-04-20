@@ -47,6 +47,8 @@ Important commands are denoted by "***"
 
 /mh timeneeded [NUM] - Sets time runners need to stay in a course in seconds. Note that time is also cut based on existing stars in the level (1:30 for each star)
 
+/mh starsneeded [NUM] - For Star Mode, sets amount of stars runners need to get to leave a course.
+
 /mh starrun [INT] - Sets number of stars runners need to collect total. Changing this opens doors, disables infinite stairs, etc.
 
 *** /mh changeteam [NAME|ID] - Switches team of specified player (or yourself if not specified).
@@ -56,6 +58,8 @@ Important commands are denoted by "***"
 /mh allowleave [NAME|ID] - Lets the specified player leave the course (or yourself if not specified).
 
 /mh runnerswitch [ON|OFF] - In this mode, when a runner is defeated, a random hunter becomes a runner.
+
+/mh starmode [ON|OFF] - Toggles using stars to leave a stage as opposed to the timer, like in the old days of MarioHunt.
 
 /mh spectator [ON|OFF] - Toggles hunters' ability to use spectator
 
