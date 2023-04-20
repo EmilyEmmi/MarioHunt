@@ -58,6 +58,7 @@ langdata["en"] =
   single_life = "\n\\#00ffff\\Runners\\#ffffff\\: 1 life; ",
   multi_life = "\n\\#00ffff\\Runners\\#ffffff\\: %d lives; ",
   time_needed = "%d:%02d to leave any main stage; collect stars to decrease; ",
+  stars_needed = "%d star(s) to leave any main stage;\n",
   become_hunter = "Become \\#ff5c5c\\Hunters\\#ffffff\\ when defeated.",
   switch_runner = "A random \\#ff5c5c\\Hunter\\#ffffff\\ becomes a \\#00ffff\\Runner\\#ffffff\\ when one is defeated.",
   infinite_lives = "\\#ff5c5c\\Hunters\\#ffffff\\: Infinite lives",
@@ -68,6 +69,7 @@ langdata["en"] =
   win = "%s win!",
   can_leave = "Can leave course",
   time_left = "Can leave in %d:%02d",
+  stars_left = "Need %d star(s) to leave",
   in_castle = "In castle",
   until_hunters = "%s second(s) until Hunters begin",
   until_runners = "%s second(s) until Runners begin",
@@ -116,6 +118,10 @@ langdata["en"] =
   spectate_off = "No longer spectating.",
   empty = "EMPTY (%s )",
   free_camera = "FREE CAMERA",
+
+  -- total wins
+  total_wins_one = "%s\\#ffffff\\ has won 1 time as \\#00ffff\\Runner\\#ffffff\\!",
+  total_wins = "%s\\#ffffff\\ has won %d times as \\#00ffff\\Runner\\#ffffff\\!",
 }
 
 langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
@@ -149,6 +155,7 @@ langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
   single_life = "\n\\#00ffff\\Corredores\\#ffffff\\: 1 vida; ",
   multi_life = "\n\\#00ffff\\Corredores\\#ffffff\\: %d vidas; ",
   time_needed = "%d:%02d partir cualquier nivel principal; Colecciona estrellas reducir; ",
+  stars_needed = "%d estrella(s) partir cualquier nivel principal;\n",
   become_hunter = "Haceos \\#ff5c5c\\Cazadores\\#ffffff\\ cuando venció.",
   switch_runner = "Un \\#ff5c5c\\Cazador\\#ffffff\\ aleatorio hace un \\#00ffff\\Corredor\\#ffffff\\ cuando uno es venció.",
   infinite_lives = "\\#ff5c5c\\Cazadores\\#ffffff\\: Vidas infinitas",
@@ -159,6 +166,7 @@ langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
   win = "¡%s ganan!",
   can_leave = "Puede partes nivel",
   time_left = "Puede partes en %d:%02d",
+  stars_left = "Necesitas %d estrella(s) partir",
   in_castle = "En castillo",
   until_hunters = "%s segundo(s) hasta Cazadores empiezan",
   until_runners = "%s segundo(s) hasta Corredores empiezan",
@@ -207,6 +215,10 @@ langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
   spectate_off = "No observa ahora.",
   empty = "VACÍO (%s )",
   free_camera = "CÁMARA LIBRE",
+
+  -- total wins
+  total_wins_one = "%s\\#ffffff\\ ganó 1 vez cuando era \\#00ffff\\Corredor\\#ffffff\\!",
+  total_wins = "%s\\#ffffff\\ ganó %d veces cuando era \\#00ffff\\Corredor\\#ffffff\\!",
 }
 
 langdata["de"] = -- by N64 Mario
@@ -240,6 +252,7 @@ langdata["de"] = -- by N64 Mario
   single_life = "\n\\#00ffff\\Läufer\\#ffffff\\: 1 Leben; ",
   multi_life = "\n\\#00ffff\\Läufer\\#ffffff\\: %d Leben; ",
   time_needed = "%d:%02d um jeden Hauptkurs zu verlassen; Sammle Sterne zum Verringern; ",
+  stars_needed = "%d Stern(e) zum Verlassen einer beliebigen Hauptbühne;\n",
   become_hunter = "Werde \\#ff5c5c\\Jäger\\#ffffff\\, wenn du besiegt wirst.",
   switch_runner = "Ein zufälliger \\#ff5c5c\\Jäger\\#ffffff\\ wird zum \\#00ffff\\Läufer\\#ffffff\\ wenn einer besiegt wird.",
   infinite_lives = "\\#ff5c5c\\Jäger\\#ffffff\\: Unendlich viele Leben",
@@ -250,6 +263,7 @@ langdata["de"] = -- by N64 Mario
   win = "%s haben gewonnen!",
   can_leave = "Kurs kann verlassen werden",
   time_left = "Kannst in %d:%02d verlassen",
+  stars_left = "Benötigen %d Stern(e) zum Verlassen",
   in_castle = "Im Schloss",
   until_hunters = "%s Sekunde(n) bis die Jäger beginnen",
   until_runners = "%s Sekunde(n) bis die Läufer beginnen",
@@ -298,6 +312,10 @@ langdata["de"] = -- by N64 Mario
   spectate_off = "Nicht mehr am zuschauen.",
   empty = "LEER (%s )",
   free_camera = "FREIE KAMERA",
+
+  -- total wins
+  total_wins_one = "%s hat 1 mal als Läufer gewonnen!",
+  total_wins = "%s hat %d mal als Läufer gewonnen!", -- may not be correct
 }
 
 for langname,data in pairs(langdata) do

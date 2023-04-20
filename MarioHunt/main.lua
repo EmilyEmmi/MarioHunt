@@ -1,5 +1,5 @@
 -- name: Mariohunt (v1.0)
--- incompatible: gamemode
+-- incompatible: gamemode, mariohunt
 -- description: A gamemode based off of Beyond's concept.\n\nHunters stop Runners from clearing the game!\n\nProgramming by EmilyEmmi, TroopaParaKoopa, Blocky, Sunk, and Sprinter05.\n\nSpanish Translation made with help from TroopaParaKoopa.\nGerman Translation made with help from N64 Mario.
 
 -- some debug stuff
@@ -77,6 +77,7 @@ if network_is_server() then
   gGlobalSyncTable.starRun = 70 -- stars runners must get to face bowser; star doors and infinite stairs will be disabled accordingly
   gGlobalSyncTable.runnerSwitch = false -- pick new runners whenever one dies
   gGlobalSyncTable.allowSpectate = true -- hunters can spectate
+  gGlobalSyncTable.starMode = false -- use stars collected instead of timer
   gGlobalSyncTable.mhState = 0 -- game state
   --[[
     0: not started
@@ -324,8 +325,15 @@ function get_leave_requirements(sMario)
   local file = get_current_save_file_num() - 1
   local starCount = save_file_get_course_star_count(file, np.currCourseNum - 1)
   available_stars = available_stars - starCount
-  if (total_time / 1800) > available_stars then
-    total_time = available_stars * 2700 -- 1.5 minutes per star
+
+  if available_stars == 0 then return 0 end
+
+  if gGlobalSyncTable.starMode then
+    if (total_time - sMario.runTime) > available_stars then
+      sMario.runTime = total_time - available_stars
+    end
+  elseif (total_time - sMario.runTime) > available_stars * 2700 then
+    sMario.runTime = total_time - available_stars * 2700
   end
   return (total_time - sMario.runTime)
 end
@@ -441,6 +449,18 @@ function update()
     m.numStars = save_file_get_total_star_count(get_current_save_file_num()-1,COURSE_MIN-1,COURSE_MAX-1)
     m.prevNumStarsForDialog = m.numStars
 
+    local wins = tonumber(mod_storage_load("wins"))
+    if wins ~= nil and math.floor(wins) > 0 then
+      local np = gNetworkPlayers[0]
+      local playerColor = network_get_player_text_color_string(np.localIndex)
+      network_send(true, {
+        id = PACKET_WINS,
+        wins = math.floor(wins),
+        name = playerColor .. np.name,
+      })
+      on_packet_wins({wins = math.floor(wins), name = playerColor .. np.name})
+    end
+
     sawMessage = true
   end
 
@@ -547,7 +567,11 @@ function show_rules()
   else
     text = text .. trans("multi_life",(gGlobalSyncTable.runnerLives+1))
   end
-  text = text .. trans("time_needed",math.floor(gGlobalSyncTable.runTime/1800),math.floor((gGlobalSyncTable.runTime%1800)/30))
+  if (gGlobalSyncTable.starMode) then
+    text = text .. trans("stars_needed",gGlobalSyncTable.runTime)
+  else
+    text = text .. trans("time_needed",math.floor(gGlobalSyncTable.runTime/1800),math.floor((gGlobalSyncTable.runTime%1800)/30))
+  end
   if gGlobalSyncTable.runnerSwitch == false then
     text = text .. trans("become_hunter")
   else
@@ -623,6 +647,8 @@ function runner_hud(sMario)
     text = special
   elseif timeLeft <= 0 then
     text = trans("can_leave")
+  elseif gGlobalSyncTable.starMode then
+    text = trans("stars_left",timeLeft)
   else
     text = trans("time_left",math.floor(timeLeft / 1800),math.floor((timeLeft%1800)/30))
   end
@@ -968,10 +994,28 @@ function runner_lives_command(msg)
 end
 
 function time_needed_command(msg)
+  if gGlobalSyncTable.starMode then
+    djui_chat_message_create("Disable star mode first!")
+    return true
+  end
   local num = tonumber(msg)
   if num ~= nil then
     gGlobalSyncTable.runTime = math.floor(num * 30)
     djui_chat_message_create("Runners can leave in "..num.." seconds now")
+    return true
+  end
+  return false
+end
+
+function stars_needed_command(msg)
+  if not gGlobalSyncTable.starMode then
+    djui_chat_message_create("Enable star mode first!")
+    return true
+  end
+  local num = tonumber(msg)
+  if num ~= nil and num > 0 and num < 8 then
+    gGlobalSyncTable.runTime = num
+    djui_chat_message_create("Runners need "..num.." stars now")
     return true
   end
   return false
@@ -999,6 +1043,21 @@ function runner_switch_command(msg)
   elseif string.lower(msg) == "off" then
     gGlobalSyncTable.runnerSwitch = false
     djui_chat_message_create("Runners will no longer switch")
+    return true
+  end
+  return false
+end
+
+function star_mode_command(msg)
+  if string.lower(msg) == "on" then
+    gGlobalSyncTable.starMode = true
+    gGlobalSyncTable.runTime = 2
+    djui_chat_message_create("Using stars collected")
+    return true
+  elseif string.lower(msg) == "off" then
+    gGlobalSyncTable.starMode = false
+    gGlobalSyncTable.runTime = 7200
+    djui_chat_message_create("Using timer")
     return true
   end
   return false
@@ -1168,6 +1227,11 @@ function runner_update(m,sMario)
       winner = 1,
     })
     game_end_sfx({winner = 1})
+    local wins = tonumber(mod_storage_load("wins"))
+    if wins == nil then
+      wins = 0
+    end
+    mod_storage_save("wins",tostring(math.floor(wins)+1))
   end
 
   -- match life counter to actual lives
@@ -1177,7 +1241,9 @@ function runner_update(m,sMario)
 
   -- reduce timer
   if m.playerIndex == 0 and sMario.runTime ~= "done" then
-    sMario.runTime = sMario.runTime + 1
+    if not gGlobalSyncTable.starMode then
+      sMario.runTime = sMario.runTime + 1
+    end
 
     -- match run time with other runners in level
     for i=1,(MAX_PLAYERS-1) do
@@ -1219,7 +1285,11 @@ function runner_update(m,sMario)
     m.prevNumStarsForDialog = m.numStars -- this also disables some dialogue, which helps with the fast pace
     if m.playerIndex == 0 and gotStar then
       if sMario.runTime ~= "done" then
-        sMario.runTime = sMario.runTime + 1800 -- 1 minute
+        if gGlobalSyncTable.starMode then
+          sMario.runTime = sMario.runTime + 1 -- 1 star
+        else
+          sMario.runTime = sMario.runTime + 1800 -- 1 minute
+        end
       end
       -- send message
       network_send(true, {
@@ -1467,18 +1537,28 @@ function game_end_sfx(data)
   end
 end
 
+function on_packet_wins(data)
+  if data.wins ~= 1 then
+    djui_chat_message_create(trans("total_wins",data.name,data.wins))
+  else
+    djui_chat_message_create(trans("total_wins_one",data.name))
+  end
+end
+
 -- packets
 PACKET_RUNNER_STAR = 0
 PACKET_KILL = 1
 PACKET_MH_START = 2
 PACKET_TC = 3
 PACKET_GAME_END = 4
+PACKET_WINS = 5
 sPacketTable = {
     [PACKET_RUNNER_STAR] = on_packet_runner_star,
     [PACKET_KILL] = on_packet_kill,
     [PACKET_MH_START] = do_game_start,
     [PACKET_TC] = on_packet_tc,
     [PACKET_GAME_END] = game_end_sfx,
+    [PACKET_WINS] = on_packet_wins,
 }
 
 -- from arena
@@ -1498,11 +1578,13 @@ function setup_commands()
   marioHuntCommands.randomize = {"[INT] - Picks the specified amount of runners at random", randomize_command}
   marioHuntCommands.runnerlives = {"[INT] - Sets the amount of lives Runners have, from 0 to 99 (note: 0 lives is still 1 life)", runner_lives_command}
   marioHuntCommands.timeneeded = {"[NUM] - Sets the maximum amount of time Runners have to wait to leave, in seconds", time_needed_command}
+  marioHuntCommands.starsneeded = {"[INT] - Sets the maximum amount of stars Runners must collect to leave, from 1 to 7 (only in star mode)", stars_needed_command}
   marioHuntCommands.starrun = {"[INT] - Sets the amount of stars Runners must have to face Bowser. Set to -1 for any%.", star_count_command}
   marioHuntCommands.changeteam = {"[NAME|ID] - Flips the team of the specified player, or your own if none entered", change_team_command}
   marioHuntCommands.addlife = {"[NAME|ID] - Adds another runner life to the specified player or yourself if none entered", add_life_command}
   marioHuntCommands.allowleave = {"[NAME|ID] - Allows the specified player, or yourself if none entered, to leave the level if they are a runner", allow_leave_command}
   marioHuntCommands.runnerswitch = {"[ON|OFF] - Toggles runner switch; switches runners when one dies; off by default", runner_switch_command}
+  marioHuntCommands.starmode = {"[ON|OFF] - Toggles using stars collected instead of timer; off by default", star_mode_command}
   marioHuntCommands.spectator = {"[ON|OFF] - Toggles Hunters' ability to spectate; on by default", spectate_command}
   marioHuntCommands.pause = {"[NAME|ID|ALL] - Toggles pause status for specified players, self if not specified, or all", pause_command}
 
