@@ -23,6 +23,7 @@ function setup_hack_data()
         [LEVEL_TOTWC] = {1, 0}, -- can get trapped in wing
         [LEVEL_VCUTM] = {1, 0}, -- can get trapped in vanish
         [LEVEL_PSS] = {1, 1}, -- you can fail time challenge
+        [LEVEL_WMOTR] = {1, 0}, -- you can enter without wing cap
       },
 
       special_run = function(m)
