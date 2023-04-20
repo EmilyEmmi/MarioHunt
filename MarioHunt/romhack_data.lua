@@ -14,6 +14,17 @@ function setup_hack_data()
       },
       ddd = true, -- pretty much only relevant for vanilla
 
+      -- stars in certain sub areas, for star mode to avoid getting trapped
+      area_stars = {
+        [LEVEL_JRB] = {2, 1}, -- 1 star in ship
+        [LEVEL_SSL] = {2, 1}, -- 1 star in pyramid (to avoid getting trapped in hand)
+        [LEVEL_LLL] = {2, 2}, -- 2 stars in volcano
+        [LEVEL_THI] = {3, 1}, -- 1 star inside island (for wiggler)
+        [LEVEL_TOTWC] = {1, 0}, -- can get trapped in wing
+        [LEVEL_VCUTM] = {1, 0}, -- can get trapped in vanish
+        [LEVEL_PSS] = {1, 1}, -- you can fail time challenge
+      },
+
       special_run = function(m)
         local np = gNetworkPlayers[m.playerIndex]
         if m.playerIndex == 0 and np.currLevelNum == LEVEL_DDD and gGlobalSyncTable.starRun == 0 then
@@ -45,7 +56,20 @@ function setup_hack_data()
         [LEVEL_WMOTR] = 120, -- hidden palace
       },
 
-      special_run = deleteStarRoadStuff,
+      area_stars = {
+        [LEVEL_SA] = {1, 1}, -- you can fail time challenge
+      },
+
+      special_run = function(m)
+        deleteStarRoadStuff(m)
+        local np = gNetworkPlayers[0]
+        -- prevent getting trapped in cage star
+        if gotStar and m.playerIndex == 0 and np.currLevelNum == LEVEL_CCM 
+        and m.pos.x < -4000 and m.pos.z < -4700 then
+          local sMario = gPlayerSyncTable[0]
+          sMario.runTime = "done"
+        end
+      end,
 
       starCount = {
         [LEVEL_PSS] = 2, -- Mushroom Mountain Town

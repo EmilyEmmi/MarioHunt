@@ -329,6 +329,11 @@ function get_leave_requirements(sMario)
   if available_stars == 0 then return 0 end
 
   if gGlobalSyncTable.starMode then
+    if ROMHACK ~= nil and ROMHACK.area_stars ~= nil
+    and ROMHACK.area_stars[np.currLevelNum] ~= nil
+    and ROMHACK.area_stars[np.currLevelNum][1] == np.currAreaIndex then
+      available_stars = ROMHACK.area_stars[np.currLevelNum][2]
+    end
     if (total_time - sMario.runTime) > available_stars then
       sMario.runTime = total_time - available_stars
     end
