@@ -1,6 +1,6 @@
 <img src="logo.png" alt="MarioHunt" width="800"/>
 
-### v1.1
+### v1.2
 
 ## [Trailer](https://www.youtube.com/watch?v=hyuXu4Bzugs&ab_channel=N64Mario)
 
