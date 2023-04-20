@@ -1,4 +1,4 @@
--- name: Mariohunt (v1.0)
+-- name: Mariohunt (v1.2)
 -- incompatible: gamemode, mariohunt
 -- description: A gamemode based off of Beyond's concept.\n\nHunters stop Runners from clearing the game!\n\nProgramming by EmilyEmmi, TroopaParaKoopa, Blocky, Sunk, and Sprinter05.\n\nSpanish Translation made with help from TroopaParaKoopa.\nGerman Translation made with help from N64 Mario.
 
