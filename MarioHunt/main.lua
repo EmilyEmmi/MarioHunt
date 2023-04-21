@@ -71,6 +71,9 @@ end
 ACT_PAUSE = allocate_mario_action(ACT_FLAG_IDLE)
 gGlobalSyncTable.pause = false
 
+-- TroopaParaKoopa's hns metal cap option
+gGlobalSyncTable.metal = false
+
 if network_is_server() then
   gGlobalSyncTable.runnerLives = 1 -- the lives runners get (0 is a life)
   gGlobalSyncTable.runTime = 7200 -- time runners must stay in stage to leave (default: 4 minutes)
@@ -1108,6 +1111,21 @@ function pause_command(msg)
   end
   return true
 end
+
+-- TroopaParaKoopa's metal command
+function metal_command(msg)
+  if string.lower(msg) == "on" then
+      gGlobalSyncTable.metal = true
+      djui_chat_message_create("All hunters are metal")
+      return true
+  end
+  if string.lower(msg) == "off" then
+      gGlobalSyncTable.metal = false
+      djui_chat_message_create("All hunters are not metal")
+      return true
+  end
+end
+
 -- TroopaParaKoopa's Level Cooldown
 hook_event(HOOK_ON_WARP,
    function()
@@ -1139,6 +1157,7 @@ function mario_update(m)
   else
     network_player_set_description(np, trans("hunter"), 255, 92, 92, 255)
   end
+
   if m.playerIndex == 0 then
     if desc_switch_timer < 1 then
       desc_switch_timer = 61
@@ -1312,6 +1331,11 @@ end
 function hunter_update(m,sMario)
   -- infinite lives
   m.numLives = 100
+
+  -- hns hunters become metal cap - troopa
+  if gGlobalSyncTable.metal == true then
+    m.marioBodyState.modelState = MODEL_STATE_METAL
+  end
 
   -- only local mario at this point
   if m.playerIndex ~= 0 then return end
@@ -1592,6 +1616,7 @@ function setup_commands()
   marioHuntCommands.starmode = {"[ON|OFF] - Toggles using stars collected instead of timer; off by default", star_mode_command}
   marioHuntCommands.spectator = {"[ON|OFF] - Toggles Hunters' ability to spectate; on by default", spectate_command}
   marioHuntCommands.pause = {"[NAME|ID|ALL] - Toggles pause status for specified players, self if not specified, or all", pause_command}
+  marioHuntCommands.metal = {"[ON|OFF] - Toggles hunters should make them look like they have the metal cap", metal_command}
 
   -- debug
   marioHuntCommands.print = {"[STRING] - Outputs message to console", print, true}
