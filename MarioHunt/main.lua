@@ -1616,7 +1616,7 @@ function setup_commands()
   marioHuntCommands.starmode = {"[ON|OFF] - Toggles using stars collected instead of timer; off by default", star_mode_command}
   marioHuntCommands.spectator = {"[ON|OFF] - Toggles Hunters' ability to spectate; on by default", spectate_command}
   marioHuntCommands.pause = {"[NAME|ID|ALL] - Toggles pause status for specified players, self if not specified, or all", pause_command}
-  marioHuntCommands.metal = {"[ON|OFF] - Toggles hunters should make them look like they have the metal cap", metal_command}
+  marioHuntCommands.metal = {"[ON|OFF] - Toggles making hunters appear as if they have the metal cap; this does not make them invincible", metal_command}
 
   -- debug
   marioHuntCommands.print = {"[STRING] - Outputs message to console", print, true}
