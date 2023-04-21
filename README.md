@@ -64,6 +64,8 @@ Important commands are denoted by "***"
 /mh spectator [ON|OFF] - Toggles hunters' ability to use spectator
 
 /mh pause [NAME|ID|ALL] - Freezes or unfreezes the specified player, yourself if not specified, or all players if specified.
+
+/mh metal [ON|OFF] - Toggles making hunters appear as if they have the metal cap; this does not make them invincible
 <br/>
 <br/>
 <br/>
