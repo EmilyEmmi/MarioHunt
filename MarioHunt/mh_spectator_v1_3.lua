@@ -31,12 +31,13 @@ local SVposX = 0
 local SVposY = 0
 local SVposZ = 0
 
-local SVlsP = { x = 0, y = 0, z = 0 }
+--[[local SVlsP = { x = 0, y = 0, z = 0 }
 local SVlsF = { x = 0, y = 0, z = 0 }
 local SVlsCP = { x = 0, y = 0, z = 0 }
 local SVlsCF = { x = 0, y = 0, z = 0 }
 local SVlsGP = { x = 0, y = 0, z = 0 }
-local SVlsGF = { x = 0, y = 0, z = 0 }
+local SVlsGF = { x = 0, y = 0, z = 0 }]]
+local SVprevA = 0
 
 local SVcln
 local SVcai
@@ -224,6 +225,11 @@ function mario_update_local(m)
             MSP.pos.y = SVposY
             MSP.pos.z = SVposZ
             MSP.peakHeight = SVposY -- to prevent fall damage death
+            if (SVprevA & ACT_GROUP_SUBMERGED) ~= 0 then
+              print("set to water")
+              set_mario_action(MSP, ACT_WATER_IDLE, 0)
+            end
+            SVprevA = 0
 
             SVtp = 3
         end
@@ -256,6 +262,8 @@ function mario_update(m)
 end
 
 function enable_spectator(m)
+  local sMario = gPlayerSyncTable[m.playerIndex]
+  if sMario.spectator == 1 then return end
   SVcln = NPP.currLevelNum
   SVcai = NPP.currAreaIndex
   SVcan = NPP.currActNum
@@ -263,6 +271,7 @@ function enable_spectator(m)
   SVposX = MSP.pos.x
   SVposY = MSP.pos.y
   SVposZ = MSP.pos.z
+  SVprevA = m.action or 0
 
   -- Unused due to Free Camera overriding Vanilla values
   --vec3f_copy(SVlsP, LLS.pos)
@@ -412,7 +421,7 @@ function spectate_command(msg)
   if not gGlobalSyncTable.allowSpectate then
     djui_chat_message_create(trans("spectate_disabled"))
     return true
-  elseif sMario.team == 1 then
+  elseif sMario.team == 1 and gGlobalSyncTable.mhState == 2 then
     djui_chat_message_create(trans("hunters_only"))
     return true
   elseif gGlobalSyncTable.mhState == 1 then

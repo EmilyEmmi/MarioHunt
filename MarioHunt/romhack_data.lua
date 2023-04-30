@@ -1,5 +1,5 @@
 ROMHACK = {}
-function setup_hack_data()
+function setup_hack_data(settingRomHack)
   local romhack_data = {
 
   vanilla = {
@@ -7,7 +7,7 @@ function setup_hack_data()
       max_stars = 120, -- maximum stars collectible
       requirements = {
         [LEVEL_BITDW] = 8,
-        [LEVEL_DDD] = 31, -- 1 gets subtracted in code
+        [LEVEL_DDD] = 30,
         [LEVEL_BITFS] = 31,
         [LEVEL_BITS] = 70,
         [LEVEL_BOWSER_3] = 120, -- NOTE: This is overridden by the default star run
@@ -65,7 +65,7 @@ function setup_hack_data()
         deleteStarRoadStuff(m)
         local np = gNetworkPlayers[0]
         -- prevent getting trapped in cage star
-        if gotStar and m.playerIndex == 0 and np.currLevelNum == LEVEL_CCM 
+        if gotStar and m.playerIndex == 0 and np.currLevelNum == LEVEL_CCM
         and m.pos.x < -4000 and m.pos.z < -4700 then
           local sMario = gPlayerSyncTable[0]
           sMario.runTime = "done"
@@ -169,23 +169,31 @@ function setup_hack_data()
 
   }
 
-  local romhack_name = "vanilla"
-  for i,mod in ipairs(gActiveMods) do
-    if mod.incompatible ~= nil and string.find(mod.incompatible,"romhack") then -- is a romhack
-      romhack_name = mod.name
-    end
-  end
+  local romhack_name = gGlobalSyncTable.romhackName
   ROMHACK = romhack_data[romhack_name]
+  if ROMHACK == nil and settingRomHack then
+    romhack_name = "vanilla"
+    for i,mod in ipairs(gActiveMods) do
+      if mod.incompatible ~= nil and string.find(mod.incompatible,"romhack") then -- is a romhack
+        romhack_name = mod.name
+      end
+    end
+    ROMHACK = romhack_data[romhack_name]
+  end
   if ROMHACK == nil then
+    romhack_name = "default"
     ROMHACK = romhack_data["default"]
     print("Not compatible!")
     djui_popup_create("WARNING: Hack does not have compatibility!",2)
+    gGlobalSyncTable.romhackName = "default"
   elseif romhack_name ~= "vanilla" then
     djui_popup_create("Hack set to "..romhack_name,2)
   end
-  if network_is_server() then
+  if settingRomHack then
     gGlobalSyncTable.starRun = ROMHACK.default_stars
+    gGlobalSyncTable.romhackName = romhack_name
   end
+  return romhack_name
 end
 
 function warp_beginning()

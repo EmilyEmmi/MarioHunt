@@ -2,6 +2,7 @@ lang = "en"
 
 function trans(id,format,format2_)
   local format2 = format2_ or 10
+  if id == nil then return "INVALID" end
   if langdata == nil then return id end
 
   if langdata[lang] == nil then
@@ -66,17 +67,17 @@ langdata["en"] =
   fun = " Have fun!",
 
   -- hud text
-  win = "%s win!",
-  can_leave = "Can leave course",
-  time_left = "Can leave in %d:%02d",
-  stars_left = "Need %d star(s) to leave",
+  win = "%s\\#ffffff\\ win!",
+  can_leave = "\\#5aff5a\\Can leave course",
+  time_left = "Can leave in \\#ffff5a\\%d:%02d",
+  stars_left = "Need \\#ffff5a\\%d star(s)\\#ffffff\\ to leave",
   in_castle = "In castle",
-  until_hunters = "%s second(s) until Hunters begin",
-  until_runners = "%s second(s) until Runners begin",
+  until_hunters = "%s second(s) until \\#ff5c5c\\Hunters\\#ffffff\\ begin",
+  until_runners = "%s second(s) until \\#00ffff\\Runners\\#ffffff\\ begin",
   show_lives_one = "1 life",
   show_lives = "%d lives",
-  no_runners = "No Runners!",
-  camp_timer = "Keep moving! (%d)",
+  no_runners = "No \\#00ffff\\Runners!",
+  camp_timer = "Keep moving! \\#ff5c5c\\(%d)",
 
   -- popups
   lost_life = "%s\\#ffa0a0\\ lost a life!",
@@ -91,6 +92,13 @@ langdata["en"] =
   not_using_ee = "This is using Standard Edition only.",
   killed = "%s\\#ffa0a0\\ killed %s!",
   sidelined = "%s\\#ffa0a0\\ finished off %s!",
+  paused = "You have been paused.",
+  unpaused = "You are no longer paused.",
+  kill_combo_2 = "%s\\#ffa0a0\\ got a \\#ffff5a\\double\\#ffa0a0\\ kill!",
+  kill_combo_3 = "%s\\#ffa0a0\\ got a \\#ffff5a\\triple\\#ffa0a0\\ kill!",
+  kill_combo_4 = "%s\\#ffa0a0\\ got a \\#ffff5a\\quadruple\\#ffa0a0\\ kill!",
+  kill_combo_5 = "%s\\#ffa0a0\\ got a \\#ffff5a\\quintuple\\#ffa0a0\\ kill!",
+  kill_combo_large = "\\#ffa0a0\\Wow! %s\\#ffa0a0\\ got \\#ffff5a\\%d\\#ffa0a0\\ kills in a row!",
 
   -- command feedback
   no_such_player = "No such player exists",
@@ -119,9 +127,14 @@ langdata["en"] =
   empty = "EMPTY (%s )",
   free_camera = "FREE CAMERA",
 
-  -- total wins
-  total_wins_one = "%s\\#ffffff\\ has won 1 time as \\#00ffff\\Runner\\#ffffff\\!",
-  total_wins = "%s\\#ffffff\\ has won %d times as \\#00ffff\\Runner\\#ffffff\\!",
+  -- stats
+  disp_wins_one = "%s\\#ffffff\\ has won 1 time as \\#00ffff\\Runner\\#ffffff\\!",
+  disp_wins = "%s\\#ffffff\\ has won %d times as \\#00ffff\\Runner\\#ffffff\\!",
+  disp_kills_one = "%s\\#ffffff\\ has killed 1 player!", -- unused
+  disp_kills = "%s\\#ffffff\\ has killed %d players!",
+  stat_wins = "Wins:",
+  stat_kills = "Kills:",
+  stat_combo = "Max Kill Streak:",
 }
 
 langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
@@ -163,17 +176,17 @@ langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
   fun = " ¡Disfruta!",
 
   -- hud text
-  win = "¡%s ganan!",
-  can_leave = "Puede partes nivel",
-  time_left = "Puede partes en %d:%02d",
-  stars_left = "Necesitas %d estrella(s) partir",
+  win = "¡%s\\#ffffff\\ ganan!",
+  can_leave = "\\#5aff5a\\Puede partes nivel",
+  time_left = "Puede partes en \\#ffff5a\\%d:%02d",
+  stars_left = "Necesitas \\#ffff5a\\%d estrella(s)\\#ffffff\\ partir",
   in_castle = "En castillo",
-  until_hunters = "%s segundo(s) hasta Cazadores empiezan",
-  until_runners = "%s segundo(s) hasta Corredores empiezan",
+  until_hunters = "%s segundo(s) hasta \\#ff5c5c\\Cazadores\\#ffffff\\ empiezan",
+  until_runners = "%s segundo(s) hasta \\#00ffff\\Corredores\\#ffffff\\ empiezan",
   show_lives_one = "1 vida",
   show_lives = "%d vidas",
-  no_runners = "¡No Corredores!",
-  camp_timer = "¡Vamos! (%d)",
+  no_runners = "¡No \\#00ffff\\Corredores!",
+  camp_timer = "¡Vamos! \\#ff5c5c\\(%d)",
 
   -- popups
   lost_life = "¡%s\\#ffa0a0\\ perdió una vida!",
@@ -188,6 +201,13 @@ langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
   not_using_ee = "\\#ffa0a0\\Este solo usa Edicion de Tradicional.",
   killed = "¡%s\\#ffa0a0\\ mató a %s!",
   sidelined = "¡%s\\#ffa0a0\\ terminó a %s!",
+  paused = "Hayas interrumpiste.",
+  unpaused = "No está interrumpido ahora.",
+  kill_combo_2 = "¡%s\\#ffa0a0\\ sacó una \\#ffff5a\\doble\\#ffa0a0\\ muerte!",
+  kill_combo_3 = "¡%s\\#ffa0a0\\ sacó una \\#ffff5a\\triple\\#ffa0a0\\ muerte!",
+  kill_combo_4 = "¡%s\\#ffa0a0\\ sacó una \\#ffff5a\\cuádrupla\\#ffa0a0\\ muerte!",
+  kill_combo_5 = "¡%s\\#ffa0a0\\ sacó una \\#ffff5a\\quíntupla\\#ffa0a0\\ muerte!",
+  kill_combo_large = "\\#ffa0a0\\¡Guau! ¡%s\\#ffa0a0\\ sacó \\#ffff5a\\%d\\#ffa0a0\\ muertes consecutivas!",
 
   -- command feedback
   no_such_player = "Jugador no existe",
@@ -216,9 +236,14 @@ langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
   empty = "VACÍO (%s )",
   free_camera = "CÁMARA LIBRE",
 
-  -- total wins
-  total_wins_one = "%s\\#ffffff\\ ganó 1 vez cuando era \\#00ffff\\Corredor\\#ffffff\\!",
-  total_wins = "%s\\#ffffff\\ ganó %d veces cuando era \\#00ffff\\Corredor\\#ffffff\\!",
+  -- stats
+  disp_wins_one = "%s\\#ffffff\\ ganó 1 vez cuando era \\#00ffff\\Corredor\\#ffffff\\!",
+  disp_wins = "%s\\#ffffff\\ ganó %d veces cuando era \\#00ffff\\Corredor\\#ffffff\\!",
+  disp_kills_one = "%s\\#ffffff\\ mató 1 jugador!", -- unused
+  disp_kills = "%s\\#ffffff\\ mató %d jugadores!",
+  stat_wins = "Victoria:",
+  stat_kills = "Muertes:",
+  stat_combo = "Racha de Muertes Máxima:",
 }
 
 langdata["de"] = -- by N64 Mario
@@ -260,17 +285,17 @@ langdata["de"] = -- by N64 Mario
   fun = " Viel Spaß!",
 
   -- hud text
-  win = "%s haben gewonnen!",
-  can_leave = "Kurs kann verlassen werden",
-  time_left = "Kannst in %d:%02d verlassen",
-  stars_left = "Brauchst %d Stern(e) um zu verlassen",
+  win = "%s\\#ffffff\\ haben gewonnen!",
+  can_leave = "\\#5aff5a\\Kurs kann verlassen werden",
+  time_left = "Kannst in \\#ffff5a\\%d:%02d\\#ffffff\\ verlassen",
+  stars_left = "Brauchst \\#ffff5a\\%d Stern(e)\\#ffffff\\ um zu verlassen",
   in_castle = "Im Schloss",
-  until_hunters = "%s Sekunde(n) bis die Jäger beginnen",
-  until_runners = "%s Sekunde(n) bis die Läufer beginnen",
+  until_hunters = "%s Sekunde(n) bis die \\#ff5c5c\\Jäger\\#ffffff\\ beginnen",
+  until_runners = "%s Sekunde(n) bis die \\#00ffff\\Läufer\\#ffffff\\ beginnen",
   show_lives_one = "1 Leben",
   show_lives = "%d Leben",
-  no_runners = "Keine Läufer!",
-  camp_timer = "Weiter bewegen! (%d)",
+  no_runners = "Keine \\#00ffff\\Läufer!",
+  camp_timer = "Weiter bewegen! \\#ff5c5c\\(%d)",
 
   -- popups
   lost_life = "%s\\#ffa0a0\\ hat einen Leben verloren!",
@@ -285,6 +310,13 @@ langdata["de"] = -- by N64 Mario
   not_using_ee = "Dies verwendet nur die Standard Version.",
   killed = "%s\\#ffa0a0\\ hat %s getötet!",
   sidelined = "%s\\#ffa0a0\\ hat %s erledigt!",
+  paused = "Du wurdest pausiert.",
+  unpaused = "Du bist nicht mehr pausiert.",
+  kill_combo_2 = "%s\\#ffa0a0\\ hat einen \\#ffff5a\\doppelten\\#ffa0a0\\ Kill!",
+  kill_combo_3 = "%s\\#ffa0a0\\ hat einen \\#ffff5a\\dreifachen\\#ffa0a0\\ Kill!",
+  kill_combo_4 = "%s\\#ffa0a0\\ hat einen \\#ffff5a\\vierfachen\\#ffa0a0\\ Kill!",
+  kill_combo_5 = "%s\\#ffa0a0\\ hat einen \\#ffff5a\\fünffachen\\#ffa0a0\\ Kill!",
+  kill_combo_large = "\\#ffa0a0\\Wow! %s\\#ffa0a0\\ hat \\#ffff5a\\%d\\#ffa0a0\\ Kills in Folge!",
 
   -- command feedback
   no_such_player = "Es gibt nicht so einen Spieler",
@@ -313,9 +345,14 @@ langdata["de"] = -- by N64 Mario
   empty = "LEER (%s )",
   free_camera = "FREIE KAMERA",
 
-  -- total wins
-  total_wins_one = "%s hat 1 mal als Läufer gewonnen!",
-  total_wins = "%s hat %d mal als Läufer gewonnen!", -- may not be correct
+  -- stats
+  disp_wins_one = "%s\\#ffffff\\ hat 1 mal als Läufer gewonnen!",
+  disp_wins = "%s\\#ffffff\\ hat %d mal als Läufer gewonnen!", -- may not be correct
+  disp_kills_one = "%s\\#ffffff\\ hat einen Spieler getötet!", -- unused
+  disp_kills = "%s\\#ffffff\\ hat %d Spieler getötet!",
+  stat_wins = "Gewinnt:",
+  stat_kills = "Kills:",
+  stat_combo = "Max Kill Streak:",
 }
 
 for langname,data in pairs(langdata) do
