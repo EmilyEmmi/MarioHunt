@@ -1,6 +1,6 @@
 <img src="logo.png" alt="MarioHunt" width="800"/>
 
-### v1.2
+### v1.5 (view changelog [here](changelog.md))
 
 ## [Trailer](https://www.youtube.com/watch?v=hyuXu4Bzugs&ab_channel=N64Mario)
 
@@ -25,6 +25,10 @@ Spectator mod by Sprinter05
 Spanish Translation made with help from TroopaParaKoopa (I've gotten mixed feedback on the quality, so please report any inaccuracies)
 
 German Translation made with help from N64 Mario
+<br/>
+<br/>
+<br/>
+Port of "Shooting Star Summet" by pieordie1 [(here)](https://www.smwcentral.net/?p=section&a=details&id=13275)
 <br/>
 <br/>
 <br/>
@@ -66,6 +70,8 @@ Important commands are denoted by "***"
 /mh pause [NAME|ID|ALL] - Freezes or unfreezes the specified player, yourself if not specified, or all players if specified.
 
 /mh metal [ON|OFF] - Toggles making hunters appear as if they have the metal cap; this does not make them invincible
+
+/mh hack [STRING] - Sets hack; Supported hacks are "vanilla", "Star Road", and "Super Mario 74 (+EE)", case sensitive
 <br/>
 <br/>
 <br/>
@@ -76,6 +82,8 @@ In addition, the following commands are available:
 /lang [EN|ES|DE] - Switches language. Some command feedback and descriptions are not translated.
 
 /spectate [NAME|ID|OFF] - Hunters only. Spectate the specified player, or unspectate.
+
+/stats - Display stats for all players
 <br/>
 <br/>
 <br/>
