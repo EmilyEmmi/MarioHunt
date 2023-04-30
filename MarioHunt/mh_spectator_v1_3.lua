@@ -154,7 +154,7 @@ function mario_update_local(m)
             end
         end
 
-        if STP.team == 1 or GST.mhState == 1 or GST.allowSpectate == false or spectate == false then
+        if (STP.team == 1 and GST.mhState == 2) or GST.mhState == 1 or GST.allowSpectate == false or spectate == false then
           STP.spectator = 0
           MSP.health = Shealth
           free_camera = 0
