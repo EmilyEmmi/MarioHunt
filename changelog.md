@@ -11,6 +11,7 @@
   - /mh hack: Sets rom hack
 ### Adjustments:
   - Not all cutscenes activate the camp timer anymore
+  - Runners can now spectate if the game is not active
   - Runners can no longer constantly grab caps to remain invincible
   - Kill messages now display while the game is not active
   - When the game ends, all players are warped to the starting area
