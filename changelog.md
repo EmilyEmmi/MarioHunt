@@ -1,4 +1,23 @@
 # Changelog
+## v1.6
+### Adjustments:
+  - In Runner Switch mode, those who become runners now get their time set to what the other runner's time was
+  - Spectators can no longer become Runner in Runner Switch mode
+  - Slightly nerfed Hunters' underwatch punch
+  - Description for /mh start mentions that the "alt" modifier is buggy
+### Fixes/Backend changes:
+  - Custom music now plays for players who have just joined the lobby
+  - Spectators will no longer interact with lava, quicksand, paintings, etc.
+  - Kill Combo now resets when its time runs out
+  - Kill Combo now saves
+  - Fixed issue with Runners becoming Hunters when a new player joins
+  - Runners can no longer lose lives before the game begins
+  - Hopefully fixed issue with Runners having nil lives
+  - /mh allowleave now works
+  - The Bowser Laugh plays when a Runner dies without being killed
+  - The death message appears when a Runner dies without being killed in Runner Switch mode
+  - lang.lua has more comments for those who wish to add their own language
+
 ## v1.5
 - Added changelog
 
