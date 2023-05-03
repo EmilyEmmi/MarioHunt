@@ -1,5 +1,9 @@
-lang = "en"
+--[[
+Hello! For those who are looking to translate, please scroll down.
+Also, be sure to read the comments.
+]]
 
+-- this is the translate command, it supports up to two blanks
 function trans(id,format,format2_)
   local format2 = format2_ or 10
   if id == nil then return "INVALID" end
@@ -16,38 +20,47 @@ function trans(id,format,format2_)
   return translation
 end
 
-function lang_command(msg)
-  if langdata[string.lower(msg)] ~= nil then
-    lang = string.lower(msg)
-    djui_chat_message_create(trans("switched"))
-    show_rules()
-    return true
-  end
-  return false
-end
-hook_chat_command("lang", "[EN|ES|DE] - Switch language", lang_command)
-
 langdata = {}
-langdata["en"] =
+
+-- below is where all of the language data starts
+
+langdata["en"] = -- the letters here will be what you type for the command (ex: to switch to this language, type "/lang en")
 {
-  -- fullname for auto select
+  -- fullname for auto select (make sure this matches in-game under Misc -> Languages)
   fullname = "English",
 
   -- global command info
-  to_switch = "Type \"/lang [EN|ES|DE]\" to switch languages",
-  switched = "Switched to English!",
+  to_switch = "Type \"/lang %s\" to switch languages",
+  switched = "Switched to English!", -- Replace "English" with the name of this language
   rule_command = "Type /rules to show this message again",
 
   -- roles
   runner = "Runner",
   runners = "Runners",
-  short_runner = "Run",
+  short_runner = "Run", -- unused
   hunters = "Hunters",
   hunter = "Hunter",
   spectator = "Spectator",
 
   -- rules
-  welcome = "Welcome to \\#ffff00\\Mariohunt\\#ffffff\\! HOW TO PLAY:",
+  --[[
+    This is laid out as follows:
+    {welcome}
+    {runners}{shown_above|thats_you}{any_bowser|collect_bowser}
+    {hunters}{thats_you}{all_runners|any_runners}
+    {single_life|multi_life}{time_needed|stars_needed}{become_hunter|switch_runner}
+    {infinite_lives}{spectate}
+    {banned_glitchless|banned_general}{fun}
+
+    I highly recommend testing this in-game
+    Also:
+    \\#ffffff\\ = white (default)
+    \\#00ffff\\ = cyan (for Runner team name)
+    \\#ff5c5c\\ = red (for Hunter team name and popups)
+    \\#ffff5a\\ = yellow
+    \\#5aff5a\\ = green
+  ]]
+  welcome = "Welcome to \\#ffff5a\\Mariohunt\\#ffffff\\! HOW TO PLAY:",
   all_runners = ": Defeat all \\#00ffff\\Runners\\#ffffff\\.",
   any_runners = ": Defeat any \\#00ffff\\Runners\\#ffffff\\.",
   shown_above = " (shown above)",
@@ -66,14 +79,14 @@ langdata["en"] =
   spectate = "; type \"/spectate\" to spectate",
   fun = " Have fun!",
 
-  -- hud text
-  win = "%s\\#ffffff\\ win!",
+  -- hud text (%s is a placeholder for names, and %d is a placeholder for a number)
+  win = "%s\\#ffffff\\ win!", -- team name is placed here
   can_leave = "\\#5aff5a\\Can leave course",
   time_left = "Can leave in \\#ffff5a\\%d:%02d",
   stars_left = "Need \\#ffff5a\\%d star(s)\\#ffffff\\ to leave",
   in_castle = "In castle",
-  until_hunters = "%s second(s) until \\#ff5c5c\\Hunters\\#ffffff\\ begin",
-  until_runners = "%s second(s) until \\#00ffff\\Runners\\#ffffff\\ begin",
+  until_hunters = "%d second(s) until \\#ff5c5c\\Hunters\\#ffffff\\ begin",
+  until_runners = "%d second(s) until \\#00ffff\\Runners\\#ffffff\\ begin",
   show_lives_one = "1 life",
   show_lives = "%d lives",
   no_runners = "No \\#00ffff\\Runners!",
@@ -124,7 +137,7 @@ langdata["en"] =
   "\nZ: Go down"..
   "\nType \"/spectate OFF\" to cancel",
   spectate_off = "No longer spectating.",
-  empty = "EMPTY (%s )",
+  empty = "EMPTY (%d )",
   free_camera = "FREE CAMERA",
 
   -- stats
@@ -132,6 +145,7 @@ langdata["en"] =
   disp_wins = "%s\\#ffffff\\ has won %d times as \\#00ffff\\Runner\\#ffffff\\!",
   disp_kills_one = "%s\\#ffffff\\ has killed 1 player!", -- unused
   disp_kills = "%s\\#ffffff\\ has killed %d players!",
+  -- for stats table
   stat_wins = "Wins:",
   stat_kills = "Kills:",
   stat_combo = "Max Kill Streak:",
@@ -143,7 +157,7 @@ langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
   fullname = "Spanish",
 
   -- global command info
-  to_switch = "Escriba \"/lang [EN|ES|DE]\" cambiar idiomas",
+  to_switch = "Escriba \"/lang %s\" cambiar idiomas",
   switched = "Cambiaste a español!",
   rule_command = "Escriba /rules mostrar este mensaje otra vez",
 
@@ -155,8 +169,8 @@ langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
   hunters = "Cazadores",
   spectator = "Espectador",
 
-  -- rules
-  welcome = "¡Bienvenido a \\#ffff00\\Mariohunt\\#ffffff\\! COMO JUGAR:",
+  -- rules (%d:%02d is time in minutes:seconds format)
+  welcome = "¡Bienvenido a \\#ffff5a\\Mariohunt\\#ffffff\\! COMO JUGAR:",
   all_runners = ": Venced todo \\#00ffff\\Corredores\\#ffffff\\.",
   any_runners = ": Venced cualquier \\#00ffff\\Corredores\\#ffffff\\.",
   shown_above = " (mostrado de arriba)",
@@ -181,8 +195,8 @@ langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
   time_left = "Puede partes en \\#ffff5a\\%d:%02d",
   stars_left = "Necesitas \\#ffff5a\\%d estrella(s)\\#ffffff\\ partir",
   in_castle = "En castillo",
-  until_hunters = "%s segundo(s) hasta \\#ff5c5c\\Cazadores\\#ffffff\\ empiezan",
-  until_runners = "%s segundo(s) hasta \\#00ffff\\Corredores\\#ffffff\\ empiezan",
+  until_hunters = "%d segundo(s) hasta \\#ff5c5c\\Cazadores\\#ffffff\\ empiezan",
+  until_runners = "%d segundo(s) hasta \\#00ffff\\Corredores\\#ffffff\\ empiezan",
   show_lives_one = "1 vida",
   show_lives = "%d vidas",
   no_runners = "¡No \\#00ffff\\Corredores!",
@@ -233,7 +247,7 @@ langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
   "\nZ: Viaja abajo"..
   "\nEscrita \"/spectate OFF\" cancelar",
   spectate_off = "No observa ahora.",
-  empty = "VACÍO (%s )",
+  empty = "VACÍO (%d )",
   free_camera = "CÁMARA LIBRE",
 
   -- stats
@@ -252,7 +266,7 @@ langdata["de"] = -- by N64 Mario
   fullname = "German",
 
   -- global command info
-  to_switch = "Gebe \"/lang [EN|ES|DE] ein\", um die Sprache zu wechseln",
+  to_switch = "Gebe \"/lang %s\" ein, um die Sprache zu wechseln",
   switched = "Auf Deutsch umgestellt!",
   rule_command = "Gebe /rules ein, um diese Nachricht erneut anzuzeigen",
 
@@ -265,7 +279,7 @@ langdata["de"] = -- by N64 Mario
   spectator = "Zuschauer",
 
   -- rules
-  welcome = "Wilkommen zu \\#ffff00\\Mariohunt\\#ffffff\\! WIE MAN SPIELT:",
+  welcome = "Wilkommen zu \\#ffff5a\\Mariohunt\\#ffffff\\! WIE MAN SPIELT:",
   all_runners = ": Besiege alle \\#00ffff\\Läufer\\#ffffff\\.",
   any_runners = ": Besiege alle \\#00ffff\\Läufer\\#ffffff\\.",
   shown_above = " (oben gezeigt)",
@@ -290,8 +304,8 @@ langdata["de"] = -- by N64 Mario
   time_left = "Kannst in \\#ffff5a\\%d:%02d\\#ffffff\\ verlassen",
   stars_left = "Brauchst \\#ffff5a\\%d Stern(e)\\#ffffff\\ um zu verlassen",
   in_castle = "Im Schloss",
-  until_hunters = "%s Sekunde(n) bis die \\#ff5c5c\\Jäger\\#ffffff\\ beginnen",
-  until_runners = "%s Sekunde(n) bis die \\#00ffff\\Läufer\\#ffffff\\ beginnen",
+  until_hunters = "%d Sekunde(n) bis die \\#ff5c5c\\Jäger\\#ffffff\\ beginnen",
+  until_runners = "%d Sekunde(n) bis die \\#00ffff\\Läufer\\#ffffff\\ beginnen",
   show_lives_one = "1 Leben",
   show_lives = "%d Leben",
   no_runners = "Keine \\#00ffff\\Läufer!",
@@ -342,7 +356,7 @@ langdata["de"] = -- by N64 Mario
   "\nZ: geh runter"..
   "\nType \"/spectate OFF\" um abzubrechen",
   spectate_off = "Nicht mehr am zuschauen.",
-  empty = "LEER (%s )",
+  empty = "LEER (%d )",
   free_camera = "FREIE KAMERA",
 
   -- stats
@@ -355,6 +369,29 @@ langdata["de"] = -- by N64 Mario
   stat_combo = "Max Kill Streak:",
 }
 
+-- language data ends here
+
+-- this generates a list of available languages for the command description
+lang = "en"
+lang_list = "["
+for lang,data in pairs(langdata) do
+  lang_list = lang_list .. string.upper(lang) .. "|"
+end
+lang_list = lang_list:sub(1,-2) .. "]"
+
+-- this allows players to switch languages
+function lang_command(msg)
+  if langdata[string.lower(msg)] ~= nil then
+    lang = string.lower(msg)
+    djui_chat_message_create(trans("switched"))
+    show_rules()
+    return true
+  end
+  return false
+end
+hook_chat_command("lang", lang_list .. " - Switch language", lang_command)
+
+-- this handles auto select
 for langname,data in pairs(langdata) do
   if data.fullname == smlua_text_utils_get_language() then
     lang = langname
