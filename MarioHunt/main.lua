@@ -509,7 +509,7 @@ function update()
     become_hunter(sMario)
     sMario.pause = nil
 
-    if gGlobalSyncTable == 0 then
+    if gGlobalSyncTable.mhState == 0 then
       set_background_music(0,0,0)
       play_music(0, 0x41, 1)
     end
