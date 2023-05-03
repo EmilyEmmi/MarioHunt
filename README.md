@@ -41,7 +41,7 @@ Important commands are denoted by "***"
 
 *** /mh: Displays command list. Do /mh [COMMAND] to run the specified command. Do /mh [COMMAND] [PARAMETER] to add parameters. Host/moderator/developer (me) only
 
-*** /mh start [CONTINUE|MAIN|ALT] - Starts the game. Must have at least 1 runner. Add "continue" to skip timer sequence, add "main" to use main save file, and add "alt" to use alt save file.
+*** /mh start [CONTINUE|MAIN|ALT] - Starts the game. Must have at least 1 runner. Add "continue" to skip timer sequence, add "main" to use main save file, and add "alt" to use alt save file (buggy).
 
 *** /mh addrunner [INT] - Adds the specified amount of runners at random. Must have at least 1 hunter remaining after selection.
 
