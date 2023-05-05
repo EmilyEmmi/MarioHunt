@@ -24,7 +24,9 @@ Spectator mod by Sprinter05
 <br/>
 Spanish Translation made with help from TroopaParaKoopa (I've gotten mixed feedback on the quality, so please report any inaccuracies)
 
-German Translation made with help from N64 Mario
+German Translation made by N64 Mario
+
+Brazillian Portuguese Translation made by PietroM
 <br/>
 <br/>
 <br/>
@@ -43,25 +45,25 @@ Important commands are denoted by "***"
 
 *** /mh start [CONTINUE|MAIN|ALT] - Starts the game. Must have at least 1 runner. Add "continue" to skip timer sequence, add "main" to use main save file, and add "alt" to use alt save file (buggy).
 
-*** /mh addrunner [INT] - Adds the specified amount of runners at random. Must have at least 1 hunter remaining after selection.
+*** /mh add [INT] - Adds the specified amount of runners at random. Must have at least 1 hunter remaining after selection.
 
-*** /mh randomize [INT] - Sets the specified amount of runners total at random. Must have at least 1 hunter remaining after selection.
+*** /mh random [INT] - Sets the specified amount of runners total at random. Must have at least 1 hunter remaining after selection.
 
-/mh runnerlives [INT] - Sets amount of lives runners have. Remember that 0 is a life, so /mh runnerlives 1 gives Runners 2 deaths until they lose.
+/mh lives [INT] - Sets amount of lives runners have. Remember that 0 is a life, so /mh runnerlives 1 gives Runners 2 deaths until they lose.
 
-/mh timeneeded [NUM] - Sets time runners need to stay in a course in seconds. Note that time is also cut based on existing stars in the level (1:30 for each star)
+/mh time [NUM] - Sets time runners need to stay in a course in seconds. Note that time is also cut based on existing stars in the level (1:30 for each star)
 
-/mh starsneeded [NUM] - For Star Mode, sets amount of stars runners need to get to leave a course.
+/mh stars [NUM] - For Star Mode, sets amount of stars runners need to get to leave a course.
 
-/mh starrun [INT] - Sets number of stars runners need to collect total. Changing this opens doors, disables infinite stairs, etc.
+/mh category [INT] - Sets number of stars runners need to collect total. Changing this opens doors, disables infinite stairs, etc.
 
-*** /mh changeteam [NAME|ID] - Switches team of specified player (or yourself if not specified).
+*** /mh flip [NAME|ID] - Switches team of specified player (or yourself if not specified).
 
-/mh addlife [NAME|ID] - Adds 1 life to the specified player (or yourself if not specified).
+/mh setlife [NAME|ID|INT,INT] - Sets the specified lives for the specified runner (or yourself if not specified).
 
-/mh allowleave [NAME|ID] - Lets the specified player leave the course (or yourself if not specified).
+/mh leave [NAME|ID] - Lets the specified player leave the course (or yourself if not specified).
 
-/mh runnerswitch [ON|OFF] - In this mode, when a runner is defeated, a random hunter becomes a runner.
+/mh mode [NORMAL|SWITCH] - Change game mode. In Runner Switch mode, when a runner is defeated, a random hunter becomes a runner.
 
 /mh starmode [ON|OFF] - Toggles using stars to leave a stage as opposed to the timer, like in the old days of MarioHunt.
 
@@ -72,6 +74,8 @@ Important commands are denoted by "***"
 /mh metal [ON|OFF] - Toggles making hunters appear as if they have the metal cap; this does not make them invincible
 
 /mh hack [STRING] - Sets hack; Supported hacks are "vanilla", "Star Road", and "Super Mario 74 (+EE)", case sensitive
+
+/mh weak [ON|OFF] - Toggles cutting players' invulnerability frames in half
 <br/>
 <br/>
 <br/>
@@ -79,7 +83,7 @@ In addition, the following commands are available:
 
 /tc [MSG|ON|OFF] - Send message to team only. ON enables this without having to type /tc every time.
 
-/lang [EN|ES|DE] - Switches language. Some command feedback and descriptions are not translated.
+/lang [EN|ES|DE|PT-BR] - Switches language. Some command feedback and descriptions are not translated.
 
 /spectate [NAME|ID|OFF] - Hunters only. Spectate the specified player, or unspectate.
 
