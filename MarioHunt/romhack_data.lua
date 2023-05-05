@@ -174,8 +174,15 @@ function setup_hack_data(settingRomHack)
   if ROMHACK == nil and settingRomHack then
     romhack_name = "vanilla"
     for i,mod in ipairs(gActiveMods) do
-      if mod.incompatible ~= nil and string.find(mod.incompatible,"romhack") then -- is a romhack
-        romhack_name = mod.name
+      if mod.enabled and mod.incompatible ~= nil then
+        if string.find(mod.incompatible,"romhack") then -- is a romhack
+          romhack_name = mod.name
+        elseif string.find(mod.incompatible,"nametags") then -- is nametags
+          djui_popup_create("Do \"/nametag-distance 7000\" to restore nametags.", 2)
+        elseif mod.name == "OMM Rebirth" then
+          gGlobalSyncTable.weak = true -- turn on half frames automatically
+          djui_popup_create("OMM Detected - cut invincibility frames", 2)
+        end
       end
     end
     ROMHACK = romhack_data[romhack_name]

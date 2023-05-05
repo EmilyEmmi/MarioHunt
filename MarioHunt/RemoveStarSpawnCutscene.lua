@@ -28,8 +28,8 @@ function remove_timestop()
           end
         end
         c.cutscene = 0
-    elseif m.invincTimer < 10 and c.cutscene ~= 0 and gGlobalSyncTable.mhState == 2 then
-        m.invincTimer = 10
+    elseif m.invincTimer < 30 and c.cutscene ~= 0 and gGlobalSyncTable.mhState == 2 then
+        m.invincTimer = 30
     end
 end
 hook_event(HOOK_UPDATE, remove_timestop)

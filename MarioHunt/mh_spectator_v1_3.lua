@@ -192,7 +192,6 @@ function mario_update_local(m)
               cData.focus.y = cData.focus.y + 120
             end
 
-            m.floor = nil
             update_spectator_camera(MSP, MSI)
 
             if free_camera == 0 and obj_get_first_with_behavior_id(id_bhvActSelector) == nil and (NPI.currLevelNum ~= NPP.currLevelNum or NPI.currAreaIndex ~= NPP.currAreaIndex or NPI.currActNum ~= NPP.currActNum) then
