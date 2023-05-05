@@ -1,4 +1,28 @@
 # Changelog
+## v1.7
+### Additions:
+  - Added /mh weak, which halves invulnerability frames for all players
+    - It is enabled by default when using OMM Rebirth
+  - Added a popup message when using Nametags advising how to turn nametags on
+  - **Added Brazillian Portuguese translation, courtesy of PietroM#4782**
+### Adjustments:
+  - Several changes to lives system, including players being counted as killed faster
+    - These changes make the mod work properly with OMM Rebirth
+  - Runners will no longer heal from red coins
+  - Runners have more invulnerability frames when starting a level
+  - Runners have invulnerability frames when exiting a cannon
+  - Both runners and hunters now have a camp timer when in a cannon
+  - Runners have more invulnerability frames
+  - In Runner Switch mode, killing a runner will now make you a runner
+  - Renamed many commands to be more concise
+    - The old names still function as they always have
+  - Replaced /mh addlife with /mh setlife
+  - Replaced /mh runnerswitch with /mh mode
+### Fixes:
+  - HOPEFULLY fixed runners having nil lives _this_ time
+  - Fixed rejoin system reconnecting people as if they were someone who just left
+  - Reverted spectator change from v1.6 to fix script errors with other mode
+
 ## v1.6
 ### Adjustments:
   - In Runner Switch mode, those who become runners now get their time set to what the other runner's time was
@@ -7,7 +31,7 @@
   - Description for /mh start mentions that the "alt" modifier is buggy
 ### Fixes/Backend changes:
   - Custom music now plays for players who have just joined the lobby
-  - Spectators will no longer interact with lava, quicksand, paintings, etc.
+  - ~~Spectators will no longer interact with lava, quicksand, paintings, etc.~~ Did not fix issue
   - Kill Combo now resets when its time runs out
   - Kill Combo now saves
   - Fixed issue with Runners becoming Hunters when a new player joins
