@@ -5,6 +5,7 @@
     - It is enabled by default when using OMM Rebirth
   - Added a popup message when using Nametags advising how to turn nametags on
   - **Added Brazillian Portuguese translation, courtesy of PietroM#4782**
+  - "Got a star!" popup now displays what level the star was collected in
 ### Adjustments:
   - Several changes to lives system, including players being counted as killed faster
     - These changes make the mod work properly with OMM Rebirth
