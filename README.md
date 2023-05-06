@@ -1,10 +1,10 @@
-<img src="logo.png" alt="MarioHunt" width="800"/>
+<img src="newlogo.png" alt="MarioHunt" width="800"/>
 
-### v1.7 (view changelog [here](changelog.md))
+### v1.71 (view changelog [here](changelog.md))
 
 ## [Trailer](https://www.youtube.com/watch?v=hyuXu4Bzugs&ab_channel=N64Mario)
 
-Trailer by N64 Mario, logo by N64 Mario and Beyond
+Trailer by **N64 Mario**, logo by **N64 Mario**, **Beyond**, and **AquariusAlexx**
 <br/>
 <br/>
 <br/>
@@ -14,23 +14,26 @@ Mod for sm64ex-coop
 <br/>
 <br/>
 <br/>
-Main Programming by EmilyEmmi, and TroopaParaKoopa
+Main Programming by **EmilyEmmi**
+Some additional programming by **TroopaParaKoopa**
 
-Automatic Doors and Disable Star Spawn Cutscenes by Blocky, and Sunk
+Automatic Doors and Disable Star Spawn Cutscenes by **Blocky** and **Sunk**
 
 Spectator mod by Sprinter05
 <br/>
 <br/>
 <br/>
-Spanish Translation made with help from TroopaParaKoopa (I've gotten mixed feedback on the quality, so please report any inaccuracies)
+Spanish Translation made with help from KanHeaven and SonicDark
 
 German Translation made by N64 Mario
 
 Brazillian Portuguese Translation made by PietroM
+
+If you would like to make changes or submit your own translation, check lang.lua for details
 <br/>
 <br/>
 <br/>
-Port of "Shooting Star Summet" by pieordie1 [(here)](https://www.smwcentral.net/?p=section&a=details&id=13275)
+Port of "Shooting Star Summit" by pieordie1 [(here)](https://www.smwcentral.net/?p=section&a=details&id=13275)
 <br/>
 <br/>
 <br/>
