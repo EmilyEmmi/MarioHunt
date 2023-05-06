@@ -1,4 +1,9 @@
 # Changelog
+## v1.71
+### Adjustments:
+  - New Spanish Translation by KanHeaven and SonicDark
+### Backend changes:
+  - Added more instructions for submitting translations
 ## v1.7
 ### Additions:
   - Added /mh weak, which halves invulnerability frames for all players
