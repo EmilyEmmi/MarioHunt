@@ -1,6 +1,10 @@
 --[[
-Hello! For those who are looking to translate, please scroll down.
-Also, be sure to read the comments.
+Hello! For those who are looking to translate:
+- PLEASE PLEASE PLEASE have more than a basic understanding of whatever language you're translating
+- Scroll down and copy one of the language tables (English and Brazillian Portuguese have more helpful comments)
+- Translate all of the things. Make sure you don't miss anything!
+- Send the table (don't need the whole file) to me in some text style format
+- Let me know who worked on it so I can provide proper credit
 ]]
 
 -- this is the translate command, it supports up to two blanks
@@ -151,15 +155,15 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   stat_combo = "Max Kill Streak:",
 }
 
-langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
+langdata["es"] = -- massively improved by KanHeaven and SonicDark
 {
   -- fullname for auto select
   fullname = "Spanish",
 
   -- global command info
-  to_switch = "Escriba \"/lang %s\" cambiar idiomas",
-  switched = "Cambiaste a español!",
-  rule_command = "Escriba /rules mostrar este mensaje otra vez",
+  to_switch = "Escribe \"/lang %s\" para cambiar idioma",
+  switched = "¡Cambiaste a español!",
+  rule_command = "Escribe /rules para mostrar este mensaje otra vez",
 
   -- roles
   runner = "Corredor",
@@ -170,94 +174,94 @@ langdata["es"] = -- made with wordreference and help from TroopaParaKoopa
   spectator = "Espectador",
 
   -- rules (%d:%02d is time in minutes:seconds format)
-  welcome = "¡Bienvenido a \\#ffff5a\\Mariohunt\\#ffffff\\! COMO JUGAR:",
-  all_runners = ": Venced todo \\#00ffff\\Corredores\\#ffffff\\.",
-  any_runners = ": Venced cualquier \\#00ffff\\Corredores\\#ffffff\\.",
-  shown_above = " (mostrado de arriba)",
-  any_bowser = ": Venced Bowser en cualquiera manera.",
-  collect_bowser = ": Coleccionad %d estrella(s) y venced Bowser.",
-  thats_you = " (¡ese es tú!)",
-  banned_glitchless = "NO: Traicionar a tu equipo, BLJs, cortar de pared, postergado, acampado.",
-  banned_general = "NO: Traicionar a tu equipo, postergado, acampado.",
+  welcome = "¡Bienvenido a \\#ffff5a\\Mariohunt\\#ffffff\\! CÓMO JUGAR:",
+  all_runners = ": Eliminen a todos los \\#00ffff\\Corredores\\#ffffff\\.",
+  any_runners = ": Eiminen a cualquiera de los \\#00ffff\\Corredores\\#ffffff\\.",
+  shown_above = " (mostrado arriba)",
+  any_bowser = ": Derrota a Bowser de cualquiera manera.",
+  collect_bowser = ": Recolecten %d estrella(s) y derroten a Bowser.",
+  thats_you = " (¡ese eres tú!)",
+  banned_glitchless = "NO: Traicionar a tu equipo, BLJs, atravesar paredes, frenar el avance del juego, campear.",
+  banned_general = "NO: Traicionar a tu equipo, frenar el avance del juego, campear.",
   single_life = "\n\\#00ffff\\Corredores\\#ffffff\\: 1 vida; ",
   multi_life = "\n\\#00ffff\\Corredores\\#ffffff\\: %d vidas; ",
-  time_needed = "%d:%02d partir cualquier nivel principal; Colecciona estrellas reducir; ",
-  stars_needed = "%d estrella(s) partir cualquier nivel principal;\n",
-  become_hunter = "Haceos \\#ff5c5c\\Cazadores\\#ffffff\\ cuando venció.",
-  switch_runner = "Un \\#ff5c5c\\Cazador\\#ffffff\\ aleatorio hace un \\#00ffff\\Corredor\\#ffffff\\ cuando uno es venció.",
+  time_needed = "%d:%02d para salir de cualquier nivel; recolecta estrellas para reducir este tiempo; ",
+  stars_needed = "%d estrella(s) para salir de cualquier nivel;\n",
+  become_hunter = "únete a los \\#ff5c5c\\Cazadores\\#ffffff\\ cuando hayas sido eliminado.",
+  switch_runner = "Un \\#ff5c5c\\Cazador\\#ffffff\\ aleatorio se convierte en \\#00ffff\\Corredor\\#ffffff\\ cuando uno es eliminado.",
   infinite_lives = "\\#ff5c5c\\Cazadores\\#ffffff\\: Vidas infinitas",
-  spectate = "; escrita \"/spectate\" observar",
-  fun = " ¡Disfruta!",
+  spectate = "; escribe \"/spectate\" para ser un espectador",
+  fun = " ¡Diviértete!",
 
   -- hud text
   win = "¡%s\\#ffffff\\ ganan!",
-  can_leave = "\\#5aff5a\\Puede partes nivel",
-  time_left = "Puede partes en \\#ffff5a\\%d:%02d",
-  stars_left = "Necesitas \\#ffff5a\\%d estrella(s)\\#ffffff\\ partir",
-  in_castle = "En castillo",
-  until_hunters = "%d segundo(s) hasta \\#ff5c5c\\Cazadores\\#ffffff\\ empiezan",
-  until_runners = "%d segundo(s) hasta \\#00ffff\\Corredores\\#ffffff\\ empiezan",
+  can_leave = "\\#5aff5a\\Puedes salir del nivel",
+  time_left = "Puedes salir en \\#ffff5a\\%d:%02d",
+  stars_left = "Necesitas \\#ffff5a\\%d estrella(s)\\#ffffff\\ para salir del nivel",
+  in_castle = "En el castillo",
+  until_hunters = "%d segundo(s) para que los \\#ff5c5c\\Cazadores\\#ffffff\\ empiecen",
+  until_runners = "%d segundo(s) para que los \\#00ffff\\Corredores\\#ffffff\\ empiecen",
   show_lives_one = "1 vida",
   show_lives = "%d vidas",
-  no_runners = "¡No \\#00ffff\\Corredores!",
-  camp_timer = "¡Vamos! \\#ff5c5c\\(%d)",
+  no_runners = "¡No hay \\#00ffff\\Corredores!",
+  camp_timer = "¡Muévete! \\#ff5c5c\\(%d)",
 
   -- popups
   lost_life = "¡%s\\#ffa0a0\\ perdió una vida!",
-  lost_all = "¡%s\\#ffa0a0\\ perdió todos sus vidas!",
-  now_runner = "%s\\#ffa0a0\\ es ahora un \\#00ffff\\Corredor\\#ffa0a0\\.",
+  lost_all = "¡%s\\#ffa0a0\\ perdió todas sus vidas!",
+  now_runner = "%s\\#ffa0a0\\ ahora es un \\#00ffff\\Corredor\\#ffa0a0\\.",
   got_star = "¡%s\\#ffa0a0\\ consiguió una estrella!",
   got_key = "¡%s\\#ffa0a0\\ consiguió una llave!",
-  rejoin_start = "%s\\#ffa0a0\\ tiene dos minutos unir de nuevo.",
+  rejoin_start = "%s\\#ffa0a0\\ tiene dos minutos para volver a unirse.",
   rejoin_success = "¡%s\\#ffa0a0\\ se unió a tiempo!",
-  rejoin_fail = "%s\\#ffa0a0\\ no es un \\#00ffff\\Corredor\\#ffa0a0\\ ahora.",
-  using_ee = "\\#ffa0a0\\Este solo usa Edicion de Extrema.",
-  not_using_ee = "\\#ffa0a0\\Este solo usa Edicion de Tradicional.",
+  rejoin_fail = "%s\\#ffa0a0\\ ya no es un \\#00ffff\\Corredor\\#ffa0a0\\.",
+  using_ee = "\\#ffa0a0\\La partida está teniendo lugar en Extreme Edition.",
+  not_using_ee = "\\#ffa0a0\\La partida está teniendo lugar en Normal Edition.",
   killed = "¡%s\\#ffa0a0\\ mató a %s!",
-  sidelined = "¡%s\\#ffa0a0\\ terminó a %s!",
-  paused = "Hayas interrumpiste.",
-  unpaused = "No está interrumpido ahora.",
-  kill_combo_2 = "¡%s\\#ffa0a0\\ sacó una \\#ffff5a\\doble\\#ffa0a0\\ muerte!",
-  kill_combo_3 = "¡%s\\#ffa0a0\\ sacó una \\#ffff5a\\triple\\#ffa0a0\\ muerte!",
-  kill_combo_4 = "¡%s\\#ffa0a0\\ sacó una \\#ffff5a\\cuádrupla\\#ffa0a0\\ muerte!",
-  kill_combo_5 = "¡%s\\#ffa0a0\\ sacó una \\#ffff5a\\quíntupla\\#ffa0a0\\ muerte!",
-  kill_combo_large = "\\#ffa0a0\\¡Guau! ¡%s\\#ffa0a0\\ sacó \\#ffff5a\\%d\\#ffa0a0\\ muertes consecutivas!",
+  sidelined = "¡%s\\#ffa0a0\\ eliminó a %s!",
+  paused = "Has sido pausado.",
+  unpaused = "Ya no estás pausado.",
+  kill_combo_2 = "¡%s\\#ffa0a0\\ hizo una \\#ffff5a\\doble\\#ffa0a0\\ muerte!",
+  kill_combo_3 = "¡%s\\#ffa0a0\\ hizo una \\#ffff5a\\triple\\#ffa0a0\\ muerte!",
+  kill_combo_4 = "¡%s\\#ffa0a0\\ hizo una \\#ffff5a\\cuádruple\\#ffa0a0\\ muerte!",
+  kill_combo_5 = "¡%s\\#ffa0a0\\ hizo una \\#ffff5a\\quíntuple\\#ffa0a0\\ muerte!",
+  kill_combo_large = "\\#ffa0a0\\¡Wow! ¡%s\\#ffa0a0\\ hizo \\#ffff5a\\%d\\#ffa0a0\\ muertes consecutivas!",
 
   -- command feedback
-  no_such_player = "Jugador no existe",
+  no_such_player = "Ese jugador no existe",
   bad_id = "ID de jugador inválido!",
 
   -- team chat
-  tc_on = "¡Charla de equipo es \\#5cff5c\\ENCENDIDO!",
-  tc_off = "¡Charla de equipo es \\#ff5c5c\\APAGADO!",
-  to_team = "\\#8a8a8a\\De equipo: ",
+  tc_on = "¡El chat de equipo está \\#5cff5c\\ENCENDIDO!",
+  tc_off = "¡El chat de equipo está \\#ff5c5c\\APAGADO!",
+  to_team = "\\#8a8a8a\\Para tu equipo: ",
   from_team = "\\#8a8a8a\\ (equipo): ",
 
   -- spectator
-  hunters_only = "¡Solo Cazadores puede observa!",
-  spectate_disabled = "¡Espectador no es activado!",
-  timer_going = "¡No observa durante temporizador!",
-  spectate_self = "¡No observa te!",
+  hunters_only = "¡Solo los Cazadores pueden ser espectadores!",
+  spectate_disabled = "¡Modo espectador desactivado!",
+  timer_going = "¡No puedes ser espectador cuando el tiempo corre!",
+  spectate_self = "¡No puedes ser espectador de ti mismo!",
   spectator_controls = "Controles:"..
-  "\nDPAD-UP: Apaga hud"..
-  "\nDPAD-DOWN: Cambia vista de camara libre/jugador"..
+  "\nDPAD-UP: Desactiva la interfaz"..
+  "\nDPAD-DOWN: Cambia la vista entre cámara libre/punto de vista del jugador"..
   "\nDPAD-LEFT / DPAD-RIGHT: Cambia jugador"..
-  "\nJOYSTICK: Viaja"..
-  "\nA: Viaja arriba"..
-  "\nZ: Viaja abajo"..
-  "\nEscrita \"/spectate OFF\" cancelar",
-  spectate_off = "No observa ahora.",
+  "\nJOYSTICK: Moverse"..
+  "\nA: Moverse hacia arriba"..
+  "\nZ: Moverse hacia abajo"..
+  "\nType \"/spectate OFF\" para cancelar",
+  spectate_off = "Dejaste de ser espectador.",
   empty = "VACÍO (%d )",
   free_camera = "CÁMARA LIBRE",
 
   -- stats
-  disp_wins_one = "%s\\#ffffff\\ ganó 1 vez cuando era \\#00ffff\\Corredor\\#ffffff\\!",
-  disp_wins = "%s\\#ffffff\\ ganó %d veces cuando era \\#00ffff\\Corredor\\#ffffff\\!",
-  disp_kills_one = "%s\\#ffffff\\ mató 1 jugador!", -- unused
-  disp_kills = "%s\\#ffffff\\ mató %d jugadores!",
-  stat_wins = "Victoria:",
+  disp_wins_one = "¡%s\\#ffffff\\ ganó 1 vez como \\#00ffff\\Corredor\\#ffffff\\!",
+  disp_wins = "¡%s\\#ffffff\\ ganó %d veces como \\#00ffff\\Corredor\\#ffffff\\!",
+  disp_kills_one = "%s\\#ffffff\\ mató a 1 jugador!", -- unused
+  disp_kills = "%s\\#ffffff\\ mató a %d jugadores!",
+  stat_wins = "Victorias:",
   stat_kills = "Muertes:",
-  stat_combo = "Racha de Muertes Máxima:",
+  stat_combo = "Racha de muertes más alta:",
 }
 
 langdata["de"] = -- by N64 Mario

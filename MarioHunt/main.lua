@@ -1,6 +1,6 @@
--- name: Mariohunt (v1.7)
+-- name: Mariohunt (v1.71)
 -- incompatible: gamemode
--- description: A gamemode based off of Beyond's concept.\n\nHunters stop Runners from clearing the game!\n\nProgramming by EmilyEmmi, TroopaParaKoopa, Blocky, Sunk, and Sprinter05.\n\nSpanish Translation made with help from TroopaParaKoopa.\nGerman Translation made by N64 Mario.\nBrazillian Portuguese translation made by PietroM.\n\n\"Shooting Star Summit\" port by pieordie1
+-- description: A gamemode based off of Beyond's concept.\n\nHunters stop Runners from clearing the game!\n\nProgramming by EmilyEmmi, TroopaParaKoopa, Blocky, Sunk, and Sprinter05.\n\nSpanish Translation made with help from KanHeaven and SonicDark.\nGerman Translation made by N64 Mario.\nBrazillian Portuguese translation made by PietroM.\n\n\"Shooting Star Summit\" port by pieordie1
 
 -- some debug stuff
 function do_warp(msg)
