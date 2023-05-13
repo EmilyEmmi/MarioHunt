@@ -1434,6 +1434,8 @@ function on_player_disconnected(m)
     if sMario.team == 1 then
       local discordID = sMario.discordID
       print(tostring(discordID),"left")
+      become_hunter(sMario) -- be hunter by default
+      sMario.discordID = nil
       if discordID ~= nil and discordID ~= "0" then
         local playerColor = network_get_player_text_color_string(np.localIndex)
         local name = playerColor .. np.name
@@ -1531,6 +1533,7 @@ function runner_update(m,sMario)
   }
 
   local newInvincTimer = runner_invincible[m.action]
+  if newInvincTimer ~= nil and gGlobalSyncTable.weak then newInvincTimer = newInvincTimer * 2 end -- same amount in weak mode
   if newInvincTimer ~= nil and m.invincTimer < newInvincTimer then
     m.invincTimer = newInvincTimer
     if m.playerIndex == 0 and campTimer == nil and runner_camping[m.action] ~= nil then
