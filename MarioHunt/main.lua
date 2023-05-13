@@ -276,7 +276,6 @@ function do_game_start(data)
       save_file_erase_current_backup_save()
     end]]
     save_file_reload(1)
-    display_unlock_message(-1, 0)
   end
 end
 
