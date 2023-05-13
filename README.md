@@ -1,6 +1,6 @@
 <img src="newLogo.png" alt="MarioHunt" width="800"/>
 
-### v1.71 (view changelog [here](changelog.md))
+### v1.8 (view changelog [here](changelog.md))
 
 ## [Trailer](https://www.youtube.com/watch?v=hyuXu4Bzugs&ab_channel=N64Mario)
 
@@ -23,22 +23,24 @@ Spectator mod by Sprinter05
 <br/>
 <br/>
 <br/>
-Spanish Translation made with help from KanHeaven and SonicDark
+Spanish Translation made with help from **KanHeaven** and **SonicDark**
 
-German Translation made by N64 Mario
+German Translation made by **N64 Mario**
 
-Brazillian Portuguese Translation made by PietroM
+Brazillian Portuguese Translation made by **PietroM**
+
+French translation made by **Skeletan**
 
 If you would like to make changes or submit your own translation, check lang.lua for details
 <br/>
 <br/>
 <br/>
-Port of "Shooting Star Summit" by pieordie1 [(here)](https://www.smwcentral.net/?p=section&a=details&id=13275)
+Port of "Shooting Star Summit" by **pieordie1** [(here)](https://www.smwcentral.net/?p=section&a=details&id=13275)
 <br/>
 <br/>
 <br/>
 # HOW TO USE:
-Install like a regular mod (place the MarioHunt folder in either mods folder). The main rules of the game will appear first. To change rules, start the game, and select players, the following commands are available:
+Select CODE, then DOWNLOAD ZIP. Install like a regular mod (place the MarioHunt folder in either mods folder). The main rules of the game will appear first. To change rules, start the game, and select players, the following commands are available:
 <br/>
 <br/>
 <br/>
