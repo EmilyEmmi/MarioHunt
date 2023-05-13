@@ -88,7 +88,7 @@ In addition, the following commands are available:
 
 /tc [MSG|ON|OFF] - Send message to team only. ON enables this without having to type /tc every time.
 
-/lang [EN|ES|DE|PT-BR] - Switches language. Some command feedback and descriptions are not translated.
+/lang [EN|ES|DE|PT-BR|FR] - Switches language. Some command feedback and descriptions are not translated.
 
 /spectate [NAME|ID|OFF] - Hunters only. Spectate the specified player, or unspectate.
 
