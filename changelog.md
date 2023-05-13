@@ -8,6 +8,7 @@
   - Players can now interact with trees, signs, etc. while the game is not active
   - In OMM Rebirth, Runners have invulnerability frames when grabbing a star in Odyssey mode
   - A player's kill count will be displayed if they have over 50 when they join instead of 10
+  - Actions that grant invulnerablity frames (such as talking to an NPC) will not be halved in Weak mode
 ### Fixes/Backend changes:
   - Camp Timer now runs during all text properly
   - Runners have invulnerability frames during all text
