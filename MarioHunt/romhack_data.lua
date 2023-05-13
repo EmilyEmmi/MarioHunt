@@ -1,5 +1,5 @@
 ROMHACK = {}
-function setup_hack_data(settingRomHack)
+function setup_hack_data(settingRomHack,initial)
   local romhack_data = {
 
   vanilla = {
@@ -11,6 +11,7 @@ function setup_hack_data(settingRomHack)
         [LEVEL_BITFS] = 31,
         [LEVEL_BITS] = 70,
         [LEVEL_BOWSER_3] = 120, -- NOTE: This is overridden by the default star run
+        ["Castle Top Floor"] = 50, -- Not a level, but this is here too
       },
       ddd = true, -- pretty much only relevant for vanilla
 
@@ -177,24 +178,30 @@ function setup_hack_data(settingRomHack)
       if mod.enabled and mod.incompatible ~= nil then
         if string.find(mod.incompatible,"romhack") then -- is a romhack
           romhack_name = mod.name
-        elseif string.find(mod.incompatible,"nametags") then -- is nametags
-          djui_popup_create("Do \"/nametag-distance 7000\" to restore nametags.", 2)
-        elseif mod.name == "OMM Rebirth" then
-          gGlobalSyncTable.weak = true -- turn on half frames automatically
-          djui_popup_create("OMM Detected - cut invincibility frames", 2)
+        elseif initial then
+          if string.find(mod.incompatible,"nametags") then -- is nametags
+            djui_popup_create(trans("nametag_restore"), 2)
+          elseif mod.name == "OMM Rebirth" then
+            gGlobalSyncTable.weak = true -- turn on half frames automatically
+            gGlobalSyncTable.omm = true -- other changes for OMM
+            djui_popup_create(trans("omm_detected"), 2)
+          end
         end
       end
     end
     ROMHACK = romhack_data[romhack_name]
   end
+  if initial and romhack_name == "vanilla" then
+    omm_replace(gGlobalSyncTable.omm)
+  end
   if ROMHACK == nil then
     romhack_name = "default"
     ROMHACK = romhack_data["default"]
     print("Not compatible!")
-    djui_popup_create("WARNING: Hack does not have compatibility!",2)
+    djui_popup_create(trans("incompatible_hack"),2)
     gGlobalSyncTable.romhackName = "default"
   elseif romhack_name ~= "vanilla" then
-    djui_popup_create("Hack set to "..romhack_name,2)
+    djui_popup_create(trans("set_hack",romhack_name),2)
   end
   if settingRomHack then
     gGlobalSyncTable.starRun = ROMHACK.default_stars

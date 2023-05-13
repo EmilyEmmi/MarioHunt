@@ -1,6 +1,6 @@
--- name: Mariohunt (v1.71)
+-- name: Mariohunt (v1.8)
 -- incompatible: gamemode
--- description: A gamemode based off of Beyond's concept.\n\nHunters stop Runners from clearing the game!\n\nProgramming by EmilyEmmi, TroopaParaKoopa, Blocky, Sunk, and Sprinter05.\n\nSpanish Translation made with help from KanHeaven and SonicDark.\nGerman Translation made by N64 Mario.\nBrazillian Portuguese translation made by PietroM.\n\n\"Shooting Star Summit\" port by pieordie1
+-- description: A gamemode based off of Beyond's concept.\n\nHunters stop Runners from clearing the game!\n\nProgramming by EmilyEmmi, TroopaParaKoopa, Blocky, Sunk, and Sprinter05.\n\nSpanish Translation made with help from KanHeaven and SonicDark.\nGerman Translation made by N64 Mario.\nBrazillian Portuguese translation made by PietroM.\nFrench translation made by Skeletan.\n\n\"Shooting Star Summit\" port by pieordie1
 
 -- some debug stuff
 function do_warp(msg)
@@ -86,6 +86,7 @@ function combo_debug(msg)
     name = playerColor .. np.name,
     kills = tonumber(msg) or 0,
   })
+  print(get_dialog_id())
   return true
 end
 
@@ -132,6 +133,7 @@ if network_is_server() then
   gGlobalSyncTable.otherSave = false -- using other save file
   gGlobalSyncTable.bowserBeaten = false -- used for Star Road
   gGlobalSyncTable.ee = false -- used for SM74
+  gGlobalSyncTable.omm = flase -- is true if using OMM Rebirth
 
   rejoin_timer = {} -- rejoin timer for runners
 end
@@ -161,7 +163,7 @@ function mario_hunt_command(msg)
   local np = gNetworkPlayers[0]
   local isDev = (network_discord_id_from_local_index(0) == "409438020870078486") -- my discord id
   if not (network_is_server() or network_is_moderator() or isDev) then
-    djui_chat_message_create("You don't have the AUTHORITY to run this command, you fool!")
+    djui_chat_message_create(trans("not_mod"))
     return true
   elseif marioHuntCommands == nil or #marioHuntCommands < 1 then
     setup_commands()
@@ -178,9 +180,9 @@ function mario_hunt_command(msg)
   if usedCmd == "" then
     djui_chat_message_create("List of commands: ")
     for cmd,cdata in pairs(marioHuntCommands) do
-      local desc = cdata[1]
+      local desc = trans(cmd .. "_desc")
       local hidden = false
-      if cdata[3] == true then
+      if cdata[2] == true then
         if not isDev then
           hidden = true
         end
@@ -196,13 +198,13 @@ function mario_hunt_command(msg)
       cmd = marioHuntCommands[marioHuntAlias[usedCmd]]
     end
     if cmd ~= nil then
-      local func = cmd[2]
+      local func = cmd[1]
 
       if (not func(data)) then
-        djui_chat_message_create("Invalid parameters!")
+        djui_chat_message_create(trans("bad_param"))
       end
     else
-      djui_chat_message_create("Invalid command!")
+      djui_chat_message_create(trans("bad_command"))
       return true
     end
   end
@@ -219,7 +221,7 @@ function start_game_command(msg)
     end
   end
   if runners < 1 then
-    djui_chat_message_create("ERROR: No runners!")
+    djui_chat_message_create(trans("error_no_runners"))
     return true
   end
 
@@ -274,6 +276,7 @@ function do_game_start(data)
       save_file_erase_current_backup_save()
     end]]
     save_file_reload(1)
+    display_unlock_message(-1, 0)
   end
 end
 
@@ -465,7 +468,6 @@ function new_runner(includeLocal)
     if not includeLocal then
       local sMario = gPlayerSyncTable[0] -- just make them runner again
       local np = gNetworkPlayers[0]
-      become_runner(sMario)
       return np.globalIndex
     else
       return nil
@@ -483,7 +485,7 @@ function update()
 
   if (not didFirstJoinStuff) and gGlobalSyncTable.mhState ~= nil and gGlobalSyncTable.starRun ~= nil
   and gGlobalSyncTable.otherSave ~= nil and gGlobalSyncTable.runTime ~= nil and gGlobalSyncTable.ee ~= nil then
-    setup_hack_data(network_is_server())
+    setup_hack_data(network_is_server(), true)
     show_rules()
     print(get_time())
     math.randomseed(get_time())
@@ -517,7 +519,7 @@ function update()
         name = playerColor .. np.name,
       })
     end
-    if kills >= 10 then
+    if kills >= 50 then
       local np = gNetworkPlayers[0]
       local playerColor = network_get_player_text_color_string(0)
       network_send_include_self(false, {
@@ -624,8 +626,15 @@ end
 function camp_timer(sMario)
   local m = gMarioStates[0]
   local c = m.area.camera
-  if campTimer == nil and sMario.team == 1 and obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil then
-    campTimer = 300 -- 10 seconds
+  if sMario.team == 1 then
+    if m.freeze == true or (m.freeze ~= false and m.freeze > 0) and not is_game_paused() then
+      if campTimer == nil then
+        campTimer = 600 -- 20 seconds
+      end
+      m.invincTimer = 60 -- 2 seconds
+    elseif campTimer == nil and obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil then
+      campTimer = 300 -- 10 seconds
+    end
   end
   if campTimer ~= nil and not (sMario.pause or gGlobalSyncTable.pause) then
     campTimer = campTimer - 1
@@ -974,10 +983,10 @@ function change_team_command(msg)
   local name = remove_color(np.name)
   if sMario.team ~= 1 then
     become_runner(sMario)
-    djui_chat_message_create(name .. "'s team has been set to 'Runner'")
+    djui_chat_message_create(trans("set_team",name,trans("runner")))
   else
     become_hunter(sMario)
-    djui_chat_message_create(name .. "'s team has been set to 'Hunter'")
+    djui_chat_message_create(trans("set_team",name,trans("hunter")))
   end
   return true
 end
@@ -1001,12 +1010,12 @@ function set_life_command(msg)
   local sMario = gPlayerSyncTable[playerID]
   local name = remove_color(np.name)
   if gGlobalSyncTable.mhState == 0 then
-    djui_chat_message_create("Game hasn't been started yet")
+    djui_chat_message_create(trans("not_started"))
   elseif sMario.runnerLives ~= nil then
     sMario.runnerLives = lives
-    djui_chat_message_create(name.." now has "..lives.." lives")
+    djui_chat_message_create(trans_plural("set_lives",name,lives))
   else
-    djui_chat_message_create(name.." isn't a Runner")
+    djui_chat_message_create(trans("not_runner",name))
   end
   return true
 end
@@ -1018,18 +1027,13 @@ function allow_leave_command(msg)
   local sMario = gPlayerSyncTable[playerID]
   local name = remove_color(np.name)
   sMario.allowLeave = true
-  djui_chat_message_create(name.." may leave")
+  djui_chat_message_create(trans("may_leave",name))
   return true
 end
 
 function add_runner_command(msg)
   local runners = tonumber(msg)
-  if runners == nil then return false end
-  if runners ~= math.floor(runners) then return false end
-  if runners < 1 then
-    djui_chat_message_create("Can't add zero or negative runners")
-    return true
-  end
+  if runners == nil or runners ~= math.floor(runners) or runners < 1 then return false end
 
   -- get current hunters
   local currHunterIDs = {}
@@ -1047,7 +1051,7 @@ function add_runner_command(msg)
     end
   end
   if #currHunterIDs < (runners + 1) then
-    djui_chat_message_create("Not enough hunters to add that many")
+    djui_chat_message_create(trans("must_have_one"))
     return true
   elseif runners_available < runners then -- if everyone has been a runner before, ignore recent status
     print("Not enough recent runners! Ignoring recent status")
@@ -1065,7 +1069,7 @@ function add_runner_command(msg)
     table.remove(goodHunterIDs, selected)
   end
 
-  local text = "Added runners: "
+  local text = trans("added")
   for i=1,#runnerNames do
     text = text .. runnerNames[i] .. ", "
   end
@@ -1076,12 +1080,7 @@ end
 
 function randomize_command(msg)
   local runners = tonumber(msg)
-  if runners == nil then return false end
-  if runners ~= math.floor(runners) then return false end
-  if runners < 1 then
-    djui_chat_message_create("ERROR: Must have at least 1 runner")
-    return true
-  end
+  if runners == nil or runners ~= math.floor(runners) or runners < 1 then return false end
 
   local total_online = 0
   local max_online_id = 0
@@ -1103,7 +1102,7 @@ function randomize_command(msg)
     end
   end
   if runners >= total_online or runners >= MAX_PLAYERS then
-    djui_chat_message_create("ERROR: Maximum runners is currently "..(total_online-1))
+    djui_chat_message_create(trans("must_have_one"))
     return true
   end
   if runners > runners_available then -- if everyone has been a runner before, ignore recent status
@@ -1138,7 +1137,7 @@ function randomize_command(msg)
       become_hunter(sMario)
     end
   end
-  local text = "Runners are: "
+  local text = trans("runners_are")
   for i=1,#runnerNames do
     text = text .. runnerNames[i] .. ", "
   end
@@ -1165,7 +1164,7 @@ function runner_lives_command(msg)
   local num = tonumber(msg)
   if num ~= nil and num >= 0 and num <= 99 and math.floor(num) == num then
     gGlobalSyncTable.runnerLives = num
-    djui_chat_message_create("Runner lives set to "..num)
+    djui_chat_message_create(trans("set_lives_total",num))
     return true
   end
   return false
@@ -1173,13 +1172,13 @@ end
 
 function time_needed_command(msg)
   if gGlobalSyncTable.starMode then
-    djui_chat_message_create("Disable star mode first!")
+    djui_chat_message_create(trans("wrong_mode"))
     return true
   end
   local num = tonumber(msg)
   if num ~= nil then
     gGlobalSyncTable.runTime = math.floor(num * 30)
-    djui_chat_message_create("Runners can leave in "..num.." seconds now")
+    djui_chat_message_create(trans("need_time_feedback"))
     return true
   end
   return false
@@ -1187,13 +1186,13 @@ end
 
 function stars_needed_command(msg)
   if not gGlobalSyncTable.starMode then
-    djui_chat_message_create("Enable star mode first!")
+    djui_chat_message_create(trans("wrong_mode"))
     return true
   end
   local num = tonumber(msg)
   if num ~= nil and num > 0 and num < 8 then
     gGlobalSyncTable.runTime = num
-    djui_chat_message_create("Runners need "..num.." stars now")
+    djui_chat_message_create(trans("need_stars_feedback"))
     return true
   end
   return false
@@ -1204,9 +1203,9 @@ function star_count_command(msg)
   if num ~= nil and num >= -1 and num <= ROMHACK.max_stars and math.floor(num) == num then
     gGlobalSyncTable.starRun = num
     if num ~= -1 then
-      djui_chat_message_create("This is now a "..num.." star run")
+      djui_chat_message_create(trans("new_category",num))
     else
-      djui_chat_message_create("This is now an any% run")
+      djui_chat_message_create(trans("new_category_any"))
     end
     return true
   end
@@ -1216,11 +1215,11 @@ end
 function mode_command(msg)
   if string.lower(msg) == "normal" then
     gGlobalSyncTable.mhMode = 0
-    djui_chat_message_create("In Standard Mode")
+    djui_chat_message_create(trans("mode_normal"))
     return true
   elseif string.lower(msg) == "switch" then
     gGlobalSyncTable.mhMode = 1
-    djui_chat_message_create("In Switch Mode")
+    djui_chat_message_create(trans("mode_switch"))
     return true
   end
   return false
@@ -1230,25 +1229,25 @@ function star_mode_command(msg)
   if string.lower(msg) == "on" then
     gGlobalSyncTable.starMode = true
     gGlobalSyncTable.runTime = 2
-    djui_chat_message_create("Using stars collected")
+    djui_chat_message_create(trans("using_stars"))
     return true
   elseif string.lower(msg) == "off" then
     gGlobalSyncTable.starMode = false
     gGlobalSyncTable.runTime = 7200
-    djui_chat_message_create("Using timer")
+    djui_chat_message_create(trans("using_timer"))
     return true
   end
   return false
 end
 
-function spectate_command(msg)
+function allow_spectate_command(msg)
   if string.lower(msg) == "on" then
     gGlobalSyncTable.allowSpectate = true
-    djui_chat_message_create("Hunters can now spectate")
+    djui_chat_message_create(trans("can_spectate"))
     return true
   elseif string.lower(msg) == "off" then
     gGlobalSyncTable.allowSpectate = false
-    djui_chat_message_create("Hunters can no longer spectate")
+    djui_chat_message_create(trans("no_spectate"))
     return true
   end
   return false
@@ -1259,10 +1258,10 @@ function pause_command(msg)
   if msg == "all" then
     if gGlobalSyncTable.pause then
       gGlobalSyncTable.pause = false
-      djui_chat_message_create("All players unpaused")
+      djui_chat_message_create(trans("all_unpaused"))
     else
       gGlobalSyncTable.pause = true
-      djui_chat_message_create("All players paused")
+      djui_chat_message_create(trans("all_paused"))
     end
     return true
   end
@@ -1274,10 +1273,10 @@ function pause_command(msg)
   local name = remove_color(np.name)
   if sMario.pause then
     sMario.pause = false
-    djui_chat_message_create(name .. " has been unpaused")
+    djui_chat_message_create(trans("player_unpaused",name))
   else
     sMario.pause = true
-    djui_chat_message_create(name .. " has been paused")
+    djui_chat_message_create(trans("player_paused",name))
   end
   return true
 end
@@ -1286,12 +1285,12 @@ end
 function metal_command(msg)
   if string.lower(msg) == "on" then
       gGlobalSyncTable.metal = true
-      djui_chat_message_create("All hunters are metal")
+      djui_chat_message_create(trans("now_metal"))
       return true
   end
   if string.lower(msg) == "off" then
       gGlobalSyncTable.metal = false
-      djui_chat_message_create("All hunters are not metal")
+      djui_chat_message_create(trans("not_metal"))
       return true
   end
 end
@@ -1299,12 +1298,12 @@ end
 function weak_command(msg)
   if string.lower(msg) == "on" then
       gGlobalSyncTable.weak = true
-      djui_chat_message_create("All players have half invincibility frames")
+      djui_chat_message_create(trans("now_weak"))
       return true
   end
   if string.lower(msg) == "off" then
       gGlobalSyncTable.weak = false
-      djui_chat_message_create("All players have normal invincibility frames")
+      djui_chat_message_create(trans("not_weak"))
       return true
   end
 end
@@ -1366,11 +1365,9 @@ function mario_update(m)
     if desc_switch_timer > 30 then
       network_player_set_description(np, trans("runner"), 0, 255, 255, 255)
     else
-      if sMario.runnerLives ~= 1 then
-        network_player_set_description(np, trans("show_lives",sMario.runnerLives), 0, 255, 255, 255)
-      else
-        network_player_set_description(np, trans("show_lives_one"), 0, 255, 255, 255)
-      end
+      -- fix stupid desync bug
+      if sMario.runnerLives == nil then sMario.runnerLives = gGlobalSyncTable.runnerLives end
+      network_player_set_description(np, trans_plural("show_lives",sMario.runnerLives), 0, 255, 255, 255)
     end
   else
     network_player_set_description(np, trans("hunter"), 255, 92, 92, 255)
@@ -1397,7 +1394,7 @@ function mario_update(m)
     warp_beginning()
   end
 
-  -- not if game isn't started
+  -- if the game is inactive, disable the camp timer
   if gGlobalSyncTable.mhState ~= nil and (gGlobalSyncTable.mhState == 0 or gGlobalSyncTable.mhState >= 3) then campTimer = nil return end
 
   -- for all players: disable endless stairs if there's enough stars
@@ -1462,7 +1459,6 @@ end
 function runner_update(m,sMario)
   -- fix stupid desync bug
   if sMario.runnerLives == nil then sMario.runnerLives = gGlobalSyncTable.runnerLives end
-
   local np = gNetworkPlayers[m.playerIndex]
 
   -- detect victory
@@ -1542,7 +1538,7 @@ function runner_update(m,sMario)
       campTimer = 600 -- 20 seconds
     end
   end
-  if m.playerIndex == 0 and runner_camping[m.action] == nil and obj_get_first_with_behavior_id(id_bhvActSelector) == nil then
+  if m.playerIndex == 0 and runner_camping[m.action] == nil and obj_get_first_with_behavior_id(id_bhvActSelector) == nil and (m.freeze == false or (m.freeze ~= true and m.freeze < 1)) then
     campTimer = nil
   end
 
@@ -1561,14 +1557,14 @@ function runner_update(m,sMario)
   -- add stars
   if m.prevNumStarsForDialog < m.numStars then
     m.prevNumStarsForDialog = m.numStars -- this also disables some dialogue, which helps with the fast pace
-      if m.playerIndex == 0 and gotStar ~= nil then
+    if m.playerIndex == 0 and gotStar ~= nil then
       if gGlobalSyncTable.starMode then
         sMario.runTime = sMario.runTime + 1 -- 1 star
       else
         sMario.runTime = sMario.runTime + 1800 -- 1 minute
       end
       -- send message
-      network_send_include_self(false, {
+      network_send(false, {
         id = PACKET_RUNNER_STAR,
         runnerID = np.globalIndex,
         star = true,
@@ -1637,12 +1633,15 @@ function hunter_update(m,sMario)
 end
 
 function on_allow_interact(m, o, type)
-    -- disable during game start or end
-    if gGlobalSyncTable.mhState ~= nil and (gGlobalSyncTable.mhState == 0 or gGlobalSyncTable.mhState >= 3) then return false end
-
     local sMario = gPlayerSyncTable[m.playerIndex]
     -- disable for spectators
     if sMario.spectator == 1 then return false end
+
+    -- disable stars and warps during game start or end
+    if (type == INTERACT_WARP or type == INTERACT_STAR_OR_KEY or type == INTERACT_WARP_DOOR)
+    and gGlobalSyncTable.mhState ~= nil and (gGlobalSyncTable.mhState == 0 or gGlobalSyncTable.mhState >= 3) then
+      return false
+    end
 
     -- prevent hunters from interacting with certain things that help or softlock the runner
     local banned_hunter = {
@@ -1662,30 +1661,35 @@ function on_allow_interact(m, o, type)
     elseif type == INTERACT_STAR_OR_KEY or banned_hunter[obj_id] ~= nil then
       if sMario.team ~= 1 then
         return false
-      elseif m.playerIndex ~= 0 then
-        return true -- ignore if not local player
-      elseif obj_id == id_bhvBowserKey then -- is a key
-        sMario.allowLeave = true
-        local np = gNetworkPlayers[m.playerIndex]
-        if np.currLevelNum == LEVEL_BOWSER_1 then
-          if ((save_file_get_flags() & SAVE_FLAG_HAVE_KEY_1) ~= 0 or (save_file_get_flags() & SAVE_FLAG_UNLOCKED_BASEMENT_DOOR) ~= 0) then
-            return true
-          end
-        elseif np.currLevelNum == LEVEL_BOWSER_2 then
-          if ((save_file_get_flags() & SAVE_FLAG_HAVE_KEY_2) ~= 0 or (save_file_get_flags() & SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR) ~= 0) then
-            return true
-          end
+      else
+        if type == INTERACT_STAR_OR_KEY and gGlobalSyncTable.omm and gServerSettings.stayInLevelAfterStar == 1 then
+          m.invincTimer = 240 -- this is actually 4 seconds since weak is usually on
         end
+        if m.playerIndex ~= 0 then
+          return true -- ignore if not local player
+        elseif obj_id == id_bhvBowserKey then -- is a key
+          sMario.allowLeave = true
+          local np = gNetworkPlayers[m.playerIndex]
+          if np.currLevelNum == LEVEL_BOWSER_1 then
+            if ((save_file_get_flags() & SAVE_FLAG_HAVE_KEY_1) ~= 0 or (save_file_get_flags() & SAVE_FLAG_UNLOCKED_BASEMENT_DOOR) ~= 0) then
+              return true
+            end
+          elseif np.currLevelNum == LEVEL_BOWSER_2 then
+            if ((save_file_get_flags() & SAVE_FLAG_HAVE_KEY_2) ~= 0 or (save_file_get_flags() & SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR) ~= 0) then
+              return true
+            end
+          end
 
-        -- send message
-        network_send_include_self(false, {
-          id = PACKET_RUNNER_STAR,
-          runnerID = np.globalIndex,
-          star = false,
-          place = get_level_name(np.currCourseNum, np.currLevelNum, np.currAreaIndex),
-        })
-      elseif obj_id ~= id_bhvGrandStar then -- this isn't a star, really
-        gotStar = (o.oBehParams >> 24) + 1 -- set what star we got
+          -- send message
+          network_send_include_self(false, {
+            id = PACKET_RUNNER_STAR,
+            runnerID = np.globalIndex,
+            star = false,
+            place = get_level_name(np.currCourseNum, np.currLevelNum, np.currAreaIndex),
+          })
+        elseif obj_id ~= id_bhvGrandStar then -- this isn't a star, really
+          gotStar = (o.oBehParams >> 24) + 1 -- set what star we got
+        end
       end
       return true
     end
@@ -1740,10 +1744,6 @@ end
 
 function rom_hack_command(msg)
   gGlobalSyncTable.romhackName = msg
-  local result = setup_hack_data(true)
-  if result == "vanilla" then
-    djui_popup_create("Using vanilla game",2)
-  end
   return true
 end
 
@@ -1842,7 +1842,9 @@ function on_packet_runner_star(data)
     local np = network_player_from_global_index(runnerID)
     local playerColor = network_get_player_text_color_string(np.localIndex)
     if data.star == true then
-      djui_popup_create(trans("got_star",(playerColor .. np.name)) .. "\\#ffffff\\\n" .. data.place .. "\n" .. data.name, 2)
+      if not (gGlobalSyncTable.omm and gServerSettings.stayInLevelAfterStar == 1) then -- OMM shows its own progress, so don't show this
+        djui_popup_create(trans("got_star",(playerColor .. np.name)) .. "\\#ffffff\\\n" .. data.place .. "\n" .. data.name, 2)
+      end
     elseif np.currLevelNum ~= LEVEL_BOWSER_3 then
       djui_popup_create(trans("got_key",(playerColor .. np.name)) .. "\\#ffffff\\\n" .. data.place, 2)
     end
@@ -1905,7 +1907,7 @@ function on_packet_kill(data)
   if newRunnerID ~= nil then
     local np = network_player_from_global_index(newRunnerID)
     local playerColor = network_get_player_text_color_string(np.localIndex)
-    local sMario = gPlayerSyncTable[0]
+    local sMario = gPlayerSyncTable[np.localIndex]
     become_runner(sMario)
     sMario.runTime = data.time or 0
     djui_popup_create(trans("now_runner",(playerColor .. np.name)), 2)
@@ -1934,11 +1936,7 @@ function on_game_end(data)
 end
 
 function on_packet_stats(data)
-  if data.value ~= 1 then
-    djui_chat_message_create(trans(data.stat,data.name,data.value))
-  else
-    djui_chat_message_create(trans(data.stat.."_one",data.name))
-  end
+  djui_chat_message_create(trans_plural(data.stat,data.name,data.value))
 end
 
 function on_packet_kill_combo(data)
@@ -1976,45 +1974,57 @@ function on_packet_receive(dataTable)
     end
 end
 
+-- to update rom hack
+function on_rom_hack_changed(tag, oldVal, newVal)
+    if oldVal ~= nil and oldVal ~= newVal then
+      print("Hack set to "..newVal)
+      local result = setup_hack_data()
+      if result == "vanilla" then
+        djui_popup_create(trans("vanilla"),2)
+      end
+    end
+end
+
+
 -- main command
 hook_chat_command("mh", "[COMMAND] - Commands for MarioHunt; type nothing to list; host or moderator only", mario_hunt_command)
 function setup_commands()
   -- commands for main command
   marioHuntCommands = {}
   marioHuntAlias = {} -- these can also mean the same command
-  marioHuntCommands.start = {"[CONTINUE|MAIN|ALT] - Starts the game; add \"continue\" to not warp to start; add \"alt\" for alt save file (buggy); add \"main\" for main save file", start_game_command}
-  marioHuntCommands.add = {"[INT] - Adds the specified amount of runners at random", add_runner_command}
+  marioHuntCommands.start = {start_game_command}
+  marioHuntCommands.add = {add_runner_command}
     marioHuntAlias.addrunner = "add"
-  marioHuntCommands.random = {"[INT] - Picks the specified amount of runners at random", randomize_command}
+  marioHuntCommands.random = {randomize_command}
     marioHuntAlias.randomize = "random"
-  marioHuntCommands.lives = {"[INT] - Sets the amount of lives Runners have, from 0 to 99 (note: 0 lives is still 1 life)", runner_lives_command}
+  marioHuntCommands.lives = {runner_lives_command}
     marioHuntAlias.runnerlives = "lives"
-  marioHuntCommands.time = {"[NUM] - Sets the maximum amount of time Runners have to wait to leave, in seconds", time_needed_command}
+  marioHuntCommands.time = {time_needed_command}
     marioHuntAlias.timeneeded = "time"
-  marioHuntCommands.stars = {"[INT] - Sets the maximum amount of stars Runners must collect to leave, from 1 to 7 (only in star mode)", stars_needed_command}
+  marioHuntCommands.stars = {stars_needed_command}
     marioHuntAlias.starsneeded = "stars"
-  marioHuntCommands.category = {"[INT] - Sets the amount of stars Runners must have to face Bowser. Set to -1 for any%.", star_count_command}
+  marioHuntCommands.category = {star_count_command}
     marioHuntAlias.starrun = "category"
-  marioHuntCommands.flip = {"[NAME|ID] - Flips the team of the specified player, or your own if none entered", change_team_command}
+  marioHuntCommands.flip = {change_team_command}
     marioHuntAlias.changeteam = "flip"
-  marioHuntCommands.setlife = {"[NAME|ID|INT,INT] - Sets the specified lives for the specified runner, or yourself if not specified", set_life_command}
-  marioHuntCommands.leave = {"[NAME|ID] - Allows the specified player, or yourself if none entered, to leave the level if they are a runner", allow_leave_command}
+  marioHuntCommands.setlife = {set_life_command}
+  marioHuntCommands.leave = {allow_leave_command}
     marioHuntAlias.allowleave = "leave"
-  marioHuntCommands.mode = {"[NORMAL|SWITCH] - Changes game mode; switch switches runners when one dies", mode_command}
-  marioHuntCommands.starmode = {"[ON|OFF] - Toggles using stars collected instead of time", star_mode_command}
-  marioHuntCommands.spectator = {"[ON|OFF] - Toggles Hunters' ability to spectate", spectate_command}
-  marioHuntCommands.pause = {"[NAME|ID|ALL] - Toggles pause status for specified players, self if not specified, or all", pause_command}
-  marioHuntCommands.metal = {"[ON|OFF] - Toggles making hunters appear as if they have the metal cap; this does not make them invincible", metal_command}
-  marioHuntCommands.hack = {"[STRING] - Sets current rom hack", rom_hack_command}
-  marioHuntCommands.weak = {"[ON|OFF] - Cuts invincibility frames in half for all players", weak_command}
+  marioHuntCommands.mode = {mode_command}
+  marioHuntCommands.starmode = {star_mode_command}
+  marioHuntCommands.spectator = {allow_spectate_command}
+  marioHuntCommands.pause = {pause_command}
+  marioHuntCommands.metal = {metal_command}
+  marioHuntCommands.hack = {rom_hack_command}
+  marioHuntCommands.weak = {weak_command}
 
   -- debug
-  marioHuntCommands.print = {"[STRING] - Outputs message to console", print, true}
-  marioHuntCommands.warp = {"[INT,INT,INT,INT] - warp to level", do_warp, true}
-  marioHuntCommands.radar = {"[ON|OFF] - Sets radar debug", radar_debug, true}
-  marioHuntCommands.quick = {"- Quick game testing", quick_debug, true}
-  marioHuntCommands.combo = {"[NUM] - Test combo message", combo_debug, true}
-  marioHuntCommands.discord = {" - Get all discord ids", get_discord_ids,true}
+  marioHuntCommands.print = {print, true}
+  marioHuntCommands.warp = {do_warp, true}
+  marioHuntCommands.radar = {radar_debug, true}
+  marioHuntCommands.quick = {quick_debug, true}
+  marioHuntCommands.combo = {combo_debug, true}
+  marioHuntCommands.discord = {get_discord_ids,true}
 end
 
 -- hooks
@@ -2030,3 +2040,4 @@ hook_event(HOOK_ON_DEATH, on_death)
 hook_event(HOOK_ALLOW_INTERACT, on_allow_interact)
 hook_event(HOOK_ON_INTERACT, on_interact)
 hook_event(HOOK_ON_OBJECT_UNLOAD, on_object_unload)
+hook_on_sync_table_change(gGlobalSyncTable, "romhackName", "change_hack", on_rom_hack_changed)

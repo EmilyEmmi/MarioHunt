@@ -1,10 +1,11 @@
 --[[
 Hello! For those who are looking to translate:
 - PLEASE PLEASE PLEASE have more than a basic understanding of whatever language you're translating
-- Scroll down and copy one of the language tables (English and Brazillian Portuguese have more helpful comments)
-- Translate all of the things. Make sure you don't miss anything!
+- Scroll down and copy one of the language tables (I would copy English, as it's always complete)
+- Translate all of the things. Make sure you don't miss anything, unless stated.
 - Send the table (don't need the whole file) to me in some text style format
 - Let me know who worked on it so I can provide proper credit
+- Also note that I may ask for more translations in the future
 ]]
 
 -- this is the translate command, it supports up to two blanks
@@ -22,6 +23,15 @@ function trans(id,format,format2_)
     translation = string.format(translation,format,format2)
   end
   return translation
+end
+-- this is for scenarios where a word needs to be plural or not plural (usually "life/lives")
+function trans_plural(id,format,format2_)
+  local num = tonumber(format2_) or 0
+  if num ~= 1 or id == nil then
+    return trans(id,format,format2_)
+  else
+    return trans(id.."_one",format,format2_)
+  end
 end
 
 langdata = {}
@@ -116,10 +126,50 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   kill_combo_4 = "%s\\#ffa0a0\\ got a \\#ffff5a\\quadruple\\#ffa0a0\\ kill!",
   kill_combo_5 = "%s\\#ffa0a0\\ got a \\#ffff5a\\quintuple\\#ffa0a0\\ kill!",
   kill_combo_large = "\\#ffa0a0\\Wow! %s\\#ffa0a0\\ got \\#ffff5a\\%d\\#ffa0a0\\ kills in a row!",
+  set_hack = "Hack set to %s",
+  incompatible_hack = "WARNING: Hack does not have compatibility!",
+  vanilla = "Using vanilla game",
+  omm_detected = "OMM Rebirth detected!",
+  nametag_restore = "Do \"/nametag-distance 7000\" to restore nametags.",
 
   -- command feedback
+  not_mod = "You don't have the AUTHORITY to run this command, you fool!",
   no_such_player = "No such player exists",
   bad_id = "Invalid player ID!",
+
+  -- more command feedback (only host or mod will see these, so it's not as critical)
+  bad_param = "Invalid parameters!",
+  bad_command = "Invalid command!",
+  error_no_runners = "Can't start game with 0 runners!",
+  set_team = "%s's team has been set to '%s'", -- First %s is player name, second is team name
+  not_started = "Game hasn't been started yet",
+  set_lives_one = "%s now has 1 life",
+  set_lives = "%s now has %d lives",
+  not_runner = "%s isn't a Runner",
+  may_leave = "%s may leave",
+  must_have_one = "Must have at least 1 hunter",
+  added = "Added runners: ", -- list comes afterward
+  runners_are = "Runners are: ",
+  set_lives_total = "Runner lives set to %d",
+  wrong_mode = "Not available in this mode",
+  need_time_feedback = "Runners can leave in %d second(s) now",
+  need_stars_feedback = "Runners need %d stars now",
+  new_category = "This is now a %d star run",
+  new_category_any = "This is now an any% run",
+  mode_normal = "In Normal mode",
+  mode_switch = "In Switch mode",
+  using_stars = "Using stars collected",
+  using_timer = "Using timer",
+  can_spectate = "Hunters can now spectate",
+  no_spectate = "Hunters can no longer spectate",
+  all_paused = "All players paused",
+  all_unpaused = "All players unpaused",
+  player_paused = "%s has been paused",
+  player_unpaused = "%s has been unpaused",
+  now_metal = "All hunters are metal",
+  not_metal = "All hunters are not metal",
+  now_weak = "All players have half invincibility frames",
+  not_weak = "All players have normal invincibility frames",
 
   -- team chat
   tc_on = "Team chat is \\#5cff5c\\ON!",
@@ -153,6 +203,33 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   stat_wins = "Wins:",
   stat_kills = "Kills:",
   stat_combo = "Max Kill Streak:",
+
+  -- command descriptions (only host or mod will see these, so it's not as critical)
+  start_desc = "[CONTINUE|MAIN|ALT] - Starts the game; add \"continue\" to not warp to start; add \"alt\" for alt save file (buggy); add \"main\" for main save file",
+  add_desc = "[INT] - Adds the specified amount of runners at random",
+  random_desc = "[INT] - Picks the specified amount of runners at random",
+  lives_desc = "[INT] - Sets the amount of lives Runners have, from 0 to 99 (note: 0 lives is still 1 life)",
+  time_desc = "[NUM] - Sets the maximum amount of time Runners have to wait to leave, in seconds",
+  stars_desc = "[INT] - Sets the maximum amount of stars Runners must collect to leave, from 1 to 7 (only in star mode)",
+  category_desc = "[INT] - Sets the amount of stars Runners must have to face Bowser. Set to -1 for any%.",
+  flip_desc = "[NAME|ID] - Flips the team of the specified player, or your own if none entered",
+  setlife_desc = "[NAME|ID|INT,INT] - Sets the specified lives for the specified runner, or yourself if not specified",
+  leave_desc = "[NAME|ID] - Allows the specified player, or yourself if none entered, to leave the level if they are a runner",
+  mode_desc = "[NORMAL|SWITCH] - Changes game mode; switch switches runners when one dies",
+  starmode_desc = "[ON|OFF] - Toggles using stars collected instead of time",
+  spectator_desc = "[ON|OFF] - Toggles Hunters' ability to spectate",
+  pause_desc = "[NAME|ID|ALL] - Toggles pause status for specified players, self if not specified, or all",
+  metal_desc = "[ON|OFF] - Toggles making hunters appear as if they have the metal cap; this does not make them invincible",
+  hack_desc = "[STRING] - Sets current rom hack",
+  weak_desc = "[ON|OFF] - Cuts invincibility frames in half for all players",
+
+  -- These commands only appear to me, so I wouldn't bother translating them. You can delete these lines and everything should still work.
+  print_desc = "[STRING] - Outputs message to console",
+  warp_desc = "[INT,INT,INT,INT] - warp to level",
+  radar_desc = "[ON|OFF] - Sets radar debug",
+  quick_desc = "- Quick game testing",
+  combo_desc = "[NUM] - Test combo message",
+  discord_desc = " - Get all discord ids",
 }
 
 langdata["es"] = -- massively improved by KanHeaven and SonicDark
@@ -498,6 +575,133 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   stat_wins = "Vitórias:",
   stat_kills = "Já Matou:",
   stat_combo = "Combo Máx. de Assassinatos:",
+}
+
+langdata["fr"] = -- By Skeletan
+{
+  -- fullname for auto select (make sure this matches in-game under Misc -> Languages)
+  fullname = "French",
+
+  -- global command info
+  to_switch = "Faites \"/lang %s\" pour changer de langue",
+  switched = "La langue a été changée en français!", -- Replace "English" with the name of this language
+  rule_command = "Faites /rules pour faire apparaître ce message de nouveau",
+
+  -- roles
+  runner = "Coureur",
+  runners = "Coureurs",
+  short_runner = "Cours", -- unused
+  hunters = "Chasseurs",
+  hunter = "Chasseur",
+  spectator = "Spectateur",
+
+  -- rules
+  --[[
+    This is laid out as follows:
+    {welcome}
+    {runners}{shown_above|thats_you}{any_bowser|collect_bowser}
+    {hunters}{thats_you}{all_runners|any_runners}
+    {single_life|multi_life}{time_needed|stars_needed}{become_hunter|switch_runner}
+    {infinite_lives}{spectate}
+    {banned_glitchless|banned_general}{fun}
+
+    I highly recommend testing this in-game
+    Also:
+    \\#ffffff\\ = white (default)
+    \\#00ffff\\ = cyan (for Runner team name)
+    \\#ff5c5c\\ = red (for Hunter team name and popups)
+    \\#ffff5a\\ = yellow
+    \\#5aff5a\\ = green
+  ]]
+  welcome = "Bienvenue dans \\#ffff5a\\Mariohunt\\#ffffff\\! COMMENT JOUER:",
+  all_runners = ": Éliminez tous les \\#00ffff\\Coureurs\\#ffffff\\.",
+  any_runners = ": Éliminez n'importe quel \\#00ffff\\Coureur\\#ffffff\\.",
+  shown_above = " (montré çi-dessus)",
+  any_bowser = ": Battez Bowser par tous les moyens nécessaires.",
+  collect_bowser = ": Collectez %d étoile(s) et battez Bowser.",
+  thats_you = " (c'est vous!)",
+  banned_glitchless = "INTERDICTION DE: Faire des Alliances, faire des BLJs, passer à travers les murs, freiner l'avancée du jeu, camper.",
+  banned_general = "INTERDICTION DE: Faire des Alliances, freiner l'avancée du jeu, camper.",
+  single_life = "\n\\#00ffff\\Coureurs\\#ffffff\\: 1 vie; ",
+  multi_life = "\n\\#00ffff\\Coureurs\\#ffffff\\: %d vies; ",
+  time_needed = "%d:%02d pour sortir de n'importe quel niveau; collectez des étoiles pour réduire le compte à rebours; ",
+  stars_needed = "%d étoile(s) pour sortir de n'importe quel niveau;\n",
+  become_hunter = "Devenez     \\#ff5c5c\\Chasseurs\\#ffffff\\ une fois vaincu.",
+  switch_runner = "Un \\#ff5c5c\\Chasseur\\#ffffff\\ aléatoire deviens \\#00ffff\\Runner\\#ffffff\\ une fois vaincu.",
+  infinite_lives = "\\#ff5c5c\\Chasseurs\\#ffffff\\: Vies Illimités",
+  spectate = "; faites \"/spectate\" pour devenir spectateur",
+  fun = " Amusez-vous bien!",
+
+  -- hud text (%s is a placeholder for names, and %d is a placeholder for a number)
+  win = "%s\\#ffffff\\ ont gagné!", -- team name is placed here
+  can_leave = "\\#5aff5a\\Peut sortir du niveau",
+  time_left = "Peut sortir dans \\#ffff5a\\%d:%02d",
+  stars_left = "\\#ffff5a\\%d étoile(s)\\#ffffff\\ nécessaires pour sortir",
+  in_castle = "Dans le château",
+  until_hunters = "%d seconde(s) avant que les \\#ff5c5c\\Chasseurs\\#ffffff\\ commencent",
+  until_runners = "%d seconde(s) avant que les \\#00ffff\\Coureurs\\#ffffff\\ commencent",
+  show_lives_one = "1 vie",
+  show_lives = "%d vies",
+  no_runners = "Pas de \\#00ffff\\Coureurs!",
+  camp_timer = "Restez en mouvement! \\#ff5c5c\\(%d)",
+
+  -- popups
+  lost_life = "%s\\#ffa0a0\\ a perdu une vie!",
+  lost_all = "%s\\#ffa0a0\\ a perdu toute ses vies!",
+  now_runner = "%s\\#ffa0a0\\ est désormais un \\#00ffff\\Coureur\\#ffa0a0\\.",
+  got_star = "%s\\#ffa0a0\\ a obtenu une étoile!",
+  got_key = "%s\\#ffa0a0\\ a obtenu une clé!",
+  rejoin_start = "%s\\#ffa0a0\\ a 2 minutes pour se reconnecter.",
+  rejoin_success = "%s\\#ffa0a0\\ est revenu à temps!",
+  rejoin_fail = "%s\\#ffa0a0\\ n'est plus un \\#00ffff\\Coureur\\#ffa0a0\\.",
+  using_ee = "Ceci utilise le mode extrême uniquement.",
+  not_using_ee = "Ceci utilise le mode standard uniquement.",
+  killed = "%s\\#ffa0a0\\ a tué %s!",
+  sidelined = "%s\\#ffa0a0\\ a vaincu %s!",
+  paused = "Vous avez été mis en pause.",
+  unpaused = "Vous n'êtes plus en pause.",
+  kill_combo_2 = "%s\\#ffa0a0\\ a tué \\#ffff5a\\deux\\#ffa0a0\\ personnes à la suite!",
+  kill_combo_3 = "%s\\#ffa0a0\\ a tué \\#ffff5a\\trois\\#ffa0a0\\ personnes à la suite!",
+  kill_combo_4 = "%s\\#ffa0a0\\ a tué \\#ffff5a\\quatre\\#ffa0a0\\ personnes à la suite!",
+  kill_combo_5 = "%s\\#ffa0a0\\ a tué \\#ffff5a\\cinq\\#ffa0a0\\ personnes à la suite!",
+  kill_combo_large = "\\#ffa0a0\\Wow! %s\\#ffa0a0\\ a tué \\#ffff5a\\%d\\#ffa0a0\\ personnes à la suite!",
+
+  -- command feedback
+  no_such_player = "Ce joueur n'existe pas",
+  bad_id = "ID de joueur invalide!",
+
+  -- team chat
+  tc_on = "Le tchat d'équipe est \\#5cff5c\\ACTIVÉ!",
+  tc_off = "Le tchat d'équipe est \\#ff5c5c\\DÉSACTIVÉ!",
+  to_team = "\\#8a8a8a\\Pour ton équipe: ",
+  from_team = "\\#8a8a8a\\ (équipe): ",
+
+  -- spectator
+  hunters_only = "Seuls les chasseurs peuvent être spectateurs!",
+  spectate_disabled = "Le mode spectateur est désactivé!",
+  timer_going = "Vous ne pouvez pas être spectateur durant le compte à rebours!",
+  spectate_self = "Vous ne pouvez être votre propre spectateur!",
+  spectator_controls = "Contrôles:"..
+  "\nDPAD-UP: Désactiver le HUD"..
+  "\nDPAD-DOWN: Alterner Caméra Libre/Suivre Joueur"..
+  "\nDPAD-LEFT / DPAD-RIGHT: Changer de joueur"..
+  "\nJOYSTICK: Se déplacer"..
+  "\nA: Aller vers le haut"..
+  "\nZ: Aller vers le bas"..
+  "\nFaites \"/spectate OFF\" pour annuler",
+  spectate_off = "Vous n'êtes plus en mode spectateur.",
+  empty = "Vide (%d )",
+  free_camera = "CAMÉRA LIBRE",
+
+  -- stats
+  disp_wins_one = "%s\\#ffffff\\ a gagné 1 fois en tant que \\#00ffff\\Coureur\\#ffffff\\!",
+  disp_wins = "%s\\#ffffff\\ a gagné %d fois en tant que \\#00ffff\\Coureur\\#ffffff\\!",
+  disp_kills_one = "%s\\#ffffff\\ a tué 1 joueur!", -- unused
+  disp_kills = "%s\\#ffffff\\ a tué %d joueurs!",
+  -- for stats table
+  stat_wins = "Victoires:",
+  stat_kills = "Kills:",
+  stat_combo = "Record de Kills:",
 }
 
 -- language data ends here
