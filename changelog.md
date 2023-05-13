@@ -1,4 +1,24 @@
 # Changelog
+## v1.8
+### Additions:
+  - French Translation by Skeletan
+  - Added new text for many bosses, sings, and NPCs (not translated atm)
+    - These signs have useful tips for both teams
+### Adjustments:
+  - Players can now interact with trees, signs, etc. while the game is not active
+  - In OMM Rebirth, Runners have invulnerability frames when grabbing a star in Odyssey mode
+  - A player's kill count will be displayed if they have over 50 when they join instead of 10
+### Fixes/Backend changes:
+  - Camp Timer now runs during all text properly
+  - Runners have invulnerability frames during all text
+  - /mh spectator now works properly
+  - Added a notice that I may ask for more translations from translators
+  - Runner Switch mode no longer makes everyone Runner when one dies
+  - Command feedback now uses language data
+    - Note that only English is translated for these at this time
+  - Changing the rom hack mid-game properly updates for all players
+  - In OMM Rebirth, the star message does not appear twice in Odyssey mode
+  - Fixed null lives bug in the lobby
 ## v1.71
 ### Adjustments:
   - New Spanish Translation by KanHeaven and SonicDark
