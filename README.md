@@ -29,7 +29,7 @@ German Translation made by **N64 Mario**
 
 Brazillian Portuguese Translation made by **PietroM**
 
-French translation made by **Skeletan**
+French translation made by **Skeltan**
 
 If you would like to make changes or submit your own translation, check lang.lua for details
 <br/>
