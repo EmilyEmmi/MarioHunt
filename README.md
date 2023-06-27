@@ -24,9 +24,9 @@ Some additional programming by **TroopaParaKoopa**
 
 Automatic Doors and Disable Star Spawn Cutscenes by **Blocky** and **Sunk**
 
-Spectator mod by Sprinter05
+Spectator mod by **Sprinter05**
 
-Mute mod created by Beard
+Mute mod created by **Beard**
 <br/>
 <br/>
 <br/>
