@@ -750,7 +750,7 @@ function update()
         localSpeedrunTimer = localSpeedrunTimer + 1
       end
     end
-    if localMHTimer == 0 then
+    if localMHTimer == 0 and network_is_server() then
       localMHTimer = -1
       gGlobalSyncTable.mhTimer = -1
       if gGlobalSyncTable.mhState == 1 then
