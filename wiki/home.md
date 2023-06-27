@@ -26,6 +26,8 @@
 ## For Modders/Translators
 [MarioHunt API](api.md)
 
+[Rom Hack Compatibility](romhack.md)
+
 [Contributing with Code](modding.md)
 
 [Contributing a Language](lang.md)
