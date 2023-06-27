@@ -12,7 +12,7 @@ function remove_timestop()
     end
 
     local sMario = gPlayerSyncTable[0]
-    if (c.cutscene == CUTSCENE_STAR_SPAWN) or (c.cutscene == CUTSCENE_RED_COIN_STAR_SPAWN) or (c.cutscene == CUTSCENE_ENTER_BOWSER_ARENA) or (c.cutscene == CUTSCENE_GRAND_STAR) then
+    if (gGlobalSyncTable.ee ~= true or gNetworkPlayers[0].currLevelNum ~= LEVEL_SA) and ((c.cutscene == CUTSCENE_STAR_SPAWN) or (c.cutscene == CUTSCENE_RED_COIN_STAR_SPAWN) or (c.cutscene == CUTSCENE_ENTER_BOWSER_ARENA) or (c.cutscene == CUTSCENE_GRAND_STAR)) then
         print("disabled cutscene")
         disable_time_stop_including_mario()
         m.freeze = 0

@@ -1,4 +1,99 @@
 # Changelog
+## v2.0
+### Additions:
+  - **Added MiniHunt!** A new gamemode for bite-sized gameplay.
+    - Added /mh auto, for starting games of MiniHunt automatically
+    - Added /skip to skip stars in MiniHunt
+  - Readded /mh start reset, though be warned: it is quite buggy
+  - Added more new text
+  - Added a speedrun timer for Standard modes; toggle with /timer
+  - Added /mh forcespectate, allowing for players to make private games that others can spectate
+  - Added support for the following rom hacks:
+    - Super Mario 64 Sapphire
+    - Ztar Attack 2
+      - Added /stalk, exclusive to this rom hack as of now
+    - SM64: The Green Stars
+  - Added a [wiki](wiki/home.md) (wip)
+  - **Added the MarioHunt API!** Now you can make your own rom hacks compatible, make add-on mods, or make your own mods compatible. Check the [wiki](wiki/home.md) for more info.
+    - The files test_mh_api.lua and mhSetup.lua are meant to be examples.
+    - mute.lua is Beard's mute mod made compatible with MarioHunt.
+  - Added /mh desync to fix desync issues
+  - Added /mh stop to quickly end games
+  - Your last used settings are now automatically saved
+    - Use /mh default to reset
+  - Added two new spectate modes: A more zoomed in mode, and FIRST PERSON (may cause motion sickness)
+  - Added more alias for some commands
+  - Added a new menu for stats, accessible with /stats
+    - Two new stats: Hard Mode wins and placement in the 64 Tour Competition (Top 10 only)
+  - Added **Hard Mode** for Runners
+  - All supported rom hacks have new names for Secret Stars! (intentionally different from Progress Pop-Ups, which is not compatible with MarioHunt)
+  - Added a Star Radar to track down stars (and star boxes!)
+  - Top 10 players in the 64 Tour Competition have their placement displayed next to their name whenever they chat.
+    - The first place player, Bombs-_-, has a rainbow radar when they are Runner.
+  - Almost all command descriptions and feedback have been translated into Spanish (thanks KanHeaven)
+  - Added punishment for camping using warps
+  - Added some level settings to improve experience, such as Visible Secrets, Cap Timer, Blue Coin Switch Respawn, etc.
+  - **1Ups now heal players**
+    - In vanilla, Recovery Hearts are replaced with 1Ups
+  - Added /spectate runner to... spectate runners
+  - Specator mode now shows the health of the player
+  - Players who ask questions about how to play or why they can't collect stars are prompted to read the rules
+    - Spanish and English only (Spanish does not have a "can't collect stars" check)
+  - Spanish speakers who ask if this is an English server will be prompted to change languages
+  - TroopaParaKoopa and I are now displayed as Devs when chatting
+  - The "game state reset" timer is now displayed in the top left
+### Adjustments:
+  - Red Coins now once again heal Runners
+  - Adjusted some sign text (also fixed bad margins)
+  - Changed switch mode description to correctly reflect changes to how Runner selection works
+  - MarioHunt will always display first in the mods list (necessary for the API to work)
+    - A warning message will be displayed if this mod is installed in the base directory (breaks API)
+  - The size of all pop-ups, excluding star messages, has been reduced
+  - The name of the mod is now displayed with Mario being blue and Hunt being red
+  - The kill combo is now displayed as it builds rather than after the combo ends
+  - A message is displayed for all players when a player's role is changed via /mh flip, /mh random, or /mh add
+  - Runners can be damaged while wearing the Metal Cap
+  - Players wearing the Metal Cap now sparkle (like in OMM Rebirth)
+  - Messages for defeating Boos, collecting Stars, or entering levels are now automatically skipped in vanilla
+  - **Collecting a Star no longer heals the player when using OMM Rebirth**
+  - Runners no longer have more invulnerability frames when on the **surface** of water
+  - Entering a level early now warps back to the start as opposed to out of the level
+  - Changed the way /mh pause works
+  - The spectator mode camera is smoother
+  - Empty player slots are skipped in spectator mode
+  - The specator player list now loops
+  - Attacked status is only reset when grounded; as such, kicking players off cliffs will now always count as your kill
+  - The camp timer will no longer revoke runner status unless the player is in the star menu; instead, it will activate text boxes/fire cannons automatically
+  - Slightly changed victory conditions for Star Road and Super Mario 74
+  - Runners cannot read signs while invulnerable
+  - Collecting stars now keeps players mid-air
+  - Spectators can no longer be made Runners in Switch mode or by /mh random and /mh add
+  - Changed the sound effects used for Runners or Hunters winning
+  - The coin counter no longer lowers when dying in OMM Rebirth
+  - Now using Releases for the mod download
+  - probably some other things I'm forgetting
+### Fixes/Backend changes
+  - Nametags is no longer disabled by default
+  - Kills with Cappy are now properly detected
+  - Performance improvements (maybe)
+  - Fixed issue where collecting red coins with Cappy as Hunter would cause desync... by allowing Hunters to collect red coins when OMM is enabled
+  - Fixed issue where rom hacks/omm would sometimes not be detected
+  - Added /mh langtest for translators
+  - Spectators are now able to spectate players in the DDD and WDW sub areas
+  - The "got a key" message should appear again
+  - Fixed many issues with the Star Timer
+  - The Metal Hunters setting now properly displays the Vanish Cap and Teleportion effects
+  - Spectators are no longer affected by level restrictions (so they can spectate desynced players)
+  - Fixed issues relating to spectators interacting with water
+  - The list of languages by /lang is now alphabetical as opposed to random
+  - Fixed Runners with 1 life displaying as "1 lives"
+  - Runners no longer lose more health when attacked on the surface of water
+  - Fixed issues with lobby music
+  - Hunters winning no longer stops the game music
+  - Learned why you should not try to put every feature in one update
+  - Fixed "LuigiHunt" issue, maybe
+  - Removed Wario Apparition
+  - more things I'm probably forgetting
 ## v1.8
 ### Additions:
   - French Translation by Skeletan

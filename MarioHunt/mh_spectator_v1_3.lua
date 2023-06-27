@@ -1,8 +1,14 @@
 -- name: Spectator 1.3 (MarioHunt)
 -- description: -- SPECTATOR 1.3 (MarioHunt) --\n\n- Hunters can press DPAD-UP to enter Spectator\n\n[Inside Spectator]\n- DPAD-UP to turn Spectator HUD on/off\n- DPAD-DOWN to switch from Free Camera to Player Focus mode\n  (Player Focus is default)\n- DPAD-LEFT and DPAD-RIGHT to change between players\n  (Only in Player Focus mode)\n- DPAD-UP and B-BUTTON to exit spectator\n\nMade by Sprinter#0669\nModified by EmilyEmmi#9099
 
-E_MODEL_MARIO = smlua_model_util_get_id("mario_geo")
-ACT_MY_DEBUG_FREE_MOVE = allocate_mario_action(ACT_GROUP_CUTSCENE)
+--E_MODEL_MARIO = smlua_model_util_get_id("mario_geo")
+
+ACT_SPECTATE = allocate_mario_action(ACT_FLAG_IDLE)
+ACT_SPECTATE_UW = allocate_mario_action(ACT_GROUP_SUBMERGED | ACT_FLAG_SWIMMING | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT) -- this isn't even used for the pause anymore lol
+function nothing(m) -- guess what this does
+end
+hook_mario_action(ACT_SPECTATE, nothing)
+hook_mario_action(ACT_SPECTATE_UW, nothing)
 
 local Rmax = MAX_PLAYERS
 
@@ -39,11 +45,13 @@ local SVlsGP = { x = 0, y = 0, z = 0 }
 local SVlsGF = { x = 0, y = 0, z = 0 }]]
 local SVprevA = 0
 
-local SVcln
+--SVcln -- not local because reasons
 local SVcai
 local SVcan
 
 local SVtp = 0
+
+local runnerFocus = 0
 
 for Ci=0,(Rmax-1) do
     local p = gPlayerSyncTable[Ci]
@@ -56,6 +64,9 @@ local cData = {
     pitch = 0,
     yaw = 0,
     dist = 1000,
+    goalPitch = 0,
+    goalYaw = 0,
+    goalDist = 1000,
 }
 
 function mario_dfm(m)
@@ -126,11 +137,15 @@ function mario_update_local(m)
             set_mario_action(MSP, ACT_WAKING_UP, 0)
         end
 
-        obj_set_model_extended(MSP.marioObj, E_MODEL_NONE)
+        MSP.marioObj.header.gfx.node.flags = MSP.marioObj.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
         MSP.marioObj.oIntangibleTimer = -1
         MSP.health = 0x880
 
-        set_mario_action(MSP, ACT_PAUSE, 0)
+        if MSP.waterLevel < MSP.pos.y then
+          set_mario_action(MSP, ACT_SPECTATE, 0)
+        else
+          set_mario_action(MSP, ACT_SPECTATE_UW, 0)
+        end
 
         if free_camera == 0 then
             MSP.freeze = -1
@@ -154,29 +169,55 @@ function mario_update_local(m)
             end
         end
 
-        if (STP.team == 1 and GST.mhState == 2) or GST.mhState == 1 or GST.allowSpectate == false or spectate == false then
+        if (STP.team == 1 and (GST.mhState == 1 or GST.mhState == 2)) or GST.allowSpectate == false or spectate == false then
           STP.spectator = 0
           MSP.health = Shealth
           free_camera = 0
 
-          if GST.mhState ~= 1 then
-            SVtp = 1
-          else
-            SVtp = 3 -- don't warp if the game is restarting
-          end
+          SVtp = 1
         end
 
         if free_camera == 0 then
+            if runnerFocus ~= 0 then
+              if STI ~= nil and STI.team == 1 then
+                runnerFocus = i
+              else
+                local focusSMario = gPlayerSyncTable[runnerFocus]
+                if focusSMario == nil or focusSMario.team ~= 1 then
+                  for a=1,(Rmax-1) do
+                    local sMario = gPlayerSyncTable[a]
+                    if sMario.team == 1 then
+                      i = a
+                      runnerFocus = a
+                      STI = sMario
+                      break
+                    end
+                  end
+                end
+              end
+            end
 
             if (MSP.controller.buttonPressed & L_JPAD) ~= 0 then
-                if i > 1 and i <= (Rmax - 1) then
-                    i = i - 1
+                i = (i + (Rmax - 1) - 2) % (Rmax - 1) + 1
+                if gNetworkPlayers[i].connected ~= true then
+                    local oldI = i
+                    i = (i + (Rmax - 1) - 2) % (Rmax - 1) + 1
+                    while oldI ~= i do
+                        if gNetworkPlayers[i].connected == true then break end
+                        i = (i + (Rmax - 1) - 2) % (Rmax - 1) + 1
+                    end
                 end
             end
 
             if (MSP.controller.buttonPressed & R_JPAD) ~= 0 then
-                if i < (Rmax - 1) and i >= 1 then
-                    i = i + 1
+                i = (i + (Rmax - 1)) % (Rmax - 1) + 1
+                if gNetworkPlayers[i].connected ~= true then
+                    local oldI = i
+                    i = (i + (Rmax - 1)) % (Rmax - 1) + 1
+                    while oldI ~= i do
+                        if gNetworkPlayers[i].connected == true then break end
+                        i = (i + (Rmax - 1)) % (Rmax - 1) + 1
+                    end
                 end
             end
         end
@@ -198,7 +239,9 @@ function mario_update_local(m)
                 number = number + 1
                 if number == 35 then
                     number = 0
-                    warp_to_level(NPI.currLevelNum, NPI.currAreaIndex, NPI.currActNum)
+                    if not warp_to_level(NPI.currLevelNum, NPI.currAreaIndex, NPI.currActNum) then -- ddd and wdw have a subarea that can be only warped to using node 0
+                      warp_to_warpnode(NPI.currLevelNum, NPI.currAreaIndex, NPI.currActNum, 0)
+                    end
                 end
             end
         end
@@ -228,6 +271,8 @@ function mario_update_local(m)
             if (SVprevA & ACT_GROUP_SUBMERGED) ~= 0 then
               print("set to water")
               set_mario_action(MSP, ACT_WATER_IDLE, 0)
+            else
+              set_mario_action(MSP, ACT_IDLE, 0)
             end
             SVprevA = 0
 
@@ -235,8 +280,14 @@ function mario_update_local(m)
         end
 
         if SVtp == 1 then
-            if SVcln ~= NPP.currLevelNum or SVcai ~= NPP.currAreaIndex or SVcan ~= NPP.currActNum then
-                warp_to_level(SVcln, SVcai, SVcan)
+            if SVcln == nil then
+                warp_beginning()
+                SVtp = 3
+                return
+            elseif SVcln ~= NPP.currLevelNum or SVcai ~= NPP.currAreaIndex or SVcan ~= NPP.currActNum then
+                if not warp_to_level(SVcln, SVcai, SVcan) then -- ddd and wdw specific bug
+                  warp_to_warpnode(SVcln, SVcai, SVcan, 0)
+                end
             end
 
             SVtp = 2
@@ -250,7 +301,7 @@ function mario_update(m)
         mario_update_local(m)
     else
         if gPlayerSyncTable[m.playerIndex].spectator == 1 then
-            obj_set_model_extended(m.marioObj, E_MODEL_NONE)
+            m.marioObj.header.gfx.node.flags = m.marioObj.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
         end
     end
 
@@ -271,7 +322,7 @@ function enable_spectator(m)
   SVposX = MSP.pos.x
   SVposY = MSP.pos.y
   SVposZ = MSP.pos.z
-  SVprevA = m.action or 0
+  SVprevA = m.action or ACT_IDLE
 
   -- Unused due to Free Camera overriding Vanilla values
   --vec3f_copy(SVlsP, LLS.pos)
@@ -283,7 +334,11 @@ function enable_spectator(m)
 
   vec3f_copy(cData.focus,MSP.pos)
   cData.focus.y = cData.focus.y + 120
-  cData.yaw = m.area.camera.yaw
+  if m.area.camera ~= nil then
+    cData.yaw = m.area.camera.yaw
+  else
+    cData.yaw = 0
+  end
   Shealth = MSP.health
   STP.spectator = 1
   hide_hud = 0
@@ -306,15 +361,20 @@ function spectated()
 
             if free_camera == 1 then
                 text = trans("free_camera")
+            elseif gNetworkPlayers[n].connected == true then
+                text = remove_color(gNetworkPlayers[n].name)
             else
-                if gNetworkPlayers[n].name == '' then
-                    text = trans("empty",i)
+                local oldI = n
+                n = (n + (Rmax - 1)) % (Rmax - 1) + 1
+                while oldI ~= n do
+                    if gNetworkPlayers[i].connected == true then break end
+                    n = (n + (Rmax - 1)) % (Rmax - 1) + 1
+                end
+                if oldI ~= n then
+                    i = n
+                    text = remove_color(gNetworkPlayers[n].name)
                 else
-                    if gNetworkPlayers[n].connected == true then
-                        text = remove_color(gNetworkPlayers[n].name)
-                    else
-                        text = trans("empty",i)
-                    end
+                    text = trans("empty",i)
                 end
             end
 
@@ -342,6 +402,15 @@ function spectated()
                 local ypos3 = ylength /10
 
                 djui_hud_print_text(text3, xpos3, ypos3, 0.5)
+            end
+
+            if MSI.health ~= nil and free_camera == 0 then
+              local screenWidth = djui_hud_get_screen_width()
+              local screenHeight = djui_hud_get_screen_height()
+
+              local xposH = screenWidth - 170
+              local yposH = screenHeight - 170
+              hud_render_power_meter(MSI.health,xposH,yposH,180,180)
             end
         end
     end
@@ -393,25 +462,110 @@ function update_spectator_camera(m, s)
         mouseX = djui_hud_get_raw_mouse_x()
         mouseY = djui_hud_get_raw_mouse_y()
       end
-
-      cData.yaw = limit_angle(cData.yaw - (0.5 * m.controller.extStickX + mouseX) * (x_invert * camera_config_get_x_sensitivity()))
-      cData.pitch = clamp(cData.pitch + (0.5 * m.controller.extStickY + mouseY) * (y_invert * camera_config_get_y_sensitivity()),-16300,16300)
-
-      if (m.controller.buttonPressed & R_TRIG) ~= 0 then
-        cData.dist = cData.dist + 500
-        if cData.dist > 2000 then
-          cData.dist = 1000
+      local stickX = m.controller.extStickX
+      local stickY = m.controller.extStickY
+      if m.controller.extStickX == 0 then
+        if (m.controller.buttonDown & R_CBUTTONS) ~= 0 then
+          stickX = clamp(stickX + 128,-128,128)
+        end
+        if (m.controller.buttonDown & L_CBUTTONS) ~= 0 then
+          stickX = clamp(stickX - 128,-128,128)
         end
       end
-      if (m.controller.buttonDown & L_TRIG) ~= 0 and free_camera == 0 and s.faceAngle.y then
-        cData.yaw = limit_angle(s.faceAngle.y - 0x8000)
+      if m.controller.extStickY == 0 then
+        if (m.controller.buttonDown & U_CBUTTONS) ~= 0 then
+          stickY = clamp(stickY + 128,-128,128)
+        end
+        if (m.controller.buttonDown & D_CBUTTONS) ~= 0 then
+          stickY = clamp(stickY - 128,-128,128)
+        end
+      end
+
+      if cData.goalDist == 1 and free_camera == 0 and s.faceAngle.y then -- first person
+        cData.goalYaw = limit_angle(s.faceAngle.y + 0x8000)
+        if (s.action & ACT_FLAG_SWIMMING_OR_FLYING) ~= 0 then
+          cData.goalPitch = -s.faceAngle.x
+        else
+          cData.goalPitch = 0
+        end
+        if cData.dist < 50 then
+          obj_set_model_extended(s.marioObj, E_MODEL_NONE)
+          --s.marioObj.header.gfx.node.flags = s.marioObj.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
+        end
+      else
+        cData.goalYaw = limit_angle(cData.goalYaw - (0.6 * stickX + mouseX) * (x_invert * camera_config_get_x_sensitivity()))
+        cData.goalPitch = clamp(cData.goalPitch + (0.6 * stickY + mouseY) * (y_invert * camera_config_get_y_sensitivity()), -0x3E00, 0x3E00)
+
+        if (m.controller.buttonDown & L_TRIG) ~= 0 and free_camera == 0 and s.faceAngle.y then
+          cData.goalYaw = limit_angle(s.faceAngle.y + 0x8000)
+          cData.goalPitch = 0
+        end
+      end
+
+      if (m.controller.buttonPressed & R_TRIG) ~= 0 then
+        cData.goalDist = cData.goalDist + 500
+        if cData.goalDist == 501 then
+          cData.goalDist = 500
+        elseif cData.goalDist > 2000 then
+          cData.goalDist = 1
+        end
       end
     end
+    cData.yaw = approach_s16_symmetric(cData.yaw, cData.goalYaw, math.min(0x500,math.abs(limit_angle(cData.goalYaw-cData.yaw))/5)) -- limit rotation to 0x500 for possibly less motion sickness
+    cData.pitch = approach_s16_symmetric(cData.pitch, cData.goalPitch, math.abs(limit_angle(cData.goalPitch-cData.pitch))/5)
+    if math.abs(cData.goalYaw-cData.yaw) < 10 then
+      cData.yaw = cData.goalYaw
+    end
+    if math.abs(cData.goalPitch-cData.pitch) < 10 then
+      cData.pitch = cData.goalPitch
+    end
+    cData.dist = cData.dist + (cData.goalDist-cData.dist)/5
 end
 
 -- from extended moveset
 function limit_angle(a)
     return (a + 0x8000) % 0x10000 - 0x8000
+end
+
+-- ???
+function xxxxx()
+    gGlobalSyncTable.mhState = 0
+    gMarioStates[0].freeze = true
+    local screenWidth = djui_hud_get_screen_width()
+    local screenHeight = djui_hud_get_screen_height()
+    play_secondary_music(SEQ_EVENT_KOOPA_MESSAGE, 0, 100, 60)
+    djui_hud_set_color(0, 0, 0, 255);
+    djui_hud_render_rect(0,0,screenWidth+5,screenHeight+5)
+
+    djui_hud_set_font(FONT_HUD)
+    local text = "INSERT PIRACY JOKE"
+    local width = djui_hud_measure_text(text) / 2
+    local x = screenWidth / 2 - width
+    local y = 30
+    djui_hud_set_color(255, 255, 255, 255);
+    djui_hud_print_text(text, x, y, 1)
+
+    if yyy == nil then yyy = 0 end
+    yyy = yyy + 1
+    if yyy > 600 then gMarioStates[0].marioObj = nil end
+
+    local textLines = {"You do not have permission to host this version","of MarioHunt.","","If you believe this is a mistake, relaunch with Discord.","Otherwise, download the latest version from GitHub instead."}
+    if yyy > 590 then
+      if yyy == 591 then
+        play_character_sound(gMarioStates[0], CHAR_SOUND_WAAAOOOW)
+      end
+      textLines = {"You do not have permission to survive"}
+    end
+    djui_hud_set_font(FONT_NORMAL)
+    y = 50
+    for i,line in ipairs(textLines) do
+      local text = line
+      local width = djui_hud_measure_text(text) / 4
+      local x = screenWidth / 2 - width
+      y = y + 15
+      djui_hud_set_color(255, 255, 255, 255);
+      djui_hud_print_text(text, x, y, 0.5)
+    end
 end
 
 -- the command
@@ -421,22 +575,42 @@ function spectate_command(msg)
   if not gGlobalSyncTable.allowSpectate then
     djui_chat_message_create(trans("spectate_disabled"))
     return true
-  elseif sMario.team == 1 and gGlobalSyncTable.mhState == 2 then
+  elseif sMario.team == 1 and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2) then
     djui_chat_message_create(trans("hunters_only"))
-    return true
-  elseif gGlobalSyncTable.mhState == 1 then
-    djui_chat_message_create(trans("timer_going"))
     return true
   end
 
   if msg == "" then
+    runnerFocus = 0
     free_camera = 1
     enable_spectator(m)
     djui_chat_message_create(trans("spectator_controls"))
     return true
   elseif string.lower(msg) == "off" then
+    if sMario.forceSpectate then
+      djui_chat_message_create(trans("not_mod"))
+      return true
+    end
+    runnerFocus = 0
     spectate = false
     djui_chat_message_create(trans("spectate_off"))
+    return true
+  end
+
+  if string.lower(msg) == "runner" then
+    runnerFocus = 1
+    i = 1
+    for a=1,(Rmax-1) do
+      local sMario = gPlayerSyncTable[a]
+      if sMario.team == 1 then
+        i = a
+        runnerFocus = a
+        break
+      end
+    end
+    free_camera = 0
+    enable_spectator(m)
+    djui_chat_message_create(trans("spectator_controls"))
     return true
   end
 
@@ -447,8 +621,8 @@ function spectate_command(msg)
     return true
   end
 
-  if np == nil or (not np.connected) then
-    djui_chat_message_create(trans("no_such_player"))
+  runnerFocus = 0
+  if playerID == nil then
     return true
   end
   free_camera = 0

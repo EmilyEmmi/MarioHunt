@@ -8,6 +8,9 @@ function door_loop(o)
     local m = gMarioStates[0]
     if dist_between_objects(m.marioObj, o) <= 400 then
         local starsNeeded = (o.oBehParams >> 24) or 0 -- this gets the star count
+        if gGlobalSyncTable.starRun ~= nil and gGlobalSyncTable.starRun ~= -1 and gGlobalSyncTable.starRun <= starsNeeded then
+          starsNeeded = gGlobalSyncTable.starRun
+        end
         if starsNeeded <= m.numStars then
           obj_mark_for_deletion(o)
           play_sound(SOUND_GENERAL_BREAK_BOX, m.marioObj.header.gfx.cameraToObject)

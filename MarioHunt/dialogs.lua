@@ -1,5 +1,4 @@
-smlua_text_utils_dialog_replace(DIALOG_000,1,2,30,200, ("Mash [A] to skip\
-text like this."))
+function dialog_replace()
 
 smlua_text_utils_dialog_replace(DIALOG_001,1,4,95,200, ("Mario! What are you\
 doing talking to me!?\
@@ -9,18 +8,19 @@ Anyways, while we're\
 here, take my advice.\
 If you know Bomb Clip,\
 I recommend going for\
-the star behind the gate\
+the Star behind the gate\
 first.\
 Otherwise, make your way\
 to the top of the mountain."))
 
-smlua_text_utils_dialog_replace(DIALOG_002,1,4,95,200, ("You can collect the star\
+smlua_text_utils_dialog_replace(DIALOG_002,1,4,95,200, ("You can collect the Star\
 on the island\
 without using the\
 cannon.\
 Build up speed\
 and long jump from\
 the top of the mountain.\
+\
 Be careful, you'll\
 take damage if you're\
 too slow."))
@@ -75,33 +75,28 @@ C'mon, let's race!\
 \
 //Go!////Don't Go"))
 
-smlua_text_utils_dialog_replace(DIALOG_010,1,4,30,200, ("You've stepped on the\
+smlua_text_utils_dialog_replace(DIALOG_010,1,5,30,200, ("You've stepped on the\
 Wing Cap Switch. Nice!\
 Wanna save?\
 \
 //Yes////No"))
 
-smlua_text_utils_dialog_replace(DIALOG_010,1,4,30,200, ("You've stepped on the\
+smlua_text_utils_dialog_replace(DIALOG_011,1,5,30,200, ("You've stepped on the\
 Metal Cap Switch.\
 Awesome! Wanna save?\
 \
 //Yes////No"))
 
-smlua_text_utils_dialog_replace(DIALOG_012,1,4,30,200, ("You've just stepped on\
+smlua_text_utils_dialog_replace(DIALOG_012,1,5,30,200, ("You've just stepped on\
 the Vanish Cap Switch.\
 Tubular! Wanna save?\
 \
 //Yes////No"))
 
-smlua_text_utils_dialog_replace(DIALOG_014,1,4,30,200, ("Wow! Another Power Star!\
-Do you want to Save?\
-\
-//You Bet//Not Now"))
-
 smlua_text_utils_dialog_replace(DIALOG_015,1,4,30,200, ("Runners need to wait\
 some time before leaving\
 the course. If they\
-collect stars, the\
+collect Stars, the\
 time will be reduced.\
 \
 This is shared among all\
@@ -112,29 +107,26 @@ on Stars 5 and 6. It\
 makes the course a lot\
 easier."))
 
-smlua_text_utils_dialog_replace(DIALOG_017,1,4,30,200, "Do you wish to obtian\
+smlua_text_utils_dialog_replace(DIALOG_017,1,4,30,200, "Do you wish to obtain\
 my Power Star, Mario?\
 It won't be easy!\
 Prepare yourself!")
 
-smlua_text_utils_dialog_replace(DIALOG_019,1,5,30,200, ("At this stage in\
-the run, I wouldn't\
-concern myself with\
-random signs.\
-Or do. I don't care."))
-
-smlua_text_utils_dialog_replace(DIALOG_030,1,6,30,200, ("Hello! The Lakitu Bros.,\
-cutting in with a live\
-update on Mario's\
-progress. He's about to\
-learn a technique for\
-defeating Piranha Plants.\
-The trick is this: He has\
-to quickly dive into\
-the plant.\
-If it wakes up, he must\
-move away first before\
-trying again."))
+smlua_text_utils_dialog_replace(DIALOG_019,1,4,30,200, ("Backwards Long Jumps\
+are usually not allowed.\
+If you try to skip ahead,\
+you'll be sent back.\
+If you're allowed, here's\
+how. Face away from the\
+stairs and do a Long Jump\
+forward.\
+Hold back on the stick\
+to start moving backwards.\
+When you reach the stairs,\
+mash [A] while going back.\
+It may take some practice.\
+I recommend practicing on\
+the Infinite Stairs."))
 
 smlua_text_utils_dialog_replace(DIALOG_031, 1, 5, 30, 200, ("No way! You beat me...\
 again!? I guess I have to\
@@ -175,24 +167,18 @@ danger.\
 \
 Good luck!"))
 
+smlua_text_utils_dialog_replace(DIALOG_037,1,1,30,200, ("skill issue"))
+
 smlua_text_utils_dialog_replace(DIALOG_041,1,1,30,200, ("skill issue"))
 
-smlua_text_utils_dialog_replace(DIALOG_042,1,4,30,200, ("Caution! Narrow Bridge!\
-Cross slowly!\
+smlua_text_utils_dialog_replace(DIALOG_042,1,4,30,200, ("Do you know about\
+the cannonless trick?\
+If you're quick, you can\
+get an easy Star.\
+I won't tell you how to\
+do it here.\
 \
-\
-You can jump to the edge\
-of the cliff and hang on,\
-and you can climb off the\
-edge if you move slowly.\
-When you want to let go,\
-either press [Z] or press\
-the Control Stick in the\
-direction of Mario's back.\
-To climb up, press Up on\
-the Control Stick. To\
-scurry up quickly, press\
-the [A] Button."))
+Look it up!"))
 
 smlua_text_utils_dialog_replace(DIALOG_044,1,4,95,200, ("Whooo's there? Whooo\
 woke me up? It's still\
@@ -225,92 +211,41 @@ Practice, practice,\
 practice. You don't stand\
 a chance without them."))
 
-smlua_text_utils_dialog_replace(DIALOG_049,1,5,30,200, ("Remember that tricky Wall\
-Kick jump? It's a\
-technique you'll have to\
-master in order to reach\
-high places.\
-Use it to jump from wall\
-to wall. Press the\
-Control Stick in the\
-direction you want to\
-bounce to gain momentum.\
-Practice makes perfect!"))
-
-function omm_replace(ommOn)
-
-if ommOn then
-
-smlua_text_utils_dialog_replace(DIALOG_050,1,4,30,200, ("You're using\
-OMM Rebirth, I see.\
-MarioHunts with this\
-moveset are fast-paced.\
-Rolling is the fastest way\
-to get around.\
-Crouch and mash [B]\
-to roll.\
-Press 'X' to throw Cappy.\
-If you're a Hunter, use the\
-omm command and set your\
-Cappy to 'Damage'.\
-Use the D-Pad to home\
-in on Runners and other\
-objects. And don't forget\
-about the Cap Bounce!"))
-
-else
-
-smlua_text_utils_dialog_replace(DIALOG_050,1,4,30,200, ("Go fast using Dives!\
-Press [B] while running\
-to dive.\
+smlua_text_utils_dialog_replace(DIALOG_049,1,5,30,200, ("Did you use the cannon\
+to get to this area?\
+There are many ways to\
+reach this spot.\
 \
-You can perform\
-a Jump Dive by pressing\
-[A], then quickly\
-pressing [B].\
-Be sure not to dive\
-into a wall, or you'll\
-be stunned for some time."))
+A careful jump off the\
+side and a kick is one\
+way to get here. Jumping\
+off of a Spindrift is a\
+safer but slower method.\
+It'll be tricky to get\
+back without the cannon,\
+so make sure this is your\
+last stop."))
 
-end
-
-end
-
-smlua_text_utils_dialog_replace(DIALOG_051,1,6,30,200, ("Climbing's easy! When you\
-jump at trees, poles or\
-pillars, you'll grab them\
-automatically. Press [A] to\
-jump off backward.\
-\
-To rotate around the\
-object, press Right or\
-Left on the Control Stick.\
-When you reach the top,\
-press Up to do a\
-handstand!\
-Jump off from the\
-handstand for a high,\
-stylin' dismount."))
-
-smlua_text_utils_dialog_replace(DIALOG_052,1,5,30,200, ("Stop and press [Z] to\
-crouch, then press [A]\
-to do a high, Backward\
-Somersault!\
-\
-To perform a Side\
-Somersault, run, do a\
-sharp U-turn and jump.\
-You can catch lots of\
-air with both jumps."))
-
-smlua_text_utils_dialog_replace(DIALOG_053,1,5,30,200, ("While Hunters can't\
-grab Red Coins, they\
-can grab secrets, hit\
-switches, and other things\
-that can help the Runners.\
-If you're a Hunter, be sure\
-not to help the Runners by\
-accident!"))
+smlua_text_utils_dialog_replace(DIALOG_051,1,5,30,200, ("There's different\
+rules if you're playing\
+MiniHunt. In this\
+fast-paced mode, everyone\
+competes with each other.\
+Runners are assigned\
+specific Stars, and must\
+be the first to grab them.\
+When they get a Star, a\
+new Star is assigned.\
+Hunters must defeat the\
+Runners. Defeat a Runner\
+to become a Runner!\
+Whichever player grabs\
+the most Stars wins!\
+Also remember that\
+player attacks deal extra\
+damage to Runners.\
+Consider giving MiniHunt\
+a try!"))
 
 smlua_text_utils_dialog_replace(DIALOG_055,1,5,30,200, ("I'm the world champion\
 sledder, you know.\
@@ -351,7 +286,10 @@ catch fire or be hurt\
 by enemy attacks.\
 You'll even deal\
 double damage to your\
-enemies!"))
+enemies!\
+But there's a catch:\
+Runners can still be\
+damaged by Hunters."))
 
 smlua_text_utils_dialog_replace(DIALOG_063,1,5,30,200, ("The Vanish Cap is inside\
 the blue block. You need\
@@ -402,11 +340,11 @@ you can enter either\
 the castle's main hall\
 or the place from which\
 you entered.\
-Exiting a course via\
-EXIT COURSE will heal\
-you, but you'll be\
-stunned for a moment.\
-\
+Sometimes, the place\
+which you entered will be\
+closer to other levels.\
+Other times, the main\
+hall is more convenient.\
 Think carefully when\
 deciding which option\
 to use!"))
@@ -433,16 +371,16 @@ the Stars, life is\
 returning to the castle.\
 Please, Mario, you have\
 to give Bowser the boot!\
-Speaking of stars..."))
+Speaking of Stars..."))
 
-smlua_text_utils_dialog_replace(DIALOG_078,1,4,30,200, ("There's a blue\
-coin switch here.\
-If you feel cruel as\
-a hunter, you could\
-try hitting it so the\
-runners can't get the\
-100 coin star...\
-But who would do that?"))
+smlua_text_utils_dialog_replace(DIALOG_078,1,4,30,200, ("Stand on top of the\
+Blue Coins Switch to see\
+where the coins will\
+appear.\
+The switch will also\
+respawn if you don't\
+collect the coins in\
+time."))
 
 smlua_text_utils_dialog_replace(DIALOG_079,1,4,30,200, ("Owwwuu! Let me go!\
 Uukee-kee!\
@@ -455,7 +393,7 @@ recommend keeping it\
 low."))
 
 smlua_text_utils_dialog_replace(DIALOG_082,1,6,30,200, ("You just want my\
-star, don't you?\
+Star, don't you?\
 I see that look in\
 your eyes.\
 Take it and leave me\
@@ -469,7 +407,7 @@ Oh, look what I found!\
 Here, Mario, catch!"))
 
 smlua_text_utils_dialog_replace(DIALOG_084,1,4,30,200, ("Yeeoww! Unhand me,\
-brute! Take the star! A\
+brute! Take the Star! A\
 gift from Bowser, it was.\
 Now let me be!"))
 
@@ -478,28 +416,11 @@ off the mountain to\
 skip the cannon here...\
 / - Game Developer"))
 
-smlua_text_utils_dialog_replace(DIALOG_092,1,5,30,200, ("Pestering me again, are\
-you, Mario?\
-Now, return those Stars!\
-My troops in the walls\
-need them! Bwa ha ha!"))
-
-smlua_text_utils_dialog_replace(DIALOG_093,1,5,30,200, ("I've\
-been looking for something\
-to fry with my fire\
-breath!\
-Bwa ha ha ha!"))
-
 smlua_text_utils_dialog_replace(DIALOG_095,1,5,30,200, ("Some signs\
 may have new, useful\
 tips. You can also take\
 some time to catch a\
 breather!"))
-
-smlua_text_utils_dialog_replace(DIALOG_097,1,4,30,200, ("Did you know\
-burning in lava\
-grants no invincibility\
-frames?"))
 
 smlua_text_utils_dialog_replace(DIALOG_100,1,3,95,200, ("Ukkiki...Wakkiki...kee kee!\
 Ha! I snagged it!\
@@ -526,10 +447,6 @@ Isn't that lovely?"))
 smlua_text_utils_dialog_replace(DIALOG_105,1,3,95,200, ("Ready for blastoff! Come\
 on, hop into the cannon!"))
 
-smlua_text_utils_dialog_replace(DIALOG_107,1,3,95,200, ("Ghosts...\
-...don't...\
-...DIE!"))
-
 smlua_text_utils_dialog_replace(DIALOG_108,1,5,95,200, ("Boooooo-m! Here comes\
 the master of mischief,\
 the tower of terror,\
@@ -549,27 +466,50 @@ the five coins around the corner!"))
 
 smlua_text_utils_dialog_replace(DIALOG_112,1,4,30,200, ("Coins allow Runners\
 to refill their Power\
-Meter, except Red Coins.\
+Meter.\
 Hunters can make use of\
 these coins too.\
 But collecting coins\
 will help Runners with\
-the 100 coin star.\
+the 100 coin Star.\
 Is it worth it?\
-Quite the dilemma..."))
+Quite the dilemma...\
+You can also fully\
+heal by collecting\
+1-up mushrooms.\
+They're useful in a\
+pinch!"))
 
 smlua_text_utils_dialog_replace(DIALOG_113,1,6,30,200, ("There are special Caps in\
 the red, green and blue\
 blocks. Step on the\
 switches in the hidden\
 courses to activate the\
-Cap Blocks."))
+Cap Blocks.\
+The Wing and Vanish Caps\
+will make some stages\
+much easier for Runners,\
+or open up new Stars.\
+Runners should try to\
+press these switches.\
+However, Hunters may\
+want to use the Metal\
+Cap to deal more damage.\
+\
+Use the Cap Switches\
+carefully!"))
 
 smlua_text_utils_dialog_replace(DIALOG_114,1,5,95,200, ("It makes me so mad! We\
 build your houses, your-\
 Argh, I'm getting tired of\
 this speech! Just try to\
 crush me!"))
+
+smlua_text_utils_dialog_replace(DIALOG_115, 1, 6, 95, 200, ("No! Crushed again!\
+I'm just a stepping stone,\
+after all. I won't gravel,\
+er, grovel. Here, you win.\
+Take this with you!"))
 
 smlua_text_utils_dialog_replace(DIALOG_116,1,5,95,200, ("Whaaa....Whaaat?\
 A pipsqueak like you has\
@@ -608,23 +548,6 @@ C'mon troops! Let's watch\
 the ending together!\
 Bwa ha ha!"))
 
-smlua_text_utils_dialog_replace(DIALOG_129,1,4,30,200, ("Welcome to the Vanish\
-Cap Switch Course! You\
-die if you fall off here,\
-so be careful!"))
-
-smlua_text_utils_dialog_replace(DIALOG_130,1,5,30,200, ("Welcome to the Metal Cap\
-Switch Course! You'll\
-die if you go into\
-the waterfall, so\
-hurry!"))
-
-smlua_text_utils_dialog_replace(DIALOG_131,1,5,30,200, ("Welcome to the Wing\
-Cap Switch Course!\
-Be careful! Falling off\
-is deadly in this\
-mode!"))
-
 smlua_text_utils_dialog_replace(DIALOG_132,1,4,30,200, ("Whoa, Mario, pal, you\
 can't be in the air that\
 long! You're disqualified!\
@@ -642,7 +565,7 @@ create his own world in\
 the paintings and walls.\
 Please recover the Power\
 Stars! Unless of course,\
-you're doing a lower star\
+you're doing a lower Star\
 run...\
 \
 You don't need any fancy\
@@ -668,11 +591,11 @@ wrote the book on bad.\
 \
 Here's some advice for\
 going faster.\
-When you enter one of\
-the main 15 courses,\
-pause the game.\
-When you resume, you'll\
-skip the transition.\
+When you enter a\
+painting, pause the\
+game. When you resume,\
+you'll skip the\
+transition.\
 Hope this helps you!"))
 
 smlua_text_utils_dialog_replace(DIALOG_150,1,5,30,200, ("You've flooded my\
@@ -713,7 +636,7 @@ you do this to me?\
 Why?"))
 
 smlua_text_utils_dialog_replace(DIALOG_163,1,5,30,200, ("Wow, did you pull\
-off a 120 star run?\
+off a 120 Star run?\
 I'm impressed! Gah,\
 what am I saying!?\
 I'll be back!"))
@@ -738,11 +661,11 @@ commands.\
 \
 Here they are:\
 mh warp\
-mh radar\
 mh quick\
 mh combo\
-mh discord\
-... and finally,\
+mh field\
+mh allstars\
+mh langtest\
 mh print\
 \
 Enjoy this sweet\
@@ -758,13 +681,107 @@ other players.\
 Press [B] to punch.\
 You won't get any points\
 or anything, but it's good\
-for relieving stress!"))
+for relieving stress!\
+\
+In-game, defeating another\
+player will fully heal you.\
+If you're in danger, try\
+fighting back!"))
 
-smlua_text_utils_dialog_replace(DIALOG_169,1,4,30,200, ("There's a blue\
-coin switch here.\
-If you feel cruel as\
-a hunter, you could\
-try hitting it so the\
-runners can't get the\
-100 coin star...\
-But who would do that?"))
+smlua_text_utils_dialog_replace(DIALOG_169,1,4,30,200, ("Stand on top of the\
+Blue Coins Switch to see\
+where the coins will\
+appear.\
+The switch will also\
+respawn if you don't\
+collect the coins in\
+time."))
+
+end
+
+function omm_replace(ommOn)
+
+if ommOn then
+
+smlua_text_utils_dialog_replace(DIALOG_050,1,4,30,200, ("You're using\
+OMM Rebirth, I see.\
+MarioHunts with this\
+moveset are fast-paced.\
+Use 'X' to throw Cappy\
+and 'Y' to spin.\
+Jump while spinning to do\
+the Spin Jump.\
+Rolling is the fastest way\
+to get around.\
+Crouch and mash [B]\
+to roll.\
+You can roll down slopes\
+to travel even faster.\
+Throw Cappy, then do a\
+Spin Jump to conserve.\
+Use the 'omm' command\
+and set your Cappy to\
+'Damage' to use him as\
+a ranged weapon.\
+Use the D-Pad to home\
+in on Runners and other\
+objects. And don't forget\
+about the Cap Bounce!"))
+
+smlua_text_utils_dialog_replace(DIALOG_053,1,4,30,200, ("Hunters are able to grab\
+Red Coins when OMM Rebirth\
+is enabled to fix a bug.\
+\
+Hunters can also find\
+secrets, hit switches,\
+and other things that can\
+help the Runners.\
+If you're a Hunter, be sure\
+not to help the Runners by\
+accident!"))
+
+else
+
+smlua_text_utils_dialog_replace(DIALOG_050,1,4,30,200, ("Go fast using Dives!\
+Press [B] while running\
+to dive.\
+\
+You can perform\
+a Jump Dive by pressing\
+[A], then quickly\
+pressing [B].\
+Be sure not to dive\
+into a wall, or you'll\
+be stunned for some time."))
+
+smlua_text_utils_dialog_replace(DIALOG_053,1,5,30,200, ("While Hunters can't\
+grab Red Coins, they\
+can grab secrets, hit\
+switches, and other things\
+that can help the Runners.\
+If you're a Hunter, be sure\
+not to help the Runners by\
+accident!"))
+
+end
+
+end
+
+function auto_skip(id)
+  if gGlobalSyncTable.romhack_file ~= "vanilla" then return end
+  local skip = {
+    [0] = 1,
+    [14] = 1,
+    [30] = 1,
+    [48] = 1,
+    [57] = 1,
+    [97] = 1,
+    [98] = 1,
+    [107] = 1,
+    [129] = 1,
+    [130] = 1,
+    [131] = 1,
+  }
+  if skip[id] ~= nil then return false end
+end
+hook_event(HOOK_ON_DIALOG, auto_skip)
