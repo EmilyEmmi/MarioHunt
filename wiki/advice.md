@@ -69,9 +69,13 @@ But what if there was a way to go fast in the *air*? Well, let me introduce you 
 ### Roll Conservation (idk what this tech is actually called)
 
 This tech lets you to travel INSANE distances in the air. Here's how to do it:
+
 1: Roll and build up speed.
+
 2: Throw Cappy.
+
 3: Quickly jump and hold Y to spin.
+
 Now you have all of the speed of a downward roll, but in the air. Better yet, if you jump as you hit the ground, you **still keep the speed**.
 It travels so far, you can collect Mario Wings To The Sky without the cannon or wing cap!
 
