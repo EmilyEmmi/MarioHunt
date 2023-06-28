@@ -1,4 +1,4 @@
-<img src="newLogo.png" alt="MarioHunt" width="800"/>
+<img src="logo.png" alt="MarioHunt" width="800"/>
 
 ### v2.0 (view changelog [here](changelog.md))
 
