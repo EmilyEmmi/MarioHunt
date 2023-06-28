@@ -23,6 +23,8 @@
 
 [Level Breakdown](breakdown.md)
 
+[OMM Rebirth](omm.md)
+
 ## For Modders/Translators
 [MarioHunt API](api.md)
 
