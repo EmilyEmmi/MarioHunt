@@ -16,6 +16,9 @@ Only one Runner can collect the star. **Runners may even attack each other.**
 ## SKIPPING STARS:
 What if the Star is too hard, with no end in sight? If that's the case, use **/skip** to vote to skip this star. Half the lobby must agree.
 
+## SUPER DYING SKILLS
+Runners take two (2) extra points of damage any time they get attacked. Be careful!
+
 ## What Stars are assigned?
 Every star in the game is eligible, with the following exceptions:
   - No castle stars (toad, mips)
