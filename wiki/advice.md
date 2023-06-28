@@ -12,7 +12,7 @@ There is no leaving the hub. If you're in trouble, you can't escape by exiting t
 ### Dead Ends
 <img src="img/corner.png" alt="I don't think Luigi's getting out of this one..." width="400"/>
 Inside areas tend to have a lot of dead ends. It's easy to get trapped.
-###Where did that bring you? Back to me.
+### Where did that bring you? Back to me.
 You have to visit the hub **constantly**. It's easy to get attacked here because the Hunters will know you're coming back.
 
 TLDR: Shhhh! Please walk carefully in the hallways!
