@@ -17,6 +17,9 @@ The pause menu in the castle also shows how many stars have been collected, even
 ## How do we do a 16 star run? Do we have to perform Mips Clip?
 No, the door should open automatically at 15 stars.
 
+## Why am I metal?
+There's a setting that makes Hunters appear in Metal form. This is visual only; you don't actually have the Metal Cap.
+
 ## I found a bug! What should I do?
 Please report it! Try to find a way to reproduce it, if you can. Issues involving desynced games are usually unfixable.
 
@@ -26,8 +29,11 @@ This is a kind of bug, so report this, too. Please do not harrass the translator
 ## Could you add/change [thing]?????
 Maybe, if I think I can do it and I think it's a good idea. Don't ask for stuff that will be too unfeasible. I also can't modify other mods, obviously.
 
+You can suggest features by dming me or asking me in-game. You could also try asking the other devs, but please don't overdo it.
+
 ## Could you make this compatible with [mod]?
 Again, if I think I can. Most mods should already have compatibility.
+
 If it's your own mod, try using the MarioHunt API to make it compatible.
 
 ## This Romhack says it isn't compatible!
@@ -38,6 +44,9 @@ Practice, I guess? Knowing speedrunning techniques helps a lot.
 
 ## Can I get the Dev role?
 No.
+
+## How to switch page on the mh command?
+/mh # (ex: /mh 2)
 
 ## This player's stats don't seem legit. What can I do?
 Not much. It doesn't affect gameplay, so I wouldn't worry about it.
