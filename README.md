@@ -4,7 +4,7 @@
 
 ## [Trailer](https://www.youtube.com/watch?v=hyuXu4Bzugs&ab_channel=N64Mario)
 
-Trailer by **N64 Mario**, logo by **N64 Mario**, **Beyond**, and **AquariusAlexx**
+Trailer by **N64 Mario**, logo by **N64 Mario** and **Beyond**
 <br/>
 <br/>
 <br/>
