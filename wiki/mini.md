@@ -1,4 +1,4 @@
-#Da Rulz (MiniHunt)
+# Da Rulz (MiniHunt)
 
 **MiniHunt** is a new game mode for bite-sized gameplay. The goals are slightly different in MiniHunt.
 
