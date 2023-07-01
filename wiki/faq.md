@@ -31,6 +31,9 @@ Maybe, if I think I can do it and I think it's a good idea. Don't ask for stuff 
 
 You can suggest features by dming me or asking me in-game. You could also try asking the other devs, but please don't overdo it.
 
+## How do I change the setting for [thing]?
+You can do /mh or /mh help to look through the commands, which allow changing many settings, including the time MiniHunt lasts, how many lives Runners start with, and more.
+
 ## Could you make this compatible with [mod]?
 Again, if I think I can. Most mods should already have compatibility.
 
@@ -47,6 +50,9 @@ No.
 
 ## How to switch page on the mh command?
 /mh # (ex: /mh 2)
+
+## Why does the mod's name start with a dot? Is this a mistake?
+No, it's to make the mod load first. Mods are loaded in ASCII order; if it loaded later, the MarioHunt API would break.
 
 ## This player's stats don't seem legit. What can I do?
 Not much. It doesn't affect gameplay, so I wouldn't worry about it.
