@@ -4,21 +4,6 @@
 doorsCanClose = false
 doorsClosing = false
 
----@param m MarioState
----@param o Object
-function should_push_or_pull_door(m, o)
-  local dx = o.oPosX - m.pos.x
-  local dz = o.oPosZ - m.pos.z
-
-  local dYaw = o.oMoveAngleYaw - atan2s(dz, dx)
-
-  if dYaw >= -0x4000 and dYaw <= 0x4000 then
-      return 1
-  else
-      return 0
-  end
-end
-
 ---@param o Object
 function door_init(o)
   -- completely remove collision and hitbox
@@ -38,16 +23,14 @@ function door_loop(o)
 
   if o.oAction == 5 then
     if o.oTimer == 0 then
-      -- when the object timer is 0 (when we first set the action to 5) play a soudn and init the animation based off of if we are pulling or pushing the door
-      if should_push_or_pull_door(gMarioStates[0], o) == 1 then
-        -- push
-        cur_obj_init_animation(1)
-      else
-        -- pull
-        cur_obj_init_animation(2)
-      end
+      -- when the object timer is 0 (when we first set the action to 5) play a sound and init the animation
+      cur_obj_init_animation(1)
 
       cur_obj_play_sound_2(SOUND_GENERAL_OPEN_WOOD_DOOR)
+    end
+
+    if o.header.gfx.animInfo.animFrame < 5 then
+      o.header.gfx.animInfo.animFrame = 5 -- make door opening feel snappier
     end
 
     -- 40 is the anim frame where the door is fully opened
@@ -63,7 +46,7 @@ function door_loop(o)
   end
 
   if o.oAction == 6 then
-    -- since the action is no longer 5, the animation continues, 78 is the end of the animation
+    -- since the action is no longer 5, the animation continues, 78 is the end of the animation (take 2 frames)
     if o.header.gfx.animInfo.animFrame >= 78 then
       -- play object sound, and set action to 0
       cur_obj_play_sound_2(SOUND_GENERAL_CLOSE_WOOD_DOOR)
