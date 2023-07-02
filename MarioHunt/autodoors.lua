@@ -5,19 +5,28 @@ doorsCanClose = false
 doorsClosing = false
 
 ---@param o Object
-function door_init(o)
-  -- completely remove collision and hitbox
-  o.collisionData = nil
-  o.hitboxRadius = 0
-  o.hitboxHeight = 0
-end
-
----@param o Object
 function door_loop(o)
-  if o.oAction == 0 then
-    -- if mario is close enough, set action to the custom open door action, 5
-    if dist_between_objects(o, gMarioStates[0].marioObj) <= 400 then
-        o.oAction = 5
+  -- check if the door has enough stars to be opened
+  local m = gMarioStates[0]
+  local starsNeeded = (o.oBehParams >> 24) or 0 -- this gets the star count
+  if gGlobalSyncTable.starRun ~= nil and gGlobalSyncTable.starRun ~= -1 and gGlobalSyncTable.starRun <= starsNeeded then
+    local np = gNetworkPlayers[0]
+    starsNeeded = gGlobalSyncTable.starRun
+    if (np.currAreaIndex ~= 2) and ROMHACK.ddd == true then
+      starsNeeded = starsNeeded - 1
+    end
+  end
+  
+  if m.numStars >= starsNeeded then
+    -- completely remove collision and hitbox
+    o.collisionData = nil
+    o.hitboxRadius = 0
+    o.hitboxHeight = 0
+    if o.oAction == 0 then
+      -- if mario is close enough, set action to the custom open door action, 5
+      if dist_between_objects(o, gMarioStates[0].marioObj) <= 400 then
+          o.oAction = 5
+      end
     end
   end
 
