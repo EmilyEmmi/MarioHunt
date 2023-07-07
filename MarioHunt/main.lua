@@ -1120,13 +1120,15 @@ function on_hud_render()
       render_radar(obj, ex_radar[2], true, "secret")
     end
     -- green demon
-    obj = obj_get_first_with_behavior_id(id_bhvHidden1upInPole)
-    while obj ~= nil do
-      if obj.oBehParams == 0xFF then
-        render_radar(obj, ex_radar[3], true, "demon")
-        break
+    if demonOn then
+      obj = obj_get_first_with_behavior_id(id_bhvHidden1upInPole)
+      while obj ~= nil do
+        if obj.oBehParams == 0xFF then
+          render_radar(obj, ex_radar[3], true, "demon")
+          break
+        end
+        obj = obj_get_next_with_same_behavior_id(obj)
       end
-      obj = obj_get_next_with_same_behavior_id(obj)
     end
   end
 
