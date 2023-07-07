@@ -7,7 +7,7 @@ A: You're Hunter. Hunters can't grab Stars.
 ## Why am I not getting Runner?
 A: Those who have yet to be Runner get first dibs.
 If you've recently been Runner, you're less likely to be chosen.
-For Switch Mode, you have to kill the Runner in order to get Runner yourself.
+For Switch Mode or MiniHunt, you have to kill the Runner in order to get Runner yourself.
 
 ## How do I know if there are any Stars left in a level?
 A: For main stages, pause the game. It will show how many stars you've collected. The maximum is 7.
@@ -33,7 +33,7 @@ Also, feel free to make a pull request!
 You can suggest features by dming me or asking me in-game. You could also try asking the other devs, but please don't overdo it.
 
 ## How do I change the setting for [thing]?
-You can do /mh or /mh help to look through the commands, which allow changing many settings, including the time MiniHunt lasts, how many lives Runners start with, and more.
+Try looking around the menu! Most settings should be under "Game Settings". You can also try using /mh help to look through the commands.
 
 ## Could you make this compatible with [mod]?
 Again, if I think I can. Most mods should already have compatibility.
@@ -49,8 +49,8 @@ Practice, I guess? Knowing speedrunning techniques helps a lot.
 ## Can I get the Dev role?
 No.
 
-## How to switch page on the mh command?
-/mh # (ex: /mh 2)
+## How to switch page on the help command?
+/mh help # (ex: /mh help 2)
 
 ## Why does the mod's name start with a dot? Is this a mistake?
 No, it's to make the mod load first. Mods are loaded in ASCII order; if it loaded later, the MarioHunt API would break.
@@ -65,6 +65,9 @@ Tell them to type /rules.
 You can still try to tell them; they might understand the command format.
 Or, if their language is supported, write "/lang [their language abbreviation]" in the chat.
 Switching languages also displays the rules.
+
+## How do I unlock the secret option?
+Your pursuit for this is as a 1UP pursues Mario.
 
 ## What's LuigiHunt?
 What are you talking about? There is no such thing.

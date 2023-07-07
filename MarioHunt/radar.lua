@@ -6,6 +6,9 @@ local djui_hud_set_color,get_texture_info,djui_hud_render_texture_interpolated,d
 TEX_RAD = get_texture_info('runner-mark')
 TEX_STAR = get_texture_info('star-mark')
 TEX_BOX = get_texture_info('box-mark')
+TEX_COIN = get_texture_info('coin-mark')
+TEX_SECRET = get_texture_info('secret-mark')
+TEX_DEMON = get_texture_info('demon-mark')
 icon_radar = {}
 star_radar = {}
 box_radar = {}
@@ -18,6 +21,10 @@ end
 for i=1,7 do
   box_radar[i] = {tex = TEX_BOX, prevX = 0, prevY = 0}
 end
+ex_radar = {}
+ex_radar[1] = {tex = TEX_COIN, prevX = 0, prevY = 0}
+ex_radar[2] = {tex = TEX_SECRET, prevX = 0, prevY = 0}
+ex_radar[3] = {tex = TEX_DEMON, prevX = 0, prevY = 0}
 defaultStarColor = {r = 255,g = 255,b = 92} -- yellow
 
 -- also includes texture data for stats
@@ -28,14 +35,15 @@ TEX_MEDAL = get_texture_info('stat-medal')
 TEX_ARROW = get_texture_info('stat-arrow')
 stat_icon_data = {}
 stat_icon_data[1] = {tex = TEX_FLAG, r = 255, g = 255, b = 92}
-stat_icon_data[2] = {tex = TEX_BOOT, r = 129, g = 90, b = 50}
-stat_icon_data[3] = {tex = TEX_MULTI_BOOT, r = 129, g = 90, b = 50}
-stat_icon_data[4] = {tex = TEX_FLAG, r = 255, g = 92, b = 92}
-stat_icon_data[5] = {tex = TEX_STAR, r = 255, g = 255, b = 92}
-stat_icon_data[6] = {tex = TEX_MEDAL, r = 255, g = 255, b = 255}
+stat_icon_data[2] = {tex = TEX_FLAG, r = 255, g = 92, b = 92}
+stat_icon_data[3] = {tex = TEX_FLAG, r = 180, g = 92, b = 255}
+stat_icon_data[4] = {tex = TEX_BOOT, r = 129, g = 90, b = 50}
+stat_icon_data[5] = {tex = TEX_MULTI_BOOT, r = 129, g = 90, b = 50}
+stat_icon_data[6] = {tex = TEX_STAR, r = 255, g = 255, b = 92}
+stat_icon_data[7] = {tex = TEX_MEDAL, r = 255, g = 255, b = 255}
 
 local rainbow_counter = 0
-function render_radar(m, hudIcon, isObj, isBox)
+function render_radar(m, hudIcon, isObj, objType)
   djui_hud_set_resolution(RESOLUTION_N64)
   local pos = {}
   local obj = m
@@ -43,7 +51,7 @@ function render_radar(m, hudIcon, isObj, isBox)
     pos = { x = m.pos.x, y = m.pos.y + 80, z = m.pos.z } -- mario is 161 units tall
   else
     pos = { x = obj.oPosX + 10, y = obj.oPosY + 10, z = obj.oPosZ + 10} -- I'm just guessing
-    if isBox then
+    if objType == "box" then
       pos.y = pos.y + 30
     end
   end
@@ -123,8 +131,24 @@ function render_radar(m, hudIcon, isObj, isBox)
       end
       -- and we're doing this every frame. Thank god there's only one of these.
     end
-  elseif isBox then
+  elseif objType == "box" or objType == "demon" then
     r,g,b = 255,255,255 -- texture has color
+    alpha = alpha - 100
+    if alpha <= 0 then
+      return
+    end
+  elseif objType == "coin" then
+    r,g,b = 255,0,0 -- red coin
+    alpha = alpha - 100
+    if alpha <= 0 then
+      return
+    end
+  elseif objType == "secret" then
+    r,g,b = 0,255,0 -- green
+    alpha = alpha - 100
+    if alpha <= 0 then
+      return
+    end
   else
     if _G.OmmEnabled
     and ROMHACK.ommSupport ~= false -- romhacks that use a custom model can't be checked; as such, the omm colored radar will never be displayed (only relevant for Green Stars)

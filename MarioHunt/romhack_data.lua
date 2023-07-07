@@ -15,6 +15,7 @@ local romhack_data = { -- supported rom hack data
       [LEVEL_BOWSER_3] = 120, -- NOTE: This is overridden by the default star run
     },
     ddd = true, -- pretty much only relevant for vanilla
+    heartReplace = true, -- replaces all hearts with 1ups
 
     -- allow leaving immediatly when grabbing these stars to avoid getting trapped
     area_stars = {
@@ -33,6 +34,7 @@ local romhack_data = { -- supported rom hack data
       [103] = 1, -- In The Deep Freeze (too easy)
       [124] = 1, -- Mysterious Mountainside (too easy)
       [84] = 1, -- Stand Tall On Four Pillars (too annoying)
+      [45] = 1, -- Snowman's Lost His Head (inconsistant)
     },
 
     -- this is a function run every frame for all players. This one in particular handles 0 star runs and minihunts in ttc
@@ -83,6 +85,7 @@ local romhack_data = { -- supported rom hack data
       [LEVEL_BITS] = 80,
       [LEVEL_WMOTR] = 120, -- hidden palace
     },
+    heartReplace = true, -- replaces all hearts with 1ups
 
     area_stars = {
       [LEVEL_SA] = {1, 1}, -- you can fail time challenge
@@ -106,6 +109,7 @@ local romhack_data = { -- supported rom hack data
     mini_exclude = {
       [46] = 1, -- The Other Entrance
       [205] = 1, -- Replica for Creepy Cap Cave
+      [111] = 1, -- Tuxie Race Down The Slide (glitchy)
     },
 
     special_run = function(m,gotStar)
@@ -139,7 +143,7 @@ local romhack_data = { -- supported rom hack data
       [201] = "Coins In The Cave",
       [205] = "Replica Of The Cave Entrance",
       [211] = "Windy Red Coin Search",
-      [216] = "Replica Of The Air Balloon",
+      [216] = "Replica Of The Airship",
       [221] = "Hidden In The Light",
       [226] = "Replica Of The Cogs",
       [231] = "On Top Of The World",
@@ -320,8 +324,9 @@ local romhack_data = { -- supported rom hack data
         set_mario_action(m, ACT_SPAWN_NO_SPIN_AIRBORNE, 0)
       end
       if (np.currAreaIndex == 1) == gGlobalSyncTable.ee then
-        if network_is_server() then
+        if has_mod_powers(0) then
           gGlobalSyncTable.ee = (np.currAreaIndex ~= 1)
+          close_menu()
           return
         else
           if gGlobalSyncTable.ee then
@@ -329,6 +334,7 @@ local romhack_data = { -- supported rom hack data
           else
             djui_chat_message_create(trans("not_using_ee"))
           end
+          close_menu()
           warp_to_level(np.currLevelNum, np.currAreaIndex ~ 3, np.currActNum)
           return
         end
@@ -345,6 +351,7 @@ local romhack_data = { -- supported rom hack data
     [LEVEL_BOWSER_3] = 30,
   },
   ommSupport = false, -- does not have default omm support
+  heartReplace = true, -- replaces all hearts with 1ups
 
   -- since not all courses are modified here, exclude those
   starCount = {
@@ -521,6 +528,7 @@ local romhack_data = { -- supported rom hack data
     [LEVEL_BOWSER_3] = 130,
   },
   starColor = {r = 92,g = 255,b = 92}, -- stars are green (duh)
+  heartReplace = true, -- replaces all hearts with 1ups
 
   starCount = {
     [LEVEL_CASTLE_GROUNDS] = 3, -- no mips
@@ -700,6 +708,78 @@ function deleteStarRoadStuff(m)
     end
 end
 
+-- sets up the minihunt blacklist using an encrypted value and mini_exclude
+function setup_mini_blacklist(blacklistData)
+  mini_blacklist = {}
+  if blacklistData ~= "none" then
+    decrypt_black(blacklistData)
+  elseif ROMHACK.mini_exclude ~= nil then
+    for id,value in pairs(ROMHACK.mini_exclude) do
+      mini_blacklist[id] = 1
+    end
+  end
+end
+
+-- takes the encrypted data and returns the blacklist
+function decrypt_black(blacklistData)
+  mini_blacklist = {}
+  local i = 0
+  for course=1,24 do -- exclude ending
+    if string.len(blacklistData) <= i-1 then break end
+
+    local courseData = tonumber("0x"..string.sub(blacklistData,i+1,i+2)) or 0
+    --print(courseData)
+    for act=1,7 do
+      if (courseData & 2^(act-1)) ~= 0 then
+        mini_blacklist[course*10+act] = 1
+        --djui_chat_message_create(tostring(courseData))
+      end
+    end
+    -- unused because we don't store course 0
+    --[[if (courseData & 128) ~= 0 then -- use star 8 of other courses as course 0
+      mini_blacklist[course] = 1
+      --print(0,course)
+    end]]
+    i = i + 2
+  end
+end
+-- encrypts the blacklist into one number value
+function encrypt_black()
+  local fullEncrypt = ""
+  local encrypted = "00"
+  for course=1,24 do -- exclude ending
+    local courseData = 0
+    for act=1,7 do
+      local doCourse = course
+      local doAct = act
+      -- unused because we don't store course 0
+      --[[if act == 8 then -- use act 8 for course 0
+        if course > 7 then break end
+        doAct = course
+        doCourse = 0
+      end]]
+      if mini_blacklist[doCourse*10+doAct] ~= nil then
+        courseData = courseData + 2^(act-1)
+      end
+    end
+    --djui_chat_message_create(string.format("%02x",courseData))
+    fullEncrypt = fullEncrypt .. string.format("%02x",courseData)
+    if courseData ~= 0 then
+      encrypted = fullEncrypt
+    end
+  end
+  return encrypted
+end
+-- runs for all players unless dontReload is true
+function on_black_changed(tag, oldVal, newVal)
+  if oldVal ~= newVal and (not dontReload) then
+    setup_mini_blacklist(newVal)
+  elseif dontReload then
+    dontReload = false
+  end
+end
+hook_on_sync_table_change(gGlobalSyncTable, "blacklistData", "blacklist_change", on_black_changed)
+
 -- I wish there was a better way to do this
 course_to_level = {
   [COURSE_NONE] = LEVEL_CASTLE_GROUNDS, -- Course 0 (note that courtyard and inside are also course 0); won't appear in minihunt
@@ -761,4 +841,37 @@ string_to_level = {
   ["wmotr"] = LEVEL_WMOTR, -- Course 23
   ["sa"] = LEVEL_SA, -- Course 24
   ["end"] = LEVEL_ENDING, -- Course 25
+}
+string_to_course = {
+  ["grounds"] = COURSE_NONE,
+  ["castle"] = COURSE_NONE,
+  ["courtyard"] = COURSE_NONE,
+  ["bob"] = COURSE_BOB, -- Course 1
+  ["wf"] = COURSE_WF, -- Course 2
+  ["jrb"] = COURSE_JRB, -- Course 3
+  ["ccm"] = COURSE_CCM, -- Course 4
+  ["bbh"] = COURSE_BBH, -- Course 5
+  ["hmc"] = COURSE_HMC, -- Course 6
+  ["lll"] = COURSE_LLL, -- Course 7
+  ["ssl"] = COURSE_SSL, -- Course 8
+  ["ddd"] = COURSE_DDD, -- Course 9
+  ["sl"] = COURSE_SL, -- Course 10
+  ["wdw"] = COURSE_WDW, -- Course 11
+  ["ttm"] = COURSE_TTM, -- Course 12
+  ["thi"] = COURSE_THI, -- Course 13
+  ["ttc"] = COURSE_TTC, -- Course 14
+  ["rr"] = COURSE_RR, -- Course 15
+  ["bitdw"] = COURSE_BITDW, -- Course 16
+  ["b1"] = COURSE_BOWSER_1,
+  ["bitfs"] = COURSE_BITFS, -- Course 17
+  ["b2"] = COURSE_BOWSER_2,
+  ["bits"] = COURSE_BITS, -- Course 18
+  ["b3"] = COURSE_BOWSER_3,
+  ["pss"] = COURSE_PSS, -- Course 19
+  ["cotmc"] = COURSE_COTMC, -- Course 20
+  ["totwc"] = COURSE_TOTWC, -- Course 21
+  ["vcutm"] = COURSE_VCUTM, -- Course 22
+  ["wmotr"] = COURSE_WMOTR, -- Course 23
+  ["sa"] = COURSE_SA, -- Course 24
+  ["end"] = 25, -- Course 25
 }

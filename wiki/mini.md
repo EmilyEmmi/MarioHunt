@@ -25,6 +25,7 @@ Every star in the game is eligible, with the following exceptions:
   - No 100 coin stars
   - No stars that are too quick (In The Deep Freeze, Mysterious Mountainside)
   - Other stars that worsen the MiniHunt experience
-Psst... if you want to know what stars are assigned, try **/mh allstars mini**. Note that this does not display Star Replicas, which *are* eligible.
+
+To view or manage the blacklist, go to **MiniHunt Blacklist** under **Game Settings**.
 
 That's all you need to know for MiniHunt!

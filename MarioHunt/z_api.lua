@@ -24,7 +24,21 @@ end
 -- also like above, but returns true if the player is in hard mode instead
 _G.mhApi.isHardMode = function(index)
   local sMario = gPlayerSyncTable[index]
-  return (sMario.hard)
+  return (sMario.hard == 1)
+end
+
+-- returns true if the player is in extreme mode
+_G.mhApi.isExtremeMode = function(index)
+  local sMario = gPlayerSyncTable[index]
+  return (sMario.hard == 2)
+end
+
+-- screw it, just read whatever field you want
+_G.mhApi.getPlayerField = function(index,field)
+  return gPlayerSyncTable[index][field]
+end
+_G.mhApi.getGlobalField = function(field)
+  return gGlobalSyncTable[field]
 end
 
 -- returns game mode
@@ -37,6 +51,28 @@ _G.mhApi.getState = function()
   return gGlobalSyncTable.mhState or 0
 end
 
+-- become a runner
+_G.mhApi.become_runner = function(index)
+  local sMario = gPlayerSyncTable[index]
+  return become_runner(sMario)
+end
+-- become a hunter
+_G.mhApi.become_hunter = function(index)
+  local sMario = gPlayerSyncTable[index]
+  return become_hunter(sMario)
+end
+
+-- returns a string, a color string, and a table, in that order
+_G.mhApi.get_role_name_and_color = function(index)
+  local sMario = gPlayerSyncTable[index]
+  return get_role_name_and_color(sMario)
+end
+
+-- checks if a menu is open
+_G.mhApi.isMenuOpen = function()
+  return (menu or showingStats)
+end
+
 -- making some things global
 _G.mhApi.interactionIsValid = on_interact
 _G.mhApi.exitIsValid = on_pause_exit
@@ -44,8 +80,10 @@ _G.mhApi.pvpIsValid = allow_pvp_attack
 _G.mhApi.getStarName = get_custom_star_name
 _G.mhApi.trans = trans
 _G.mhApi.trans_plural = trans_plural
-_G.mhApi.become_runner = become_runner
-_G.mhApi.become_hunter = become_hunter
+_G.mhApi.valid_star = valid_star -- takes course, act, bool if we're *not* in minihunt, and bool if replicas are active
+_G.mhApi.mod_powers = has_mod_powers -- the first argument is the local player index, the second is a bool if we're only looking for a dev
+_G.mhApi.global_popup_lang = global_popup_lang -- takes language parameters and the lines paramter; check main.lua
+_G.mhApi.get_tag = get_tag -- takes index, returns string for tag shown in chat (like [DEV] or [1st Place])
 
 -- this gets the local player's current kill combo
 _G.mhApi.getKillCombo = get_kill_combo
