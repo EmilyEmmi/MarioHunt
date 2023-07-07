@@ -1,30 +1,32 @@
 # Running a Game
 **FIRST: If you are playing in one of the Standard modes (Normal and Switch) make sure you start with an empty save file!** Unless you're continuing a past game, of course. Don't worry about this with MiniHunt.
 
-MarioHunt is controlled entirely with the **/mh** command. This command handles everything, from picking teams, selecting the game mode, and more.
+Previously, you had to type commands for every single thing. However, thanks to Blocky, there is now a built-in menu that can do it instead. If you would like to know the commands anyway, check [here](commands.md).
 
 Setting up a game is a simple 3-step process.
 ## Step 1: Settings
-The commands are listed on the [home page](https://github.com/EmilyEmmi/MarioHunt/blob/main/README.md).
-Don't be overwhelmed by the amount of commands. You probably won't use half of them.
+First: Type /mh, or hold L and press START, to open the Main Menu. Select MarioHunt, then Game Settings.
+
+<img src="img/menu.png" alt="What you'll see when you open the Menu." width="400"/>
 
 Here are the settings you will most likely want to change:
 
-**/mh lives:** Set the amount lives Runners have.
+**Runner Lives:** Set the amount lives Runners have.
 Remember that this is based on Mario 64 rules; so setting this to 1 will have Runners lose after dying **twice**, since game over occurs at -1 lives.
+This is actually not in Game Settings, but in the MarioHunt menu.
 
-**/mh time:** Sets the amount of time runners have to wait to leave a course OR the amount of time MiniHunt lasts (in seconds).
+**Time:** Sets the amount of time runners have to wait to leave a course OR the amount of time MiniHunt lasts (in seconds).
 This is 4 minutes by default.
 
-**/mh mode:** Change the game mode. Do /mh mode mini for MiniHunt, and do /mh mode switch for Switch Mode.
-For standard MarioHunt, do /mh mode normal (default).
+**Gamemode:** Change the game mode. Select 2 for MiniHunt, and 1 for Switch Mode.
+For standard MarioHunt, select 0 (default).
 
-**/mh default:** Changed too many settings? This will reset everything back to default (including the gamemode).
+**Reset To Defaults:** Changed too many settings? This will reset everything back to default (including the gamemode).
 
-**/mh auto:** Feeling lazy? In MiniHunt, turn this on and new games will be started **automatically!** It'll even pick a good amount of Runners for you.
-Now you can go eat lunch or something (though I would have at least one moderator on to handle any rude players)
+**Auto Game:** Feeling lazy? In MiniHunt, turn this on and new games will be started **automatically!** It'll even pick a good amount of Runners for you if you select ANY (located left of 0).
+Now you can go eat lunch or something (though I would have at least one moderator on to handle any rude players).
 
-**/mh category:** If you want a shorter game, try a different category! Simply type /mh category [NUMBER OF STARS].
+**Category:** If you want a shorter game, try a different category!
 This uses Speedrunner Terminology™. The default is a **70 star run**. Other common categories include:
   - 0 star: Play all Bowser stages.
   - 1 star: Play all Bowser stages, plus Board Bowser's Sub.
@@ -36,22 +38,22 @@ But you don't have to play these categories. You can try, say, 8 stars. Or 42 st
 
 Some of these categories normally require glitches. However, MarioHunt will automatically open doors and deactivate the Infinite Stairs so that no glitches are required.
 (Imagine trying to do Mips Clips with 7 players trying to beat you up...)
-But what if you do want glitches? Set the category to -1. This will activate an **any% run**, where anything goes.
+But what if you do want glitches? Set the category to ANY. This will activate an **any% run**, where anything goes.
 
 Once that's all handled...
 ## Step 2: Picking teams
-Now it's time to decide who gets to be Runner. First, run
-**/mh random [NUM]**, with [NUM] being the amount of Runners.
+Now it's time to decide who gets to be Runner.
+First, go to the MarioHunt menu and use **Randomize Runners** with however many you wish.
 
 Now you're ready to- wait, hold on, what if someone wants to *not* be Runner?
-Well then, use /mh flip [NAME|ID] to flip their team. Enter their name, or type /players and enter their corresponding ID.
-If you want to refer to yourself, just enter nothing and it'll flip your team. You can also use /mh flip to flip a Hunter to a Runner, if someone *really* wants to be Runner.
+Well then, navigate to the Players menu and select their name. Then select the **Flip Team** option.
+You can also use this to flip a Hunter to a Runner, if someone *really* wants to be Runner.
 
 If you're sure everyone is happy with their teams, it's time to...
 ## STEP 3: START THE GAME!!!
-Just do /mh start. That's it.
+Go to the MarioHunt menu, select Start, and select an option (usually "Main" or "Start"). That's it!
 
-But don't forget that you can run commands mid-game, too. If there aren't enough Runners, use /mh add [NUM] to add more runners at random.
-You can also use /mh flip in case someone loses their role by disconnecting.
+But don't forget that you can do stuff mid-game, too. If there aren't enough Runners, use **Add Runners** to add more runners at random.
+You can also use **Flip Team** in case someone loses their role by disconnecting.
 
 That's it! If you want to know how to play, check the [MarioHunt rules](rules.md) or [MiniHunt rules](mini.md).

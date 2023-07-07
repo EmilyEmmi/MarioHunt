@@ -25,11 +25,16 @@
 
 [OMM Rebirth](omm.md)
 
+## Other Stuff
+[Hard Mode and Extreme Mode](hard.md)
+
+[Spectate Mode](spectate.md)
+
 ## For Modders/Translators
 [MarioHunt API](api.md)
 
 [Rom Hack Compatibility](romhack.md)
 
-[Contributing with Code](modding.md)
+[Contributing Code](modding.md)
 
 [Contributing a Language](lang.md)

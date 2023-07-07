@@ -666,8 +666,10 @@ mh combo\
 mh field\
 mh allstars\
 mh langtest\
+mh unmod\
+mh gfield\
+mh hidehud\
 mh print\
-\
 Enjoy this sweet\
 knowledge!"))
 
@@ -768,7 +770,7 @@ end
 end
 
 function auto_skip(id)
-  if gGlobalSyncTable.romhack_file ~= "vanilla" then return end
+  if gGlobalSyncTable.romhackFile ~= "vanilla" then return end
   local skip = {
     [0] = 1,
     [14] = 1,

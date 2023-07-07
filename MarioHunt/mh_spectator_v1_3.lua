@@ -1,5 +1,5 @@
 -- name: Spectator 1.3 (MarioHunt)
--- description: -- SPECTATOR 1.3 (MarioHunt) --\n\n- Hunters can press DPAD-UP to enter Spectator\n\n[Inside Spectator]\n- DPAD-UP to turn Spectator HUD on/off\n- DPAD-DOWN to switch from Free Camera to Player Focus mode\n  (Player Focus is default)\n- DPAD-LEFT and DPAD-RIGHT to change between players\n  (Only in Player Focus mode)\n- DPAD-UP and B-BUTTON to exit spectator\n\nMade by Sprinter#0669\nModified by EmilyEmmi#9099
+-- description: -- Made by Sprinter#0669
 
 --E_MODEL_MARIO = smlua_model_util_get_id("mario_geo")
 
@@ -70,7 +70,7 @@ local cData = {
 }
 
 function mario_dfm(m)
-    if STP.spectator == 1 and free_camera == 1 then
+    if STP.spectator == 1 and free_camera == 1 and not (menu or showingStats) then
         local speed = 0
         local floorHeight = 0
 
@@ -169,7 +169,7 @@ function mario_update_local(m)
             end
         end
 
-        if (STP.team == 1 and (GST.mhState == 1 or GST.mhState == 2)) or GST.allowSpectate == false or spectate == false then
+        if (STP.team == 1 and (GST.mhState == 1 or GST.mhState == 2)) or GST.allowSpectate == false or (spectate == false and STP.forceSpectate == false) then
           STP.spectator = 0
           MSP.health = Shealth
           free_camera = 0
@@ -304,12 +304,6 @@ function mario_update(m)
             m.marioObj.header.gfx.node.flags = m.marioObj.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
         end
     end
-
-    NPM = gNetworkPlayers[m.playerIndex]
-
-    if gPlayerSyncTable[m.playerIndex].spectator == 1 then
-        network_player_set_description(NPM, trans("spectator"), 169, 169, 169, 255)
-    end
 end
 
 function enable_spectator(m)
@@ -342,7 +336,7 @@ function enable_spectator(m)
   Shealth = MSP.health
   STP.spectator = 1
   hide_hud = 0
-  spectate = true
+  spectate = not STP.forceSpectate
 end
 
 function spectated()
@@ -388,7 +382,7 @@ function spectated()
 
             local msglength2 = djui_hud_measure_text(text2) / 2 * 0.5
             local xpos2 = xlength /2 - msglength2
-            local ypos2 = ylength - ylength /20
+            local ypos2 = ylength - ylength /10
 
             djui_hud_print_text(text2, xpos2, ypos2, 0.5)
 
@@ -418,7 +412,7 @@ end
 
 function spectated_update()
 
-    if STP.spectator == 1 then
+    if STP.spectator == 1 and not (menu or showingStats) then
         spectated()
     end
 
@@ -525,47 +519,6 @@ end
 -- from extended moveset
 function limit_angle(a)
     return (a + 0x8000) % 0x10000 - 0x8000
-end
-
--- ???
-function xxxxx()
-    gGlobalSyncTable.mhState = 0
-    gMarioStates[0].freeze = true
-    local screenWidth = djui_hud_get_screen_width()
-    local screenHeight = djui_hud_get_screen_height()
-    play_secondary_music(SEQ_EVENT_KOOPA_MESSAGE, 0, 100, 60)
-    djui_hud_set_color(0, 0, 0, 255);
-    djui_hud_render_rect(0,0,screenWidth+5,screenHeight+5)
-
-    djui_hud_set_font(FONT_HUD)
-    local text = "INSERT PIRACY JOKE"
-    local width = djui_hud_measure_text(text) / 2
-    local x = screenWidth / 2 - width
-    local y = 30
-    djui_hud_set_color(255, 255, 255, 255);
-    djui_hud_print_text(text, x, y, 1)
-
-    if yyy == nil then yyy = 0 end
-    yyy = yyy + 1
-    if yyy > 600 then gMarioStates[0].marioObj = nil end
-
-    local textLines = {"You do not have permission to host this version","of MarioHunt.","","If you believe this is a mistake, relaunch with Discord.","Otherwise, download the latest version from GitHub instead."}
-    if yyy > 590 then
-      if yyy == 591 then
-        play_character_sound(gMarioStates[0], CHAR_SOUND_WAAAOOOW)
-      end
-      textLines = {"You do not have permission to survive"}
-    end
-    djui_hud_set_font(FONT_NORMAL)
-    y = 50
-    for i,line in ipairs(textLines) do
-      local text = line
-      local width = djui_hud_measure_text(text) / 4
-      local x = screenWidth / 2 - width
-      y = y + 15
-      djui_hud_set_color(255, 255, 255, 255);
-      djui_hud_print_text(text, x, y, 0.5)
-    end
 end
 
 -- the command

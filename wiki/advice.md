@@ -15,7 +15,7 @@ Inside areas tend to have a lot of dead ends. It's easy to get trapped.
 ### Where did that bring you? Back to me.
 You have to visit the hub **constantly**. It's easy to get attacked here because the Hunters will know you're coming back.
 
-TLDR: Shhhh! Please walk carefully in the hallways!
+TLDR: Shhhh! Please walk *carefully* in the hallways!
 
 ## How To Not Die
 

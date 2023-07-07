@@ -13,7 +13,7 @@ end
 function mute_command(msg)
     if network_is_server() or network_is_moderator() then
         if network_player_from_global_index(tonumber(msg)) ~= nil then
-            network_send(true, {id = "MUTE_PLAYER", playerIndex = tonumber(msg), popupMessage = "\\#FFFFFF\\ was muted."})
+            network_send(true, {id = "MUTE_PLAYER", playerIndex = tonumber(msg), muter = gNetworkPlayers[0].globalIndex, popupMessage = "\\#FFFFFF\\ was muted by "})
             djui_popup_create("\\#FFFFFF\\You muted ".."\\#FFFF00\\"..network_player_from_global_index(tonumber(msg)).name.."\\#FFFFFF\\.", 1)
             return true
         end
@@ -22,7 +22,7 @@ end
 
 function unmute_command(msg)
     if network_player_from_global_index(tonumber(msg)) ~= nil then
-        network_send(true, {id = "MUTE_PLAYER", playerIndex = tonumber(msg), popupMessage = "\\#FFFFFF\\ was unmuted."})
+        network_send(true, {id = "MUTE_PLAYER", playerIndex = tonumber(msg), muter = gNetworkPlayers[0].globalIndex, popupMessage = "\\#FFFFFF\\ was unmuted by "})
         djui_popup_create("\\#FFFFFF\\You unmuted ".."\\#FFFF00\\"..network_player_from_global_index(tonumber(msg)).name.."\\#FFFFFF\\.", 1)
         return true
     end
@@ -31,13 +31,13 @@ end
 function on_packet_receive(dataTable)
     if dataTable.id == "MUTE_PLAYER" then
         if gNetworkPlayers[0] == network_player_from_global_index(dataTable.playerIndex) then
-            if dataTable.popupMessage == "\\#FFFFFF\\ was muted." then
+            if dataTable.popupMessage == "\\#FFFFFF\\ was muted by " then
                 gPlayerSyncTable[0].mute = true
             else
                 gPlayerSyncTable[0].mute = false
             end
         end
-        djui_popup_create("\\#FFFF00\\"..network_player_from_global_index(tonumber(dataTable.playerIndex)).name.. dataTable.popupMessage, 1)
+        djui_popup_create("\\#FFFF00\\"..network_player_from_global_index(tonumber(dataTable.playerIndex)).name.. dataTable.popupMessage .. network_player_from_global_index(tonumber(dataTable.muter)).name, 1)
     end
 end
 

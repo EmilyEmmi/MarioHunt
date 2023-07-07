@@ -1,4 +1,47 @@
 # Changelog
+## v2.1
+### Additions:
+  - **Added menu!** Use /mh to open or hold L and press START. It does almost everything commands can do! (not fully translated at this time)
+    - Thanks so much to **Blocky** for making the framework for this.
+  - Updated German Translation (N64-Mario)
+  - Added /mh blacklist, which lets you select stars to blacklist in MiniHunt! You can also use the menu.
+  - You can now get info about a specific command with /mh help [command]
+  - Added Red Coin and Secret radars
+  - Added Extreme Mode, because Hard Mode wasn't hard enough apparently
+  - Added... something else (secret)
+  - **API Additions:**
+    - isExtremeMode, which works like isHardMode
+    - trans and trans_plural, which can use the language data
+    - valid_star, which returns if the star is valid (useful for minihunt integrations)
+    - mod_powers, which allows you to quickly check for hosts, mods, or devs
+    - isMenuOpen, for checking if the menu is open (duh)
+    - getPlayerField and getGlobalField, to read other fields such as lives
+    - get_role_name_and_color, which returns the name of the player's role, a color string, and a color table
+    - global_popup_lang, which is a combination of trans and djui_popup_create_global
+    - get_tag, which gets the tag like shown in chat
+    - For rom hacks: heartReplace, which replaces hearts with 1-ups if enabled
+    - mute.lua now displays who muted the player
+### Adjustments:
+  - Changed the name of Windy Wing Cap Well's replica to reflect its actual location
+  - Nerfed Hunters' water punch again
+  - Buffed Hunters' water punch when using OMM Rebirth
+  - Regular doors now open automatically instead of being destroyed (EmeraldLockdown)
+  - Added some more stars to the blacklist in Star Road
+  - You can now only restart a stage in MiniHunt (exit course) when standing on the ground
+  - A star sound now plays whenever you become Runner, rather than only from a kill
+  - Role change popups now change color depending on if the player is in Hard or Extreme mode
+  - Moderators and devs can change the auto status, instead of just the host
+  - Other people's placement in the 64 Tour will now be displayed in Stats (note: Only those with known discord ids will have their placement shown)
+  - Rejoin notifications now appear for all players
+### Fixes/Backend changes:
+  - Fixed cap switches being unlocked when loading a lobby in MiniHunt mode
+  - Fixed star count not resetting when switching save files, or when switching from MiniHunt to Standard modes
+  - Fixed non-stop mode in OMM not getting disabled sometimes
+  - Fixed some popups being displayed in the sender's language rather than your own
+  - **API CHANGE:** Fixed script errors when using mhSetup.lua without having MarioHunt enabled
+  - **API CHANGE:** become_runner and become_hunter now use indexes as their arguments (and therefore, now actually work)
+  - Obfuscated code related to the dev role and competition placement (thanks Isaac)
+  - Removed .png images from the files; they are available in mh-textures.zip
 ## v2.0
 ### Additions:
   - **Added MiniHunt!** A new gamemode for bite-sized gameplay.

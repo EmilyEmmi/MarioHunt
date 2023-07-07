@@ -1,8 +1,8 @@
--- selectable: false
-
 --[[ This file is a base for making your hack compatible with MarioHunt.
 Be sure to read below.
 ]]
+
+if not _G.mhExists then return end -- don't load if MarioHunt isn't enabled
 
 -- Most default values are based off of vanilla.
 _G.mhApi.romhackSetup = function()

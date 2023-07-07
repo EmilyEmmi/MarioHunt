@@ -16,7 +16,7 @@ function door_loop(o)
       starsNeeded = starsNeeded - 1
     end
   end
-  
+
   if m.numStars >= starsNeeded then
     -- completely remove collision and hitbox
     o.collisionData = nil
@@ -38,8 +38,8 @@ function door_loop(o)
       cur_obj_play_sound_2(SOUND_GENERAL_OPEN_WOOD_DOOR)
     end
 
-    if o.header.gfx.animInfo.animFrame < 5 then
-      o.header.gfx.animInfo.animFrame = 5 -- make door opening feel snappier
+    if o.header.gfx.animInfo.animFrame < 10 then
+      o.header.gfx.animInfo.animFrame = 10 -- make door opening feel snappier
     end
 
     -- 40 is the anim frame where the door is fully opened
