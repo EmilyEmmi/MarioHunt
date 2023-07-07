@@ -106,7 +106,7 @@ function menu_reload()
   if ROMHACK then maxStars = ROMHACK.max_stars end
   if auto == 99 then auto = -1 end
   settingsMenu = {
-      { name = "Gamemode", currNum = GST.mhMode, maxNum = 2,      description = trans("mode_desc"), title = trans("menu_settings") },
+      { name = trans("menu_gamemode"), currNum = GST.mhMode, maxNum = 2,      description = trans("mode_desc"), title = trans("menu_settings") },
       { name = "Seeker Appearence", option = GST.metal,           description = trans("metal_desc") },
       { name = "Weak Mode",         option = GST.weak,            description = trans("weak_desc") },
       { name = "Allow Spectating",  option = GST.allowSpectate,   description = trans("spectator_desc") },

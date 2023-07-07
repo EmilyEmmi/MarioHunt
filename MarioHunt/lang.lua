@@ -14,6 +14,8 @@ Use "/mh langtest [ID,EXTRA1,EXTRA2,LANG]" for testing.
 - LANG is what language, which is otherwise whichever one you have selected (ex: "fr" is french)
 - add "plural" at the end for phrases that change based on the entered data
 "/mh langtest all [LANG]" lists every id that doesn't have a translation (this does not include incomplete translations)
+
+IF something you want to translate does not use this table, you can add it to your table and let me know
 ]]
 
 -- this is the translate command, it supports up to two blanks
@@ -331,6 +333,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_run_add = "Add Runners",
   menu_run_lives = "Runner Lives",
   menu_mh = "MarioHunt",
+  menu_gamemode = "Gamemode",
 
   -- These commands only appear to me, so I wouldn't bother translating them. You can delete these lines and everything should still work.
   print_desc = "[STRING] - Outputs message to console",
@@ -571,6 +574,7 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   menu_back = "Volver",
   menu_exit = "Exit",
   menu_mh = "MarioHunt",
+  menu_gamemode = "Modo de juego",
 }
 
 langdata["de"] = -- by N64 Mario
@@ -805,6 +809,7 @@ langdata["de"] = -- by N64 Mario
   menu_run_add = "Läufer hinzufügen",
   menu_run_lives = "Läuferleben",
   menu_mh = "MarioHunt",
+  menu_gamemode = "Spielmodus",
 }
 
 langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
