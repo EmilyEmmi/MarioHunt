@@ -1,4 +1,4 @@
--- name: .\\#00ffff\\Mario\\#ff5a5a\\Hun‎\\\\t (v2.1)
+-- name: .\\#00ffff\\Mario\\#ff5a5a\\Hun\\\\t (v2.2)\\#dcdcdc\\
 -- incompatible: gamemode
 -- description: A gamemode based off of Beyond's concept.\n\nHunters stop Runners from clearing the game!\n\nProgramming by EmilyEmmi, TroopaParaKoopa, Blocky, Sunk, and Sprinter05.\n\nSpanish Translation made with help from KanHeaven and SonicDark.\nGerman Translation made by N64 Mario.\nBrazillian Portuguese translation made by PietroM.\nFrench translation made by Skeltan.\n\n\"Shooting Star Summit\" port by pieordie1
 
@@ -14,7 +14,7 @@ gGlobalSyncTable.pause = false
 -- TroopaParaKoopa's hns metal cap option
 gGlobalSyncTable.metal = false
 
-local rejoin_timer = {} -- rejoin timer for runners (host only)
+local rejoin_timer = {} -- rejoin timer for runners (IsHost only)
 if network_is_server() then
   -- all settings here
   gGlobalSyncTable.runnerLives = 1 -- the lives runners get (0 is a life)
@@ -259,13 +259,15 @@ function omm_attack(index,setting)
     on_pvp_attack(gMarioStates[index], gMarioStates[0], true)
   end
 end
+--- @param obj Object
 function omm_object_interact(m,cappy,obj) -- for the 1up and nothing else
-  on_interact(m, obj, nil, nil)
+  if get_id_from_behavior(obj.behavior) == id_bhvHidden1upInPole then
+    on_interact(m, obj, obj.oInteractType, 0)
+  end
 end
+-- sadly this no longer works (while I CAN force the value, it prevents it from being changed)
 function hide_both_hud(hide)
-  if OmmEnabled then
-    _G.OmmApi.omm_disable_hud(hide)
-  elseif hide then
+  if hide then
     hud_hide()
   else
     hud_show()
@@ -325,7 +327,7 @@ function calculate_leave_requirements(sMario,runTime)
   -- if there aren't any in this stage, treat as a 1 star stage
   if available_stars <= 0 then
     available_stars = 1
-    if gGlobalSyncTable.starMode then return -1,0 end -- impossible to leave in star mode
+    if gGlobalSyncTable.starMode or ROMHACK.isUnder then return -1,0 end -- impossible to leave in star mode
   end
 
   -- subtract obtained stars (excluding inside bowser areas)
@@ -549,9 +551,11 @@ function new_runner(includeLocal)
   return np.globalIndex
 end
 
--- gets replaced if OMM is enabled
 function omm_disable_non_stop_mode(disable)
-  return
+  if OmmEnabled then
+    gLevelValues.disableActs = disable
+    return _G.OmmApi.omm_disable_feature("trueNonStop", disable)
+  end
 end
 
 function update()
@@ -658,7 +662,10 @@ function on_course_sync()
       _G.OmmApi.omm_resolve_cappy_mario_interaction = omm_attack
       _G.OmmApi.omm_allow_cappy_mario_interaction = omm_allow_attack
       _G.OmmApi.omm_resolve_cappy_object_interaction = omm_object_interact
-      omm_disable_non_stop_mode = _G.OmmApi.omm_disable_non_stop_mode
+      _G.OmmApi.omm_disable_feature("lostCoins",true)
+      _G.OmmApi.omm_force_setting_value("player",2)
+      _G.OmmApi.omm_force_setting_value("damage",20)
+      _G.OmmApi.omm_force_setting_value("bubble",0)
     end
     if gGlobalSyncTable.romhackFile == "vanilla" then
       omm_replace(OmmEnabled)
@@ -786,7 +793,7 @@ function on_course_sync()
   end
 end
 
--- load saved settings for host
+-- load saved settings for IsHost
 function load_settings()
   if not network_is_server() then return end
 
@@ -819,7 +826,7 @@ function load_settings()
     gGlobalSyncTable.starRun = tonumber(option)
   end
 end
--- save settings for host
+-- save settings for IsHost
 function save_settings()
   if not network_is_server() then return end
 
@@ -844,7 +851,7 @@ function save_settings()
     mod_storage_save(fileName,tostring(option))
   end
 end
--- loads default settings for host
+-- loads default settings for IsHost
 function default_settings()
   setup_hack_data(true,false,OmmEnabled)
   gGlobalSyncTable.runnerLives = 1
@@ -1073,9 +1080,15 @@ function on_hud_render()
           local file = get_current_save_file_num() - 1
           local course_star_flags = save_file_get_star_flags(file, gNetworkPlayers[0].currCourseNum - 1)
           if course_star_flags & (1 << (star - 1)) == 0 then
+            if star_radar[star] == nil then
+              star_radar[star] = {tex = TEX_STAR, prevX = 0, prevY = 0}
+            end
             render_radar(obj, star_radar[star], true)
           end
         elseif star == gGlobalSyncTable.getStar then
+          if star_radar[star] == nil then
+            star_radar[star] = {tex = TEX_STAR, prevX = 0, prevY = 0}
+          end
           render_radar(obj, star_radar[star], true)
           if obj.unused1 ~= 5 then
             obj_set_model_extended(obj, E_MODEL_STAR)
@@ -1114,7 +1127,7 @@ function on_hud_render()
     if obj ~= nil then
       render_radar(obj, ex_radar[1], true, "coin")
     end
-    -- red coins
+    -- secrets
     obj = obj_get_nearest_object_with_behavior_id(gMarioStates[0].marioObj, id_bhvHiddenStarTrigger)
     if obj ~= nil then
       render_radar(obj, ex_radar[2], true, "secret")
@@ -1123,7 +1136,7 @@ function on_hud_render()
     if demonOn then
       obj = obj_get_first_with_behavior_id(id_bhvHidden1upInPole)
       while obj ~= nil do
-        if obj.oBehParams == 0xFF then
+        if obj.oBehParams <= 255 then
           render_radar(obj, ex_radar[3], true, "demon")
           break
         end
@@ -1454,7 +1467,7 @@ function on_player_disconnected(m)
   if np.globalIndex == attackedBy then attackedBy = nil end
 
 
-  -- for host only
+  -- for IsHost only
   if network_is_server() then -- rejoin handling
     local sMario = gPlayerSyncTable[m.playerIndex]
     sMario.wins,sMario.kills,sMario.maxStreak,sMario.hardWins,sMario.maxStar,sMario.exWins,sMario.beenRunner = 0,0,0,0,0,0,0 -- unassign stats
@@ -1490,9 +1503,45 @@ function on_player_disconnected(m)
   end
 end
 
+-- speed up these actions (troopa)
+local faster_actions = {
+  [ACT_GROUND_BONK] = true,
+  [ACT_SPECIAL_DEATH_EXIT] = true,
+  [ACT_FORWARD_GROUND_KB] = true,
+  [ACT_BACKWARD_GROUND_KB] = true,
+  [ACT_BACKFLIP_LAND] = true,
+  [ACT_TRIPLE_JUMP_LAND] = true,
+  [ACT_STAR_DANCE_EXIT] = true,
+  [ACT_STAR_DANCE_WATER] = true,
+  [ACT_STAR_DANCE_NO_EXIT] = true,
+  [ACT_DIVE_PICKING_UP] = true,
+  [ACT_PICKING_UP] = true,
+  [ACT_PICKING_UP_BOWSER] = true,
+  [ACT_HARD_FORWARD_GROUND_KB] = true,
+  [ACT_SOFT_FORWARD_GROUND_KB] = true,
+  [ACT_HARD_BACKWARD_GROUND_KB] = true,
+  [ACT_SOFT_BACKWARD_GROUND_KB] = true,
+  [ACT_LEDGE_GRAB] = true,
+  [ACT_LEDGE_CLIMB_SLOW_1] = true,
+  [ACT_LEDGE_CLIMB_SLOW_2] = true,
+  [ACT_LEDGE_CLIMB_FAST] = true,
+  [ACT_ENTERING_STAR_DOOR] = true,
+  [ACT_PUSHING_DOOR] = true,
+  [ACT_PULLING_DOOR] = true,
+  [ACT_UNLOCKING_KEY_DOOR] = true,
+  [ACT_UNLOCKING_STAR_DOOR] = true,
+  [ACT_BACKWARD_WATER_KB] = true,
+  [ACT_FORWARD_WATER_KB] = true,
+}
+
 -- based off of example
 function mario_update(m)
   if not didFirstJoinStuff then return end
+
+  -- fast actions by troopa
+  if faster_actions[m.action] then
+    m.marioObj.header.gfx.animInfo.animFrame = m.marioObj.header.gfx.animInfo.animFrame + 1
+  end
 
   -- force spectate
   local sMario = gPlayerSyncTable[m.playerIndex]
@@ -1534,7 +1583,7 @@ function mario_update(m)
     local demonOkay = (sMario.team == 1 and m.health > 0xFF and m.invincTimer <= 0 and gGlobalSyncTable.mhState == 2)
     local obj = obj_get_first_with_behavior_id(id_bhvHidden1upInPole)
     while obj ~= nil do
-      if obj.oBehParams == 0xFF then
+      if obj.oBehParams <= 255 then
         demonExists = true
         break
       end
@@ -1558,14 +1607,6 @@ function mario_update(m)
     if died and m.invincTimer < 100 then m.invincTimer = 100 end -- start invincibility
 
     died = false
-    -- prevent coin loss in OMM... unless it's ztar attack
-    if OmmEnabled and ROMHACK.stalk == nil then
-      if prevCoins < m.numCoins then
-        prevCoins = m.numCoins
-      elseif prevCoins > m.numCoins then
-        m.numCoins = prevCoins
-      end
-    end
 
     -- match life counter to actual lives
     if sMario.team == 1 and m.numLives ~= sMario.runnerLives and sMario.runnerLives ~= nil then
@@ -1826,7 +1867,7 @@ function runner_update(m,sMario)
   if ((sMario.hard ~= 0) and sMario.runnerLives > 0) then sMario.runnerLives = 0 end
 
   -- add stars
-  if gGlobalSyncTable.mhMode == 2 or m.prevNumStarsForDialog < m.numStars then
+  if gGlobalSyncTable.mhMode == 2 or m.prevNumStarsForDialog < m.numStars or ROMHACK.isUnder then
     if m.playerIndex == 0 and gotStar ~= nil then
       if gGlobalSyncTable.mhMode == 2 then
         if gotStar == gGlobalSyncTable.getStar then
@@ -1894,6 +1935,11 @@ function hunter_update(m,sMario)
     m.forwardVel = waterPunchVel
   end
 
+  -- slight speed boost for hunters
+  if m.action & ACT_GROUP_MASK == ACT_GROUP_MOVING and m.forwardVel > 30 and m.forwardVel < 40 then
+    m.forwardVel = m.forwardVel + 2
+  end
+
   -- only local mario at this point
   if m.playerIndex ~= 0 then return end
 
@@ -1906,7 +1952,7 @@ function hunter_update(m,sMario)
     campTimer = nil
   end
 
-  -- detect victory for hunters (only host to avoid disconnect bugs)
+  -- detect victory for hunters (only IsHost to avoid disconnect bugs)
   if network_is_server() then
     -- check for runners
     local stillrunners = false
@@ -1958,6 +2004,13 @@ end
 
 -- disable some interactions
 function on_allow_interact(m, o, type)
+    if m.playerIndex == 0 and type == INTERACT_STAR_OR_KEY and ROMHACK.isUnder then -- star detection is silly
+      local obj_id = get_id_from_behavior(o.behavior)
+      if obj_id ~= id_bhvGrandStar then
+        gotStar = (o.oBehParams >> 24) + 1
+      end
+    end
+
     local sMario = gPlayerSyncTable[m.playerIndex]
     -- disable for spectators
     if sMario.spectator == 1 then return false end
@@ -1996,7 +2049,7 @@ function on_interact(m, o, type, value)
   if m.healCounter < 0 then m.healCounter = 0 end]]
 
   if obj_id == id_bhvHidden1upInPole and m.playerIndex == 0 then
-    if o.oBehParams == 0xFF and sMario.team == 1 then
+    if o.oBehParams <= 255 and sMario.team == 1 then
       m.healCounter = 0x0
       m.health = 0xFF -- die
     end
@@ -2139,7 +2192,7 @@ function on_object_unload(o)
       o.oPosX, o.oPosY, o.oPosZ,
       nil)
     end
-  elseif (o.header.gfx.node.flags & GRAPH_RENDER_INVISIBLE) == 0 and obj_has_behavior_id(o, id_bhvHidden1upInPole) == 1 and o.oBehParams == 0xFF and gPlayerSyncTable[0].team == 1 and obj_check_hitbox_overlap(o, gMarioStates[0].marioObj) then -- from flood
+  elseif (o.header.gfx.node.flags & GRAPH_RENDER_INVISIBLE) == 0 and obj_has_behavior_id(o, id_bhvHidden1upInPole) == 1 and o.oBehParams <= 255 and gPlayerSyncTable[0].team == 1 and obj_check_hitbox_overlap(o, gMarioStates[0].marioObj) then -- from flood
     local m = gMarioStates[0]
     m.healCounter = 0x0
     m.health = 0xFF -- die

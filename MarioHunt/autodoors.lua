@@ -17,7 +17,7 @@ function door_loop(o)
     end
   end
 
-  if m.numStars >= starsNeeded then
+  if m.numStars >= starsNeeded and not ROMHACK.isUnder then
     -- completely remove collision and hitbox
     o.collisionData = nil
     o.hitboxRadius = 0

@@ -669,6 +669,9 @@ mh langtest\
 mh unmod\
 mh gfield\
 mh hidehud\
+mh wing-cap\
+mh set-fov\
+mh debug-move\
 mh print\
 Enjoy this sweet\
 knowledge!"))

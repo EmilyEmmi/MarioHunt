@@ -175,6 +175,10 @@ function render_radar(m, hudIcon, isObj, objType)
 
   djui_hud_set_color(r, g, b, alpha)
   djui_hud_render_texture_interpolated(hudIcon.tex, hudIcon.prevX, hudIcon.prevY, 0.6, 0.6, dX, dY, 0.6, 0.6)
+  --[[if objType == nil then
+    djui_hud_set_font(FONT_HUD)
+    djui_hud_print_text_interpolated(tostring((obj.oBehParams >> 24) + 1), hudIcon.prevX, hudIcon.prevY, 0.6, dX, dY, 0.6)
+  end]]
 
   hudIcon.prevX = dX
   hudIcon.prevY = dY

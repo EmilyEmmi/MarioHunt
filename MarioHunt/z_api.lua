@@ -1,7 +1,7 @@
 -- named this way so it loads last
 
 _G.mhExists = true -- use this to detect MarioHunt
-_G.mhVersion = "v2.0" -- version string
+_G.mhVersion = "v2.2" -- version string
 _G.mhApi = {}
 
 -- check mhSetup.lua for more info

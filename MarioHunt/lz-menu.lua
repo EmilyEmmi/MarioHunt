@@ -45,89 +45,89 @@ end)
 for i,data in ipairs(lang_table) do
   table.insert(LanguageMenu, { name = data[1], lang = data[2] } )
 end
-table.insert(LanguageMenu, { name = trans("menu_back") })
-LanguageMenu[1].title = trans("menu_lang")
+table.insert(LanguageMenu, { name = ("menu_back") })
+LanguageMenu[1].title = ("menu_lang")
 LanguageMenu.name = "LanguageMenu"
 LanguageMenu.back = langnum + 1
 
--- we reload all of this whenever we change languages
+-- we reload all of this sometimes
 function menu_reload()
   local GST = gGlobalSyncTable
 
   mainMenu = {
-      { name = trans("menu_mh"),          title = trans("main_menu"), invalid = not has_mod_powers(0) },
-      { name = trans("menu_settings_player"), },
-      { name = trans("menu_rules") },
-      { name = trans("menu_lang") },
-      { name = trans("menu_misc") },
-      { name = trans("players") },
-      { name = trans("menu_stats") },
-      { name = trans("menu_exit") },
+      { name = ("menu_mh"),          title = ("main_menu"), invalid = not has_mod_powers(0) },
+      { name = ("menu_settings_player"), },
+      { name = ("menu_rules") },
+      { name = ("menu_lang") },
+      { name = ("menu_misc") },
+      { name = ("players") },
+      { name = ("menu_stats") },
+      { name = ("menu_exit") },
       name = "mainMenu",
       back = 8,
   }
 
   marioHuntMenu = {
-      { name = "Start",             title = trans("menu_mh")},
-      { name = trans("menu_run_random"), currNum = 1,   minNum = 1, maxNum = MAX_PLAYERS - 1, description = trans("random_desc")  },
-      { name = trans("menu_run_add"),       currNum = 1,   minNum = 1, maxNum = MAX_PLAYERS - 1, description = trans("add_desc") },
-      { name = trans("menu_run_lives"),      currNum = GST.runnerLives, maxNum = 99,              description = trans("lives_desc") },
-      { name = trans("menu_settings") },
-      { name = "Stop", description = trans("stop_desc")},
-      { name = trans("menu_back") },
+      { name = ("menu_start"),             title = ("menu_mh")},
+      { name = ("menu_run_random"), currNum = 1,   minNum = 1, maxNum = MAX_PLAYERS - 1, desc = ("random_desc")  },
+      { name = ("menu_run_add"),       currNum = 1,   minNum = 1, maxNum = MAX_PLAYERS - 1, desc = ("add_desc") },
+      { name = ("menu_run_lives"),      currNum = GST.runnerLives, maxNum = 99,              desc = ("lives_desc") },
+      { name = ("menu_settings") },
+      { name = ("menu_stop"), desc = ("stop_desc")},
+      { name = ("menu_back") },
       name = "marioHuntMenu",
       back = 7,
   }
 
   startMenu = {
-      { name = "Main", title = "Start"  },
-      { name = "Alt Save (buggy)" },
-      { name = "Reset Alt Save (buggy)" },
-      { name = "Continue (no warping back)"},
-      { name = trans("menu_back") },
-      { name = trans("main_menu") },
+      { name = ("menu_save_main"), title = ("menu_start")  },
+      { name = ("menu_save_alt") },
+      { name = ("menu_save_reset") },
+      { name = ("menu_save_continue")},
+      { name = ("menu_back") },
+      { name = ("main_menu") },
       name = "startMenu",
       back = 5,
   }
 
   startMenuMini = {
-      { name = "Random", title = "Start" },
-      { name = "Campaign", currNum = 1, minNum = 1, maxNum = 25 },
-      { name = trans("menu_back") },
-      { name = trans("main_menu") },
+      { name = ("menu_random"), title = ("menu_start") },
+      { name = ("menu_campaign"), currNum = 1, minNum = 1, maxNum = 25 },
+      { name = ("menu_back") },
+      { name = ("main_menu") },
       name = "startMenuMini",
       back = 3,
   }
 
-  LanguageMenu[1].title = trans("menu_lang")
+  LanguageMenu[1].title = ("menu_lang")
 
   local maxStars = 255
   local auto = gGlobalSyncTable.gameAuto
   if ROMHACK then maxStars = ROMHACK.max_stars end
   if auto == 99 then auto = -1 end
   settingsMenu = {
-      { name = trans("menu_gamemode"), currNum = GST.mhMode, maxNum = 2,      description = trans("mode_desc"), title = trans("menu_settings") },
-      { name = "Seeker Appearence", option = GST.metal,           description = trans("metal_desc") },
-      { name = "Weak Mode",         option = GST.weak,            description = trans("weak_desc") },
-      { name = "Allow Spectating",  option = GST.allowSpectate,   description = trans("spectator_desc") },
-      { name = "Star Mode",         option = GST.starMode,        description = trans("starmode_desc"), invalid = (GST.mhMode == 2) },
-      { name = "Category", currNum = GST.starRun, maxNum = maxStars, minNum = -1, description = trans("category_desc"), invalid = (GST.mhMode == 2) },
-      { name = "Time",  currNum = GST.runTime//30, maxNum = 3600,  description = trans("time_desc")},
-      { name = "Auto Game", invalid = (GST.mhMode ~= 2), currNum = auto, minNum = -1, maxNum = MAX_PLAYERS-1, description = trans("auto_desc")},
-      { name = "MiniHunt Blacklist", description = "Control what stars may appear in MiniHunt." },
-      { name = "Reset to Defaults",                               description = trans("default_desc") },
-      { name = trans("menu_back") },
-      { name = trans("main_menu") },
+      { name = ("menu_gamemode"), currNum = GST.mhMode, maxNum = 2, desc = ("mode_desc"), title = ("menu_settings") },
+      { name = ("menu_metal"),          option = GST.metal,         desc = ("metal_desc") },
+      { name = ("menu_weak"),           option = GST.weak,          desc = ("weak_desc") },
+      { name = ("menu_allow_spectate"), option = GST.allowSpectate, desc = ("spectator_desc") },
+      { name = ("menu_star_mode"),      option = GST.starMode,      desc = ("starmode_desc"), invalid = (GST.mhMode == 2) },
+      { name = ("menu_category"), currNum = GST.starRun, maxNum = maxStars, minNum = -1, desc = ("category_desc"), invalid = (GST.mhMode == 2) },
+      { name = ("menu_time"),  currNum = GST.runTime//30, maxNum = 3600,  desc = ("time_desc")},
+      { name = ("menu_auto"), invalid = (GST.mhMode ~= 2), currNum = auto, minNum = -1, maxNum = MAX_PLAYERS-1, desc = ("auto_desc")},
+      { name = ("menu_blacklist"), desc = ("blacklist_desc") },
+      { name = ("menu_default"),   desc = ("default_desc") },
+      { name = ("menu_back") },
+      { name = ("main_menu") },
       name = "settingsMenu",
       back = 11,
   }
   if GST.starMode and GST.mhMode ~= 2 then
-    settingsMenu[7] = { name = "Stars", currNum = GST.runTime, maxNum = 7, description = trans("stars_desc") }
+    settingsMenu[7] = { name = ("menu_stars"), currNum = GST.runTime, maxNum = 7, desc = ("stars_desc") }
   end
 
   -- name gets overriden
   playerMenu = {
-      { name = "PLAYER_0",  color = true, title = trans("players") },
+      { name = "PLAYER_0",  color = true, title = ("players") },
       { name = "PLAYER_1",  color = true },
       { name = "PLAYER_2",  color = true },
       { name = "PLAYER_3",  color = true },
@@ -143,8 +143,8 @@ function menu_reload()
       { name = "PLAYER_13", color = true },
       { name = "PLAYER_14", color = true },
       { name = "PLAYER_15", color = true },
-      { name = "All Players", invalid = not has_mod_powers(0) },
-      { name = trans("menu_back") },
+      { name = ("menu_players_all"), invalid = not has_mod_powers(0) },
+      { name = ("menu_back") },
       name = "playerMenu",
       back = 18,
   }
@@ -152,38 +152,38 @@ function menu_reload()
   one_player_reload()
 
   allPlayerMenu = {
-    { name = "Pause", option = GST.pause, title = "All Players", description = trans("pause_desc") },
-    { name = "Force to Spectate", option = GST.forceSpectate, description = trans("forcespectate_desc") },
-    { name = trans("menu_back") },
-    { name = trans("main_menu") },
+    { name = ("menu_pause"), option = GST.pause, title = ("menu_players_all"), desc = ("pause_desc") },
+    { name = ("menu_forcespectate"), option = GST.forceSpectate, desc = ("forcespectate_desc") },
+    { name = ("menu_back") },
+    { name = ("main_menu") },
     name = "allPlayerMenu",
     back = 3,
   }
 
   playerSettingsMenu = {
-    { name = trans("hard_mode"), title = trans("menu_settings_player"), option = (gPlayerSyncTable[0].hard == 1), description = trans("hard_info_short")},
-    { name = trans("extreme_mode"), option = (gPlayerSyncTable[0].hard == 2), description = trans("extreme_info_short")},
-    { name = trans("menu_timer"), option = showSpeedrunTimer, invalid = (GST.mode == 2), description = "Show a timer at the bottom of the screen." },
-    { name = "Team Chat", option = (gPlayerSyncTable[0].teamChat or false), description = "Chat only with your team."},
-    { name = "???", option = demonOn, invalid = true, description = "This is a secret. How do you unlock it?" },
-    { name = trans("menu_back") },
+    { name = ("hard_mode"), title = ("menu_settings_player"), option = (gPlayerSyncTable[0].hard == 1), desc = ("hard_info_short")},
+    { name = ("extreme_mode"), option = (gPlayerSyncTable[0].hard == 2), desc = ("extreme_info_short")},
+    { name = ("menu_timer"), option = showSpeedrunTimer, invalid = (GST.mode == 2), desc = ("menu_timer_desc") },
+    { name = ("menu_tc"), option = (gPlayerSyncTable[0].teamChat or false), desc = ("menu_tc_desc")},
+    { name = ("menu_unknown"), option = demonOn, invalid = true, desc = ("menu_secret") },
+    { name = ("menu_back") },
     name = "playerSettingsMenu",
     back = 6,
   }
   if demonOn or demonUnlocked then
-    playerSettingsMenu[5].name = "Green Demon"
-    playerSettingsMenu[5].description = "Have a 1up chase you as Runner."
+    playerSettingsMenu[5].name = ("menu_demon")
+    playerSettingsMenu[5].desc = ("menu_demon_desc")
     playerSettingsMenu[5].invalid = false
   end
 
   miscMenu = {
-    { name = trans("free_camera"), title = trans("menu_misc"), invalid = ((not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), description = "Enter Free Camera in Spectator Mode."},
-    { name = "Spectate Runner", invalid = ((not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), description = "Automatically spectate the first Runner."},
-    { name = "Exit Spectate", invalid = (gPlayerSyncTable[0].forceSpectate or gPlayerSyncTable[0].spectator ~= 1), description = "Exit spectator mode."},
-    { name = "Warp to Runner Level", invalid = ((not ROMHACK.stalk) or GST.mhMode == 2 or GST.mhState ~= 2), description = "Warp to the level the first Runner is in."},
-    { name = "Skip", invalid = (GST.mhState ~= 2 or GST.mhMode ~= 2 or iVoted), description = "Vote to skip this star in MiniHunt."},
-    { name = "List Blacklist", description = "Lists all blacklisted stars in MiniHunt for this server."},
-    { name = trans("menu_back") },
+    { name = ("free_camera"), title = ("menu_misc"), invalid = ((not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), desc = ("menu_free_cam_desc")},
+    { name = ("menu_spectate_run"), invalid = ((not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), desc = ("menu_spectate_run_desc")},
+    { name = ("menu_exit_spectate"), invalid = (gPlayerSyncTable[0].forceSpectate or gPlayerSyncTable[0].spectator ~= 1), desc = ("menu_exit_spectate_desc")},
+    { name = ("menu_stalk_run"), invalid = ((not ROMHACK.stalk) or GST.mhMode == 2 or GST.mhState ~= 2), desc = ("menu_stalk_run_desc")},
+    { name = ("menu_skip"), invalid = (GST.mhState ~= 2 or GST.mhMode ~= 2 or iVoted), desc = ("menu_skip_desc")},
+    { name = ("menu_blacklist_list"), desc = ("menu_blacklist_list_desc")},
+    { name = ("menu_back") },
     name = "miscMenu",
     back = 7,
   }
@@ -195,15 +195,15 @@ function one_player_reload()
   local STP = gPlayerSyncTable[focusPlayerOrCourse]
   local GST = gGlobalSyncTable
   onePlayerMenu = {
-      { name = "Flip Team", title = "PLAYER_S", invalid = not has_mod_powers(0), description = trans("flip_desc") },
-      { name = "Spectate", invalid = (focusPlayerOrCourse == 0 or (not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), description = "Spectate this player." },
-      { name = "Warp To Level", invalid = (focusPlayerOrCourse == 0 or (not ROMHACK.stalk) or STP.team == 1 or GST.mhMode == 2 or GST.mhState ~= 2), description = "Warp to this player's level." },
-      { name = "Pause", option = STP.pause, invalid = not has_mod_powers(0), description = trans("pause_desc") },
-      { name = "Force to Spectate", option = STP.forceSpectate, invalid = not has_mod_powers(0), description = trans("forcespectate_desc") },
-      { name = "Allow to Leave", invalid = (not has_mod_powers(0)) or (GST.mhMode == 2), description = trans("leave_desc") },
-      { name = "Set Lives", invalid = (not has_mod_powers(0) or STP.team ~= 1 or GST.mhState == 0), currNum = STP.runnerLives or GST.runnerLives, maxNum = 99, description = trans("setlife_desc") },
-      { name = trans("menu_back") },
-      { name = trans("main_menu") },
+      { name = ("menu_flip"), title = "PLAYER_S", invalid = not has_mod_powers(0), desc = ("flip_desc") },
+      { name = ("menu_spectate"), invalid = (focusPlayerOrCourse == 0 or (not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), desc = ("menu_spectate_desc") },
+      { name = ("menu_stalk"), invalid = (focusPlayerOrCourse == 0 or (not ROMHACK.stalk) or STP.team == 1 or GST.mhMode == 2 or GST.mhState ~= 2), desc = ("menu_stalk_desc") },
+      { name = ("menu_pause"), option = STP.pause, invalid = not has_mod_powers(0), desc = ("pause_desc") },
+      { name = ("menu_forcespectate"), option = STP.forceSpectate, invalid = not has_mod_powers(0), desc = ("forcespectate_desc") },
+      { name = ("menu_allowleave"), invalid = (not has_mod_powers(0)) or (GST.mhMode == 2), desc = ("leave_desc") },
+      { name = ("menu_setlife"), invalid = (not has_mod_powers(0) or STP.team ~= 1 or GST.mhState == 0), currNum = STP.runnerLives or GST.runnerLives, maxNum = 99, desc = ("setlife_desc") },
+      { name = ("menu_back") },
+      { name = ("main_menu") },
       name = "onePlayerMenu",
       back = 8,
   }
@@ -213,17 +213,17 @@ function build_blacklist_menu()
   blacklistMenu = {}
   for i=1,24 do
     if ROMHACK.starCount and course_to_level and ROMHACK.starCount[course_to_level[i]] ~= 0 and (ROMHACK.hubStages == nil or ROMHACK.hubStages[i] == nil) then
-      table.insert(blacklistMenu, {name = get_level_name(i, course_to_level[i], 1), course = i } )
+      table.insert(blacklistMenu, {name = "COURSE", course = i } )
     end
   end
-  table.insert(blacklistMenu, { name = "List All Blacklisted", action = "list" } )
-  table.insert(blacklistMenu, { name = "Save Blacklist", action = "save", description = "Save this blacklist on your end." } )
-  table.insert(blacklistMenu, { name = "Load Blacklist", action = "load", description = "Load your saved blacklist." } )
-  table.insert(blacklistMenu, { name = "Reset Blacklist", action = "reset", description = "Reset the blacklist to the default." } )
-  table.insert(blacklistMenu, { name = trans("menu_back")} )
+  table.insert(blacklistMenu, { name = ("menu_blacklist_list"),  action = "list",  desc = ("menu_blacklist_list_desc")  } )
+  table.insert(blacklistMenu, { name = ("menu_blacklist_save"),  action = "save",  desc = ("menu_blacklist_save_desc")  } )
+  table.insert(blacklistMenu, { name = ("menu_blacklist_load"),  action = "load",  desc = ("menu_blacklist_load_desc")  } )
+  table.insert(blacklistMenu, { name = ("menu_blacklist_reset"), action = "reset", desc = ("menu_blacklist_reset_desc") } )
+  table.insert(blacklistMenu, { name = ("menu_back")} )
   blacklistMenu.back = #blacklistMenu
-  table.insert(blacklistMenu, { name = trans("main_menu")} )
-  blacklistMenu[1].title = "MiniHunt Blacklist"
+  table.insert(blacklistMenu, { name = ("main_menu")} )
+  blacklistMenu[1].title = ("menu_blacklist")
   blacklistMenu.name = "blacklistMenu"
 end
 
@@ -238,12 +238,12 @@ function build_blacklist_course_menu()
     end
   end
   if #blacklistCourseMenu > 1 then
-    table.insert(blacklistCourseMenu, { name = "Toggle All", option = oneValid, star = "all" } )
+    table.insert(blacklistCourseMenu, { name = ("menu_toggle_all"), option = oneValid, star = "all" } )
   end
-  table.insert(blacklistCourseMenu, { name = trans("menu_back")} )
+  table.insert(blacklistCourseMenu, { name = ("menu_back")} )
   blacklistCourseMenu.back = #blacklistCourseMenu
-  table.insert(blacklistCourseMenu, { name = trans("main_menu")} )
-  blacklistCourseMenu[1].title = get_level_name(focusPlayerOrCourse,course_to_level[focusPlayerOrCourse],1)
+  table.insert(blacklistCourseMenu, { name = ("main_menu")} )
+  blacklistCourseMenu[1].title = "COURSE"
   blacklistCourseMenu.name = "blacklistCourseMenu"
 end
 
@@ -514,7 +514,7 @@ function selectOption(option)
     if currentMenuName == "LanguageMenu" then
       if currMenu[option].lang then
         switch_lang(currMenu[option].lang)
-        menu_reload()
+        --menu_reload()
         menu_enter(LanguageMenu, currentOption)
       else -- back
         menu_enter(nil, 4)
@@ -583,18 +583,22 @@ function handleMenu()
 
     for i, option in ipairs(currMenu) do
         local optionText = option.name
+        optionText = trans(optionText)
 
         local textWidth = 0
         if option.name:sub(1,7) == "PLAYER_" then
-          textWidth = screenWidth*0.4
+          textWidth = screenWidth*0.7
+        elseif option.course then
+          textWidth = djui_hud_measure_text(get_level_name(option.course, course_to_level[option.course], 1)) * textScale
         elseif option.color then
           textWidth = djui_hud_measure_text(remove_color(optionText)) * textScale
         else
           textWidth = djui_hud_measure_text(optionText) * textScale
         end
+        if option.currNum then textWidth = textWidth + 30 end
         maxTextWidth = math.max(maxTextWidth, textWidth)
     end
-    maxTextWidth = maxTextWidth + 30
+    maxTextWidth = maxTextWidth + 10
 
     local optionCount = #currMenu
     if optionCount > 7 then
@@ -634,6 +638,12 @@ function handleMenu()
       djui_hud_print_text_with_color(titleText, titleCenter, 0, titleScale)
       --print_text_ex_hud_font(titleText, titleCenter, screenHeight * 0.03, titleScale)
     else
+      if titleText == "COURSE" then
+        titleText = get_level_name(focusPlayerOrCourse, course_to_level[focusPlayerOrCourse], 1)
+      else
+        titleText = trans(titleText)
+      end
+
       if djui_hud_measure_text(titleText) * titleScale > screenWidth*0.8 then -- shrink the title if it's too big
         titleScale = 1
       end
@@ -683,6 +693,10 @@ function handleMenu()
               roleText = ""
               optionText = trans("empty",index)
             end
+          elseif option.course then
+            optionText = get_level_name(option.course, course_to_level[option.course], 1)
+          else
+            optionText = trans(optionText)
           end
 
           local textWidth = 0
@@ -757,18 +771,18 @@ function handleMenu()
           optionY = optionY + (screenHeight * 0.2) * textScale
 
           if i == currentOption then
-              local rectX = optionX - maxTextWidth * 0.2
+              local rectX = optionX -- maxTextWidth * 0.2
               local rectY = optionY - screenHeight * 0.1
-              local rectWidth = maxTextWidth * 1.4
+              local rectWidth = maxTextWidth-- * 1.4
               local rectHeight = screenHeight * 0.07
               djui_hud_set_color(92, 255, 92, math.abs((frameCounter%60)-30)*2)
               djui_hud_render_rect(rectX, rectY, rectWidth, rectHeight)
               djui_hud_set_color(255, 255, 255, 255)
 
-              if currMenu[currentOption].description then
+              if currMenu[currentOption].desc then
                 djui_hud_set_font(FONT_NORMAL)
                 djui_hud_set_color(255, 255, 255, 255)
-                local desc = (tostring(currMenu[currentOption].description))
+                local desc = (trans(currMenu[currentOption].desc))
                 local descWidth = djui_hud_measure_text(desc) * 0.3
                 local descX = (screenWidth - descWidth) * 0.5
                 djui_hud_print_text(desc, descX, screenHeight - 15, 0.3)
@@ -802,7 +816,7 @@ function stats_table_hud()
   width = djui_hud_measure_text(text)
   x = (screenWidth-width) / 2
   djui_hud_set_color(255, 255, 255, 255);
-  djui_hud_print_text(text, x, 10, 1);
+  print_text_ex_hud_font(text, x, 10, 1);
   djui_hud_set_font(FONT_NORMAL)
 
   text = trans("player")
@@ -974,16 +988,30 @@ function menu_controls(m)
         local countBy = 1
         if m.controller.buttonDown & X_BUTTON ~= 0 then countBy = 10 end
         if joystickX <= -JOYSTICK_THRESHOLD and option.currNum then
-            option.currNum = (option.currNum - countBy - min) % (option.maxNum + 1 - min) + min
-            if option.currNum < min then
-                option.currNum = option.maxNum
+            if countBy == 1 then
+              option.currNum = (option.currNum - countBy - min) % (option.maxNum + 1 - min) + min
+            else
+              if option.currNum == min then option.currNum = 0 end
+              option.currNum = (option.currNum - countBy)
+              if option.currNum == -countBy then
+                  option.currNum = option.maxNum
+              elseif option.currNum < 0 then
+                  option.currNum = option.maxNum + option.currNum
+              end
             end
             play_sound(SOUND_MENU_CHANGE_SELECT, gMarioStates[0].marioObj.header.gfx.cameraToObject)
             frameDelay = delayFrames
         elseif joystickX >= JOYSTICK_THRESHOLD and option.currNum then
-            option.currNum = (option.currNum + countBy - min) % (option.maxNum + 1 - min) + min
-            if option.currNum > option.maxNum then
-                option.currNum = min
+            if countBy == 1 then
+              option.currNum = (option.currNum + countBy - min) % (option.maxNum + 1 - min) + min
+            else
+              if option.currNum == min then option.currNum = 0 end
+              option.currNum = (option.currNum + countBy)
+              if option.currNum == option.maxNum + countBy then
+                  option.currNum = 0
+              elseif option.currNum > option.maxNum then
+                  option.currNum = option.currNum - option.maxNum
+              end
             end
             play_sound(SOUND_MENU_CHANGE_SELECT, gMarioStates[0].marioObj.header.gfx.cameraToObject)
             frameDelay = delayFrames
@@ -1008,7 +1036,7 @@ function menu_controls(m)
 end
 
 -- custom text function that allows the HUD font to support more characters
--- TODO: a bunch of these characters are actually the wrong ones (potentially 26-38?)
+-- TODO: a bunch of these characters are actually the wrong ones
 local extra_chars = {
   ["ü"] = "font_00", ["Ü"] = "font_00", -- string_lower doesn't work for these, so we need both
   ["q"] = "font_01",

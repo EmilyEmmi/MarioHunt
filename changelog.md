@@ -1,4 +1,24 @@
 # Changelog
+## v2.2
+### Additions:
+  - Updated Spanish Translation (KanHeaven)
+  - Added support for SM64: The Underworld
+### Adjustments:
+  - Some animations will now be faster (Troopa)
+  - **Hunters now run slightly faster**
+  - More star requirements have been added to Star Road
+  - Adjusted the size of selectors in menu
+  - Made the Exclamation Box radar less opaque
+### Fixes/Backend changes:
+  - All menu-related text now uses the language system
+  - Fixed switching languages via commands not update the menu
+  - Fixed script errors as a result of the latest OMM Rebirth update
+  - Fixed coin duplication when using OMM Rebirth
+  - Fixed issue with being able to cross-team when using Cappy
+    - This was actually implemented earlier, but didn't work until this OMM update
+  - Due to complaints, the debug command /mh combo was modified to only display locally
+  - Fixed the API version string still being v2.0
+  - Fixed being able to grab stars with Cappy in MiniHunt
 ## v2.1
 ### Additions:
   - **Added menu!** Use /mh to open or hold L and press START. It does almost everything commands can do! (not fully translated at this time)

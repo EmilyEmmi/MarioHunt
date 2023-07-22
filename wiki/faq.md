@@ -28,7 +28,7 @@ This is a kind of bug, so report this, too. Please do not harrass the translator
 
 ## Could you add/change [thing]?????
 Maybe, if I think I can do it and I think it's a good idea. Don't ask for stuff that will be too unfeasible. I also can't modify other mods, obviously.
-Also, feel free to make a pull request!
+Also, feel free to make a pull request! Note that I won't update this build directly if you do, but it will be implemented next update.
 
 You can suggest features by dming me or asking me in-game. You could also try asking the other devs, but please don't overdo it.
 

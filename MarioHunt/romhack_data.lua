@@ -80,12 +80,15 @@ local romhack_data = { -- supported rom hack data
     default_stars = 80,
     max_stars = 130,
     requirements = {
+      [LEVEL_CCM] = 8, -- Chuckya Harbor
+      [LEVEL_BBH] = 8, -- Gloomy Garden
       [LEVEL_BITDW] = 20,
+      [LEVEL_DDD] = 30, -- Mad Musical Mess
       [LEVEL_BITFS] = 40,
       [LEVEL_BITS] = 80,
-      [LEVEL_WMOTR] = 120, -- hidden palace
+      [LEVEL_WMOTR] = 120, -- Hidden Palace Finale
     },
-    heartReplace = true, -- replaces all hearts with 1ups
+    heartReplace = true, -- replaces all hearts with 1ups (doesn't affect the bubbles, thankfully)
 
     area_stars = {
       [LEVEL_SA] = {1, 1}, -- you can fail time challenge
@@ -117,7 +120,7 @@ local romhack_data = { -- supported rom hack data
       local np = gNetworkPlayers[0]
       -- prevent getting trapped in cage star
       if m.action == ACT_TELEPORT_FADE_IN and m.playerIndex == 0 and np.currLevelNum == LEVEL_CCM
-      and m.pos.x < -4000 and m.pos.z < -4700 then
+      and m.pos.x < -3200 and m.pos.z < -4600 then
         local sMario = gPlayerSyncTable[0]
         sMario.allowLeave = true
       end
@@ -583,6 +586,105 @@ local romhack_data = { -- supported rom hack data
       gGlobalSyncTable.bowserBeaten = true
     end
     return false
+  end,
+},
+
+["underworld"] = {
+  name = "Super Mario 64: The Underworld",
+  default_stars = 30,
+  max_stars = 30,
+  ommSupport = false, -- does not have default omm support
+  no_bowser = true, -- 30 stars isn't the entire goal but oh well
+  isUnder = true, -- activates special star detection
+  starColor = {r = 0, g = 255, b = 255}, -- light blue
+
+  -- prevents moving at start, disables some things
+  special_run = function(m,gotStar)
+    if gGlobalSyncTable.mhMode == 2 then
+      change_game_mode(nil,0)
+      djui_popup_create(trans("wrong_mode"),1)
+    end
+    if gGlobalSyncTable.starRun ~= 30 then
+      gGlobalSyncTable.starRun = 30
+      djui_popup_create(trans("wrong_mode"),1)
+    end
+    if gGlobalSyncTable.mhState == 0 then
+      set_mario_action(m, ACT_SPAWN_NO_SPIN_AIRBORNE, 0)
+      if m.playerIndex == 0 and (m.controller.buttonPressed & R_TRIG) ~= 0 then
+        djui_open_pause_menu()
+      end
+    end
+
+    if m.playerIndex ~= 0 then return end
+    local np = gNetworkPlayers[0]
+    gLevelValues.entryLevel = np.currLevelNum
+  end,
+
+  -- no typical stars
+  starCount = {
+    [LEVEL_CASTLE_GROUNDS] = 0,
+    [LEVEL_BOB] = 0,
+    [LEVEL_WF] = 0,
+    [LEVEL_JRB] = 0,
+    [LEVEL_CCM] = 0,
+    [LEVEL_BBH] = 0,
+    [LEVEL_HMC] = 0,
+    [LEVEL_LLL] = 0,
+    [LEVEL_SSL] = 0,
+    [LEVEL_DDD] = 0,
+    [LEVEL_SL] = 0,
+    [LEVEL_WDW] = 0,
+    [LEVEL_TTM] = 0,
+    [LEVEL_THI] = 0,
+    [LEVEL_TTC] = 0,
+    [LEVEL_RR] = 0,
+    [LEVEL_BITDW] = 0,
+    [LEVEL_BITFS] = 0,
+    [LEVEL_BITS] = 0,
+    [LEVEL_PSS] = 0,
+    [LEVEL_COTMC] = 0,
+    [LEVEL_TOTWC] = 0,
+    [LEVEL_VCUTM] = 0,
+    [LEVEL_WMOTR] = 0,
+    [LEVEL_SA] = 0,
+  },
+
+  -- custom star names! (30 omg)
+  starNames = {
+    [11] = "The Land Of The Condemned",
+    [12] = "Remnant Across From The Tower",
+    [13] = "The Entrance Remnant",
+    [14] = "Beside the Remnant Pair",
+    [15] = "The Battlefield Remnant",
+    [16] = "Nowhere to Blast",
+    [17] = "Bob-Omb Battlefield?",
+    [18] = "Seek The Soul Star",
+    [19] = "Behind No Such Gate",
+    [20] = "Soul Star Of The Summit",
+    [21] = "Underworld Plains",
+    [22] = "A Glow In The Dark",
+    [23] = "Fortress In The Deep",
+    [24] = "Beneath The Wild Blue",
+    [25] = "Beside The Deep's Fortress",
+    [26] = "To The Top Of Deep's Fortress",
+    [27] = "Open In The Fortress",
+    [28] = "View From The Fortress",
+    [29] = "Midway Up The Fortress",
+    [30] = "Sunken Sand Land",
+    [31] = "Corner Of The Lava",
+    [32] = "Stand Tall On Second Pillar", -- going clockwise
+    [33] = "Stand Tall On First Pillar",
+    [34] = "Stand Tall On Fourth Pillar",
+    [35] = "Stand Tall On Third Pillar",
+    [36] = "Pyramid of the Underworld",
+    [37] = "Remnant Pair 1",
+    [38] = "Remnant Pair 2",
+    [39] = "The Tower Remnant",
+    [40] = "Beside-Across From The Tower",
+  },
+
+  runner_victory = function(m)
+    return m.action == ACT_JUMBO_STAR_CUTSCENE
   end,
 },
 

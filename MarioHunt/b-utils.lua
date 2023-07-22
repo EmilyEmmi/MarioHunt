@@ -77,12 +77,11 @@ end
 function combo_debug(msg)
   local np = gNetworkPlayers[0]
   local playerColor = network_get_player_text_color_string(0)
-  network_send_include_self(false, {
+  on_packet_kill_combo({
     id = PACKET_KILL_COMBO,
     name = playerColor .. np.name,
     kills = tonumber(msg) or 0,
-  })
-  print(get_dialog_id())
+  }, true)
   return true
 end
 
@@ -419,5 +418,8 @@ function setup_commands()
   table.insert(marioHuntCommands, {"langtest", nil, lang_test, true})
   table.insert(marioHuntCommands, {"unmod", nil, unmod, true})
   table.insert(marioHuntCommands, {"gfield", nil, get_field_global, true})
-  table.insert(marioHuntCommands, {"hidehud", nil, (function(msg) mhHideHud = not mhHideHud return true end), true})
+  table.insert(marioHuntCommands, {"hidehud", nil, (function() mhHideHud = not mhHideHud return true end), true})
+  table.insert(marioHuntCommands, {"debug-move", nil, (function() gMarioStates[0].action = ACT_DEBUG_FREE_MOVE return true end), true})
+  table.insert(marioHuntCommands, {"wing-cap", nil, (function() gMarioStates[0].flags = gMarioStates[0].flags | MARIO_WING_CAP play_sound(SOUND_GENERAL_SHORT_STAR, gMarioStates[0].marioObj.header.gfx.cameraToObject) play_cap_music(SEQ_EVENT_POWERUP) play_character_sound(gMarioStates[0], CHAR_SOUND_HERE_WE_GO) return true end), true})
+  table.insert(marioHuntCommands, {"set-fov", nil, (function(msg) set_override_fov(tonumber(msg) or 45) return true end), true})
 end
