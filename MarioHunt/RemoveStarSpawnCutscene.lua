@@ -11,8 +11,7 @@ function remove_timestop()
         return
     end
 
-    local sMario = gPlayerSyncTable[0]
-    if (gGlobalSyncTable.ee ~= true or gNetworkPlayers[0].currLevelNum ~= LEVEL_SA) and ((c.cutscene == CUTSCENE_STAR_SPAWN) or (c.cutscene == CUTSCENE_RED_COIN_STAR_SPAWN) or (c.cutscene == CUTSCENE_ENTER_BOWSER_ARENA) or (c.cutscene == CUTSCENE_GRAND_STAR)) then
+    if ((c.cutscene == CUTSCENE_STAR_SPAWN) or (c.cutscene == CUTSCENE_RED_COIN_STAR_SPAWN) or (c.cutscene == CUTSCENE_ENTER_BOWSER_ARENA)) then
         print("disabled cutscene")
         disable_time_stop_including_mario()
         m.freeze = 0
@@ -25,9 +24,20 @@ function remove_timestop()
             else
               bowser.oAction = 0
             end
+            if m.action == ACT_READING_NPC_DIALOG then
+              set_mario_action(m, ACT_IDLE, 0)
+            end
+          end
+        elseif c.cutscene == CUTSCENE_STAR_SPAWN then -- done here because a lot of hacks hook to this object
+          local grand = obj_get_first_with_behavior_id(id_bhvGrandStar)
+          if grand then
+            grand.oAction = 1
+            m.invincTimer = 600 -- 20 seconds is long enough I think
+            --obj_become_tangible(grand)
           end
         end
         c.cutscene = 0
+        play_cutscene(c)
     elseif m.invincTimer < 30 and c.cutscene ~= 0 and gGlobalSyncTable.mhState == 2 then
         m.invincTimer = 30
     end

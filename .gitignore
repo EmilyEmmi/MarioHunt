@@ -1,0 +1,8 @@
+*.cmd
+*.zip
+*.lnk
+*.code-workspace
+*.json
+MarioHunt/actors/demon/
+MarioHunt/levels/lobby/
+MarioHunt/skybox

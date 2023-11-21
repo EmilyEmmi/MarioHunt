@@ -1,4 +1,124 @@
 # Changelog
+## v2.3
+### Additions:
+  - Added a new Lobby! It appears between rounds, and contains a new platforming challenge! Aim for a fast time!
+  - Added roles for contributers and translators
+  - Added Lead Dev role (me)
+  - Support for multiple roles
+  - Added Hide My Roles menu, to control what roles display in chat
+  - Updated all translations
+    - Updated Spanish Translation (KanHeaven)
+    - Updated French Translation (Skeltan)
+    - Updated Brazillian Portuguese translation (PietroM)
+  - Added support for the following romhacks:
+    - B3313 v0.7
+    - Super Mario 64 Moonshine
+  - **API CHANGE:** Added *levelNames*, which allows for custom level names for different areas
+  - **API CHANGE:** Added *vagueName*, a property which displays courses and stars as "Course X" and "Star X"
+  - **API CHANGE:** Added *parseStars*, which will automatically set up star information
+  - **API CHANGE:** The new *star_data* has new features, such as setting up stars that allow the player to exit
+    - See mhSetup.lua for more info
+  - **API CHANGE:** Added badGuy for listing the villian of the hack (if it isn't Bowser)
+  - Romhacks without built-in support will now have their star data read automatically
+  - **API CHANGE:** mini_exclude can now control which area players start in MiniHunt
+  - **API CHANGE:** Added modifyChatFunction, useful for mods like Swear Filter and Nicknames
+  - The runner timer will now properly adjust based on how many stars may be obtained in an area
+  - Some stars will now allow the player to leave immediately (such as Plunder In The Sunken Ship)
+  - You can now press X in the player menu to flip their team (if you have mod powers)
+  - You can now press X in the course blacklist menu to toggle an entire course
+  - Added the ability to disable the HUD
+  - Added the ability to disable Faster Actions
+  - Added compatibility with Personal Star Counter (if the incompatibility tag for PSC is disabled)
+  - Added mouse support for the menu! Just set one of your mouse click buttons to A and you should be good to go!
+    - Some adjustments have been made to accomodate this
+  - **MiniHunt may now be played in singleplayer**
+  - The text "NEW RECORD!!!" will appear and a different sound effect will play when beating your Maximum Stars in one game of MiniHunt record
+  - Scrolling in the menu will now speed up if the direction is held
+  - Added four more game options:
+    - **Nerf Vanish Cap: Players have to hold B to vanish, and it drains faster while doing so. ON by default.**
+    - Friendly Fire: Allows players to attack their own teammates. It can also be set for Runners or Hunters individually. OFF by default in Standard Modes, RUNNERS by default in MiniHunt.
+    - Runner PVP DMG Up: Runners will take more damage when attacked by players. 0 by default in Standard Modes, 2 by default in MiniHunt.
+      - Select "OHKO" for *instant* kills
+    - **Leader Death Timer**: MiniHunt exclusive; the player with the most stars gets the death timer from Extreme mode. ON by default.
+  - Added "List Settings" to the main menu
+  - Added support for Blocky's "121rst star" mod
+  - Typing "desync" in the chat will automatically fix MiniHunt desyncs (runs /mh desync from the host's end)
+    - Simularly, typing "stuck" in chat will try to fix softlocks
+  - Added "Auto" option for both Randomize Runners and Add Runners, which adds an ideal amount of runners
+    - Formula is floor((n+2) / 4), where n is the amount of non-spectators
+  - Added sound effects to more popups, such as stars, keys, and players entering levels
+    - Can be disabled in Settings
+  - Added popup stating how many stars are in a level
+  - Added popup when the amount of stars needed to complete a run are collected
+  - Added popup when collecting the Grand Star
+  - Wins in MiniHunt are now counted separately
+    - All wins prior to this update now count as "MiniHunt/pre v2.3 wins"
+  - Advice signs now appear with a red backdrop
+  - Added 32 player support for the Stats and Players menus
+  - Explosion sfx now plays when killed by another player
+### Adjustments:
+  - **Hunters no longer run faster**
+  - **Bowser stages can no longer be left, even in Timer mode**
+  - **When a Runner is defeated in Switch mode or MiniHunt, the new Runner is now chosen based on whoever is closest instead of being random**
+    - If no other player is in the level, the Runner is selected at random.
+    - Thanks to Vanilla for this suggestion!
+  - Radars now shrink when near the player, like in Shine Thief
+  - Increased grace period when entering a level
+  - When joining a lobby, players are told how to open the menu instead of how to display the rules again
+  - Swapped the location of Gamemode and Runner Lives in the menu
+  - Menu description no longer displays command hints
+  - False stars will no longer be tracked by the radar
+  - Added more actions to Faster Actions, such as throwing objects or falling into snow or sand
+  - Unlocking a key door and entering a door now occur instantly (Troopa)
+  - Removed "enter course" actions (Troopa)
+    - Can be disabled by disabling Faster Actions
+  - Ledge grabs are no longer included in Faster Actions
+  - The Death Timer in Extreme Mode no longer drains while talking with an npc or other idle actions
+  - Changed the name of the [DEV] role to [MH Dev]
+  - Non-mod players can no longer access their own player menu
+  - Reimplemented the *HIDDEN FEATURE*, resulting in the following changes:
+    - The *HIDDEN FEATURE* can no longer be grabbed with Cappy
+    - The *HIDDEN FEATURE* now has a custom texture (N64 Mario)
+    - The *HIDDEN FEATURE* now waits for the player's invulnerability timer instead of respawning
+    - Instead of respawning at 10000+ units away, the *HIDDEN FEATURE* now gains the ability to go through walls at 5000+ units away
+    - The *HIDDEN FEATURE* now travels at half speed if the player is swimming
+    - The *HIDDEN FEATURE* will no longer home in on other players
+  - Some additonal text relating to spectating is now translated in some languages
+  - **API CHANGE:** starCount, renumber_stars, and area_stars have been combined into star_data
+    - The old format will still work, but it is recommended that one updates
+  - **API CHANGE:** get_tag now returns an empty string if there are no tags instead of nil
+  - The goal in SM64: Underworld is now listed as "Collect 30 stars and defeat The Shitilizer" instead of simply "Collect 30 Stars"
+  - Various visual adjustments to the menu
+  - Adjusted some characters in the Extended HUD Font
+  - Runner Lives, Time/Stars, Team Attack, and Runner PVP DMG Up will be saved separately for each mode
+  - Respawning is now faster in MiniHunt
+  - All chat commands now use the language system
+  - Fixed some lines not being in the language system
+  - Changed /mh pause to refer to all players by default, like the description says.
+  - The timer will not remain frozen if "All Players" are paused if the host is unpaused.
+  - **All star/key cutscenes are faster**
+  - **Runners now gain 20 seconds of invulnerability when the Grand Star appears**
+  - Weak mode is no longer on by default when using OMM Rebirth (Isaac)
+  - Mips and Mother Penguin dialog is now automatically skipped
+  - The punishment for warping is now smarter (won't trigger from standard gameplay anymore!)
+### Fixes:
+  - Fixed team change popups displaying the wrong color for the name
+  - Fixed win detection for SM64 Sapphire
+  - Fixed spectating in the Eyerok boss and TTM slide
+  - Fixed Warp To Level in the player menu not being selectable
+  - Fixed 1ups killing the player in Ztar Attack 2
+  - The Star Radar will no longer glitch out if multiple of the same star is present
+  - Fixed a softlock when using OMM Rebirth + Ztar Attack 2
+  - Fixed script error when typing /hard with no arguments
+  - Fixed reconnecting Runners getting their lives restored
+  - Fixed black screen when switching to MiniHunt while in the castle
+  - Some fixes for snowman's head (CCM) and the Manta Ray have been added (Issac)
+  - Fixed runner timer being recalculated whenever a new runner is selected in Switch mode
+  - Fixed double message bug when using Nicknames or Swear Filter
+    - Note that Team Chat and roles are disabled when these are used
+  - Fixed box stars falling through the floor while the menu is open
+  - FINALLY fixed talking to Toad after exiting a course resulting in the camera getting stuck
+  - Probably a bunch of other things
 ## v2.2
 ### Additions:
   - Updated Spanish Translation (KanHeaven)

@@ -1,3 +1,13 @@
+-- constants
+STAR_EXIT = 0x10 -- player can leave when grabbing this star
+STAR_IGNORE_STARMODE = 0x20 -- star is not counted in star mode
+STAR_ACT_SPECIFIC = 0x40 -- star can only be gotten in this act
+STAR_NOT_ACT_1 = 0x80 -- star cannot be gotten in act 1
+STAR_APPLY_NO_ACTS = 0x100 -- applies even if disable acts is on (like in OMM)
+STAR_NOT_BEFORE_THIS_ACT = 0x200 -- star cannot be gotten before this act
+STAR_MULTIPLE_AREAS = 0x400 -- only needed if your star can be obtained in only certain areas
+STAR_AREA_MASK = 0xF -- 1-15
+
 local romhack_data = { -- supported rom hack data
 
 ["vanilla"] = {
@@ -17,16 +27,23 @@ local romhack_data = { -- supported rom hack data
     ddd = true, -- pretty much only relevant for vanilla
     heartReplace = true, -- replaces all hearts with 1ups
 
-    -- allow leaving immediatly when grabbing these stars to avoid getting trapped
-    area_stars = {
-      [LEVEL_JRB] = {2, 1}, -- 1 star in ship
-      [LEVEL_SSL] = {2, 1}, -- 1 star in pyramid (to avoid getting trapped in hand)
-      [LEVEL_LLL] = {2, 2}, -- 2 stars in volcano
-      [LEVEL_THI] = {3, 1}, -- 1 star inside island (for wiggler)
-      [LEVEL_TOTWC] = {1, 0}, -- can get trapped in wing
-      [LEVEL_VCUTM] = {1, 0}, -- can get trapped in vanish
-      [LEVEL_PSS] = {1, 1}, -- you can fail time challenge
-      [LEVEL_WMOTR] = {1, 0}, -- you can enter without wing cap
+    -- all one table now!
+    star_data = {
+      [COURSE_BOB] = {8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8},
+      [COURSE_WF] = {8 | STAR_ACT_SPECIFIC, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8, 8},
+      [COURSE_JRB] = {8 | STAR_ACT_SPECIFIC, 1, 1, 1, 1, 1 | STAR_NOT_ACT_1, 1},
+      [COURSE_CCM] = {8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8},
+      [COURSE_BBH] = {8 | STAR_ACT_SPECIFIC, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8, 8},
+      [COURSE_LLL] = {1, 1, 1, 1, 8, 8, 1},
+      [COURSE_SSL] = {1 | STAR_ACT_SPECIFIC, 1, 8, 8 | STAR_EXIT, 1, 8, 1},
+      [COURSE_DDD] = {8, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8 | STAR_EXIT, 8},
+      [COURSE_WDW] = {1, 1, 1, 1, 8, 8, 1},
+      [COURSE_TTM] = {8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8},
+      [COURSE_THI] = {8, 8, 8 | STAR_ACT_SPECIFIC, 8, 8, 8 | STAR_EXIT, 8},
+      [COURSE_TOTWC] = {8 | STAR_IGNORE_STARMODE},
+      [COURSE_VCUTM] = {8 | STAR_IGNORE_STARMODE},
+      [COURSE_PSS] = {8 | STAR_EXIT | STAR_APPLY_NO_ACTS, 8},
+      [COURSE_WMOTR] = {8 | STAR_IGNORE_STARMODE | STAR_APPLY_NO_ACTS}
     },
 
     -- exclude some stars in MiniHunt
@@ -52,10 +69,6 @@ local romhack_data = { -- supported rom hack data
       end
     end,
 
-    -- star count for secret courses (only ones with more than 1 star)
-    starCount = {
-      [LEVEL_PSS] = 2, -- this is the only one lol
-    },
     -- custom star names!
     starNames = {
       [161] = "Red Coins Of The Dark",
@@ -90,24 +103,36 @@ local romhack_data = { -- supported rom hack data
     },
     heartReplace = true, -- replaces all hearts with 1ups (doesn't affect the bubbles, thankfully)
 
-    area_stars = {
-      [LEVEL_SA] = {1, 1}, -- you can fail time challenge
+    -- mostly defining replicas
+    star_data = {
+      [COURSE_NONE] = {8, 8, 8, 8},
+      [COURSE_BOB] = {8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8, 8},
+      [COURSE_WF] = {8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8, 8},
+      [COURSE_JRB] = {8, 8, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8},
+      [COURSE_CCM] = {8, 8, 8, 8, 8, 8 | STAR_EXIT | STAR_APPLY_NO_ACTS, 8}, -- don't get trapped in The Other Entrance
+      [COURSE_BBH] = {8 | STAR_ACT_SPECIFIC, 8, 8, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8}, -- wow, Gloomy Garden has a lot of act specifics
+      [COURSE_HMC] = {8, 8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_ACT_SPECIFIC, 8, 8, 8},
+      [COURSE_LLL] = {8, 8 | STAR_ACT_SPECIFIC, 8 | STAR_NOT_BEFORE_THIS_ACT, 8, 8, 8, 8},
+      -- I decided to flag 100 coins here because I don't think there's enough coins without getting up the tree
+      [COURSE_SSL] = {8 | STAR_ACT_SPECIFIC | STAR_IGNORE_STARMODE, 8 | STAR_NOT_ACT_1, 8, 8 | STAR_NOT_ACT_1, 8 | STAR_NOT_ACT_1, 8, 8 | STAR_NOT_ACT_1},
+      [COURSE_SL] = {8, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8, 8},
+      [COURSE_TTM] = {8, 8 | STAR_NOT_ACT_1, 8 | STAR_NOT_ACT_1, 8 | STAR_NOT_ACT_1, 8, 8, 8},
+      [COURSE_TTC] = {8, 8, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8}, -- star 1 actually disappears in acts 5 and 6 (I could account for that but ehhh)
+      [COURSE_WDW] = {8 | STAR_ACT_SPECIFIC | STAR_IGNORE_STARMODE, 8, 8, 8, 8, 8, 8}, -- ignored in star mode because it's glitchy
+      [COURSE_THI] = {8, 8 | STAR_ACT_SPECIFIC, 8, 8, 8 | STAR_NOT_BEFORE_THIS_ACT, 8 | STAR_ACT_SPECIFIC | STAR_EXIT, 8},
+      [COURSE_RR] = {8, 8, 8 | STAR_IGNORE_STARMODE | STAR_APPLY_NO_ACTS, 8, 8, 8 | STAR_EXIT | STAR_APPLY_NO_ACTS, 8}, -- don't get trapped in In The Cage
+      [COURSE_BITDW] = {8, 0, 0, 8},
+      [COURSE_BITFS] = {8, 0, 0, 0, 8},
+      [COURSE_BITS] = {8, 0, 0, 0, 0, 8},
+      [COURSE_PSS] = {8, 8, 0, 0, 0, 8},
+      [COURSE_COTMC] = {8, 0, 0, 0, 8},
+      [COURSE_TOTWC] = {8, 0, 0, 0, 0, 8},
+      [COURSE_VCUTM] = {8, 0, 0, 0, 0, 8},
+      [COURSE_WMOTR] = {8, 0, 0, 0, 0, 8},
+      [COURSE_SA] = {8, 8 | STAR_IGNORE_STARMODE | STAR_APPLY_NO_ACTS, 0, 0, 0, 8}, -- can fail time challenge
+      [COURSE_CAKE_END] = {0, 8},
     },
 
-    -- renumber some stars
-    renumber_stars = {
-      [5] = 0, -- There IS no second mips
-      [162] = 4, -- Replica for Bowser's Slippery Swamp
-      [172] = 5, -- Replica for Retro Remix Castle
-      [182] = 6, -- Replica for Bowser's Rainbow Rumble
-      [193] = 6, -- Replica for Mushroom Mountain Town
-      [202] = 5, -- Replica for Creepy Cap Cave
-      [212] = 6, -- Replica for Windy Wing Cap Well
-      [222] = 6, -- Replica for Puzzle Of The Vanish Cap
-      [232] = 6, -- Replica for Hidden Palace Finale
-      [243] = 6, -- Replica for Sandy Slide Secret
-      [251] = 2, -- ending star
-    },
     -- exclude some stars in MiniHunt
     mini_exclude = {
       [46] = 1, -- The Other Entrance
@@ -126,12 +151,6 @@ local romhack_data = { -- supported rom hack data
       end
     end,
 
-    starCount = {
-      [LEVEL_CASTLE_GROUNDS] = 4,
-      [LEVEL_PSS] = 2, -- Mushroom Mountain Town
-      [LEVEL_SA] = 2, -- Sandy Slide Secret
-      [LEVEL_ENDING] = 1, -- Peach's Castle (Ending)
-    },
     -- custom star names!
     starNames = {
       [161] = "Across The Sinking Logs",
@@ -189,22 +208,24 @@ local romhack_data = { -- supported rom hack data
       [LEVEL_BOWSER_3] = 157,
       [LEVEL_SA] = 150,
     },
+    noLobby = true,
 
-    starCount = {
-      [LEVEL_COTMC] = 5, -- Toxic-Switch of Danger
-      [LEVEL_BITDW] = 4, -- Bowser's Badlands-Battlefield
-      [LEVEL_WMOTR] = 6, -- Tower of the East
-      [LEVEL_TOTWC] = 3, -- Lava-Switch of Eruption
-      [LEVEL_VCUTM] = 6, -- Dust-Switch of Identity
-      [LEVEL_PSS] = 4, -- Frozen Slide
-      [LEVEL_BITFS] = 5, -- Bowser's Aquatic Castle
-      [LEVEL_SA] = 1, -- Champion's Challenge (there's another star but it is hard to get so we ignore in the time)
-      [LEVEL_BITS] = 6, -- Bowser's Crystal Palace
+    star_data = {
+      [COURSE_COTMC] = {8, 8, 8, 8, 8}, -- Toxic-Switch of Danger
+      [COURSE_BITDW] = {8, 8, 8, 8}, -- Bowser's Badlands-Battlefield
+      [COURSE_WMOTR] = {8, 8, 8, 8, 8, 8}, -- Tower of the East
+      [COURSE_TOTWC] = {8, 8, 8}, -- Lava-Switch of Eruption
+      [COURSE_VCUTM] = {8, 8, 8, 8, 8, 8}, -- Dust-Switch of Identity
+      [COURSE_PSS] = {8, 8, 8, 8}, -- Frozen Slide
+      [COURSE_BITFS] = {8, 8, 8, 8, 8}, -- Bowser's Aquatic Castle
+      [COURSE_SA] = {8}, -- Champion's Challenge (there's another star but it is hard to get so we ignore in the time)
+      [COURSE_BITS] = {8, 8, 8, 8, 8, 8}, -- Bowser's Crystal Palace
     },
+    
     -- EE has some different counts
-    starCount_ee = {
-      [LEVEL_COTMC] = 6, -- Toxic Terrace
-      [LEVEL_SA] = 7, -- Triarc-Bridge
+    star_data_ee = {
+      [COURSE_COTMC] = {8, 8, 8, 8, 8, 8}, -- Toxic Terrace
+      [COURSE_SA] = {8, 8, 8, 8, 8, 8, 8}, -- Triarc-Bridge
     },
     -- custom star names!
     starNames = {
@@ -308,12 +329,6 @@ local romhack_data = { -- supported rom hack data
       [COURSE_WMOTR] = 1, -- Tower Of The East
     },
 
-    -- renumber final star
-    renumber_stars = {
-      [242] = 3,
-      [243] = 2, -- make sure star 3 is still considered in ee
-    },
-
     runner_victory = function(m)
       return m.action == ACT_JUMBO_STAR_CUTSCENE
     end,
@@ -346,7 +361,7 @@ local romhack_data = { -- supported rom hack data
 },
 
 ["sapphire"] = {
-  name = "Super Mario 64 Sapphire",
+  name = "SM64 Sapphire",
   default_stars = 30,
   max_stars = 30,
   requirements = {
@@ -357,28 +372,34 @@ local romhack_data = { -- supported rom hack data
   heartReplace = true, -- replaces all hearts with 1ups
 
   -- since not all courses are modified here, exclude those
-  starCount = {
-    [LEVEL_CASTLE_GROUNDS] = 0,
-    [LEVEL_BBH] = 0,
-    [LEVEL_HMC] = 0,
-    [LEVEL_LLL] = 0,
-    [LEVEL_SSL] = 0,
-    [LEVEL_DDD] = 0,
-    [LEVEL_SL] = 0,
-    [LEVEL_WDW] = 0,
-    [LEVEL_TTM] = 0,
-    [LEVEL_THI] = 0,
-    [LEVEL_TTC] = 0,
-    [LEVEL_RR] = 0,
-    [LEVEL_BITDW] = 0,
-    [LEVEL_BITFS] = 0,
-    [LEVEL_BITS] = 0,
-    [LEVEL_PSS] = 2, -- includes toad star
-    [LEVEL_COTMC] = 0,
-    [LEVEL_TOTWC] = 0,
-    [LEVEL_VCUTM] = 0,
-    [LEVEL_WMOTR] = 0,
-    [LEVEL_SA] = 0,
+  star_data = {
+    [COURSE_NONE] = {},
+    [COURSE_BOB] = {8, 8, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8},
+    [COURSE_CCM] = {8, 8, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8},
+    [COURSE_BBH] = {},
+    [COURSE_HMC] = {},
+    [COURSE_LLL] = {},
+    [COURSE_SSL] = {},
+    [COURSE_DDD] = {},
+    [COURSE_SL] = {},
+    [COURSE_WDW] = {},
+    [COURSE_TTM] = {},
+    [COURSE_THI] = {},
+    [COURSE_TTC] = {},
+    [COURSE_RR] = {},
+    [COURSE_BITDW] = {},
+    [COURSE_BITFS] = {},
+    [COURSE_BITS] = {},
+    [COURSE_PSS] = {8 | STAR_EXIT, 8}, -- includes toad star
+    [COURSE_COTMC] = {},
+    [COURSE_TOTWC] = {},
+    [COURSE_VCUTM] = {},
+    [COURSE_WMOTR] = {},
+    [COURSE_SA] = {},
+
+    [COURSE_WF] = {8, 8, 8 | STAR_EXIT, 8, 8, 8 | STAR_EXIT, 8}, -- prevent getting stuck
+    [COURSE_JRB] = {8, 8 | STAR_EXIT, 8, 8, 8, 8, 8}, -- prevent getting stuck
+    [COURSE_CCM] = {8, 8, 8, 8, 8, 8 | STAR_EXIT, 8}, -- prevent getting stuck
   },
   -- custom star names!
   starNames = {
@@ -392,7 +413,11 @@ local romhack_data = { -- supported rom hack data
   },
 
   runner_victory = function(m)
-    return m.action == ACT_JUMBO_STAR_CUTSCENE
+    local np = gNetworkPlayers[m.playerIndex]
+    if np.currLevelNum == LEVEL_ENDING then
+      return true
+    end
+    return false
   end,
 },
 
@@ -411,39 +436,39 @@ local romhack_data = { -- supported rom hack data
   end,
 
   -- gotta define almost every level in the game, yay
-  starCount = { -- in order
+  star_data = { -- in order
     -- World 1
-    [LEVEL_BOB] = 2,
-    [LEVEL_WF] = 2,
-    [LEVEL_JRB] = 3,
-    [LEVEL_BITDW] = 4,
+    [COURSE_BOB] = {8, 8},
+    [COURSE_WF] = {8, 8},
+    [COURSE_JRB] = {8, 8, 8},
+    [COURSE_BITDW] = {8, 8, 8, 8},
     -- World 2
-    [LEVEL_CCM] = 2,
-    [LEVEL_BBH] = 4,
-    [LEVEL_HMC] = 5,
-    [LEVEL_BITFS] = 5,
+    [COURSE_CCM] = {8, 8},
+    [COURSE_BBH] = {8, 8, 8, 8},
+    [COURSE_HMC] = {8, 8, 8, 8, 8},
+    [COURSE_BITFS] = {8, 8, 8, 8, 8},
     -- World 3
-    [LEVEL_LLL] = 4,
-    [LEVEL_SSL] = 3,
-    [LEVEL_DDD] = 3,
-    [LEVEL_COTMC] = 6,
+    [COURSE_LLL] = {8, 8, 8, 8},
+    [COURSE_SSL] = {8, 8, 8},
+    [COURSE_DDD] = {8, 8, 8},
+    [COURSE_COTMC] = {8, 8, 8, 8, 8, 8},
     -- World 4
-    [LEVEL_SL] = 2,
-    [LEVEL_WDW] = 6,
-    [LEVEL_TTM] = 3,
-    [LEVEL_VCUTM] = 5,
+    [COURSE_SL] = {8, 8},
+    [COURSE_WDW] = {8, 8, 8, 8, 8, 8},
+    [COURSE_TTM] = {8, 8, 8},
+    [COURSE_VCUTM] = {8, 8, 8, 8, 8},
     -- World 5
-    [LEVEL_THI] = 4,
-    [LEVEL_TTC] = 6,
-    [LEVEL_RR] = 6,
-    [LEVEL_BITS] = 6,
-    [LEVEL_TOTWC] = 1,
+    [COURSE_THI] = {8, 8, 8, 8},
+    [COURSE_TTC] = {8, 8, 8, 8, 8, 8},
+    [COURSE_RR] = {8, 8, 8, 8, 8, 8},
+    [COURSE_BITS] = {8, 8, 8, 8, 8, 8},
+    [COURSE_TOTWC] = {8},
     -- Extra
-    [LEVEL_PSS] = 1, -- The Super Quiz
-    [LEVEL_WMOTR] = 1, -- Negative Realm
-    [LEVEL_SA] = 4, -- Gaell's Dream
-    [LEVEL_ENDING] = 1, -- The End
-    [LEVEL_CASTLE_GROUNDS] = 1, -- has mips
+    -- [COURSE_PSS] = {8}, -- The Super Quiz
+    -- [COURSE_WMOTR] = {8}, -- Negative Realm
+    [COURSE_SA] = {8, 8, 0, 0, 8, 8}, -- Gaell's Dream
+    [COURSE_CAKE_END] = {0, 0, 8}, -- The End
+    [COURSE_NONE] = {0, 0, 0, 8}, -- has mips
   },
   -- custom star names!
   starNames = {
@@ -495,17 +520,6 @@ local romhack_data = { -- supported rom hack data
     [COURSE_PSS] = 1, -- The Super Quiz
   },
 
-  -- this renumbers certains stars
-  renumber_stars = {
-    -- renumber mips star
-    [1] = 4,
-    -- renumber stars in Gaell's Dream
-    [243] = 5,
-    [244] = 6,
-    -- renumber the ending star
-    [251] = 3,
-  },
-
   runner_victory = function(m) -- red switch is after bowser
     if (save_file_get_flags() & SAVE_FLAG_HAVE_WING_CAP) ~= 0 and m.numStars >= gGlobalSyncTable.starRun then
       return true
@@ -533,17 +547,27 @@ local romhack_data = { -- supported rom hack data
   starColor = {r = 92,g = 255,b = 92}, -- stars are green (duh)
   heartReplace = true, -- replaces all hearts with 1ups
 
-  starCount = {
-    [LEVEL_CASTLE_GROUNDS] = 3, -- no mips
-    [LEVEL_BITDW] = 3,
-    [LEVEL_BITFS] = 4,
-    [LEVEL_BITS] = 4,
-    [LEVEL_PSS] = 4,
-    [LEVEL_COTMC] = 3,
-    [LEVEL_TOTWC] = 2,
-    [LEVEL_VCUTM] = 0, -- does not exist
-    [LEVEL_WMOTR] = 1,
-    [LEVEL_SA] = 2,
+  star_data = {
+    [COURSE_NONE] = {8, 8, 8}, -- no mips
+    [COURSE_BOB] = {8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8, 8},
+    [COURSE_WF] = {8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_EXIT, 8, 8, 8, 8},
+    [COURSE_BBH] = {8, 8, 8, 8, 8 | STAR_NOT_BEFORE_THIS_ACT, 8, 8},
+    [COURSE_HMC] = {8, 8 | STAR_NOT_BEFORE_THIS_ACT, 8, 8, 8 | STAR_ACT_SPECIFIC, 8, 8},
+    [COURSE_SSL] = {8, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8},
+    [COURSE_DDD] = {8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8, 8},
+    [COURSE_SL] = {8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_NOT_ACT_1, 8}, -- the act 6 star is obtainable in acts 4-6, so this was the best solution I could think of
+    [COURSE_DDD] = {8, 8 | STAR_ACT_SPECIFIC | STAR_EXIT, 8 | STAR_ACT_SPECIFIC, 8, 8, 8 | STAR_ACT_SPECIFIC, 8},
+    [COURSE_THI] = {8, 8, 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8},
+    [COURSE_TTC] = {8, 8 | STAR_NOT_BEFORE_THIS_ACT, 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8}, -- star 2 isn't actually available in acts 5 and 6 :/
+    [COURSE_BITDW] = {8, 8, 8},
+    [COURSE_BITFS] = {8, 8, 8, 8},
+    [COURSE_BITS] = {8, 8, 8, 8},
+    [COURSE_PSS] = {8 | STAR_IGNORE_STARMODE | STAR_APPLY_NO_ACTS, 8, 8, 8 | STAR_EXIT | STAR_APPLY_NO_ACTS},
+    [COURSE_COTMC] = {8, 8 | STAR_EXIT | STAR_APPLY_NO_ACTS, 8},
+    [COURSE_TOTWC] = {8, 8},
+    [COURSE_VCUTM] = {}, -- does not exist
+    [COURSE_WMOTR] = {8},
+    [COURSE_SA] = {8, 8},
   },
   -- custom star names!
   starNames = {
@@ -590,12 +614,16 @@ local romhack_data = { -- supported rom hack data
 },
 
 ["underworld"] = {
-  name = "Super Mario 64: The Underworld",
+  name = "SM64: The Underworld",
   default_stars = 30,
   max_stars = 30,
   ommSupport = false, -- does not have default omm support
-  no_bowser = true, -- 30 stars isn't the entire goal but oh well
+  badGuy = "The Shitilizer", -- this will display in the rules
+  badGuy_es = "El Shitilizer",
+  badGuy_de = "Den Shitilizer",
+  badGuy_fr = "Le Shitilizer",
   isUnder = true, -- activates special star detection
+  noLobby = true,
   starColor = {r = 0, g = 255, b = 255}, -- light blue
 
   -- prevents moving at start, disables some things
@@ -621,32 +649,32 @@ local romhack_data = { -- supported rom hack data
   end,
 
   -- no typical stars
-  starCount = {
-    [LEVEL_CASTLE_GROUNDS] = 0,
-    [LEVEL_BOB] = 0,
-    [LEVEL_WF] = 0,
-    [LEVEL_JRB] = 0,
-    [LEVEL_CCM] = 0,
-    [LEVEL_BBH] = 0,
-    [LEVEL_HMC] = 0,
-    [LEVEL_LLL] = 0,
-    [LEVEL_SSL] = 0,
-    [LEVEL_DDD] = 0,
-    [LEVEL_SL] = 0,
-    [LEVEL_WDW] = 0,
-    [LEVEL_TTM] = 0,
-    [LEVEL_THI] = 0,
-    [LEVEL_TTC] = 0,
-    [LEVEL_RR] = 0,
-    [LEVEL_BITDW] = 0,
-    [LEVEL_BITFS] = 0,
-    [LEVEL_BITS] = 0,
-    [LEVEL_PSS] = 0,
-    [LEVEL_COTMC] = 0,
-    [LEVEL_TOTWC] = 0,
-    [LEVEL_VCUTM] = 0,
-    [LEVEL_WMOTR] = 0,
-    [LEVEL_SA] = 0,
+  star_data = {
+    [COURSE_NONE] = {},
+    [COURSE_BOB] = {},
+    [COURSE_WF] = {},
+    [COURSE_JRB] = {},
+    [COURSE_CCM] = {},
+    [COURSE_BBH] = {},
+    [COURSE_HMC] = {},
+    [COURSE_LLL] = {},
+    [COURSE_SSL] = {},
+    [COURSE_DDD] = {},
+    [COURSE_SL] = {},
+    [COURSE_WDW] = {},
+    [COURSE_TTM] = {},
+    [COURSE_THI] = {},
+    [COURSE_TTC] = {},
+    [COURSE_RR] = {},
+    [COURSE_BITDW] = {},
+    [COURSE_BITFS] = {},
+    [COURSE_BITS] = {},
+    [COURSE_PSS] = {},
+    [COURSE_COTMC] = {},
+    [COURSE_TOTWC] = {},
+    [COURSE_VCUTM] = {},
+    [COURSE_WMOTR] = {},
+    [COURSE_SA] = {},
   },
 
   -- custom star names! (30 omg)
@@ -681,10 +709,338 @@ local romhack_data = { -- supported rom hack data
     [38] = "Remnant Pair 2",
     [39] = "The Tower Remnant",
     [40] = "Beside-Across From The Tower",
+    [1099511627776] = "Master Of OMM", -- did you know OMM adds a 31st star?
   },
 
   runner_victory = function(m)
     return m.action == ACT_JUMBO_STAR_CUTSCENE
+  end,
+
+  ["badGuy_pt-br"] = "O Shitilizer",
+},
+
+["B3313"] = {
+  name = "B3313",
+  default_stars = 30, -- just a number
+  max_stars = 120, -- unknown how many stars there actually are
+  vagueName = true, -- the names are all identical, just use course numbers
+  -- no requirements
+  parseStars = true, -- automatically generate star list (this hack is too large I can't be bothered)
+  stalk = true, -- the hack is confusing, so let people warp
+  no_bowser = true, -- don't display killing bowser as win condition
+  ommSupport = false,
+
+  star_data = {}, -- filled when parsed
+
+  -- overrides the generated information
+  game_exclude = {
+    [34] = 1, -- is area 3 meant to appear?
+    [73] = 1, -- prevent lava death
+
+    [122] = 0, -- unobtainable (can't enter act 2)... but you CAN get this star in OMM
+
+    -- test rooms
+    [212] = 0,
+    [213] = 0,
+    [214] = 0,
+    [215] = 0,
+    [216] = 0,
+
+     -- I don't think area 3 is meant to appear
+    [132] = 7,
+    [133] = 2,
+
+    [117] = 0, -- same for this area
+    [231] = 1, -- instant death
+  },
+
+  mini_exclude = {
+    [124] = 1, -- this is literally "Mysterious Mountainside" unchanged; as such, too easy
+
+     -- too easy (some are "Checkerboard")
+    [132] = 1,
+    [213] = 1,
+    [152] = 1,
+    [153] = 1,
+    [44] = 1,
+    [45] = 1,
+  },
+
+  starNames = {
+    [151] = "Star (1)", -- Manta Ray is not possible
+    [211] = "5 Hidden Secrets (1)", -- Same here
+  },
+
+  -- wip (from b3313 wiki)
+  levelNames = {
+    [41] = "Whomp's Kingdom",
+    [42] = "Whomp's Prison",
+    [43] = "Whomps Fortress (beta)?", -- no stars; is similar to the correct one
+    [44] = "King Whomp's Battle Arena",
+    [45] = "Flower Fields",
+    [46] = "Vanish Cap Under The Moat (beta)",
+
+    [51] = "Jolly Roger Lagoon",
+    [52] = "Orange Hall",
+    [53] = "Test Level",
+    [54] = "Checkerboard (C4)",
+    [55] = "Holy Yellow Switch Palace",
+    [56] = "Holy Yellow Switch Palace?", -- duplicate with wdw diamonds for some reason
+
+    [71] = "Hazy Maze Cave (empty)",
+    [72] = "Tick Tock Blocks",
+    [73] = "Midnight Meadow",
+    [74] = "Lethal Cavern",
+    [75] = "Plains", -- couldn't find on wiki; probably unused
+    [76] = "Cave City",
+    [77] = "Click Clock Climb",
+
+    [81] = "Desert Maze",
+    [82] = "Shifted Sand Land",
+    [83] = "Scary Sewer Maze",
+    [84] = "Eyerok's Tomb",
+    [85] = "Sandy Skyloft",
+    [86] = "Scary Sewer Maze", -- shadow mario encounter
+    [87] = "Scary Sewer Maze", -- death
+
+    [91] = "Crimson Hallway",
+    [92] = "3rd Floor (beta)",
+    [93] = "athletic",
+    [94] = "Bowser's Castle",
+    [95] = "Fake Lobby",
+    [96] = "Crescent Castle",
+    [97] = "Goomba Hills",
+
+    [101] = "Floating Hotel",
+    [102] = "Haunted Castle Grounds",
+    [103] = "Wing Cap by the Rainbow Highway",
+    [104] = "Tower of the Wing Cap (beta)",
+    [105] = "Rainbow Ride (beta)",
+    [106] = "Vanish Cap within the Plexus",
+
+    [111] = "Snow Slide (B-Roll)?", -- duplicate (is accessible?)
+    [112] = "Snowman's Darkness",
+    [113] = "Frosty Highlands?", -- duplicate?
+    [114] = "Cool, Cool Mountain (beta)",
+    [115] = "Chief Chilly's Ring",
+    [116] = "Cold, Cold Crevasse",
+    [117] = "Chroma Tundra",
+
+    [121] = "Bob-Omb River",
+    [122] = "Big Bob-Omb's Fortress?", -- duplicate with fog
+    [123] = "Piranha Plant Garden",
+    [124] = "Minion Base?", -- duplicate with different skybox
+    [125] = "Piranha's Igloo",
+
+    [131] = "Castle Grounds",
+    [132] = "Bob-Omb Tower",
+    [133] = "Creepy Cove?", -- Seems to be a duplicate
+    [134] = "Grassy Highlands",
+    [135] = "Minion Base",
+    [136] = "Peach's Cell",
+    [137] = "Peach's Cell",
+
+    [141] = "Big Boo's Haunted Forest",
+    [142] = "Dark Lobby",
+    [143] = "Plexal Lobby",
+    [144] = "Clock Hall",
+    [145] = "Big Boo's Fortress",
+    [146] = "Plexal Hallway",
+    [147] = "???'s Floor", -- both peach/bowser floor are here
+
+    [151] = "Jolly Roger Bay (beta)",
+    [152] = "Dead Fortress", -- empty wiggler's forest fortress; unused?
+    [153] = "Checkerboard (C15)",
+    [154] = "Bowser's Maze",
+    [155] = "Balcony",
+
+    [161] = "Castle Grounds?", -- not quite a duplicate
+    [162] = "Beta Lobby C/D", -- both rooms are connected
+    [163] = "Beta Lobby B",
+    [164] = "Beta Lobby A",
+    [165] = "Genesis Basement",
+    [166] = "Bowser's Hallway/Prison", -- both are here
+    [167] = "Plexal Upstairs",
+
+    [171] = "Tiny Huge Island (beta)",
+    [172] = "Red Courtyard", -- unknown
+    [173] = "Creepy Cove",
+    [174] = "Sunken Castle",
+    [175] = "Mario's Maze",
+    [176] = "Mario's Maze", -- get attacked by faceless marios (doesn't work in this port)
+    
+    [181] = "Battle Fort",
+    [182] = "Floor 2B",
+    [183] = "Randomized Realm",
+    [184] = "Unknown Lobby", -- unused lobby; doesn't lead anywhere good
+    [185] = "Bob-omb Test Site", -- also called "test field"?
+    [186] = "Big Bob-Omb's Fortress",
+
+    [191] = "Aquatic Tunnel",
+    [192] = "Cryptic Hideout",
+    [193] = "Cryptic Hideout", -- faceless mario encounter (instant death)
+    [194] = "Cryptic Hideout", -- ??? (instant death)
+    [195] = "Funhouse",
+
+    [201] = "Dry Town",
+    [202] = "Wiggler's Forest Fortress",
+    [203] = "Pleasant, Pleasant Falls",
+    [204] = "Sky-High Pathway",
+    [206] = "Ruins In The Blood Lake",
+
+    [211] = "Wet-Dry World (beta)?", -- no pipe here
+    [213] = "Ice-Cold Warzone",
+    [214] = "Bob-omb Battlefield (beta)",
+
+    [221] = "Blazing Bully Base", -- red version
+    [222] = "Peaceful Sewer Maze",
+    [223] = "Blazing Bully Base", -- blue version
+    [224] = "Infernal Tower",
+    [225] = "Fire Bubble (B-Roll)",
+
+    [231] = "Dark Hallway",
+    [232] = "Checkerboard (C9)",
+    [233] = "Deadly Descent",
+    [234] = "Delicious Cake",
+    [235] = "Snow Slide (B-Roll)",
+    [236] = "Snowman's Land (beta)",
+    [237] = "Frosty Highlands",
+
+    [241] = "Cryptic Hideout?", -- possibly an early version
+    [242] = "Dark Lobby?", -- duplicate with different warps?
+    [243] = "Plexal Basement",
+    [244] = "Flooded Hallway", -- unknown
+    [245] = "Empty Flooded Hallway",
+    [246] = "Lavish Lava Mountain", -- grass side
+    [247] = "Lavish Lava Mountain", -- lava side
+
+    [251] = "Flooded Town",
+    [252] = "Underground Passageway",
+    [256] = "Wet-Dry World (beta)",
+
+    [261] = "Uncanny Courtyard",
+    [262] = "Forest Maze",
+    [263] = "The Star",
+    [264] = "Purple Upstairs",
+    [265] = "The Void",
+    [266] = "Uncanny Courtyard", -- crimson state
+    [267] = "Uncanny Courtyard", -- windy state
+
+    [271] = "Dark Downtown",
+    [272] = "castle2",
+    [273] = "Cubic Greens",
+    [274] = "Purple Cavern", -- probably unused
+    [275] = "Bob-Omb Village",
+    [276] = "Dead Village",
+    [277] = "Dark Plexal Upstairs",
+    
+    [281] = "Mountain (B-Roll)",
+    [282] = "Goomboss Battle",
+    [283] = "Sinister Clockwork",
+    [284] = "Whomp's Fortress (beta)",
+    [285] = "Tall Floating Fortress",
+    [286] = "Rocky Trek",
+
+    [291] = "Eel Graveyard",
+    [292] = "Empty Graveyard", -- unused?
+    [293] = "Checkboard (WC)",
+    [294] = "Plexal Upstairs?", -- somewhat different
+    [295] = "Silent Hall",
+    [296] = "Void?", -- just like 34 area 2; idk
+    [297] = "Void?", -- another one? instant death this time
+
+    [301] = "Bowser 1",
+
+    [311] = "Water Land",
+    [312] = "Castle1", -- layout 2?
+    [313] = "Castle1",
+    [314] = "Forgotten Bay", -- couldn't find this one, so I made this name up
+    [315] = "Castle Garden",
+    [316] = "Water Land", -- Unused duplicate?
+
+    [331] = "Bowser's Checkered Madness",
+    [332] = "Bowser In The Bully Battlefield",
+    [333] = "Bowser 2",
+
+    [341] = "Eternal Fort",
+    [342] = "Void?", -- unused, perhaps? somewhat similar to void
+
+    -- vanilla tall tall mountain
+    [361] = "Tall, Tall Mountain",
+    [362] = "Tall, Tall Mountain",
+    [363] = "Tall, Tall Mountain",
+    [364] = "Tall, Tall Mountain",
+  },
+
+  -- warp to ruins in the blood lake
+  special_run = function(m,gotStar)
+    if m.playerIndex == 0 and gotStar == 2 and gNetworkPlayers[0].currLevelNum == LEVEL_THI and gNetworkPlayers[0].currAreaIndex == 7 then
+      warp_to_level(LEVEL_SA, 6, 0)
+    end
+  end,
+
+  -- condition is "kill bowser" if any%, or simply "get X stars" otherwise
+  runner_victory = function(m)
+    if gGlobalSyncTable.starRun == -1 then
+      return m.action == ACT_JUMBO_STAR_CUTSCENE
+    else
+      return m.numStars >= gGlobalSyncTable.starRun
+    end
+  end,
+},
+
+["moonshine"] = {
+  name = "SM64 Moonshine",
+  default_stars = 50, -- there is no end, really
+  max_stars = 50,
+  no_bowser = true,
+  requirements = {
+    [LEVEL_LLL] = 8, -- Sweet Sweet Rush
+    [LEVEL_BITS] = 30, -- Down Street
+  },
+  ommSupport = false, -- not true, but this only affected the colored radar
+  starColor = {r = 92,g = 255,b = 92}, -- all moons are green
+  heartReplace = true, -- replaces all hearts with 1ups
+  isMoonshine = true, -- changes hud elements
+
+  star_data = {
+    [COURSE_NONE] = {0, 8}, -- only toad star 2
+    [COURSE_JRB] = {},
+    [COURSE_LLL] = {8, 8, 0, 0, 0, 0, 8}, -- Sweet Sweet Rush
+    [COURSE_SSL] = {},
+    [COURSE_DDD] = {},
+    [COURSE_SL] = {},
+    [COURSE_WDW] = {8, 8, 8, 8, 0, 0, 8}, -- Green Plains
+    [COURSE_TTM] = {},
+    [COURSE_THI] = {},
+    [COURSE_TTC] = {},
+    [COURSE_RR] = {},
+    [COURSE_BITDW] = {},
+    [COURSE_BITFS] = {8, 8}, -- Purple Swampy Swamp
+    [COURSE_BITS] = {8, 8}, -- Moonshine
+    [COURSE_PSS] = {},
+    [COURSE_COTMC] = {},
+    [COURSE_TOTWC] = {},
+    [COURSE_VCUTM] = {},
+    [COURSE_WMOTR] = {},
+    [COURSE_PSS] = {8, 8}, -- Forest Valley
+    [COURSE_SA] = {},
+  },
+  -- custom star names!
+  starNames = {
+    [2] = "Toad's Gift",
+    [171] = "Surviving The Swamp",
+    [172] = "8 Coins Across The Swamp",
+    [181] = "Shining Moon",
+    [182] = "8 Shining Coins",
+    [191] = "Top Of The Valley",
+    [192] = "Green Coins Among Green Trees",
+  },
+
+  mini_exclude = {}, -- none!
+
+  runner_victory = function(m)
+    return m.numStars >= gGlobalSyncTable.starRun
   end,
 },
 
@@ -693,8 +1049,9 @@ default = {
     default_stars = -1,
     max_stars = 255,
     requirements = {[LEVEL_BOWSER_3] = 255}, -- block off Bowser 3 until needed stars are collected
+    parseStars = true, -- automatically generate star list
 
-    starCount = {}, -- assume every secret stage has 1 star
+    star_data = {}, -- assume every secret stage has 1 star
 
     runner_victory = function(m)
       return m.action == ACT_JUMBO_STAR_CUTSCENE
@@ -703,25 +1060,43 @@ default = {
 
 }
 
-ROMHACK = {}
+ROMHACK = {} -- table containing the romhack data we're using
+PARSE_COURSE = 0 -- what course we're parsing in level_script_parse
+PARSE_AREA = 0 -- what area we're parsing in level_script_parse
+PARSE_LEVEL = 0 -- what level we're parsing in level_script_parse
+PARSE_PRINT = false -- used in debug command; displays information about found stars
+PARSE_FOUND_STARS = {} -- stars we've found in the level we're parsing
+PARSE_MINI_EXCLUDE = {} -- stars we've found to exclude in minihunt
+PARSE_STAR_NAMES = {} -- the name of the stars we've found
+
+disable_chat_hook = false -- disabled if a mod uses it (swear filter, for example)
+
 function setup_hack_data(settingRomHack,initial,usingOMM)
   local romhack_file = gGlobalSyncTable.romhackFile
   ROMHACK = romhack_data[romhack_file]
   if initial and usingOMM then
-    gGlobalSyncTable.weak = true -- turn on half frames automatically
     djui_popup_create(trans("omm_detected"), 1)
   end
 
+  local found_121 = false
   if ROMHACK == nil and settingRomHack then
     if _G.mhApi == nil or _G.mhApi.romhackSetup == nil then
       romhack_file = "vanilla"
       for i,mod in pairs(gActiveMods) do
-        if mod.enabled and mod.incompatible ~= nil then
-          if string.find(mod.incompatible,"romhack") then -- is a romhack
+        if mod.enabled then
+          if mod.incompatible and string.find(mod.incompatible,"romhack") then -- is a romhack
             romhack_file = mod.relativePath
-          elseif string.find(mod.incompatible,"gamemode") then -- is mariohunt
+            found_121 = false
+          elseif mod.incompatible and string.find(mod.incompatible,"gamemode") then -- is mariohunt
             if string.find(mod.basePath,"sm64ex/-coop") then
               djui_popup_create("WARNING: Mod installed in base directory; API may not function",2)
+            end
+          elseif (romhack_file == "vanilla") and (not found_121) and string.find(mod.name,"121rst star") then -- 121rst star support
+            found_121 = true
+          elseif not disable_chat_hook then -- disable hook for some mods
+            local name = mod.name:lower()
+            if (not (_G.mhApi.chatValidFunction or _G.mhApi.chatModifyFunction)) and (name:find("mute") or name:find("swear filter") or name:find("nicknames")) then
+              disable_chat_hook = true
             end
           end
         end
@@ -740,6 +1115,11 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
   if initial and romhack_file == "vanilla" then
     dialog_replace()
     omm_replace(usingOMM)
+  end
+
+  if found_121 then
+    ROMHACK.star_data[COURSE_NONE] = {8, 8, 8, 8, 8, 8}
+    ROMHACK.starNames[6] = "Red Coins at Midnight"
   end
 
   if ROMHACK == nil then
@@ -764,6 +1144,45 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
       star_ids[id] = name
     end
   end
+  if initial and ROMHACK.otherStarSources ~= nil then
+    local otherStarSources = ROMHACK.otherStarSources() or {}
+    for id,data in pairs(otherStarSources) do
+      star_sources[id] = data
+    end
+  end
+
+  -- support for old format
+  if ROMHACK.star_data == nil then
+    ROMHACK.star_data = {}
+    for level,course in pairs(level_to_course) do
+      if ROMHACK.starCount[level] then
+        if ROMHACK.star_data[course] == nil then ROMHACK.star_data[course] = {} end
+        if ROMHACK.starCount[level] > 0 then
+          for i=1,ROMHACK.starCount[level] do
+            local starNum = i
+            if ROMHACK.renumber_stars and ROMHACK.renumber_stars[course * 10 + i] then
+              starNum = ROMHACK.renumber_stars[course * 10 + i]
+            end
+            if starNum ~= 0 then
+              ROMHACK.star_data[course][starNum] = 8
+            end
+          end
+        end
+      end
+    end
+  end
+
+  if ROMHACK.parseStars then
+    for course=COURSE_MIN,COURSE_MAX-1 do
+      parse_course_stars(course, course_to_level[course] or 0)
+    end
+  end
+
+  if (ROMHACK ~= nil and ROMHACK.stalk == nil) then
+    update_chat_command_description("stalk", "- " .. trans("wrong_mode"))
+  else
+    update_chat_command_description("stalk", trans("stalk_desc"))
+  end
 
   if settingRomHack then
     gGlobalSyncTable.starRun = ROMHACK.default_stars
@@ -772,16 +1191,186 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
   return romhack_file
 end
 
+-- uses level_script_parse to setup romhack data
+function parse_course_stars(course, level)
+  PARSE_COURSE = course
+  PARSE_LEVEL = level
+  PARSE_AREA = 1
+  PARSE_FOUND_STARS = {}
+  PARSE_MINI_EXCLUDE = {}
+  PARSE_STAR_NAMES = {}
+
+  if ROMHACK.mini_exclude == nil then ROMHACK.mini_exclude = {} end
+  if ROMHACK.starNames == nil then ROMHACK.starNames = {} end
+  if ROMHACK.star_data[course] == nil then ROMHACK.star_data[course] = {} end
+
+  local exText = ""
+  local renumText = ""
+
+  print(PARSE_LEVEL)
+  level_script_parse(PARSE_LEVEL, parse_stars)
+  if course == 0 then
+    PARSE_LEVEL = LEVEL_CASTLE
+    level_script_parse(PARSE_LEVEL, parse_stars)
+    PARSE_LEVEL = LEVEL_CASTLE_COURTYARD
+    level_script_parse(PARSE_LEVEL, parse_stars)
+  end
+  local starCount = 0
+  for i=1,7 do
+    if (PARSE_FOUND_STARS[i] or (i==7 and course <= 15 and course > 0)) then
+      ROMHACK.star_data[course][i] = PARSE_FOUND_STARS[i] or 1 -- 100 coin star is always area 1
+
+      if ROMHACK.starNames == nil or ROMHACK.starNames[course*10+i] == nil then
+        ROMHACK.starNames[course*10+i] = PARSE_STAR_NAMES[course*10+i]
+      end
+
+      if course ~= 0 and course ~= 25 then
+        if PARSE_MINI_EXCLUDE[i] == 1 then
+          exText = exText .. (string.format("[%d%d] = 1,",course,i)) .. "\n"
+          ROMHACK.mini_exclude[course*10+i] = 1
+        elseif PARSE_MINI_EXCLUDE[i] and PARSE_MINI_EXCLUDE[i] ~= 0 then
+          exText = exText .. (string.format("[%d%d] = %d,",course,i,PARSE_MINI_EXCLUDE[i])) .. "\n"
+          ROMHACK.mini_exclude[course*10+i] = PARSE_MINI_EXCLUDE[i]
+        end
+      end
+    else
+      ROMHACK.star_data[course][i] = 0
+    end
+  end
+  if PARSE_PRINT then
+    print(string.format("[%d] = %d,\n",level,starCount))
+  end
+  if PARSE_PRINT then
+    print(renumText)
+    print(exText)
+  end
+end
+
+-- gets all stars (and star sources, such as King Bob-omb); used with level_script_parse
+function parse_stars(area, bhvData, macroBhvIds, macroBhvArgs)
+  if macroBhvIds then
+    for i,id in pairs(macroBhvIds) do
+      parse_stars(nil, {behavior = id, behaviorArg = macroBhvArgs[i]}) -- parse for each macro object
+    end
+  elseif area and area ~= 0 then
+    PARSE_AREA = area
+  elseif bhvData then
+    local starNum = 0
+    local obj_id = bhvData.behavior
+    local byte1 = bhvData.behaviorArg >> 24 -- first byte
+    local byte2 = (bhvData.behaviorArg >> 16 & 0x00FF) -- second byte
+
+    local neededByte2
+    local custom_name
+    if star_sources[obj_id] ~= nil then
+      neededByte2 = star_sources[obj_id][1] or 0
+      custom_name = star_sources[obj_id][2]
+    end
+
+    local mini_invalid = false
+
+    if star_ids[obj_id] then
+      custom_name = "Star"
+      starNum = (byte1) + 1
+    elseif neededByte2 == true then
+      starNum = (byte1) + 1
+    elseif neededByte2 == 0xFF then
+      if byte2 ~= 0 then
+        starNum = (byte1) + 1
+      end
+    elseif neededByte2 then
+      if byte2 == neededByte2 then
+        starNum = (byte1) + 1
+      end
+    elseif obj_id == id_bhvKoopa then -- koopa the quick special case
+      if byte2 > 0x01 then
+        custom_name = "Race with Koopa The Quick"
+        starNum = (byte1) + 1
+      end
+    elseif obj_id == id_bhvExclamationBox then -- exclamation box special case
+      if exclamation_box_valid[byte2] then
+        custom_name = "Box Star"
+        
+        if byte2 == 8 then
+          starNum = (byte1) + 1
+        else
+          starNum = byte2 - 8
+        end
+      end
+    elseif obj_id == id_bhvToadMessage then -- toad special case
+      mini_invalid = true
+      custom_name = "Toad Star"
+      if byte1 == gBehaviorValues.dialogs.ToadStar1Dialog then
+        starNum = 1
+      elseif byte1 == gBehaviorValues.dialogs.ToadStar2Dialog then
+        starNum = 2
+      elseif byte1 == gBehaviorValues.dialogs.ToadStar3Dialog then
+        starNum = 3
+      end
+    elseif obj_id == id_bhvMips then -- mips special case
+      mini_invalid = true
+      custom_name = "Mips Star"
+      if area then -- if the area was set, we're doing mip's second star
+        starNum = 5
+      else
+        -- two stars from mips, perhaps (check if star 2 is disabled)
+        if gBehaviorValues.MipsStar2Requirement ~= 255 then
+          parse_stars(0, bhvData) -- call again with area set to 0; this normally doesn't happen
+        end
+        starNum = 4
+      end
+    end
+
+    if (starNum > 0 and starNum < 8) and (
+    ROMHACK.game_exclude == nil or ROMHACK.game_exclude[PARSE_COURSE*10+starNum] == nil or
+    ROMHACK.game_exclude[PARSE_COURSE*10+starNum] == PARSE_AREA
+    ) then
+      custom_name = custom_name .. " (" .. starNum ..")"
+
+      if PARSE_PRINT then
+        djui_chat_message_create(string.format("%s (C%d, L%d, A%d)",custom_name,PARSE_COURSE,PARSE_LEVEL,PARSE_AREA))
+        print(custom_name, PARSE_COURSE, PARSE_AREA)
+      end
+      
+      if PARSE_FOUND_STARS[starNum] == nil then
+        PARSE_FOUND_STARS[starNum] = PARSE_AREA | STAR_APPLY_NO_ACTS
+      else
+        PARSE_FOUND_STARS[starNum] = PARSE_FOUND_STARS[starNum] & ~STAR_AREA_MASK
+        PARSE_FOUND_STARS[starNum] = PARSE_FOUND_STARS[starNum] | (STAR_MULTIPLE_AREAS << (PARSE_AREA-1))
+      end
+
+      if mini_invalid and PARSE_MINI_EXCLUDE[starNum] == nil then
+        PARSE_MINI_EXCLUDE[starNum] = 1
+      elseif PARSE_AREA ~= 1 and (not mini_invalid) then
+        PARSE_MINI_EXCLUDE[starNum] = PARSE_AREA
+      else
+        PARSE_MINI_EXCLUDE[starNum] = 0
+      end
+
+      if ROMHACK.vagueName or PARSE_COURSE > 15 or PARSE_COURSE == 0 then
+        PARSE_STAR_NAMES[PARSE_COURSE*10+starNum] = custom_name
+      end
+    end
+  end
+end
+
 -- exteme edition support, and sets minihunt level as beginning
 function warp_beginning()
   warpCount = 0
+  warpPrevArea = 0
   warpCooldown = 0
   if gGlobalSyncTable.mhMode == 2 and gGlobalSyncTable.mhState ~= 0 then
     local correctAct = gGlobalSyncTable.getStar
-    local area = 1
+
+    local course = level_to_course[gGlobalSyncTable.gameLevel] or 0
+    local area = (ROMHACK.mini_exclude and ROMHACK.mini_exclude[course*10+correctAct]) or 1
     if gGlobalSyncTable.ee then area = 2 end
+
     if correctAct == 7 then correctAct = 6 end
+    if course == 0 then correctAct = 0 end
     warp_to_level(gGlobalSyncTable.gameLevel, area, correctAct)
+  elseif gGlobalSyncTable.mhState == 0 and LEVEL_LOBBY and not ROMHACK.noLobby then
+    warp_to_level(LEVEL_LOBBY, 1, 0) -- go to custom lobby!
   elseif gGlobalSyncTable.ee then
     warp_to_level(gLevelValues.entryLevel, 2, 0)
   else
@@ -813,11 +1402,13 @@ end
 -- sets up the minihunt blacklist using an encrypted value and mini_exclude
 function setup_mini_blacklist(blacklistData)
   mini_blacklist = {}
-  if blacklistData ~= "none" then
+  if blacklistData and blacklistData ~= "none" then
     decrypt_black(blacklistData)
   elseif ROMHACK.mini_exclude ~= nil then
     for id,value in pairs(ROMHACK.mini_exclude) do
-      mini_blacklist[id] = 1
+      if value == 1 then
+        mini_blacklist[id] = 1
+      end
     end
   end
 end
@@ -882,6 +1473,59 @@ function on_black_changed(tag, oldVal, newVal)
 end
 hook_on_sync_table_change(gGlobalSyncTable, "blacklistData", "blacklist_change", on_black_changed)
 
+-- stars to track (replicas and such are in romhack_data)
+star_ids = {
+  [id_bhvStar] = "bhvStar",
+  [id_bhvSpawnedStar] = "bhvSpawnedStar",
+  [id_bhvSpawnedStarNoLevelExit] = "bhvSpawnedStarNoLevelExit",
+  [id_bhvStarSpawnCoordinates] = "bhvStarSpawnCoordinates",
+}
+
+-- other sources for stars (again, more in romhack_data)
+-- The second argument is:
+-- TRUE if the 2nd byte doesn't matter
+-- 0xFF for any non-zero value for the second byte
+-- some other number value for the second byte being equal to such
+-- exclamation boxes, KTQ, toad, mips, and piranha plants are special cases
+star_sources = {
+  [id_bhvKingBobomb] = {true, "Big Battle with King Bob-Omb"},
+  [id_bhvWhompKingBoss] = {true, "Chip Off Whomp's Block"},
+  [id_bhvHiddenRedCoinStar] = {true, "Find The Red Coins"},
+  [id_bhvBowserCourseRedCoinStar] = {true, "Find The Red Coins"},
+  [id_bhvHiddenStar] = {true, "5 Hidden Secrets"},
+  [id_bhvTuxiesMother] = {true, "Li'l Penguin Lost"},
+  [id_bhvWigglerHead] = {true, "Make Wiggler Squirm"},
+  [id_bhvEyerokBoss] = {true, "Hand to Hand with Eyerok"},
+  [id_bhvBalconyBigBoo] = {true, "Bout with Big Boo"},
+  [id_bhvGhostHuntBigBoo] = {true, "Go On A Ghost Hunt"},
+  [id_bhvMerryGoRoundBooManager] = {true, "Merry Go Round"},
+  [id_bhvTreasureChests] = {true, "Puzzle of the Chests"},
+  [id_bhvTreasureChestsJrb] = {true, "Puzzle of the Chests"},
+  [id_bhvRacingPenguin] = {true, "Penguin Race"},
+  [id_bhvUnagi] = {0x01, "Can The Eel Come Out To Play?"}, -- Is this correct?
+  [id_bhvSnowmansHead] = {true, "Snowman's Lost His Head"},
+  [id_bhvBigBully] = {true, "Battle the Big Bully"},
+  [id_bhvBigChillBully] = {true, "Chill With The Bully"},
+  [id_bhvBigBullyWithMinions] = {true, "Bully The Bullies"},
+  [id_bhvCcmTouchedStarSpawn] = {true, "Sliding Star"},
+  [id_bhvMrI] = {0xFF, "Eye To Eye"}, -- any set byte
+  [id_bhvMantaRay] = {true, "The Manta Ray's Reward"},
+  [id_bhvJetStreamRingSpawner] = {true, "Through The Jet Stream"},
+  [id_bhvKlepto] = {0xFF, "In The Talons Of The Big Bird"}, -- any set byte
+  [id_bhvUkikiCage] = {true, "Mystery Of The Monkey Cage"},
+  [id_bhvFirePiranhaPlant] = {0xFF, "Pluck The Piranha Plants"}, -- any set byte
+}
+
+-- thank you sunk
+exclamation_box_valid = {
+  [8] = true,
+  [10] = true,
+  [11] = true,
+  [12] = true,
+  [13] = true,
+  [14] = true
+}
+
 -- I wish there was a better way to do this
 course_to_level = {
   [COURSE_NONE] = LEVEL_CASTLE_GROUNDS, -- Course 0 (note that courtyard and inside are also course 0); won't appear in minihunt
@@ -909,7 +1553,7 @@ course_to_level = {
   [COURSE_VCUTM] = LEVEL_VCUTM, -- Course 22
   [COURSE_WMOTR] = LEVEL_WMOTR, -- Course 23
   [COURSE_SA] = LEVEL_SA, -- Course 24
-  [25] = LEVEL_ENDING, -- Course 25 (will not appear in MiniHunt)
+  [COURSE_CAKE_END] = LEVEL_ENDING, -- Course 25 (will not appear in MiniHunt)
 }
 string_to_level = {
   ["grounds"] = LEVEL_CASTLE_GROUNDS,
@@ -975,5 +1619,38 @@ string_to_course = {
   ["vcutm"] = COURSE_VCUTM, -- Course 22
   ["wmotr"] = COURSE_WMOTR, -- Course 23
   ["sa"] = COURSE_SA, -- Course 24
-  ["end"] = 25, -- Course 25
+  ["end"] = COURSE_CAKE_END, -- Course 25
+}
+level_to_course = {
+  [LEVEL_CASTLE_GROUNDS] = COURSE_NONE, -- Course 0
+  [LEVEL_CASTLE] = COURSE_NONE, -- Course 0
+  [LEVEL_CASTLE_COURTYARD] = COURSE_NONE, -- Course 0
+  [LEVEL_BOB] = COURSE_BOB, -- Course 1
+  [LEVEL_WF] = COURSE_WF, -- Course 2
+  [LEVEL_JRB] = COURSE_JRB, -- Course 3
+  [LEVEL_CCM] = COURSE_CCM, -- Course 4
+  [LEVEL_BBH] = COURSE_BBH, -- Course 5
+  [LEVEL_HMC] = COURSE_HMC, -- Course 6
+  [LEVEL_LLL] = COURSE_LLL, -- Course 7
+  [LEVEL_SSL] = COURSE_SSL, -- Course 8
+  [LEVEL_DDD] = COURSE_DDD, -- Course 9
+  [LEVEL_SL] = COURSE_SL, -- Course 10
+  [LEVEL_WDW] = COURSE_WDW, -- Course 11
+  [LEVEL_TTM] = COURSE_TTM, -- Course 12
+  [LEVEL_THI] = COURSE_THI, -- Course 13
+  [LEVEL_TTC] = COURSE_TTC, -- Course 14
+  [LEVEL_RR] = COURSE_RR, -- Course 15
+  [LEVEL_BITDW] = COURSE_BITDW, -- Course 16
+  [LEVEL_BOWSER_1] = COURSE_BITDW, -- Course 16
+  [LEVEL_BITFS] = COURSE_BITFS, -- Course 17
+  [LEVEL_BOWSER_2] = COURSE_BITFS, -- Course 17
+  [LEVEL_BITS] = COURSE_BITS, -- Course 18
+  [LEVEL_BOWSER_3] = COURSE_BITS, -- Course 18
+  [LEVEL_PSS] = COURSE_PSS, -- Course 19
+  [LEVEL_COTMC] = COURSE_COTMC, -- Course 20
+  [LEVEL_TOTWC] = COURSE_TOTWC, -- Course 21
+  [LEVEL_VCUTM] = COURSE_VCUTM, -- Course 22
+  [LEVEL_WMOTR] = COURSE_WMOTR, -- Course 23
+  [LEVEL_SA] = COURSE_SA, -- Course 24
+  [LEVEL_ENDING] = COURSE_CAKE_END, -- Course 25 (will not appear in MiniHunt)
 }

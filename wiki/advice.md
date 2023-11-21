@@ -4,7 +4,7 @@ This is advice for Normal and Switch mode. These tips should apply regardless of
 # Runners
 
 ## The Hub
-<img src="img/lll.png" alt="The Lethal Lava Land painting" width="400"/>
+<img src="img/lll_painting.png" alt="The Lethal Lava Land painting" width="400"/>
 
 Don't let your guard down in hub areas. They are **very dangerous.** Why?
 ### NO ESCAPE
@@ -59,14 +59,15 @@ You can even do a dive out of a sideflip to fly straight over Hunters! Sort of l
 
 ### OMM Rebirth
 
-But what if you prefer to play with Issac ever-popular OMM Rebirth?
+But what if you prefer to play with the popular OMM Rebirth?
 You can't dive in that!
 Generally, you'll want to **Roll** by crouching and mashing B.
 Roll down a slope, and you'll go even faster.
 
 But what if there was a way to go fast in the *air*? Well, let me introduce you to the most broken tech in gaming history (citation needed)...
 
-### Roll Conservation (idk what this tech is actually called)
+### Gork Jump
+#### (idk why it's called this)
 
 This tech lets you to travel INSANE distances in the air. Here's how to do it:
 

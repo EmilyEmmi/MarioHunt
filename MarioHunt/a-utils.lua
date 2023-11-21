@@ -1,5 +1,5 @@
 -- localize common functions
-local djui_chat_message_create,djui_popup_create,network_send,tonumber = djui_chat_message_create,djui_popup_create,network_send,tonumber
+local djui_chat_message_create,network_send,tonumber = djui_chat_message_create,network_send,tonumber
 
 -- main command
 function mario_hunt_command(msg)
@@ -115,8 +115,26 @@ function start_game(msg)
     end
   end
   if runners < 1 then
-    djui_chat_message_create(trans("error_no_runners"))
-    return true
+    if gGlobalSyncTable.mhMode ~= 2 then
+      djui_chat_message_create(trans("error_no_runners"))
+      return true
+    else
+      local singlePlayer = true
+      for i=1,MAX_PLAYERS-1 do
+        local np = gNetworkPlayers[i]
+        local sMario = gPlayerSyncTable[i]
+        if np.connected and sMario.spectator ~= 1 then
+          singlePlayer = false
+          break
+        end
+      end
+      if singlePlayer then
+        become_runner(gPlayerSyncTable[0])
+      else
+        djui_chat_message_create(trans("error_no_runners"))
+        return true
+      end
+    end
   end
 
   local cmd = "none"
@@ -193,23 +211,43 @@ end
 
 function add_runner(msg)
   local runners = tonumber(msg)
-  if runners == nil or runners ~= math.floor(runners) or runners < 1 then return false end
+  if msg == "" or msg == 0 or msg == "auto" then
+    runners = 0 -- TBD
+  elseif runners == nil or runners ~= math.floor(runners) or runners < 1 then
+    return false
+  end
 
   -- get current hunters
   local currHunterIDs = {}
   local goodHunterIDs = {}
   local runners_available = 0
+  local currPlayers = 0
+  local currRunners = 0
   for i=0,(MAX_PLAYERS-1) do
     local np = gNetworkPlayers[i]
     local sMario = gPlayerSyncTable[i]
-    if np.connected and sMario.team ~= 1 and sMario.spectator ~= 1 then
-      if sMario.beenRunner == 0 then
-        runners_available = runners_available + 1
-        table.insert(goodHunterIDs, np.localIndex)
+    if np.connected and (sMario.spectator ~= 1 or sMario.team == 1) then
+      if sMario.team ~= 1 then
+        if sMario.beenRunner == 0 then
+          runners_available = runners_available + 1
+          table.insert(goodHunterIDs, np.localIndex)
+        end
+        table.insert(currHunterIDs, np.localIndex)
+      else
+        currRunners = currRunners + 1
       end
-      table.insert(currHunterIDs, np.localIndex)
+      currPlayers = currPlayers + 1
     end
   end
+
+  if runners == 0 then -- calculate good amount of runners
+    runners = (currPlayers+2)//4-currRunners -- 3 hunters per runner (4 max with 16 player lobby)
+    if runners <= 0 then
+      djui_chat_message_create(trans("no_runners_added"))
+      return true
+    end
+  end
+
   if #currHunterIDs < (runners + 1) then
     djui_chat_message_create(trans("must_have_one"))
     return true
@@ -241,7 +279,7 @@ end
 
 function runner_randomize(msg)
   local runners = tonumber(msg)
-  if msg == nil or msg == "" or msg == 99 then
+  if msg == nil or msg == "" or msg == 99 or msg == 0 or msg == "auto" then
     runners = 0 -- TBD
   elseif (runners == nil or runners ~= math.floor(runners) or runners < 1) then
     return false
@@ -266,9 +304,9 @@ function runner_randomize(msg)
 
   if runners == 0 then -- calculate good amount of runners
     runners = (#currPlayerIDs+2)//4 -- 3 hunters per runner (4 max with 16 player lobby)
-    if runners == 0 then
+    if runners <= 0 then
       djui_chat_message_create(trans("must_have_one"))
-      return treu
+      return true
     end
   end
 
@@ -416,43 +454,60 @@ end
 function change_game_mode(msg,mode)
   if mode == 0 or string.lower(msg) == "normal" then
     gGlobalSyncTable.mhMode = 0
+
+    -- defaults
     gGlobalSyncTable.runnerLives = 1
     gGlobalSyncTable.runTime = 7200 -- 4 minutes
+    gGlobalSyncTable.anarchy = 0
+    gGlobalSyncTable.dmgAdd = 0
+    if gGlobalSyncTable.starMode then gGlobalSyncTable.runTime = 2 end
+
     gGlobalSyncTable.gameAuto = 0
     if gGlobalSyncTable.mhState == 0 then
       gGlobalSyncTable.mhTimer = 0
     end
-    if gGlobalSyncTable.starMode then gGlobalSyncTable.runTime = 2 end
+    
     omm_disable_non_stop_mode(false)
-    return true
   elseif mode == 1 or string.lower(msg) == "switch" then
     gGlobalSyncTable.mhMode = 1
+
+    -- defaults
     gGlobalSyncTable.runnerLives = 0
     gGlobalSyncTable.runTime = 7200 -- 4 minutes
+    gGlobalSyncTable.anarchy = 0
+    gGlobalSyncTable.dmgAdd = 0
+    if gGlobalSyncTable.starMode then gGlobalSyncTable.runTime = 2 end
+
     gGlobalSyncTable.gameAuto = 0
     if gGlobalSyncTable.mhState == 0 then
       gGlobalSyncTable.mhTimer = 0
     end
-    if gGlobalSyncTable.starMode then gGlobalSyncTable.runTime = 2 end
+    
     omm_disable_non_stop_mode(false)
-    return true
   elseif mode == 2 or string.lower(msg) == "mini" then
     local np = gNetworkPlayers[0]
     gGlobalSyncTable.mhMode = 2
+    
+    -- defaults
     gGlobalSyncTable.runnerLives = 0
     gGlobalSyncTable.runTime = 9000 -- 5 minutes
+    gGlobalSyncTable.anarchy = 1
+    gGlobalSyncTable.dmgAdd = 2
+
     gGlobalSyncTable.gameLevel = np.currLevelNum
     gGlobalSyncTable.getStar = np.currActNum
-    if gGlobalSyncTable.getStar == 0 then gGlobalSyncTable.getStar = 1 end
     omm_disable_non_stop_mode(true)
-    return true
+  else
+    return false
   end
-  return false
+
+  load_settings(true)
+  return true
 end
 
 -- TroopaParaKoopa's pause mod
 function pause_command(msg)
-  if msg == "all" then
+  if msg == "all" or msg == nil or msg == "" then
     if gGlobalSyncTable.pause then
       gGlobalSyncTable.pause = false
       for i=0,(MAX_PLAYERS-1) do
@@ -514,6 +569,10 @@ function get_role_name_and_color(sMario)
       colorString = "\\#00ffff\\"
     end
     roleName = trans("runner")
+  elseif sMario.team == nil then -- joining
+    color = {r = 169, g = 169, b = 169} -- grey
+    colorString = "\\#a9a9a9\\"
+    roleName = trans("menu_unknown")
   elseif sMario.spectator ~= 1 then
     roleName = trans("hunter")
   else
@@ -522,4 +581,23 @@ function get_role_name_and_color(sMario)
     roleName = trans("spectator")
   end
   return roleName,colorString,color
+end
+
+function set_lobby_music(month)
+  if month ~= 10 and month ~= 12 then
+    set_background_music(0,0x53,0)
+  elseif month == 10 then
+    set_background_music(0,SEQ_LEVEL_SPOOKY,0)
+  else
+    set_background_music(0,SEQ_LEVEL_SNOW,0)
+  end
+end
+
+-- some minor conversion functions
+function bool_to_int(bool)
+  return (bool and 1) or 0
+end
+
+function is_zero(int)
+  return (int == 0 and 1) or 0
 end

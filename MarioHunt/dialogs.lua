@@ -1,18 +1,22 @@
+local changed_dialogs = {}
+
 function dialog_replace()
 
+changed_dialogs[001] = 1
 smlua_text_utils_dialog_replace(DIALOG_001,1,4,95,200, ("Mario! What are you\
 doing talking to me!?\
 Aren't you playing a\
 game or something?\
 Anyways, while we're\
 here, take my advice.\
-If you know Bomb Clip,\
+If you know how to clip,\
 I recommend going for\
 the Star behind the gate\
 first.\
 Otherwise, make your way\
 to the top of the mountain."))
 
+changed_dialogs[002] = 1
 smlua_text_utils_dialog_replace(DIALOG_002,1,4,95,200, ("You can collect the Star\
 on the island\
 without using the\
@@ -25,6 +29,7 @@ Be careful, you'll\
 take damage if you're\
 too slow."))
 
+changed_dialogs[003] = 1
 smlua_text_utils_dialog_replace(DIALOG_003,1,5,95,200, ("Thank you, Mario! The Big\
 Bob-omb is nothing but a\
 big dud now! But the\
@@ -49,6 +54,24 @@ ME. You've gotta run\
 the whole course,\
 paizano."))
 
+changed_dialogs[008] = 1
+smlua_text_utils_dialog_replace(DIALOG_008,1,4,30,200, ("You may have heard\
+of Bomb Clip, but have\
+you seen the Cork Box\
+Clip?\
+The small box at the\
+start of the course can\
+be used to get past the\
+gate.\
+Hold the box as close as\
+possible to the left\
+corner of the gate, and\
+press [Z] to drop it.\
+This technique is\
+slower, but a lot easier\
+to perform."))
+
+--[[changed_dialogs[008] = 1
 smlua_text_utils_dialog_replace(DIALOG_008,1,4,30,200, ("HOW TO BOMB CLIP\
 (I would look up the\
 exact setup)\
@@ -68,7 +91,7 @@ Navigate to the gate.\
 STEP 4: Throw the bomb\
 when you reach the gate.\
 \
-Enjoy being faster!"))
+Enjoy being faster!"))]]
 
 smlua_text_utils_dialog_replace(DIALOG_009,1,4,30,200, ("You again!\
 C'mon, let's race!\
@@ -93,6 +116,7 @@ Tubular! Wanna save?\
 \
 //Yes////No"))
 
+changed_dialogs[015] = 1
 smlua_text_utils_dialog_replace(DIALOG_015,1,4,30,200, ("Runners need to wait\
 some time before leaving\
 the course. If they\
@@ -102,7 +126,9 @@ time will be reduced.\
 This is shared among all\
 Runners, so work together!"))
 
-smlua_text_utils_dialog_replace(DIALOG_016,1,4,30,200, ("This shell only appears\
+changed_dialogs[016] = 1
+smlua_text_utils_dialog_replace(DIALOG_016,1,4,30,200, ("In Lethal Lava Land,\
+the shell only appears\
 on Stars 5 and 6. It\
 makes the course a lot\
 easier."))
@@ -112,6 +138,7 @@ my Power Star, Mario?\
 It won't be easy!\
 Prepare yourself!")
 
+changed_dialogs[019] = 1
 smlua_text_utils_dialog_replace(DIALOG_019,1,4,30,200, ("Backwards Long Jumps\
 are usually not allowed.\
 If you try to skip ahead,\
@@ -134,23 +161,11 @@ hand over this Star to\
 the winner of the race.\
 Congrats, Mario!"))
 
-smlua_text_utils_dialog_replace(DIALOG_032,1,5,30,200, ("If you get the Wing Cap,\
-you can fly! Put the cap\
-on, then do a Triple\
-Jump--jump three times\
-in a row--to take off.\
-You can fly even higher\
-if you blast out of a\
-cannon wearing the\
-Wing Cap!\
-\
-Use the [C] Buttons to look\
-around while flying, and\
-press [Z] to land."))
-
+changed_dialogs[034] = 1
 smlua_text_utils_dialog_replace(DIALOG_034,1,2,30,200, ("Careful, this course\
 is quite dangerous."))
 
+changed_dialogs[035] = 1
 smlua_text_utils_dialog_replace(DIALOG_035,1,5,30,200, ("Use your skills to\
 evade Hunters! If you're\
 being chased, try doing a\
@@ -171,6 +186,7 @@ smlua_text_utils_dialog_replace(DIALOG_037,1,1,30,200, ("skill issue"))
 
 smlua_text_utils_dialog_replace(DIALOG_041,1,1,30,200, ("skill issue"))
 
+changed_dialogs[042] = 1
 smlua_text_utils_dialog_replace(DIALOG_042,1,4,30,200, ("Do you know about\
 the cannonless trick?\
 If you're quick, you can\
@@ -185,32 +201,21 @@ woke me up? It's still\
 daylight--I should be\
 sleeping!"))
 
-smlua_text_utils_dialog_replace(DIALOG_046,1,5,30,200, ("You have to master three\
-important jumping\
-techniques.\
-First try the Triple Jump.\
+changed_dialogs[046] = 1
+smlua_text_utils_dialog_replace(DIALOG_046,1,5,30,200, ("Think you've mastered\
+all three jumping\
+techniques?\
+Have you tried combining\
+them with other moves?\
+Triple Jump or Side Flip\
+into a Wall Kick,\
+Dive out of a Jump,\
+the list goes on...\
 \
-Run fast, then jump three\
-times, one, two, three.\
-If you time the jumps\
-right, you'll hop, skip,\
-then jump really high.\
-Next, go for distance\
-with the Long Jump. Run,\
-press [Z] to crouch then [A]\
-to jump really far.\
-\
-To do the Wall Kick, press\
-[A] to jump at a wall, then\
-jump again when you hit\
-the wall.\
-\
-Got that? Triple Jump,\
-Long Jump, Wall Kick.\
-Practice, practice,\
-practice. You don't stand\
-a chance without them."))
+Use your moves to reach\
+touch places fast!"))
 
+changed_dialogs[049] = 1
 smlua_text_utils_dialog_replace(DIALOG_049,1,5,30,200, ("Did you use the cannon\
 to get to this area?\
 There are many ways to\
@@ -226,6 +231,7 @@ back without the cannon,\
 so make sure this is your\
 last stop."))
 
+changed_dialogs[051] = 1
 smlua_text_utils_dialog_replace(DIALOG_051,1,5,30,200, ("There's different\
 rules if you're playing\
 MiniHunt. In this\
@@ -258,6 +264,7 @@ Unbelievable! Take\
 this Star. You've\
 earned it!"))
 
+changed_dialogs[060] = 1
 smlua_text_utils_dialog_replace(DIALOG_060,1,4,30,200, ("ATTENTION!\
 Read Before Diving In!\
 \
@@ -278,6 +285,7 @@ The game is still on\
 even when underwater!\
 Be careful!"))
 
+changed_dialogs[062] = 1
 smlua_text_utils_dialog_replace(DIALOG_062,1,3,30,200, ("Hidden inside the green\
 block is the amazing\
 Metal Cap.\
@@ -291,21 +299,24 @@ But there's a catch:\
 Runners can still be\
 damaged by Hunters."))
 
+changed_dialogs[063] = 1
 smlua_text_utils_dialog_replace(DIALOG_063,1,5,30,200, ("The Vanish Cap is inside\
 the blue block. You need\
 it to collect some Stars.\
-It also even makes you\
+It even makes you\
 invincible!\
 However, you won't be able\
 to hurt other players.\
 Use it to get around\
 safely!"))
 
+changed_dialogs[064] = 1
 smlua_text_utils_dialog_replace(DIALOG_064,1,5,30,200, ("The Wing Cap is\
 excellent for avoiding\
 enemies! Do a quick\
 Triple Jump to take off."))
 
+changed_dialogs[065] = 1
 smlua_text_utils_dialog_replace(DIALOG_065,1,5,30,200, ("You need at least\
 one Hunter and one Runner\
 for a game of MarioHunt.\
@@ -317,6 +328,7 @@ host know. You can also\
 revoke your status by\
 reading for too long."))
 
+changed_dialogs[066] = 1
 smlua_text_utils_dialog_replace(DIALOG_066,1,5,30,200, ("Mario, it's Peach!\
 Please be careful! Bowser\
 is so wicked! He will try\
@@ -335,6 +347,7 @@ him up again.\
 Good luck, Mario! Our\
 fate is in your hands."))
 
+changed_dialogs[070] = 1
 smlua_text_utils_dialog_replace(DIALOG_070,1,5,30,200, ("When exiting a level,\
 you can enter either\
 the castle's main hall\
@@ -349,6 +362,7 @@ Think carefully when\
 deciding which option\
 to use!"))
 
+changed_dialogs[073] = 1
 smlua_text_utils_dialog_replace(DIALOG_073,1,4,95,200, ("Aarrgh! Ahoy, matey. I\
 have sunken treasure,\
 here, I do.\
@@ -373,6 +387,7 @@ Please, Mario, you have\
 to give Bowser the boot!\
 Speaking of Stars..."))
 
+changed_dialogs[078] = 1
 smlua_text_utils_dialog_replace(DIALOG_078,1,4,30,200, ("Stand on top of the\
 Blue Coins Switch to see\
 where the coins will\
@@ -387,6 +402,7 @@ Uukee-kee!\
 \
 //Free him/ Hold on"))
 
+changed_dialogs[081] = 1
 smlua_text_utils_dialog_replace(DIALOG_081,1,4,30,200, ("Runners can heal\
 from water, so I\
 recommend keeping it\
@@ -406,16 +422,13 @@ position of the big hand.\
 Oh, look what I found!\
 Here, Mario, catch!"))
 
-smlua_text_utils_dialog_replace(DIALOG_084,1,4,30,200, ("Yeeoww! Unhand me,\
-brute! Take the Star! A\
-gift from Bowser, it was.\
-Now let me be!"))
-
+changed_dialogs[087] = 1
 smlua_text_utils_dialog_replace(DIALOG_087,1,4,30,200, ("Please don't jump\
 off the mountain to\
 skip the cannon here...\
 / - Game Developer"))
 
+changed_dialogs[095] = 1
 smlua_text_utils_dialog_replace(DIALOG_095,1,5,30,200, ("Some signs\
 may have new, useful\
 tips. You can also take\
@@ -430,6 +443,7 @@ smlua_text_utils_dialog_replace(DIALOG_101,1,3,95,200, ("Ackk! Let...go...\
 You're...choking...me...\
 All right, take your cap."))
 
+changed_dialogs[103] = 1
 smlua_text_utils_dialog_replace(DIALOG_103,1,4,95,200, ("Upon four towers\
 one must alight...\
 Then at the peak\
@@ -439,6 +453,7 @@ particularly acrobatic\
 explorer does not need\
 such a ritual..."))
 
+changed_dialogs[104] = 1
 smlua_text_utils_dialog_replace(DIALOG_104,1,4,30,200, ("In this mode, you will\
 not pause while a Star\
 appears.\
@@ -458,12 +473,7 @@ My body has melted away!\
 I could sure use a new\
 body!"))
 
-smlua_text_utils_dialog_replace(DIALOG_110,1,5,95,200, ("What's that? You know\
-someone who needs a good\
-body? Okay, I'll follow you!\
-Don't forget to grab\
-the five coins around the corner!"))
-
+changed_dialogs[112] = 1
 smlua_text_utils_dialog_replace(DIALOG_112,1,4,30,200, ("Coins allow Runners\
 to refill their Power\
 Meter.\
@@ -480,6 +490,7 @@ heal by collecting\
 They're useful in a\
 pinch!"))
 
+changed_dialogs[113] = 1
 smlua_text_utils_dialog_replace(DIALOG_113,1,6,30,200, ("There are special Caps in\
 the red, green and blue\
 blocks. Step on the\
@@ -548,11 +559,40 @@ C'mon troops! Let's watch\
 the ending together!\
 Bwa ha ha!"))
 
+changed_dialogs[122] = 1
+smlua_text_utils_dialog_replace(DIALOG_122, 1, 4, 30, 200, ("The Black Hole\
+Right: Work Elevator\
+/// Cloudy Maze\
+Left: Underground Lake\
+A skilled plumber can\
+use this spot to bypass\
+the Underground Lake\
+elevator.\
+Perform the Side Flip\
+followed by a Wall Kick\
+to leap over the back\
+wall here.\
+Be careful not to go\
+for the Star too fast,\
+or you'll be sorry!"))
+
+changed_dialogs[126] = 1
+smlua_text_utils_dialog_replace(DIALOG_126, 2, 3, 30, 200, ("Up: Black Hole\
+Right: Work Elevator\
+/// Hazy Maze\
+Slide against the dark\
+spot on the wall as\
+the elevator arrives.\
+If you're sliding right,\
+you can phase through\
+solid matter!"))
+
 smlua_text_utils_dialog_replace(DIALOG_132,1,4,30,200, ("Whoa, Mario, pal, you\
 can't be in the air that\
 long! You're disqualified!\
 Next time, play fair!"))
 
+changed_dialogs[133] = 1
 smlua_text_utils_dialog_replace(DIALOG_133,1,5,30,200, ("Am I glad to see you! The\
 Princess...and I...and,\
 well, everybody...we're all\
@@ -579,6 +619,7 @@ You can conquer stages\
 together or split up\
 to overwhelm the Hunters."))
 
+changed_dialogs[136] = 1
 smlua_text_utils_dialog_replace(DIALOG_136,1,6,30,200, ("Wow! You've already\
 recovered that many\
 Stars? Way to go, Mario!\
@@ -619,6 +660,15 @@ What's climbing on me?\
 Whatever it is, I think\
 I'll blow it away!"))
 
+smlua_text_utils_dialog_replace(DIALOG_154,1,4,30,200, ("I already gave you\
+that Power Star.\
+You aren't getting a\
+second one!"))
+
+smlua_text_utils_dialog_replace(DIALOG_155,1,3,30,200, ("I'm so sorry, but\
+I don't have any more\
+Power Stars."))
+
 smlua_text_utils_dialog_replace(DIALOG_161,1,4,30,200, ("Mario!!!\
 It that really you???\
 ...Did I just mispeak?\
@@ -630,11 +680,7 @@ want to. Just take your\
 awful Triple Jump and these\
 useless lives."))
 
-smlua_text_utils_dialog_replace(DIALOG_162,1,4,30,200, ("You caught me\
-again? Why must\
-you do this to me?\
-Why?"))
-
+changed_dialogs[163] = 1 -- not advice but I want to draw attention to it
 smlua_text_utils_dialog_replace(DIALOG_163,1,5,30,200, ("Wow, did you pull\
 off a 120 Star run?\
 I'm impressed! Gah,\
@@ -650,6 +696,7 @@ Race?\
 \
 //Go//// Don't Go"))
 
+changed_dialogs[165] = 1
 smlua_text_utils_dialog_replace(DIALOG_165,1,5,30,200, ("I'm honestly shocked\
 that you bothered\
 to get to this sign.\
@@ -668,14 +715,17 @@ mh allstars\
 mh langtest\
 mh unmod\
 mh gfield\
-mh hidehud\
+mh complete\
 mh wing-cap\
 mh set-fov\
 mh debug-move\
+mh djui\
+mh hidehud\
 mh print\
 Enjoy this sweet\
 knowledge!"))
 
+changed_dialogs[167] = 1
 smlua_text_utils_dialog_replace(DIALOG_167,1,4,30,200, ("Hello! Welcome\
 to MarioHunt!\
 \
@@ -688,11 +738,12 @@ You won't get any points\
 or anything, but it's good\
 for relieving stress!\
 \
-In-game, defeating another\
+In-game, defeating any\
 player will fully heal you.\
 If you're in danger, try\
 fighting back!"))
 
+changed_dialogs[169] = 1
 smlua_text_utils_dialog_replace(DIALOG_169,1,4,30,200, ("Stand on top of the\
 Blue Coins Switch to see\
 where the coins will\
@@ -708,6 +759,7 @@ function omm_replace(ommOn)
 
 if ommOn then
 
+changed_dialogs[050] = 1
 smlua_text_utils_dialog_replace(DIALOG_050,1,4,30,200, ("You're using\
 OMM Rebirth, I see.\
 MarioHunts with this\
@@ -733,6 +785,7 @@ in on Runners and other\
 objects. And don't forget\
 about the Cap Bounce!"))
 
+changed_dialogs[053] = 1
 smlua_text_utils_dialog_replace(DIALOG_053,1,4,30,200, ("Hunters are able to grab\
 Red Coins when OMM Rebirth\
 is enabled to fix a bug.\
@@ -747,6 +800,7 @@ accident!"))
 
 else
 
+changed_dialogs[050] = 1
 smlua_text_utils_dialog_replace(DIALOG_050,1,4,30,200, ("Go fast using Dives!\
 Press [B] while running\
 to dive.\
@@ -759,6 +813,7 @@ Be sure not to dive\
 into a wall, or you'll\
 be stunned for some time."))
 
+changed_dialogs[053] = 1
 smlua_text_utils_dialog_replace(DIALOG_053,1,5,30,200, ("While Hunters can't\
 grab Red Coins, they\
 can grab secrets, hit\
@@ -772,21 +827,34 @@ end
 
 end
 
+local skip = {
+  [0] = 1,
+  [13] = 1,
+  [14] = 1,
+  [30] = 1,
+  [48] = 1,
+  [57] = 1,
+  [90] = 1,
+  [97] = 1,
+  [98] = 1,
+  [107] = 1,
+  [129] = 1,
+  [130] = 1,
+  [131] = 1,
+}
+
 function auto_skip(id)
+  if id == gBehaviorValues.dialogs.Mips1Dialog or id == gBehaviorValues.dialogs.Mips2Dialog then return false end -- always skip mips dialog
+  if id == gBehaviorValues.dialogs.TuxieMotherDialog or id == gBehaviorValues.dialogs.TuxieMotherBabyFoundDialog then return false end -- always skip mother dialog
+
   if gGlobalSyncTable.romhackFile ~= "vanilla" then return end
-  local skip = {
-    [0] = 1,
-    [14] = 1,
-    [30] = 1,
-    [48] = 1,
-    [57] = 1,
-    [97] = 1,
-    [98] = 1,
-    [107] = 1,
-    [129] = 1,
-    [130] = 1,
-    [131] = 1,
-  }
-  if skip[id] ~= nil then return false end
+
+  if skip[id] then return false end
+
+  if changed_dialogs[id] then -- red dialog box
+    set_dialog_override_color(255, 100, 100, 180, 255, 255, 255, 255)
+  else
+    reset_dialog_override_color()
+  end
 end
 hook_event(HOOK_ON_DIALOG, auto_skip)

@@ -115,6 +115,7 @@ function mario_dfm(m)
 
 end
 
+--- @param m MarioState
 function mario_update_local(m)
 
     STP = gPlayerSyncTable[0]
@@ -207,6 +208,7 @@ function mario_update_local(m)
                         i = (i + (Rmax - 1) - 2) % (Rmax - 1) + 1
                     end
                 end
+                number = 0
             end
 
             if (MSP.controller.buttonPressed & R_JPAD) ~= 0 then
@@ -219,12 +221,14 @@ function mario_update_local(m)
                         i = (i + (Rmax - 1)) % (Rmax - 1) + 1
                     end
                 end
+                number = 0
             end
         end
 
         if STI.spectator == 0 then
 
             if free_camera == 1 then
+              number = 0
               if not is_game_paused() then
                 mario_dfm(m)
               end
@@ -237,10 +241,11 @@ function mario_update_local(m)
 
             if free_camera == 0 and obj_get_first_with_behavior_id(id_bhvActSelector) == nil and (NPI.currLevelNum ~= NPP.currLevelNum or NPI.currAreaIndex ~= NPP.currAreaIndex or NPI.currActNum ~= NPP.currActNum) then
                 number = number + 1
-                if number == 35 then
-                    number = 0
-                    if not warp_to_level(NPI.currLevelNum, NPI.currAreaIndex, NPI.currActNum) then -- ddd and wdw have a subarea that can be only warped to using node 0
-                      warp_to_warpnode(NPI.currLevelNum, NPI.currAreaIndex, NPI.currActNum, 0)
+                if number >= 35 then
+                  number = 30
+
+                    if not warp_to_level(NPI.currLevelNum, NPI.currAreaIndex, NPI.currActNum) then -- these areas don't have an entrance node, so use their death nodes as the entrance
+                      warp_to_warpnode(NPI.currLevelNum, NPI.currAreaIndex, NPI.currActNum, 0xF0)
                     end
                 end
             end
@@ -285,8 +290,8 @@ function mario_update_local(m)
                 SVtp = 3
                 return
             elseif SVcln ~= NPP.currLevelNum or SVcai ~= NPP.currAreaIndex or SVcan ~= NPP.currActNum then
-                if not warp_to_level(SVcln, SVcai, SVcan) then -- ddd and wdw specific bug
-                  warp_to_warpnode(SVcln, SVcai, SVcan, 0)
+                if not warp_to_level(SVcln, SVcai, SVcan) then -- these areas don't have an entrance node, so use their death nodes as the entrance
+                  warp_to_warpnode(SVcln, SVcai, SVcan, 0xF0)
                 end
             end
 
@@ -336,6 +341,7 @@ function enable_spectator(m)
   Shealth = MSP.health
   STP.spectator = 1
   hide_hud = 0
+  number = 0
   spectate = not STP.forceSpectate
 end
 
@@ -378,7 +384,7 @@ function spectated()
 
             djui_hud_print_text(text, xpos, ypos, 1)
 
-            local text2 = '- SPECTATOR MODE -'
+            local text2 = trans("spectate_mode")
 
             local msglength2 = djui_hud_measure_text(text2) / 2 * 0.5
             local xpos2 = xlength /2 - msglength2
@@ -389,7 +395,7 @@ function spectated()
             if STI.spectator == 1 and free_camera == 0 then
                 djui_hud_set_color(255, 0, 0, 255)
 
-                local text3 = '* PLAYER IS A SPECTATOR  *'
+                local text3 = trans("is_spectator")
 
                 local msglength3 = djui_hud_measure_text(text3) / 2 * 0.5
                 local xpos3 = xlength /2 - msglength3
@@ -584,7 +590,7 @@ function spectate_command(msg)
   djui_chat_message_create(trans("spectator_controls"))
   return true
 end
-hook_chat_command("spectate","[NAME|ID|OFF] - Spectate the specified player, free camera if not specified, or OFF to turn off",spectate_command)
+hook_chat_command("spectate",trans("spectate_desc"),spectate_command)
 
 hook_event(HOOK_ON_HUD_RENDER, spectated_update)
 hook_event(HOOK_MARIO_UPDATE, mario_update)

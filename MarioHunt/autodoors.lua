@@ -33,7 +33,7 @@ function door_loop(o)
   if o.oAction == 5 then
     if o.oTimer == 0 then
       -- when the object timer is 0 (when we first set the action to 5) play a sound and init the animation
-      cur_obj_init_animation(1)
+      cur_obj_init_animation_with_sound(1)
 
       cur_obj_play_sound_2(SOUND_GENERAL_OPEN_WOOD_DOOR)
     end

@@ -82,16 +82,36 @@ _G.mhApi.trans = trans
 _G.mhApi.trans_plural = trans_plural
 _G.mhApi.valid_star = valid_star -- takes course, act, bool if we're *not* in minihunt, and bool if replicas are active
 _G.mhApi.mod_powers = has_mod_powers -- the first argument is the local player index, the second is a bool if we're only looking for a dev
-_G.mhApi.global_popup_lang = global_popup_lang -- takes language parameters and the lines paramter; check main.lua
+_G.mhApi.global_popup_lang = global_popup_lang -- takes language parameters and the lines paramter; check lang.lua
 _G.mhApi.get_tag = get_tag -- takes index, returns string for tag shown in chat (like [DEV] or [1st Place])
 
 -- this gets the local player's current kill combo
 _G.mhApi.getKillCombo = get_kill_combo
 
--- for mods that use HOOK_ON_CHAT_MESSAGE, set this value to that function (check mute.lua for an example)
-_G.mhApi.chatValidFunction = function()
-  return true
+-- for mods that use HOOK_ON_CHAT_MESSAGE to cancel messages, set this value to that function (check mute.lua with api_stuff for an example)
+-- _G.mhApi.chatValidFunction
+
+-- for mods that use HOOK_ON_CHAT_MESSAGE to modify chat messages, set this value to a function
+-- This allows the message to be modified (for things like Swear Filter, etc.)
+-- Return argument 1 to modify the message, and argument 2 to modify the sender's name
+-- _G.mhApi.chatModifyFunction
+
+-- Here's an example that replaces any message that contains "help" with "I don't need help, everything is fine" and replaces "Mario" in names with "[REDACTED]"
+--[[
+function hide_the_truth(m, msg_)
+  local np = gNetworkPlayers[m.playerIndex]
+  local playerColor = network_get_player_text_color_string(m.playerIndex)
+  local name = playerColor .. np.name
+
+  local msg = msg_
+  if msg:lower():find("help") then
+    msg = "I don't need help, everything is fine"
+  end
+  name = name:gsub("Mario","[REDACTED]")
+  return msg,name
 end
+_G.mhApi.chatModifyFunction = hide_the_truth
+]]
 
 -- this function is called when a kill or runner death occurs, or when a player fails to rejoin
 -- killer and killed are both global indexes (both may be nil)
@@ -102,5 +122,3 @@ end
 _G.mhApi.onKill = function(killer,killed,runner,death,time,newRunnerID)
   -- does nothing unless you set it
 end
-
--- you can also use any packets with other mods (I think)

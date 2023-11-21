@@ -9,38 +9,43 @@ TEX_BOX = get_texture_info('box-mark')
 TEX_COIN = get_texture_info('coin-mark')
 TEX_SECRET = get_texture_info('secret-mark')
 TEX_DEMON = get_texture_info('demon-mark')
+TEX_MOON = get_texture_info('moon-mark')
 icon_radar = {}
 star_radar = {}
 box_radar = {}
 for i=0,(MAX_PLAYERS-1) do
-  icon_radar[i] = {tex = TEX_RAD, prevX = 0, prevY = 0}
+  icon_radar[i] = {tex = TEX_RAD, prevX = 0, prevY = 0, prevScale = 0.6}
 end
 for i=1,7 do
-  star_radar[i] = {tex = TEX_STAR, prevX = 0, prevY = 0}
+  star_radar[i] = {tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6}
 end
 for i=1,7 do
-  box_radar[i] = {tex = TEX_BOX, prevX = 0, prevY = 0}
+  box_radar[i] = {tex = TEX_BOX, prevX = 0, prevY = 0, prevScale = 0.6}
 end
 ex_radar = {}
-ex_radar[1] = {tex = TEX_COIN, prevX = 0, prevY = 0}
-ex_radar[2] = {tex = TEX_SECRET, prevX = 0, prevY = 0}
-ex_radar[3] = {tex = TEX_DEMON, prevX = 0, prevY = 0}
+ex_radar[1] = {tex = TEX_COIN, prevX = 0, prevY = 0, prevScale = 0.6}
+ex_radar[2] = {tex = TEX_SECRET, prevX = 0, prevY = 0, prevScale = 0.6}
+ex_radar[3] = {tex = TEX_DEMON, prevX = 0, prevY = 0, prevScale = 0.6}
 defaultStarColor = {r = 255,g = 255,b = 92} -- yellow
 
 -- also includes texture data for stats
 TEX_FLAG = get_texture_info('stat-flag')
+TEX_MULTI_STARS = get_texture_info('stat-stars')
 TEX_BOOT = get_texture_info('stat-kill')
 TEX_MULTI_BOOT = get_texture_info('stat-multikill')
 TEX_MEDAL = get_texture_info('stat-medal')
 TEX_ARROW = get_texture_info('stat-arrow')
 stat_icon_data = {}
 stat_icon_data[1] = {tex = TEX_FLAG, r = 255, g = 255, b = 92}
-stat_icon_data[2] = {tex = TEX_FLAG, r = 255, g = 92, b = 92}
-stat_icon_data[3] = {tex = TEX_FLAG, r = 180, g = 92, b = 255}
-stat_icon_data[4] = {tex = TEX_BOOT, r = 129, g = 90, b = 50}
-stat_icon_data[5] = {tex = TEX_MULTI_BOOT, r = 129, g = 90, b = 50}
-stat_icon_data[6] = {tex = TEX_STAR, r = 255, g = 255, b = 92}
-stat_icon_data[7] = {tex = TEX_MEDAL, r = 255, g = 255, b = 255}
+stat_icon_data[2] = {tex = TEX_STAR, r = 255, g = 255, b = 92}
+stat_icon_data[3] = {tex = TEX_FLAG, r = 255, g = 92, b = 92}
+stat_icon_data[4] = {tex = TEX_STAR, r = 255, g = 92, b = 92}
+stat_icon_data[5] = {tex = TEX_FLAG, r = 180, g = 92, b = 255}
+stat_icon_data[6] = {tex = TEX_STAR, r = 180, g = 92, b = 255}
+stat_icon_data[7] = {tex = TEX_BOOT, r = 129, g = 90, b = 50}
+stat_icon_data[8] = {tex = TEX_MULTI_BOOT, r = 129, g = 90, b = 50}
+stat_icon_data[9] = {tex = TEX_MULTI_STARS, r = 255, g = 255, b = 92}
+stat_icon_data[10] = {tex = TEX_MEDAL, r = 255, g = 255, b = 255}
 
 local rainbow_counter = 0
 function render_radar(m, hudIcon, isObj, objType)
@@ -50,28 +55,24 @@ function render_radar(m, hudIcon, isObj, objType)
   if not isObj then
     pos = { x = m.pos.x, y = m.pos.y + 80, z = m.pos.z } -- mario is 161 units tall
   else
-    pos = { x = obj.oPosX + 10, y = obj.oPosY + 10, z = obj.oPosZ + 10} -- I'm just guessing
-    if objType == "box" then
-      pos.y = pos.y + 30
+    pos = { x = obj.oPosX, y = obj.oPosY, z = obj.oPosZ}
+    if objType == "box" then -- box's position is a bit higher
+      pos.y = pos.y + 50
+    elseif objType == "secret" then -- secrets have a misleading hitbox (although they aren't usually visible)
+      pos.y = pos.y + 15
+    elseif objType == "demon" then -- 1ups also have a misleading hitbox
+      pos.y = pos.y + obj.hitboxHeight
+    elseif objType == "coin" then -- these have their position centered at their bottom, so move up based on hitbox size
+      pos.y = pos.y + obj.hitboxHeight / 2
     end
   end
   local out = { x = 0, y = 0, z = 0 }
   djui_hud_world_pos_to_screen_pos(pos, out)
 
-  local dX = out.x - 10
-  local dY = out.y - 10
+  local dX = out.x
+  local dY = out.y
   local screenWidth = djui_hud_get_screen_width()
   local screenHeight = djui_hud_get_screen_height()
-  if dX > (screenWidth - 20) then
-    dX = (screenWidth - 20)
-  elseif dX < 0 then
-    dX = 0
-  end
-  if dY > (screenHeight - 20) then
-    dY = (screenHeight - 20)
-  elseif dY < 0 then
-    dY = 0
-  end
 
   if out.z > -260 then
     hudIcon.prevX = dX
@@ -79,12 +80,14 @@ function render_radar(m, hudIcon, isObj, objType)
     return
   end
 
-  local alpha = clamp(vec3f_dist(pos, gMarioStates[0].pos), 0, 1200) - 1000
+  local dist = vec3f_dist(pos, gMarioStates[0].pos)
+  local alpha = clamp(dist, 0, 1200) - 1000
   if alpha <= 0 then
     return
   end
 
   local r,g,b = 0,0,0
+  local tex = hudIcon.tex or TEX_STAR
   if not isObj then
     local sMario = gPlayerSyncTable[m.playerIndex]
     if sMario.placement ~= 1 then
@@ -142,6 +145,8 @@ function render_radar(m, hudIcon, isObj, objType)
     alpha = alpha - 100
     if alpha <= 0 then
       return
+    elseif ROMHACK.isMoonshine then -- change to green
+      r,g,b = 0,255,0
     end
   elseif objType == "secret" then
     r,g,b = 0,255,0 -- green
@@ -150,6 +155,10 @@ function render_radar(m, hudIcon, isObj, objType)
       return
     end
   else
+    if ROMHACK.isMoonshine then
+      tex = TEX_MOON
+    end
+    
     if _G.OmmEnabled
     and ROMHACK.ommSupport ~= false -- romhacks that use a custom model can't be checked; as such, the omm colored radar will never be displayed (only relevant for Green Stars)
     and obj_has_model_extended(obj, E_MODEL_STAR) ~= 1
@@ -173,13 +182,28 @@ function render_radar(m, hudIcon, isObj, objType)
     end
   end
 
+  local scale = clamp(dist, 0, 2400) / 4000
+  local width = tex.width*scale
+  dX = dX-width*0.5
+  dY = dY-width*0.5
+  if dX > (screenWidth - width) then
+    dX = (screenWidth - width)
+  elseif dX < 0 then
+    dX = 0
+  end
+  if dY > (screenHeight - width) then
+    dY = (screenHeight - width)
+  elseif dY < 0 then
+    dY = 0
+  end
   djui_hud_set_color(r, g, b, alpha)
-  djui_hud_render_texture_interpolated(hudIcon.tex, hudIcon.prevX, hudIcon.prevY, 0.6, 0.6, dX, dY, 0.6, 0.6)
+  djui_hud_render_texture_interpolated(tex, hudIcon.prevX, hudIcon.prevY, hudIcon.prevScale, hudIcon.prevScale, dX, dY, scale, scale)
   --[[if objType == nil then
     djui_hud_set_font(FONT_HUD)
     djui_hud_print_text_interpolated(tostring((obj.oBehParams >> 24) + 1), hudIcon.prevX, hudIcon.prevY, 0.6, dX, dY, 0.6)
   end]]
 
+  hudIcon.prevScale = scale
   hudIcon.prevX = dX
   hudIcon.prevY = dY
 end

@@ -1,9 +1,36 @@
+-- Math
+local math_min, math_max, math_floor, math_ceil, math_abs, math_sqrt, coss, sins, atan2s, vec3f_copy, vec3f_normalize, vec3f_dot, vec3f_mul, vec3f_dif, vec3f_length =
+      math.min, math.max, math.floor, math.ceil, math.abs, math.sqrt, coss, sins, atan2s, vec3f_copy, vec3f_normalize, vec3f_dot, vec3f_mul, vec3f_dif, vec3f_length
+
+function u16(x)
+  x = (math_floor(x) & 0xFFFF)
+  if x < 0 then return x + 65536 end
+  return x
+end
+
+local r0 = 0
+function random_u16()
+  local r1 = 0
+  r1 = u16((r0 & 255) << 8 ~ r0)
+  r0 = u16(((r1 & 255) << 8) + ((r1 & 65280) >> 8))
+  r1 = u16((r1 & 255) << 1 ~ r0)
+  r0 = u16(r1 >> 1 ~ 65408 ~ (r1 & 1 ~= 0 and 33152 or 8180))
+  if (r0 == 22026) then r0 = 0 end
+  return r0
+end
+
 -- localize some functions
 local djui_chat_message_create,warp_to_level,warp_to_warpnode,tonumber,string_lower,mod_storage_save,mod_storage_load = djui_chat_message_create,warp_to_level,warp_to_warpnode,tonumber,string.lower,mod_storage_save_fix_bug,mod_storage_load
+
+function if_then_else(cond, if_true, if_false)
+  if cond then return if_true end
+  return if_false
+end
 
 -- some debug stuff
 function do_warp(msg)
   warpCount = 0
+  warpPrevArea = 0
   warpCooldown = 0
   if msg == "random" then
     local worked = false
@@ -24,7 +51,7 @@ function do_warp(msg)
   end
   local args = split(msg, " ")
   local level = tonumber(args[1])
-  if string.sub(args[1],1,1) == "c" then
+  if args[1] and string.sub(args[1],1,1) == "c" then
     level = course_to_level[tonumber(string.sub(args[1],2))]
   end
   if level == nil then
@@ -35,7 +62,7 @@ function do_warp(msg)
   local node = tonumber(args[4])
   if node == nil then
     djui_chat_message_create("Warping to level "..level.." area "..area.." act "..act)
-    if warp_to_level(level, area, act) then
+    if warp_to_level(level, area, act) or warp_to_warpnode(level, area, act, 0xF0) then
       if gGlobalSyncTable.mhMode == 2 then
         gGlobalSyncTable.gameLevel = level
         gGlobalSyncTable.getStar = act
@@ -104,18 +131,50 @@ function get_field_global(msg)
 end
 
 function get_all_stars(msg)
-  local valid_star_table = generate_star_table(tonumber(msg),(msg ~= "mini"),(msg=="replica"))
+  if msg == "parse" then
+    ROMHACK.parseStars = true
+    PARSE_PRINT = true
+    setup_hack_data(false,false,gGlobalSyncTable.romhackFile)
+    PARSE_PRINT = false
+    return true
+  end
+  local valid_star_table = generate_star_table(tonumber(msg),(msg ~= "mini"),(msg~="noreplica"))
   print("")
   for i,star in ipairs(valid_star_table) do
     local act = star % 10
     local course = star // 10
-    local starString = string.format("%s - %s (%d) (ID: %d)",get_level_name(course, course_to_level[course], 1),get_custom_star_name(course,act),act,star)
+    local starString = string.format("%s - %s (%d) (ID: %d)",get_custom_level_name(course, course_to_level[course], 1),get_custom_star_name(course,act),act,star)
     djui_chat_message_create(starString)
-    print(string.format("%-31s%-31s%-5s%-5s",get_level_name(course, course_to_level[course], 1),get_custom_star_name(course,act),act,star))
+    print(string.format("%-31s%-31s%-5s%-5s",get_custom_level_name(course, course_to_level[course], 1),get_custom_star_name(course,act),act,star))
   end
   djui_chat_message_create(#valid_star_table.." stars total")
   print("")
   print(#valid_star_table,"stars total")
+  return true
+end
+
+function kill_bowser(msg)
+  local bowser = obj_get_first_with_behavior_id(id_bhvBowser)
+  if bowser then
+    bowser.oAction = 4
+    bowser.oSubAction = 10
+    djui_chat_message_create("oh he ded")
+  else
+    djui_chat_message_create("There ain't no Bowser bro")
+  end
+  return true
+end
+
+function get_location(msg)
+  local playerID,np = get_specified_player(msg)
+  if playerID ~= nil then
+    local course = np.currCourseNum
+    local level = np.currLevelNum
+    local area = np.currAreaIndex
+    local name = get_custom_level_name(course, level, area)
+    djui_chat_message_create(string.format("%s (C%d, L%d, A%d)",name,course,level,area))
+    print(name,course,level,area)
+  end
   return true
 end
 
@@ -127,11 +186,13 @@ function star_mode_command(msg,bool)
   if bool == true or string_lower(msg) == "on" then
     gGlobalSyncTable.starMode = true
     gGlobalSyncTable.runTime = 2
+    load_settings(false, true)
     djui_chat_message_create(trans("using_stars"))
     return true
   elseif bool == false or string_lower(msg) == "off" then
     gGlobalSyncTable.starMode = false
     gGlobalSyncTable.runTime = 7200
+    load_settings(false, true)
     djui_chat_message_create(trans("using_timer"))
     return true
   end
@@ -250,8 +311,8 @@ function blacklist_command(msg)
     for id,value in pairs(mini_blacklist) do
       local course = id // 10
       local act = id % 10
-      if not valid_star(course, act, false, (ROMHACK.replica_start ~= nil)) then
-        local starString = string.format("%s - %s (Course %d, Star %d)",get_level_name(course, course_to_level[course], 1),get_custom_star_name(course,act),course,act)
+      if not valid_star(course, act, false, true) then
+        local starString = string.format("%s - %s (Course %d, Star %d)",get_custom_level_name(course, course_to_level[course], 1),get_custom_star_name(course,act),course,act)
         djui_chat_message_create(starString)
       end
     end
@@ -266,7 +327,7 @@ function blacklist_command(msg)
     if act ~= nil then
       if act < 1 or act > 7 then
         return false
-      elseif not valid_star(course, act, false, (ROMHACK.replica_start ~= nil)) then
+      elseif not valid_star(course, act, false, true) then
         djui_chat_message_create(trans("blacklist_add_already"))
         return true
       end
@@ -275,7 +336,7 @@ function blacklist_command(msg)
     else
       local allblacklist = true
       for act=1,7 do
-        if valid_star(course, act, false, (ROMHACK.replica_start ~= nil)) then
+        if valid_star(course, act, false, true) then
           local starID = course*10+act
           mini_blacklist[starID] = 1
           allblacklist = false
@@ -291,9 +352,9 @@ function blacklist_command(msg)
 
     local starString = ""
     if act ~= nil then
-      starString = string.format("%s - %s (Course %d, Star %d)",get_level_name(course, course_to_level[course], 1),get_custom_star_name(course,act),course,act)
+      starString = string.format("%s - %s (Course %d, Star %d)",get_custom_level_name(course, course_to_level[course], 1),get_custom_star_name(course,act),course,act)
     else
-      starString = string.format("%s (Course %d)",get_level_name(course, course_to_level[course], 1), course)
+      starString = string.format("%s (Course %d)",get_custom_level_name(course, course_to_level[course], 1), course)
     end
     djui_chat_message_create(trans("blacklist_add",starString))
   elseif action == "remove" then
@@ -308,7 +369,7 @@ function blacklist_command(msg)
       local starID = course*10+act
       if act < 1 or act > 7 then
         return false
-      elseif valid_star(course, act, false, (ROMHACK.replica_start ~= nil)) then
+      elseif valid_star(course, act, false, true) then
         djui_chat_message_create(trans("blacklist_remove_already"))
         return true
       elseif mini_blacklist[starID] == nil then
@@ -321,7 +382,7 @@ function blacklist_command(msg)
       local invalid = true
       for act=1,7 do
         local starID = course*10+act
-        local valid = valid_star(course, act, false, (ROMHACK.replica_start ~= nil))
+        local valid = valid_star(course, act, false, true)
         if (not valid) and mini_blacklist[starID] ~= nil then
           mini_blacklist[starID] = nil
           allwhitelist = false
@@ -343,9 +404,9 @@ function blacklist_command(msg)
 
     local starString = ""
     if act ~= nil then
-      starString = string.format("%s - %s (Course %d, Star %d)",get_level_name(course, course_to_level[course], 1),get_custom_star_name(course,act),course,act)
+      starString = string.format("%s - %s (Course %d, Star %d)",get_custom_level_name(course, course_to_level[course], 1),get_custom_star_name(course,act),course,act)
     else
-      starString = string.format("%s (Course %d)",get_level_name(course, course_to_level[course], 1), course)
+      starString = string.format("%s (Course %d)",get_custom_level_name(course, course_to_level[course], 1), course)
     end
     djui_chat_message_create(trans("blacklist_remove",starString))
   elseif action == "reset" then
@@ -360,12 +421,12 @@ function blacklist_command(msg)
     else
       mod_storage_save(fileName.."_black","none")
     end
-    djui_chat_message_create("Blacklist saved!")
+    djui_chat_message_create(trans("blacklist_save"))
   elseif action == "load" then
     local fileName = string.gsub(gGlobalSyncTable.romhackFile," ","_")
     local option = mod_storage_load(fileName.."_black") or "none"
     gGlobalSyncTable.blacklistData = option
-    djui_chat_message_create("Blacklist loaded!")
+    djui_chat_message_create(trans("blacklist_load"))
   else
     return false
   end
@@ -375,6 +436,54 @@ end
 
 function rom_hack_command(msg)
   gGlobalSyncTable.romhackFile = msg
+  return true
+end
+
+function complete_command(msg)
+  local file = get_current_save_file_num() - 1
+  for course=0,25 do
+    local data = {8, 8, 8, 8, 8, 8, 8}
+    if gGlobalSyncTable.ee and ROMHACK.star_data_ee[course] then
+      data = ROMHACK.star_data_ee[course]
+    elseif ROMHACK.star_data[course] then
+      data = ROMHACK.star_data[course]
+    elseif course == 25 then
+      break
+    elseif course > 15 then
+      data = {8}
+    elseif course == 0 then
+      data = {8, 8, 8, 8, 8}
+    end
+    for star=1,7 do
+      if data[star] and data[star] ~= 0 then
+        if course ~= 0 then
+          save_file_set_star_flags(file, course - 1, (1 << (star - 1)))
+        else
+          save_file_set_flags((SAVE_FLAG_COLLECTED_TOAD_STAR_1 << (star - 1)))
+        end
+      end
+    end
+    save_file_set_star_flags(file, course, 0x80)
+  end
+  --[[save_file_set_flags(SAVE_FLAG_COLLECTED_TOAD_STAR_2)
+  save_file_set_flags(SAVE_FLAG_COLLECTED_TOAD_STAR_3)
+  save_file_set_flags(SAVE_FLAG_COLLECTED_MIPS_STAR_1)
+  save_file_set_flags(SAVE_FLAG_COLLECTED_MIPS_STAR_2)]]
+  save_file_clear_flags(SAVE_FLAG_HAVE_KEY_1)
+  save_file_clear_flags(SAVE_FLAG_HAVE_KEY_1)
+  save_file_set_flags(SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)
+  save_file_set_flags(SAVE_FLAG_UNLOCKED_BASEMENT_DOOR)
+  save_file_set_flags(SAVE_FLAG_HAVE_METAL_CAP)
+  save_file_set_flags(SAVE_FLAG_HAVE_VANISH_CAP)
+  save_file_set_flags(SAVE_FLAG_HAVE_WING_CAP)
+  save_file_set_flags(SAVE_FLAG_UNLOCKED_WF_DOOR)
+  save_file_set_flags(SAVE_FLAG_UNLOCKED_CCM_DOOR)
+  save_file_set_flags(SAVE_FLAG_UNLOCKED_JRB_DOOR)
+  save_file_set_flags(SAVE_FLAG_UNLOCKED_PSS_DOOR)
+  save_file_set_flags(SAVE_FLAG_UNLOCKED_BITDW_DOOR)
+  save_file_set_flags(SAVE_FLAG_UNLOCKED_BITFS_DOOR)
+  save_file_set_flags(SAVE_FLAG_UNLOCKED_50_STAR_DOOR)
+  djui_chat_message_create("The save has been completed!")
   return true
 end
 
@@ -407,6 +516,7 @@ function setup_commands()
   table.insert(marioHuntCommands, {"stop", "halt", halt_command})
   table.insert(marioHuntCommands, {"default", nil, default_settings})
   table.insert(marioHuntCommands, {"blacklist", "black", blacklist_command})
+  table.insert(marioHuntCommands, {"hidehud", "hide", function() mhHideHud = not mhHideHud return true end})
 
   -- debug
   table.insert(marioHuntCommands, {"print", nil, print, true})
@@ -418,8 +528,11 @@ function setup_commands()
   table.insert(marioHuntCommands, {"langtest", nil, lang_test, true})
   table.insert(marioHuntCommands, {"unmod", nil, unmod, true})
   table.insert(marioHuntCommands, {"gfield", nil, get_field_global, true})
-  table.insert(marioHuntCommands, {"hidehud", nil, (function() mhHideHud = not mhHideHud return true end), true})
   table.insert(marioHuntCommands, {"debug-move", nil, (function() gMarioStates[0].action = ACT_DEBUG_FREE_MOVE return true end), true})
   table.insert(marioHuntCommands, {"wing-cap", nil, (function() gMarioStates[0].flags = gMarioStates[0].flags | MARIO_WING_CAP play_sound(SOUND_GENERAL_SHORT_STAR, gMarioStates[0].marioObj.header.gfx.cameraToObject) play_cap_music(SEQ_EVENT_POWERUP) play_character_sound(gMarioStates[0], CHAR_SOUND_HERE_WE_GO) return true end), true})
   table.insert(marioHuntCommands, {"set-fov", nil, (function(msg) set_override_fov(tonumber(msg) or 45) return true end), true})
+  table.insert(marioHuntCommands, {"kill-bowser", nil, kill_bowser, true})
+  table.insert(marioHuntCommands, {"location", nil, get_location, true})
+  table.insert(marioHuntCommands, {"complete", nil, complete_command, true})
+  table.insert(marioHuntCommands, {"djui", nil, function() djui_open_pause_menu() return true end, true})
 end
