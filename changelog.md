@@ -1,4 +1,11 @@
 # Changelog
+## v2.31
+### Fixes:
+  - Fixed Extreme Edition getting swapped to when using Spectator Mode as host/mod
+  - Fixed save file desyncs
+    - Alt save has been flagged as "buggy" again
+  - Updated German Translation (N64-Mario)
+  - Fixed getting softlocked when dialog skips while paused
 ## v2.3
 ### Additions:
   - Added a new Lobby! It appears between rounds, and contains a new platforming challenge! Aim for a fast time!

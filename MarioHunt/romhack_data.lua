@@ -341,7 +341,7 @@ local romhack_data = { -- supported rom hack data
         m.pos.x,m.pos.y,m.pos.z = 6044,136,-5564 -- make this level possible without dying
         set_mario_action(m, ACT_SPAWN_NO_SPIN_AIRBORNE, 0)
       end
-      if (np.currAreaIndex == 1) == gGlobalSyncTable.ee then
+      if (np.currAreaIndex == 1) == gGlobalSyncTable.ee and gPlayerSyncTable[0].spectator ~= 1 then
         if has_mod_powers(0) then
           gGlobalSyncTable.ee = (np.currAreaIndex ~= 1)
           close_menu()

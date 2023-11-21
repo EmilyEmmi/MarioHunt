@@ -337,7 +337,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
 
   -- command descriptions
   page = "\\#ffff5a\\Page %d/%d", -- page for mariohunt command
-  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Starts the game; add \"continue\" to not warp to start; add \"alt\" for alt save file; add \"main\" for main save file; add \"reset\" to reset file (buggy)",
+  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Starts the game; add \"continue\" to not warp to start; add \"alt\" for alt save file (buggy); add \"main\" for main save file; add \"reset\" to reset file (buggy)",
   add_desc = "[INT] - Adds the specified amount of runners at random",
   random_desc = "[INT] - Picks the specified amount of runners at random",
   lives_desc = "[INT] - Sets the amount of lives Runners have, from 0 to 99 (note: 0 lives is still 1 life)",
@@ -382,7 +382,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_start = "Start",
   menu_stop = "Stop",
   menu_save_main = "Main",
-  menu_save_alt = "Alt Save",
+  menu_save_alt = "Alt Save (buggy)",
   menu_save_reset = "Reset Alt Save (buggy)",
   menu_save_continue = "Continue (no warping back)",
   menu_random = "Random",
@@ -716,7 +716,7 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
 
   -- command descriptions
   page = "\\#ffff5a\\Página %d/%d", -- page for mariohunt command
-  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Inicia la partida; agrega \"continue\" para no ser enviado al principio; agrega \"alt\" para usar una ranura de guardado alternativa; agrega \"main\" para usar la ranura de guardado principal; agrega \"reset\" para reiniciar la ranura de guardado (puede causar bugs)",
+  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Inicia la partida; agrega \"continue\" para no ser enviado al principio; agrega \"alt\" para usar una ranura de guardado alternativa (puede causar bugs); agrega \"main\" para usar la ranura de guardado principal; agrega \"reset\" para reiniciar la ranura de guardado (puede causar bugs)",
   add_desc = "[INT] - Agrega la cantidad especificada de Corredores de manera aleatoria",
   random_desc = "[INT] - Escoge la cantidad de corredores",
   lives_desc = "[INT] - Ajusta la cantidad de vidas de los Corredores, de 0 a 99 (nota: 0 vidas es aún 1 vida)",
@@ -759,7 +759,7 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   menu_start = "Iniciar",
   menu_stop = "Detener",
   menu_save_main = "Ranura de Guardado Principal",
-  menu_save_alt = "Ranura Alternativa",
+  menu_save_alt = "Ranura Alternativa (puede causar bugs)",
   menu_save_reset = "Reiniciar ranura alternativa (puede causar bugs)",
   menu_save_continue = "Continuar (no eres enviado al principio)",
   menu_random = "Aleatoria",
@@ -913,11 +913,10 @@ langdata["de"] = -- by N64 Mario
   article_1 = "Die", -- feminine,  accusative article (unused)
   article_2 = "Das", -- neuter,    accusative article (unused)
 
-  -- some untranslated things here
   -- hud, extra desc, and results text
   win = "%s\\#ffffff\\ haben gewonnen!",
   can_leave = "\\#5aff5a\\Kurs kann verlassen werden",
-  cant_leave = "\\#ff5a5a\\Kurs kann nicht verlassen werden", -- is this correct?
+  cant_leave = "\\#ff5a5a\\Kurs kann nicht verlassen werden",
   time_left = "Kannst in \\#ffff5a\\%d:%02d\\#ffffff\\ verlassen",
   stars_left = "Brauchst \\#ffff5a\\%d Stern(e)\\#ffffff\\ um zu verlassen",
   in_castle = "Im Schloss",
@@ -931,7 +930,7 @@ langdata["de"] = -- by N64 Mario
   camp_timer = "Weiter bewegen! \\#ff5a5a\\(%d)",
   game_over = "Das Spiel ist vorbei!",
   winners = "Gewinner: ",
-  no_winners = "\\#ff5a5a\\Keine Gewinner!", -- is this correct?
+  no_winners = "\\#ff5a5a\\Keine Gewinner!",
   on = "\\#5aff5a\\AN",
   off = "\\#ff5a5a\\AUS",
 
@@ -955,14 +954,18 @@ langdata["de"] = -- by N64 Mario
   kill_combo_4 = "%s\\#ffa0a0\\ hat einen \\#ffff5a\\vierfachen\\#ffa0a0\\ Kill!",
   kill_combo_5 = "%s\\#ffa0a0\\ hat einen \\#ffff5a\\fünffachen\\#ffa0a0\\ Kill!",
   kill_combo_large = "\\#ffa0a0\\Wow! %s\\#ffa0a0\\ hat \\#ffff5a\\%d\\#ffa0a0\\ Kills in Folge!",
-  set_hack = "Hack set to %s",
-  incompatible_hack = "WARNING: Hack does not have compatibility!",
+  set_hack = "Hack auf %s eingestellt",
+  incompatible_hack = "WARNUNG: Dieser Hack ist nicht kompatibel!",
   vanilla = "Das Vanilla-Spiel wird verwendet",
   omm_detected = "OMM Rebirth wurde detektiert!",
   custom_enter = "%s\\#ffffff\\ ist beigetreten bei\n%s", -- same as coop
+  hit_switch_red = "%s drückte den\n\\#df5050\\Roten Schalter!",
+  hit_switch_green = "%s drückte den\n\\#50b05a\\Grünen Schalter!",
+  hit_switch_blue = "%s drückte den\n\\#5050e3\\Blauen Schalter!",
+  hit_switch_yellow = "%s drückte den\n\\#e3b050\\Gelben Schalter...",
 
   -- command feedback
-  not_mod = "You don't have the AUTHORITY to run this command, you fool!",
+  not_mod = "Du hast nicht die BERECHTIGUNG diesen Befehl auszuführen.",
   no_such_player = "Es gibt nicht so einen Spieler",
   bad_id = "Ungültige Spieler ID!",
 
@@ -1022,7 +1025,7 @@ langdata["de"] = -- by N64 Mario
   hard_mode = "Harter Modus",
   extreme_mode = "Extrem Modus",
   hard_info_short = "Hälfte des Lebens, wasser heilt nicht, und ein Leben.",
-  extreme_info_short = "One health, one life, and death timer.",
+  extreme_info_short = "Einen Powermeter, einen Leben und Todestimer.",
 
   -- spectator
   hunters_only = "Nur Jäger können zuschauen!",
@@ -1046,20 +1049,16 @@ langdata["de"] = -- by N64 Mario
   disp_wins = "%s\\#ffffff\\ hat %d mal als Läufer gewonnen!",
   disp_kills_one = "%s\\#ffffff\\ hat einen Spieler getötet!", -- unused
   disp_kills = "%s\\#ffffff\\ hat %d Spieler getötet!",
-  disp_wins_hard_one = "%s\\#ffffff\\ hat 1 mal als \\#ffff5a\\Läufer\\#ffffff\\ gewonnen im \\#ff5a5a\\Harter Modus!\\#ffffff\\", -- is this correct?
-  disp_wins_hard = "%s\\#ffffff\\ hat %d mal als \\#ffff5a\\Läufer\\#ffffff\\ gewonnen im \\#ff5a5a\\Harter Modus!\\#ffffff\\", -- is this correct?
-  disp_wins_ex_one = "%s\\#ffffff\\ hat 1 mal als \\#b45aff\\Läufer\\#ffffff\\ gewonnen im \\#b45aff\\Extrem Modus!\\#ffffff\\", -- is this correct?
-  disp_wins_ex = "%s\\#ffffff\\ hat %d mal als \\#b45aff\\Läufer\\#ffffff\\ gewonnen im \\#b45aff\\Extrem Modus!\\#ffffff\\", -- is this correct?
   -- for stats table
   stat_wins_standard = "Siege",
-  stat_wins = "Siege (Minihunt/vor v2.3)", -- is this correct?
+  stat_wins = "Siege (Minihunt/vor v2.3)",
   stat_kills = "Kills",
   stat_combo = "Max Kill Streak",
   stat_wins_hard_standard = "Siege (Harter Modus)",
-  stat_wins_hard = "Siege (Harter Modus, Minihunt/vor v2.3)", -- is this correct?
+  stat_wins_hard = "Siege (Harter Modus, Minihunt/vor v2.3)",
   stat_mini_stars = "Maximale Sterne in einem Minihunt",
-  stat_wins_ex_standard = "Siege (Extrem Modus)", -- is this correct?
-  stat_wins_ex = "Siege (Extrem Modus, Minihunt/vor v2.3)", -- is this correct?
+  stat_wins_ex_standard = "Siege (Extrem Modus)",
+  stat_wins_ex = "Siege (Extrem Modus, Minihunt/vor v2.3)",
 
   -- placements
   place_1 = "\\#e3bc2d\\[Platz 1]",
@@ -1068,7 +1067,7 @@ langdata["de"] = -- by N64 Mario
   place = "\\#e7a1ff\\[Platz %d]", -- thankfully we don't go up to 21
 
   -- command descriptions
-  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Startet das Spiel; Fügen sie \"continue\" hinzu, um um nicht zum Anfang teleportiert zu werden; Fügen sie \"alt\" hinzu, für einen Alternativen Speicherstand; Fügen sie \"main\" hinzu, für die Hauptspeicher Datei",
+  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Startet das Spiel; Fügen sie \"continue\" hinzu, um um nicht zum Anfang teleportiert zu werden; Fügen sie \"alt\" hinzu, für einen Alternativen Speicherstand (fehlerhaft); Fügen sie \"main\" hinzu, für die Hauptspeicher Datei",
   add_desc = "[INT] - fügt die spezifische Anzahl an Läufern nach dem Zufallsprinzip hinzu",
   random_desc = "[INT] - wählt zufällig eine bestimmte Anzahl an Läufern aus",
   lives_desc = "[INT] - Legt die Anzahl der Leben fest, die Läufer haben, von 0 zu 99 (Notiz: 0 Leben ist immer noch 1 Leben)",
@@ -1089,7 +1088,7 @@ langdata["de"] = -- by N64 Mario
 
   -- Blocky's menu
   main_menu = "Hauptmenü",
-  menu_settings = "Spieleinstellungen", -- is this correct? translate says it's verified
+  menu_settings = "Spieleinstellungen",
   menu_settings_player = "Einstellungen",
   menu_rules = "Regeln",
   menu_lang = "Sprache",
@@ -1104,6 +1103,139 @@ langdata["de"] = -- by N64 Mario
   menu_mh = "MarioHunt",
   menu_gamemode = "Spielmodus",
   menu_stars = "Sterne",
+
+  -- unsorted
+  lang_desc = "%s - Sprache wechseln",
+  got_all_stars = "Du hast genug Sterne!",
+  spectate_mode = "- ZUSCHAUER MODUS -",
+  menu_allow_spectate = "Zuschauen Erlauben",
+  menu_hide_roles_desc = "Versteck deine Rolle vom Anzeigen im Chat.",
+  menu_stop = "Stopp",
+  spectate_desc = "[NAME|ID|OFF] - Schaue den angegeben Spieler zu, freie Kamera falls nicht angegeben, oder OFF um es auszuschalten",
+  menu_stalk_run = "Warp zum Läufer Level",
+  stop_desc = "- Stoppe das Spiel",
+  menu_star_mode = "Stern Modus",
+  tc_desc = "[ON|OFF|MSG] - Sende eine Nachricht nur zum Team; Anmachen mit \"ON\" um es auf alle Nachrichten anzuwenden",
+  stars_in_area = "%d Stern(e) sind hier verfügbar!",
+  force_spectate_one = "%s muss zuschauen",
+  role_cont = "\\#ff9696\\[MH Mitwerkender]",
+  menu_demon_desc = "Lass dich als Läufer von einem 1-Up gejagt werden.",
+  vote_pass = "Die Abstimmung hat bestanden!",
+  extreme_info = "Fühlst du dich vom \\#b45aff\\Extrem Modus\\#ffffff\\ angezogen? Wie albern.\
+  - Ein Leben\
+  - Einen Powermeter\
+  - \\#b45aff\\Todestimer\\#ffffff\\; sammle Münzen und Sterne um es zu steigern\
+  Wenn dir das keine Angst macht, tippe /hard ex ON ein.",
+  role_trans = "\\#ffd996\\[MH Übersetzer]",
+  desync_desc = "- Versucht Desynchonisierungsfehler zu beheben",
+  role_lead = "\\#9a96ff\\[Leitender MH Entwickler]",
+  menu_first_timer = "Führer Todestimer",
+  menu_popup_sound = "Popup-Sounds",
+  stalk_desc = "[NAME|ID] - Warpt dich zu das Level, in dem sich der angegebene Spieler ist, oder zum ersten Läufer",
+  blacklist_add = "%s wurde zur schwarzen Liste hinzugefügt",
+  menu_hide_roles = "Verstecke meine Rollen",
+  open_menu = "Geben Sie /mh ein oder drücke L + Start um das Menü zu öffnen",
+  menu_nerf_vanish = "Schwächere die Unsichbarkeits Kappe",
+  forcespectate_desc = "[NAME|ID|ALL] - Schalte das Erzwingen des Zuschauens für diesen Spieler oder für alle Spieler um",
+  stalk = "Benutze /stalk um zum Läufer zu warpen!",
+  menu_category = "Kategorie",
+  stat_placement = "64 Tour Platzierung",
+  menu_fast = "Schnellere Aktionen",
+  default_desc = "- Einstellungen zurücksetzen",
+  new_record = "\\#ffff5a\\NEUER REKORD!!!",
+  anarchy_set_2 = "Jäger können ihre Mitspieler attackieren",
+  menu_skip = "Überspringen",
+  menu_stalk_run_desc = "Warp auf das Level, in dem sich der erste Läufer befindet.",
+  no_runners_added = "Keine Läufer hinzugefügt",
+  menu_exit_spectate_desc = "Zuschauermodus verlassen.",
+  menu_flip = "Team wechseln",
+  menu_first_timer_desc = "Gibt den Führer in MiniHunt einen Todestimer.",
+  menu_save_continue = "Fortsetzen (kein zurück warpen)",
+  menu_start = "Start",
+  role_dev = "\\#96ecff\\[MH Entwickler]",
+  menu_nerf_vanish_desc = "Verschlechtert die Unsichtbarkeits Kappe, indem sie umschaltbar gemacht wird und bei Verwendung schneller entleert wird.",
+  menu_blacklist_list_desc = "Listet alle auf der schwarzen Liste stehenden Sterne in MiniHunt für diesen Server auf.",
+  menu_pause = "Pause",
+  menu_players_all = "Alle Spieler",
+  menu_metal = "Aussehen von Suchern",
+  menu_toggle_all = "Alles umschalten",
+  menu_blacklist_reset_desc = "Setzt die schwarze Liste auf den Standard zurück.",
+  unstuck = "Es wurde versucht den aktuellen Zustand zu beheben",
+  menu_blacklist_load = "Schwarze Liste laden",
+  menu_blacklist_load_desc = "Laden Sie ihre gespeicherte schwarze Liste.",
+  menu_blacklist_reset = "Schwarze Liste zurücksetzen",
+  menu_blacklist_save_desc = "Speicher diese schwarze Liste auf ihrer Seite.",
+  menu_blacklist_save = "Schwarze Liste speichern",
+  menu_blacklist_list = "Alles auf der schwarze Liste auflisten",
+  menu_spectate_desc = "Diesen Spieler zuschauen",
+  menu_skip_desc = "- Stimme ab, um diesen Stern in MiniHunt zu überspringen.",
+  menu_exit_spectate = "Zuschauen Verlassen",
+  menu_spectate_run_desc = "Der erste Läufer wird automatisch zugeschaut.",
+  menu_list_settings = "Einstellungen auflisten",
+  menu_spectate_run = "Läufer zuschauen",
+  anarchy_set_3 = "Spieler können ihre Mitspieler attackieren",
+  menu_free_cam_desc = "Aktiviere die freie Kamera im Zuschauermodus.",
+  menu_fast_desc = "Sie werfen Gegenstände und öffnen Türen schneller.",
+  menu_secret = "Das ist ein Geheimnis. Wie schaltet man es frei?",
+  menu_hide_hud = "Verstecke HUD",
+  menu_hide_hud_desc = "Verstecke alle HUD Elemente.",
+  menu_stalk = "Warpe zum Level",
+  dmgAdd_set = "Läufer nehmen jetzt %d zusätzlichen Schaden durch PvP-Angriffe.",
+  hard_desc = "[EX|ON|OFF,ON|OFF] - Schalte den Harter Modus für Sie selbst um",
+  menu_tc = "Team-Chat",
+  is_spectator = "* SPIELER IST EIN ZUSCHAUER  *",
+  menu_setlife = "Leben setzen",
+  menu_allowleave = "Erlauben zu verlassen",
+  menu_forcespectate = "Zuschauen erzwingen",
+  menu_stalk_desc = "Warp auf das Level dieses Spielers.",
+  menu_demon = "Green Demon",
+  menu_spectate = "Zuschauen",
+  force_spectate_off = "Zuschauen ist nicht mehr erzwungen",
+  menu_dmgAdd = "Läufer MVP Schaden erhöht",
+  menu_anarchy_desc = "Ermöglicht den angegebenen Teams, ihre Mitspieler anzugreifen.",
+  rules_desc = "- Zeigt MarioHunt Regeln",
+  menu_anarchy = "Teamangriff",
+  menu_blacklist = "MiniHunt schwarze Liste",
+  mh_desc = "[COMMAND,ARGS] - Führt Befehle aus; Geben Sie nichts oder „Menü“ ein, um das Menü zu öffnen",
+  blacklist_list = "Schwarze Liste:",
+  menu_auto = "Auto Spiel",
+  menu_weak = "Schwacher Modus",
+  menu_campaign = "Kampagne",
+  menu_random = "Zufällig",
+  menu_save_reset = "Alternativen Speicherstand zurücksetzen (fehlerhaft)",
+  vanish_custom = "Halte \\#ffff5a\\B\\#ffffff\\ um Unsichtbar zu werden!",
+  menu_save_main = "Haupt",
+  menu_timer_desc = "[ON|OFF] - In den Standardmodi wird unten auf dem Bildschirm ein Timer angezeigt.",
+  menu_list_settings_desc = "Listet alle Einstellungen für diese Lobby auf.",
+  blacklist_reset = "Reset the blacklist!",
+  all = "Alle",
+  blacklist_desc = "[ADD|REMOVE|LIST|RESET|SAVE|LOAD,COURSE,ACT] - Sterne auf die schwarze Liste setzen in MiniHunt",
+  blacklist_remove = "%s steht auf der weißen Liste",
+  page = "\\#ffff5a\\Seite %d/%d",
+  menu_default = "Auf Standardeinstellung zurücksetzen",
+  anarchy_set_1 = "Läufer können ihre Mitspieler attackieren",
+  blacklist_remove_already = "Dieser Stern oder dieses Level steht nicht auf der schwarzen Liste.",
+  force_spectate = "Jeder muss zuschauen",
+  menu_save_alt = "Alternativer Speicherstand (fehlerhaft)",
+  menu_tc_desc = "Rede nur mit deinem Team.",
+  already_voted = "Du hast bereits abgestimmt.",
+  vote_info = "Geben Sie /skip ein, um abzustimmen",
+  vote_skip = "%s\\#dcdcdc\\ hat dafür gestimmt, diesen Stern zu überspringen",
+  blacklist_remove_invalid = "Dieser Stern oder dieses Level kann nicht auf die weiße Liste gesetzt werden.",
+  no_hard_win = "Ihr Punktestand für Harte Siege oder Extrem Siege wird für dieses Spiel nicht aktualisiert.",
+  death_timer = "Tod",
+  blacklist_add_already = "Dieser Stern oder dieses Level ist bereits auf der schwarze Liste.",
+  anarchy_set_0 = "Spieler können nicht ihre Mitspieler attackieren",
+  menu_dmgAdd_desc = "Füge so viel Schaden zum Angriff gegen Läufer hinzu.",
+  no_valid_star = "Konnte nicht einen gültigen Stern finden!",
+  warp_spam = "Langsam mit den Warps!",
+  mini_score = "Punktzahl: %d",
+  stats_desc = "- Statistiktabelle ein-/ausblenden",
+  force_spectate_one_off = "%s muss nicht mehr zuschauen",
+  menu_time = "Zeit",
+  blacklist_save = "Schwarze Liste gespeichert!",
+  blacklist_load = "Schwarze Liste geladen!",
+  demon_unlock = "Green Demon Modus freigeschaltet!",
 }
 
 langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
@@ -1529,7 +1661,7 @@ langdata["fr"] = -- By Skeltan
   spectator = "Spectateur",
   player = "Joueur",
   players = "Joueurs", -- is this correct?
-  all = "Tous", -- is this correct?
+  all = "Tous",
 
   -- rules
   --[[
@@ -1813,7 +1945,7 @@ langdata["fr"] = -- By Skeltan
   menu_start = "Démarrer",
   menu_stop = "Arrêter",
   menu_save_main = "Suavegarde Principale",
-  menu_save_alt = "Sauvegarde Alternative",
+  menu_save_alt = "Sauvegarde Alternative (buggé)",
   menu_save_reset = "Effacer Sauvegarde Alternative (buggé)",
   menu_save_continue = "Continuer (sans téléportation au départ)",
   menu_random = "Aléatoire",

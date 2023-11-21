@@ -1,4 +1,4 @@
--- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hun\\\\t\\#dcdcdc\\ (v2.3) !
+-- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hun\\\\t\\#dcdcdc\\ (v2.31) !
 -- incompatible: gamemode
 -- description: A gamemode based off of Beyond's concept.\n\nHunters stop Runners from clearing the game!\n\nProgramming by EmilyEmmi, TroopaParaKoopa, Blocky, Sunk, and Sprinter05.\n\nSpanish Translation made with help from KanHeaven and SonicDark.\nGerman Translation made by N64 Mario.\nBrazillian Portuguese translation made by PietroM.\nFrench translation made by Skeltan.\n\n\"Shooting Star Summit\" port by pieordie1
 
@@ -95,7 +95,6 @@ local cooldownCaps = 0          -- stores m.flags, to see what caps are on coold
 local regainCapTimer = 0        -- timer for being able to recollect a cap
 local storeVanish = false       -- temporarily stores the vanish cap for pvp purposes
 local campTimer                 -- for camping actions (such as reading text or being in the star menu), nil means it is inactive
-local justEntered = false       -- fixes save file bugs
 warpCooldown = 0                -- to avoid warp spam
 warpCount = 0
 local warpTree = {}
@@ -977,12 +976,12 @@ function on_course_sync()
     return
   end
 
-  -- fix save file?
-  if justEntered and gGlobalSyncTable.otherSave ~= nil then
+  -- completely ruins the save file apparently :/
+  --[[if justEntered and gGlobalSyncTable.otherSave ~= nil then
     save_file_set_using_backup_slot(gGlobalSyncTable.otherSave)
     save_file_reload(1)
     justEntered = false
-  end
+  end]]
 
   -- prevent softlock if hunters kill bowser (vanilla only)
   local np = gNetworkPlayers[0]
@@ -3040,7 +3039,7 @@ hook_chat_command("stalk", trans("stalk_desc"), stalk_command)
 function on_course_enter()
   attackedBy = nil
 
-  justEntered = true
+  -- justEntered = true
 
   if gGlobalSyncTable.romhackFile == "vanilla" then
     omm_replace(OmmEnabled)

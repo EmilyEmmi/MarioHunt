@@ -127,11 +127,11 @@ This is shared among all\
 Runners, so work together!"))
 
 changed_dialogs[016] = 1
-smlua_text_utils_dialog_replace(DIALOG_016,1,4,30,200, ("In Lethal Lava Land,\
+smlua_text_utils_dialog_replace(DIALOG_016,1,5,30,200, ("In Lethal Lava Land,\
 the shell only appears\
-on Stars 5 and 6. It\
-makes the course a lot\
-easier."))
+on Stars 5 and 6.\
+It makes the course\
+a lot easier."))
 
 smlua_text_utils_dialog_replace(DIALOG_017,1,4,30,200, "Do you wish to obtain\
 my Power Star, Mario?\
@@ -849,7 +849,7 @@ function auto_skip(id)
 
   if gGlobalSyncTable.romhackFile ~= "vanilla" then return end
 
-  if skip[id] then return false end
+  if skip[id] and not is_game_paused() then return false end -- prevent softlock when paused and the dialog appears (coop bug)
 
   if changed_dialogs[id] then -- red dialog box
     set_dialog_override_color(255, 100, 100, 180, 255, 255, 255, 255)
