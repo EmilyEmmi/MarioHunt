@@ -71,7 +71,9 @@ if network_is_server() then
   gGlobalSyncTable.forceSpectate = false -- force all players to spectate unless otherwise stated
 end
 
-smlua_audio_utils_replace_sequence(0x53, 0x25, 65, "Shooting_Star_Summit") -- for lobby; hopefully there's no conflicts
+if get_os_name() ~= "Mac OSX" then -- bandaid fix for macOS.
+  smlua_audio_utils_replace_sequence(0x53, 0x25, 65, "Shooting_Star_Summit") -- for lobby; hopefully there's no conflicts
+end
 
 -- force pvp, knockback, skip intro, and no bubble death
 gServerSettings.playerInteractions = PLAYER_INTERACTIONS_PVP
