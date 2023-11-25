@@ -22,7 +22,15 @@ IF something you want to translate does not use this table, you can add it to yo
 function trans(id,format,format2_,lang_)
   local usingLang = lang_ or lang or "en"
   local format2 = format2_ or 10
-  if id == nil then return "INVALID" end
+  if id == nil then
+    return "INVALID"
+  elseif month == 13 then
+    if id == "menu_mh" then
+      id = "menu_mh_egg"
+    elseif id == "rules_desc" then
+      id = "rules_desc_egg"
+    end
+  end
   if langdata == nil then return id end
 
   if langdata[usingLang] == nil then
@@ -64,6 +72,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   open_menu = "Type /mh or press L + Start to open the menu",
   stalk = "Use /stalk to warp to runners!",
   rules_desc = "- Shows MarioHunt rules",
+  rules_desc_egg = "- Shows LuigiHunt rules",
   mh_desc = "[COMMAND,ARGS] - Runs commands; type nothing or \"menu\" to open the menu",
   lang_desc = "%s - Switch language",
   hard_desc = "[EX|ON|OFF,ON|OFF] - Toggle hard mode for yourself",
@@ -332,12 +341,12 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   -- chat roles
   role_lead = "\\#9a96ff\\[Lead MH Dev]",
   role_dev = "\\#96ecff\\[MH Dev]",
-  role_cont = "\\#ff9696\\[MH Contributer]",
+  role_cont = "\\#ff9696\\[MH Contributor]",
   role_trans = "\\#ffd996\\[MH Translator]",
 
   -- command descriptions
   page = "\\#ffff5a\\Page %d/%d", -- page for mariohunt command
-  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Starts the game; add \"continue\" to not warp to start; add \"alt\" for alt save file (buggy); add \"main\" for main save file; add \"reset\" to reset file (buggy)",
+  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Starts the game; add \"continue\" to not warp to start; add \"alt\" for alt save file; add \"main\" for main save file; add \"reset\" to reset file",
   add_desc = "[INT] - Adds the specified amount of runners at random",
   random_desc = "[INT] - Picks the specified amount of runners at random",
   lives_desc = "[INT] - Sets the amount of lives Runners have, from 0 to 99 (note: 0 lives is still 1 life)",
@@ -364,6 +373,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   -- Blocky's menu
   main_menu = "Main Menu",
   menu_mh = "MarioHunt",
+  menu_mh_egg = "LuigiHunt",
   menu_settings_player = "Settings",
   menu_rules = "Rules",
   menu_list_settings = "List Settings",
@@ -382,8 +392,8 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_start = "Start",
   menu_stop = "Stop",
   menu_save_main = "Main",
-  menu_save_alt = "Alt Save (buggy)",
-  menu_save_reset = "Reset Alt Save (buggy)",
+  menu_save_alt = "Alt Save",
+  menu_save_reset = "Reset Alt Save",
   menu_save_continue = "Continue (no warping back)",
   menu_random = "Random",
   menu_campaign = "Campaign",
@@ -407,6 +417,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_nerf_vanish_desc = "Nerfs vanish cap by making it toggleable and drain faster when used.",
   menu_first_timer = "Leader Death Timer",
   menu_first_timer_desc = "Gives the leader in MiniHunt a death timer.",
+  menu_defeat_bowser = "Defeat %s",
 
   menu_flip = "Flip Team",
   menu_spectate = "Spectate",
@@ -716,7 +727,7 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
 
   -- command descriptions
   page = "\\#ffff5a\\Página %d/%d", -- page for mariohunt command
-  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Inicia la partida; agrega \"continue\" para no ser enviado al principio; agrega \"alt\" para usar una ranura de guardado alternativa (puede causar bugs); agrega \"main\" para usar la ranura de guardado principal; agrega \"reset\" para reiniciar la ranura de guardado (puede causar bugs)",
+  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Inicia la partida; agrega \"continue\" para no ser enviado al principio; agrega \"alt\" para usar una ranura de guardado alternativa; agrega \"main\" para usar la ranura de guardado principal; agrega \"reset\" para reiniciar la ranura de guardado",
   add_desc = "[INT] - Agrega la cantidad especificada de Corredores de manera aleatoria",
   random_desc = "[INT] - Escoge la cantidad de corredores",
   lives_desc = "[INT] - Ajusta la cantidad de vidas de los Corredores, de 0 a 99 (nota: 0 vidas es aún 1 vida)",
@@ -743,6 +754,7 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   -- Blocky's menu
   main_menu = "Menu Principal",
   menu_mh = "MarioHunt",
+  menu_mh_egg = "LuigiHunt",
   menu_settings_player = "Ajustes",
   menu_rules = "Reglas",
   menu_lang = "Idioma",
@@ -759,8 +771,8 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   menu_start = "Iniciar",
   menu_stop = "Detener",
   menu_save_main = "Ranura de Guardado Principal",
-  menu_save_alt = "Ranura Alternativa (puede causar bugs)",
-  menu_save_reset = "Reiniciar ranura alternativa (puede causar bugs)",
+  menu_save_alt = "Ranura Alternativa",
+  menu_save_reset = "Reiniciar ranura alternativa",
   menu_save_continue = "Continuar (no eres enviado al principio)",
   menu_random = "Aleatoria",
   menu_campaign = "Campaña",
@@ -776,6 +788,7 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   menu_auto = "Juego automático",
   menu_blacklist = "Lista Negra de MiniHunt",
   menu_default = "Reiniciar",
+  menu_defeat_bowser = "Derrota a %s",
 
   menu_players_all = "Todos los jugadores",
   menu_flip = "Cambiar Equipo",
@@ -853,6 +866,7 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   menu_dmgAdd = "Aumentar daño del corredor",
   menu_anarchy_desc = "Permite que el equipo especificado pueda atacarse entre sí.",
   rules_desc = "- Muestra las reglas de MarioHunt",
+  rules_desc_egg = "- Muestra las reglas de LuigiHunt",
   menu_anarchy = "Fuego Amigo",
   mh_desc = "[COMMAND,ARGS] - Ejecuta comandos; escribe nada o \"menu\" para abrir el menú",
   vanish_custom = "¡Mantén \\#ffff5a\\B\\#ffffff\\ para volverte invisible!",
@@ -1067,7 +1081,7 @@ langdata["de"] = -- by N64 Mario
   place = "\\#e7a1ff\\[Platz %d]", -- thankfully we don't go up to 21
 
   -- command descriptions
-  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Startet das Spiel; Fügen sie \"continue\" hinzu, um um nicht zum Anfang teleportiert zu werden; Fügen sie \"alt\" hinzu, für einen Alternativen Speicherstand (fehlerhaft); Fügen sie \"main\" hinzu, für die Hauptspeicher Datei",
+  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Startet das Spiel; Fügen sie \"continue\" hinzu, um um nicht zum Anfang teleportiert zu werden; Fügen sie \"alt\" hinzu, für einen Alternativen Speicherstand; Fügen sie \"main\" hinzu, für die Hauptspeicher Datei",
   add_desc = "[INT] - fügt die spezifische Anzahl an Läufern nach dem Zufallsprinzip hinzu",
   random_desc = "[INT] - wählt zufällig eine bestimmte Anzahl an Läufern aus",
   lives_desc = "[INT] - Legt die Anzahl der Leben fest, die Läufer haben, von 0 zu 99 (Notiz: 0 Leben ist immer noch 1 Leben)",
@@ -1101,8 +1115,10 @@ langdata["de"] = -- by N64 Mario
   menu_run_add = "Läufer hinzufügen",
   menu_run_lives = "Läuferleben",
   menu_mh = "MarioHunt",
+  menu_mh_egg = "LuigiHunt",
   menu_gamemode = "Spielmodus",
   menu_stars = "Sterne",
+  menu_defeat_bowser = "Besiege %s",
 
   -- unsorted
   lang_desc = "%s - Sprache wechseln",
@@ -1194,6 +1210,7 @@ langdata["de"] = -- by N64 Mario
   menu_dmgAdd = "Läufer MVP Schaden erhöht",
   menu_anarchy_desc = "Ermöglicht den angegebenen Teams, ihre Mitspieler anzugreifen.",
   rules_desc = "- Zeigt MarioHunt Regeln",
+  rules_desc_egg = "- Zeigt LuigiHunt Regeln",
   menu_anarchy = "Teamangriff",
   menu_blacklist = "MiniHunt schwarze Liste",
   mh_desc = "[COMMAND,ARGS] - Führt Befehle aus; Geben Sie nichts oder „Menü“ ein, um das Menü zu öffnen",
@@ -1202,7 +1219,7 @@ langdata["de"] = -- by N64 Mario
   menu_weak = "Schwacher Modus",
   menu_campaign = "Kampagne",
   menu_random = "Zufällig",
-  menu_save_reset = "Alternativen Speicherstand zurücksetzen (fehlerhaft)",
+  menu_save_reset = "Alternativen Speicherstand zurücksetzen",
   vanish_custom = "Halte \\#ffff5a\\B\\#ffffff\\ um Unsichtbar zu werden!",
   menu_save_main = "Haupt",
   menu_timer_desc = "[ON|OFF] - In den Standardmodi wird unten auf dem Bildschirm ein Timer angezeigt.",
@@ -1216,7 +1233,7 @@ langdata["de"] = -- by N64 Mario
   anarchy_set_1 = "Läufer können ihre Mitspieler attackieren",
   blacklist_remove_already = "Dieser Stern oder dieses Level steht nicht auf der schwarzen Liste.",
   force_spectate = "Jeder muss zuschauen",
-  menu_save_alt = "Alternativer Speicherstand (fehlerhaft)",
+  menu_save_alt = "Alternativer Speicherstand",
   menu_tc_desc = "Rede nur mit deinem Team.",
   already_voted = "Du hast bereits abgestimmt.",
   vote_info = "Geben Sie /skip ein, um abzustimmen",
@@ -1494,8 +1511,10 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   menu_exit = "Sair",
   menu_back = "Voltar",
   menu_mh = "Caça-Mario",
+  menu_mh_egg = "Caça-Luigi",
   menu_stars = "Estrelas",
   menu_tc = "Chat de time",
+  menu_defeat_bowser = "Derrote %s",
 
   -- not really organized
   lang_desc = "%s - Trocar linguagem",
@@ -1589,6 +1608,7 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   menu_dmgAdd = "Corredor PVP DMG",
   menu_anarchy_desc = "Permite que os jogadores específicos possam atacar os jogadores da mesma equipe.",
   rules_desc = "- Mostrar as regras da Caça-Mario",
+  rules_desc_egg = "- Mostrar as regras da Caça-Luigi",
   menu_anarchy = "Ataque de Times",
   menu_blacklist = "Lista Negra da Mini-Caça",
   mh_desc = "[COMMAND,ARGS] - Usa comandos; digite nada, ou \"menu\" para abrir o menu",
@@ -1598,7 +1618,7 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   menu_gamemode = "Modo de jogo",
   menu_campaign = "Campanha",
   menu_random = "Aleatório",
-  menu_save_reset = "Resetar Save File Alternativa (bugada)",
+  menu_save_reset = "Resetar Save File Alternativa",
   vanish_custom = "Segure \\#ffff5a\\B\\#ffffff\\ para desaparecer!",
   menu_save_main = "Principal",
   menu_run_lives = "Vidas Extras dos Corredores",
@@ -1616,7 +1636,7 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   menu_run_add = "Adicionar Corredores",
   blacklist_remove_already = "Essa estrela e(ou) fase não está na Lista Negra.",
   force_spectate = "Todos devem observar",
-  menu_save_alt = "Save file alternativa (bugada)",
+  menu_save_alt = "Save file alternativa",
   menu_tc_desc = "Converse apenas com sua equipe.",
   already_voted = "Você já votou.",
   vote_info = "Digite /skip para votar",
@@ -1902,7 +1922,7 @@ langdata["fr"] = -- By Skeltan
   role_trans = "\\#ffd996\\[Traducteur MH]",
 
   -- command descriptions
-  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Lancez la partie; ajoutez \"continue\" pour ne pas être téléporté au début; ajoutez \"alt\" pour utiliser la sauvegarde alternative; ajoutez \"main\" pour utiliser la sauvegarde principale; ajoutez \"reset\" pour effacer la sauvegarde (buggé)",
+  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Lancez la partie; ajoutez \"continue\" pour ne pas être téléporté au début; ajoutez \"alt\" pour utiliser la sauvegarde alternative; ajoutez \"main\" pour utiliser la sauvegarde principale; ajoutez \"reset\" pour effacer la sauvegarde",
   add_desc = "[INT] - Ajoute aléatoirement le nombre indiqué de Coureur",
   random_desc = "[INT] - Sélectionne aléatoirement les Coureurs selon le nombre indiqué",
   lives_desc = "[INT] - Défini le nombre de vies que les Coureurs ont, de 0 à 99 (note: 0 vies équivaut toujours à 1 vie)",
@@ -1929,6 +1949,7 @@ langdata["fr"] = -- By Skeltan
   -- Blocky's menu
   main_menu = "Menu Principal",
   menu_mh = "MarioHunt",
+  menu_mh_egg = "LuigiHunt",
   menu_settings_player = "Paramètres",
   menu_rules = "Règles",
   menu_lang = "Langue",
@@ -1945,8 +1966,8 @@ langdata["fr"] = -- By Skeltan
   menu_start = "Démarrer",
   menu_stop = "Arrêter",
   menu_save_main = "Suavegarde Principale",
-  menu_save_alt = "Sauvegarde Alternative (buggé)",
-  menu_save_reset = "Effacer Sauvegarde Alternative (buggé)",
+  menu_save_alt = "Sauvegarde Alternative",
+  menu_save_reset = "Effacer Sauvegarde Alternative",
   menu_save_continue = "Continuer (sans téléportation au départ)",
   menu_random = "Aléatoire",
   menu_campaign = "Campagne",
@@ -1962,6 +1983,7 @@ langdata["fr"] = -- By Skeltan
   menu_auto = "Partie Auto",
   menu_blacklist = "Liste Noire MiniHunt",
   menu_default = "Réinitialiser par défaut",
+  menu_defeat_bowser = "Battez %s",
 
   menu_flip = "Inverser l'équipe",
   menu_spectate = "Passer en Mode Spectateur",
@@ -2040,6 +2062,7 @@ langdata["fr"] = -- By Skeltan
   menu_dmgAdd = "Coureur Dégâts PVP +",
   menu_anarchy_desc = "Permet aux équipes spécifiées d'attaquer leurs coéquipiers.",
   rules_desc = "- Affiche les règles de MarioHunt",
+  rules_desc_egg = "- Affiche les règles de LuigiHunt",
   menu_anarchy = "Dégâts alliés",
   mh_desc = "[COMMAND,ARGS] - Exécute des commandes; Tapez rien ou \"menu\" pour ouvrir le menu",
   vanish_custom = "Maintenez \\#ffff5a\\B\\#ffffff\\ pour devenir invisible!",

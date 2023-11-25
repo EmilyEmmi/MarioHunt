@@ -49,7 +49,7 @@ _G.mhApi.romhackSetup = function()
     },
 
     ddd = true, -- This handles considering Board Bowser's Sub in runs. Omit this unless your hack is a vanilla edit.
-    no_bowser = true, -- If your hack's goal doesn't involve beating Bowser, set this to true. Otherwise, omit this.
+    no_bowser = true, -- If your hack's goal doesn't involve beating Bowser, set this to true. Otherwise, omit this. (NOTE: Still set runner_victory to something!)
     ommSupport = false, -- If your hack doesn't support OMM (most likely it doesn't), set this to false. Otherwise, omit this. (only affects the radar)
     heartReplace = true, -- replaces all hearts with 1ups (some hacks require the hearts for lava boosting, so omit this if that's the case)
     stalk = true, -- Enables a feature that lets anyone warp to a runner's level (used in Ztar Attack 2 due to linear nature of hack). Omit this to disable (recommended for most hacks)

@@ -1,4 +1,21 @@
 # Changelog
+## v2.32
+### Additions:
+  - Added a new option: "Defeat Bowser". Toggle it off to end the match as soon as the needed Stars are collected. Not available in MiniHunt.
+### Adjustments:
+  - Custom HUD font now uses the default characters added to the hud font in version 36
+  - Player names in the menu are now capped at 16 characters (not including colors) to prevent cutoff
+  - Added message when using version lower than version 36
+  - The category displayed "List Settings" now displays as "X Star" instead of just "X"
+  - **API CHANGE:** *no_bowser* now sets the default option for the Defeat Bowser value.
+  - /mh category now accepts "any"
+### Fixes:
+  - Fixed softlock relating to mod storage changes
+  - Corrected "MH Contribut<u>e</u>r" to "MH Contribut<u>o</u>r"
+  - Alt save and alt save reset now actually work!
+    - Buggy tag has been removed
+  - Fixed key popups appearing for keys that have already been obtained
+  - For unsupported rom hacks, vanilla levels are no longer factored in the total auto-generated star count
 ## v2.31
 ### Fixes:
   - Fixed Extreme Edition getting swapped to when using Spectator Mode as host/mod

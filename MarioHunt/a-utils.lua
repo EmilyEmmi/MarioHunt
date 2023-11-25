@@ -439,7 +439,11 @@ end
 
 function star_count_command(msg)
   local num = tonumber(msg)
+  if msg and num == nil and msg:lower() == "any" then num = -1 end
   if num ~= nil and num >= -1 and num <= ROMHACK.max_stars and math.floor(num) == num then
+    if gGlobalSyncTable.noBowser and num < 1 then
+      return false
+    end
     gGlobalSyncTable.starRun = num
     if num ~= -1 then
       djui_chat_message_create(trans("new_category",num))
@@ -544,6 +548,7 @@ function mod_storage_save_fix_bug(key, value_)
   local value = value_
   local old = mod_storage_load(key)
   if old ~= nil then
+    print(old)
     while string.len(old) - 4 > string.len(value) do
       old = string.sub(old,1,-5)
       mod_storage_save(key, old)

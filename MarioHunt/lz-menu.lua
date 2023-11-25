@@ -2,68 +2,74 @@
 
 -- localize some functions
 local djui_hud_set_font, djui_hud_set_color, djui_hud_print_text, djui_hud_render_rect, djui_hud_measure_text, djui_hud_render_texture, djui_hud_set_resolution, djui_chat_message_create, djui_hud_get_screen_width, djui_hud_get_screen_height, djui_hud_set_render_behind_hud, tonumber, play_sound, string_lower, network_get_player_text_color_string =
-djui_hud_set_font, djui_hud_set_color, djui_hud_print_text, djui_hud_render_rect, djui_hud_measure_text,
+    djui_hud_set_font, djui_hud_set_color, djui_hud_print_text, djui_hud_render_rect, djui_hud_measure_text,
     djui_hud_render_texture, djui_hud_set_resolution, djui_chat_message_create, djui_hud_get_screen_width,
     djui_hud_get_screen_height, djui_hud_set_render_behind_hud, tonumber, play_sound, string.lower,
     network_get_player_text_color_string
 
-local m0                                                                                                                                                                                                                                                                                                                                     = gMarioStates
-[0]
+local m0                                                                                                                                                                                                                                                                                                                                                   = gMarioStates
+    [0]
 
 -- Constants for joystick input
-local JOYSTICK_THRESHOLD                                                                                                                                                                                                                                                                                                                     = 32
+local JOYSTICK_THRESHOLD                                                                                                                                                                                                                                                                                                                                   = 32
 
 -- Variables to keep track of current menu state
-local currentOption                                                                                                                                                                                                                                                                                                                          = 1
-local bottomOption                                                                                                                                                                                                                                                                                                                           = 0
-local focusPlayerOrCourse                                                                                                                                                                                                                                                                                                                    = 0
-local prevOption                                                                                                                                                                                                                                                                                                                             = 0
-local hoveringOption                                                                                                                                                                                                                                                                                                                         = true
+local currentOption                                                                                                                                                                                                                                                                                                                                        = 1
+local bottomOption                                                                                                                                                                                                                                                                                                                                         = 0
+local focusPlayerOrCourse                                                                                                                                                                                                                                                                                                                                  = 0
+local prevOption                                                                                                                                                                                                                                                                                                                                           = 0
+local hoveringOption                                                                                                                                                                                                                                                                                                                                       = true
 
 -- localize the menu
-local mainMenu                                                                                                                                                                                                                                                                                                                               = {}
-local marioHuntMenu                                                                                                                                                                                                                                                                                                                          = {}
-local startMenu                                                                                                                                                                                                                                                                                                                              = {}
-local startMenuMini                                                                                                                                                                                                                                                                                                                          = {}
-local settingsMenu                                                                                                                                                                                                                                                                                                                           = {}
-local playerMenu                                                                                                                                                                                                                                                                                                                             = {}
-local onePlayerMenu                                                                                                                                                                                                                                                                                                                          = {}
-local allPlayerMenu                                                                                                                                                                                                                                                                                                                          = {}
-local playerSettingsMenu                                                                                                                                                                                                                                                                                                                     = {}
-local miscMenu                                                                                                                                                                                                                                                                                                                               = {}
-local blacklistMenu                                                                                                                                                                                                                                                                                                                          = {}
-local blacklistCourseMenu                                                                                                                                                                                                                                                                                                                    = {}
-blacklistMenu.name                                                                                                                                                                                                                                                                                                                           = "blacklistMenu"
-blacklistCourseMenu.name                                                                                                                                                                                                                                                                                                                     = "blacklistCourseMenu"
+local mainMenu                                                                                                                                                                                                                                                                                                                                             = {}
+local marioHuntMenu                                                                                                                                                                                                                                                                                                                                        = {}
+local startMenu                                                                                                                                                                                                                                                                                                                                            = {}
+local startMenuMini                                                                                                                                                                                                                                                                                                                                        = {}
+local settingsMenu                                                                                                                                                                                                                                                                                                                                         = {}
+local playerMenu                                                                                                                                                                                                                                                                                                                                           = {}
+local onePlayerMenu                                                                                                                                                                                                                                                                                                                                        = {}
+local allPlayerMenu                                                                                                                                                                                                                                                                                                                                        = {}
+local playerSettingsMenu                                                                                                                                                                                                                                                                                                                                   = {}
+local miscMenu                                                                                                                                                                                                                                                                                                                                             = {}
+local blacklistMenu                                                                                                                                                                                                                                                                                                                                        = {}
+local blacklistCourseMenu                                                                                                                                                                                                                                                                                                                                  = {}
+blacklistMenu.name                                                                                                                                                                                                                                                                                                                                         = "blacklistMenu"
+blacklistCourseMenu.name                                                                                                                                                                                                                                                                                                                                   = "blacklistCourseMenu"
 
 -- Controller Inputs
-local sMenuInputsPressed                                                                                                                                                                                                                                                                                                                     = 0
-local sMenuInputsDown                                                                                                                                                                                                                                                                                                                        = 0
+local sMenuInputsPressed                                                                                                                                                                                                                                                                                                                                   = 0
+local sMenuInputsDown                                                                                                                                                                                                                                                                                                                                      = 0
 
 -- textures
-local TEX_MENU_ARROW                                                                                                                                                                                                                                                                                                                         = get_texture_info(
-"menu-arrow")
-local TEX_MENU_ARROW_VERT                                                                                                                                                                                                                                                                                                                    = get_texture_info(
-"menu-arrow-vert")
+local TEX_MENU_ARROW                                                                                                                                                                                                                                                                                                                                       = get_texture_info(
+  "menu-arrow")
+local TEX_MENU_ARROW_VERT                                                                                                                                                                                                                                                                                                                                  = get_texture_info(
+  "menu-arrow-vert")
 
 -- mouse stuff
-local TEX_HAND                                                                                                                                                                                                                                                                                                                               = get_texture_info(
-"gd_texture_hand_open")
-local TEX_HAND_SELECT                                                                                                                                                                                                                                                                                                                        = get_texture_info(
-"gd_texture_hand_closed")
-local mouseX                                                                                                                                                                                                                                                                                                                                 = djui_hud_get_mouse_x()
-local mouseY                                                                                                                                                                                                                                                                                                                                 = djui_hud_get_mouse_y()
-local mouseData                                                                                                                                                                                                                                                                                                                              = { prevX =
-mouseX, prevY = mouseY }
-local mouseIdleTimer                                                                                                                                                                                                                                                                                                                         = 90
-local mouseGrabbedScrollBar                                                                                                                                                                                                                                                                                                                  = false
-local mouseScrollBarY                                                                                                                                                                                                                                                                                                                        = 0
-local mouseArrowKey                                                                                                                                                                                                                                                                                                                          = 0
+local TEX_HAND                                                                                                                                                                                                                                                                                                                                             = get_texture_info(
+  "gd_texture_hand_open")
+local TEX_HAND_SELECT                                                                                                                                                                                                                                                                                                                                      = get_texture_info(
+  "gd_texture_hand_closed")
+local mouseX                                                                                                                                                                                                                                                                                                                                               = djui_hud_get_mouse_x()
+local mouseY                                                                                                                                                                                                                                                                                                                                               = djui_hud_get_mouse_y()
+local mouseData                                                                                                                                                                                                                                                                                                                                            = {
+  prevX =
+      mouseX,
+  prevY = mouseY
+}
+local mouseIdleTimer                                                                                                                                                                                                                                                                                                                                       = 90
+local mouseGrabbedScrollBar                                                                                                                                                                                                                                                                                                                                = false
+local mouseScrollBarY                                                                                                                                                                                                                                                                                                                                      = 0
+local mouseArrowKey                                                                                                                                                                                                                                                                                                                                        = 0
+
+-- limit for player names
+local PLAYER_NAME_CUTOFF                                                                                                                                                                                                                                                                                                                                   = 16
 
 -- build language menu
-local LanguageMenu                                                                                                                                                                                                                                                                                                                           = {}
-local langnum                                                                                                                                                                                                                                                                                                                                = 0
-local lang_table                                                                                                                                                                                                                                                                                                                             = {}
+local LanguageMenu                                                                                                                                                                                                                                                                                                                                         = {}
+local langnum                                                                                                                                                                                                                                                                                                                                              = 0
+local lang_table                                                                                                                                                                                                                                                                                                                                           = {}
 for id, data in pairs(langdata) do
   langnum = langnum + 1
   table.insert(lang_table, { (data.name_menu or data.fullname), id })
@@ -102,8 +108,8 @@ function menu_reload()
 
   marioHuntMenu = {
     { name = ("menu_start"),      title = ("menu_mh") },
-    { name = ("menu_run_random"), currNum = 0,          minNum = 0, maxNum = MAX_PLAYERS - 1, desc = ("random_desc"),             format = { "auto" } },
-    { name = ("menu_run_add"),    currNum = 0,          minNum = 0, maxNum = MAX_PLAYERS - 1, desc = ("add_desc"),                format = { "auto" } },
+    { name = ("menu_run_random"), currNum = 0,          minNum = 0, maxNum = MAX_PLAYERS - 1, desc = ("random_desc"),                 format = { "auto" } },
+    { name = ("menu_run_add"),    currNum = 0,          minNum = 0, maxNum = MAX_PLAYERS - 1, desc = ("add_desc"),                    format = { "auto" } },
     { name = ("menu_gamemode"),   currNum = GST.mhMode, maxNum = 2, desc = ("mode_desc"),     format = { "normal", "switch", "mini" } },
     { name = ("menu_settings") },
     { name = ("menu_stop"),       desc = ("stop_desc") },
@@ -139,16 +145,17 @@ function menu_reload()
   if ROMHACK then maxStars = ROMHACK.max_stars end
   if auto == 99 then auto = -1 end
   settingsMenu = {
-    { name = ("menu_run_lives"),      currNum = GST.runnerLives,   maxNum = 99,                      desc = ("lives_desc"),      title = ("menu_settings") },
+    { name = ("menu_run_lives"),      currNum = GST.runnerLives,   maxNum = 99,                      desc = ("lives_desc"),               title = ("menu_settings") },
     { name = ("menu_metal"),          option = GST.metal,          desc = ("metal_desc") },
     { name = ("menu_weak"),           option = GST.weak,           desc = ("weak_desc") },
     { name = ("menu_allow_spectate"), option = GST.allowSpectate,  desc = ("spectator_desc") },
     { name = ("menu_star_mode"),      option = GST.starMode,       desc = ("starmode_desc"),         invalid = (GST.mhMode == 2) },
-    { name = ("menu_category"),       currNum = GST.starRun,       maxNum = maxStars,                minNum = -1,                desc = ("category_desc"),     invalid = (GST.mhMode == 2) },
-    { name = ("menu_time"),           currNum = GST.runTime // 30, maxNum = 3600,                    desc = ("time_desc"),       time = true },
-    { name = ("menu_auto"),           invalid = (GST.mhMode ~= 2), currNum = auto,                   minNum = -1,                maxNum = MAX_PLAYERS - 1,     desc = ("auto_desc"),                                   format = { "auto", "~" } },
-    { name = ("menu_anarchy"),        currNum = GST.anarchy,       minNum = 0,                       maxNum = 3,                 desc = ("menu_anarchy_desc"), format = { "~", "lang_runners", "lang_hunters", "lang_all" } },
-    { name = ("menu_dmgAdd"),         currNum = GST.dmgAdd,        minNum = 0,                       maxNum = 8,                 desc = ("menu_dmgAdd_desc"),  format = { [9] = "OHKO" } },
+    { name = ("menu_category"),       currNum = GST.starRun,       maxNum = maxStars,                minNum = (GST.noBowser and 1) or -1, desc = ("category_desc"),     invalid = (GST.mhMode == 2) },
+    { name = ("menu_defeat_bowser"),  option = not GST.noBowser,   invalid = (GST.mhMode == 2 or (ROMHACK and ROMHACK.isUnder)) },
+    { name = ("menu_time"),           currNum = GST.runTime // 30, maxNum = 3600,                    desc = ("time_desc"),                time = true },
+    { name = ("menu_auto"),           invalid = (GST.mhMode ~= 2), currNum = auto,                   minNum = -1,                         maxNum = MAX_PLAYERS - 1,     desc = ("auto_desc"),                                        format = { "auto", "~" } },
+    { name = ("menu_anarchy"),        currNum = GST.anarchy,       minNum = 0,                       maxNum = 3,                          desc = ("menu_anarchy_desc"), format = { "~", "lang_runners", "lang_hunters", "lang_all" } },
+    { name = ("menu_dmgAdd"),         currNum = GST.dmgAdd,        minNum = 0,                       maxNum = 8,                          desc = ("menu_dmgAdd_desc"),  format = { [9] = "OHKO" } },
     { name = ("menu_nerf_vanish"),    option = GST.nerfVanish,     desc = ("menu_nerf_vanish_desc") },
     { name = ("menu_first_timer"),    option = GST.firstTimer,     desc = ("menu_first_timer_desc"), invalid = (GST.mhMode ~= 2) },
     { name = ("menu_blacklist"),      desc = ("blacklist_desc") },
@@ -156,7 +163,7 @@ function menu_reload()
     { name = ("menu_back") },
     { name = ("main_menu") },
     name = "settingsMenu",
-    back = 15,
+    back = 16,
   }
   if GST.starMode and GST.mhMode ~= 2 then
     settingsMenu[7] = { name = ("menu_stars"), currNum = GST.runTime, maxNum = 7, desc = ("stars_desc") }
@@ -410,24 +417,33 @@ function action_setup()
         star_count_command(option.currNum)
       end,
       [7] = function(option)
+        option.option = not option.option
+        gGlobalSyncTable.noBowser = not option.option
+        if gGlobalSyncTable.noBowser and gGlobalSyncTable.starRun < 1 then
+          gGlobalSyncTable.starRun = 1
+        end
+        menu_reload()
+        menu_enter(settingsMenu, currentOption)
+      end,
+      [8] = function(option)
         if gGlobalSyncTable.mhMode ~= 2 and gGlobalSyncTable.starMode then
           stars_needed_command(option.currNum)
         else
           time_needed_command(option.currNum)
         end
       end,
-      [8] = function(option)
+      [9] = function(option)
         if option.currNum < 0 then
           gGlobalSyncTable.gameAuto = 99,
               djui_chat_message_create(trans("auto_on"))
           if gGlobalSyncTable.mhState == 0 then
-            gGlobalSyncTable.mhTimer = 20 * 30       -- 20 seconds
+            gGlobalSyncTable.mhTimer = 20 * 30 -- 20 seconds
           end
         elseif option.currNum == 0 then
           gGlobalSyncTable.gameAuto = 0,
               djui_chat_message_create(trans("auto_off"))
           if gGlobalSyncTable.mhState == 0 then
-            gGlobalSyncTable.mhTimer = 0       -- don't set
+            gGlobalSyncTable.mhTimer = 0 -- don't set
           end
         else
           gGlobalSyncTable.gameAuto = option.currNum
@@ -437,36 +453,36 @@ function action_setup()
           end
           djui_chat_message_create(string.format("%s (%d %s)", trans("auto_on"), gGlobalSyncTable.gameAuto, runners))
           if gGlobalSyncTable.mhState == 0 then
-            gGlobalSyncTable.mhTimer = 20 * 30       -- 20 seconds
+            gGlobalSyncTable.mhTimer = 20 * 30 -- 20 seconds
           end
         end
       end,
-      [9] = function(option)
+      [10] = function(option)
         gGlobalSyncTable.anarchy = option.currNum
         djui_chat_message_create(trans("anarchy_set_" .. gGlobalSyncTable.anarchy))
       end,
-      [10] = function(option)
+      [11] = function(option)
         gGlobalSyncTable.dmgAdd = option.currNum
         djui_chat_message_create(trans("dmgAdd_set", gGlobalSyncTable.dmgAdd))
       end,
-      [11] = function(option)
+      [12] = function(option)
         option.option = not option.option
         gGlobalSyncTable.nerfVanish = option.option
       end,
-      [12] = function(option)
+      [13] = function(option)
         option.option = not option.option
         gGlobalSyncTable.firstTimer = option.option
       end,
-      [13] = function()
+      [14] = function()
         menu_enter(blacklistMenu)
       end,
-      [14] = function()
+      [15] = function()
         default_settings()
         menu_reload()
         menu_enter(settingsMenu, currentOption)
       end,
-      [15] = function() menu_enter(marioHuntMenu, 5) end,
-      [16] = function() menu_enter() end,
+      [16] = function() menu_enter(marioHuntMenu, 5) end,
+      [17] = function() menu_enter() end,
     },
     onePlayerMenu = {
       [1] = function()
@@ -632,7 +648,7 @@ function action_setup()
         menu_enter(hideRolesMenu, 6)
         mod_storage_save_fix_bug("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
-      [7] = function() menu_enter(playerSettingsMenu, 9) end,
+      [7] = function() menu_enter(playerSettingsMenu, 10) end,
       [8] = function() menu_enter(nil, 2) end,
     },
   }
@@ -662,7 +678,7 @@ function selectOption(option)
       switch_lang(currMenu[option].lang)
       --menu_reload()
       menu_enter(LanguageMenu, currentOption)
-    else   -- back
+    else -- back
       menu_enter(nil, 5)
     end
   elseif currentMenuName == "blacklistMenu" then
@@ -739,14 +755,19 @@ function handleMenu()
 
   for i, option in ipairs(currMenu) do
     local optionText = option.name
-    optionText = trans(optionText)
+    if optionText ~= "menu_defeat_bowser" then
+      optionText = trans(optionText)
+    else
+      local bad = ROMHACK["badGuy_" .. lang] or ROMHACK.badGuy or "Bowser"
+      optionText = trans(optionText, bad)
+    end
 
     local textWidth = 0
     if option.name:sub(1, 7) == "PLAYER_" then
       textWidth = screenWidth * 0.7
     elseif option.course then
       textWidth = djui_hud_measure_text(get_custom_level_name(option.course, course_to_level[option.course], 0)) *
-      textScale
+          textScale
     elseif option.color then
       textWidth = djui_hud_measure_text(remove_color(optionText)) * textScale
     else
@@ -755,7 +776,7 @@ function handleMenu()
     if option.currNum then
       local choiceString = ""
       local measureString = ""
-      if option.time then     -- time format
+      if option.time then -- time format
         choiceString = string.format("%d:%02d", option.currNum // 60, option.currNum % 60)
         measureString = string.format("%d:%02d", option.maxNum // 60, option.maxNum % 60)
       else
@@ -768,7 +789,7 @@ function handleMenu()
             choiceString = trans(choiceString:sub(6))
           end
 
-          for a, text_ in pairs(option.format) do    -- pairs is used because one of them does not have 1-7
+          for a, text_ in pairs(option.format) do -- pairs is used because one of them does not have 1-7
             local text = text_
             if text:sub(1, 5) == "lang_" then
               text = trans(text:sub(6))
@@ -810,11 +831,12 @@ function handleMenu()
   local titleCenter = 0
   djui_hud_set_color(255, 255, 255, 255)
   if titleText == "PLAYER_S" then
-    djui_hud_set_font(FONT_NORMAL)   -- extended hud font doesn't support every character that can be in a username yet
+    djui_hud_set_font(FONT_NORMAL) -- extended hud font doesn't support every character that can be in a username yet
     local np = gNetworkPlayers[focusPlayerOrCourse]
     if np and np.connected then
       local playerColor = network_get_player_text_color_string(focusPlayerOrCourse)
       titleText = playerColor .. np.name
+      titleText = cap_color_text(titleText, PLAYER_NAME_CUTOFF)
       --titleText = remove_color(np.name)
     else
       menu_enter(playerMenu, focusPlayerOrCourse + 1)
@@ -855,18 +877,24 @@ function handleMenu()
     end
 
     if render then
-      local textColor = { 255, 255, 255, 255 }   -- Default text color
+      local textColor = { 255, 255, 255, 255 } -- Default text color
 
       if option.option ~= nil then
         if option.option then
-          textColor = { 92, 255, 92, 255 }       -- Green text color
+          textColor = { 92, 255, 92, 255 } -- Green text color
         else
-          textColor = { 255, 92, 92, 255 }       -- Red text color
+          textColor = { 255, 92, 92, 255 } -- Red text color
         end
       end
 
       djui_hud_set_font(FONT_NORMAL)
       local optionText = option.name
+      if optionText ~= "menu_defeat_bowser" then
+        optionText = trans(optionText)
+      else
+        local bad = ROMHACK["badGuy_" .. lang] or ROMHACK.badGuy or "Bowser"
+        optionText = trans(optionText, bad)
+      end
       local roleText = nil
       if option.name:sub(1, 7) == "PLAYER_" then
         local index = tonumber(option.name:sub(8)) or 0
@@ -877,6 +905,7 @@ function handleMenu()
           local roleName, colorString = get_role_name_and_color(sMario)
           roleText = colorString .. roleName
           optionText = playerColor .. np.name
+          optionText = cap_color_text(optionText, PLAYER_NAME_CUTOFF)
         else
           roleText = ""
           optionText = trans("empty", index)
@@ -923,17 +952,17 @@ function handleMenu()
           end
         end
         if allValid then
-          textColor = { 92, 255, 92, 255 }    -- Green text color
+          textColor = { 92, 255, 92, 255 }  -- Green text color
         elseif oneValid then
-          textColor = { 255, 255, 92, 255 }   -- Yellow text color
+          textColor = { 255, 255, 92, 255 } -- Yellow text color
         else
-          textColor = { 255, 92, 92, 255 }    -- Red text color
+          textColor = { 255, 92, 92, 255 }  -- Red text color
         end
       end
 
       -- darken unselectable options
       if option.invalid then
-        textColor[4] = 100     -- set alpha to 100
+        textColor[4] = 100 -- set alpha to 100
       end
       djui_hud_set_color(table.unpack(textColor))
 
@@ -983,21 +1012,21 @@ function handleMenu()
         if mouseIdleTimer < 90 and i == currentOption and hoveringOption then
           local relativeX = mouseX - textX - textWidth
           if relativeX <= 50 then
-            mouseArrowKey = 3     -- left
+            mouseArrowKey = 3 -- left
           elseif relativeX >= option.choiceWidth + 50 then
-            mouseArrowKey = 1     -- right
+            mouseArrowKey = 1 -- right
           else
-            mouseArrowKey = 0     -- none
+            mouseArrowKey = 0 -- none
           end
         elseif i == currentOption then
-          mouseArrowKey = 0     -- none
+          mouseArrowKey = 0 -- none
         end
       end
 
       if i == currentOption and hoveringOption then
-        local rectX = optionX              -- maxTextWidth * 0.2
+        local rectX = optionX          -- maxTextWidth * 0.2
         local rectY = optionY
-        local rectWidth = maxTextWidth     -- * 1.4
+        local rectWidth = maxTextWidth -- * 1.4
         local rectHeight = screenHeight * 0.07
         djui_hud_set_color(92, 255, 92, math.abs((frameCounter % 60) - 30) * 2)
         djui_hud_render_rect(rectX, rectY, rectWidth, rectHeight)
@@ -1084,8 +1113,10 @@ function stats_table_hud()
   local y = 180
   djui_hud_set_color(0, 0, 0, 200);
   djui_hud_render_rect(screenWidth * 0.1, 0, screenWidth * 0.8, screenHeight);
-  local statOrder = { "wins_standard", "wins", "hardWins_standard", "hardWins", "exWins_standard", "exWins", "kills", "maxStreak", "maxStar", "placement" }
-  local descOrder = { "stat_wins_standard", "stat_wins", "stat_wins_hard_standard", "stat_wins_hard", "stat_wins_ex_standard", "stat_wins_ex", "stat_kills", "stat_combo", "stat_mini_stars",
+  local statOrder = { "wins_standard", "wins", "hardWins_standard", "hardWins", "exWins_standard", "exWins", "kills",
+    "maxStreak", "maxStar", "placement" }
+  local descOrder = { "stat_wins_standard", "stat_wins", "stat_wins_hard_standard", "stat_wins_hard",
+    "stat_wins_ex_standard", "stat_wins_ex", "stat_kills", "stat_combo", "stat_mini_stars",
     "stat_placement" }
 
   -- title
@@ -1202,8 +1233,8 @@ function stats_table_hud()
         end
       end
     else
-      if menuY > pcount-16 then
-        menuY = pcount-16
+      if menuY > pcount - 16 then
+        menuY = pcount - 16
       end
       farDown = menuY * fullportion / pcount
     end
@@ -1213,15 +1244,16 @@ function stats_table_hud()
   end
 
   -- player names
-  y = y - (menuY*32*scale)
+  y = y - (menuY * 32 * scale)
   for a, i in ipairs(statTable) do
-    if y > 170 and y < (screenHeight-96*scale) then
+    if y > 170 and y < (screenHeight - 96 * scale) then
       x = 0
       local sMario = gPlayerSyncTable[i]
       local np = gNetworkPlayers[i]
       local playerColor = network_get_player_text_color_string(i)
 
       text = playerColor .. np.name .. "\\#ffffff\\"
+      text = cap_color_text(text, PLAYER_NAME_CUTOFF)
       width = djui_hud_measure_text(remove_color(text)) * scale
       x = screenWidth * 0.1 + 150 - width / 2
       djui_hud_print_text_with_color(text, x, y, scale)
@@ -1448,7 +1480,7 @@ function menu_controls(m)
           statDesc = (statDesc + #stat_icon_data - 2) % (#stat_icon_data) + 1
           play_sound(SOUND_MENU_CHANGE_SELECT, mCamToObj)
         elseif MAX_PLAYERS > 16 and network_player_connected_count() > 16 then
-          if menuY < network_player_connected_count()-16 then
+          if menuY < network_player_connected_count() - 16 then
             menuY = menuY + 1
             play_sound(SOUND_MENU_CHANGE_SELECT, mCamToObj)
           end
@@ -1510,7 +1542,7 @@ function menu_controls(m)
         option.currNum = (option.currNum - countBy)
         if option.currNum == -countBy then
           option.currNum = option.maxNum
-        elseif option.currNum < 0 then
+        elseif option.currNum < 0 or option.currNum < min then
           option.currNum = option.maxNum + option.currNum
         end
       end
@@ -1523,6 +1555,9 @@ function menu_controls(m)
         option.currNum = (option.currNum + countBy)
         if option.currNum == option.maxNum + countBy then
           option.currNum = 0
+          if min > 0 then
+            option.currNum = 10
+          end
         elseif option.currNum > option.maxNum then
           option.currNum = option.maxNum
         end
@@ -1575,17 +1610,17 @@ end
 -- TODO: a bunch of these characters are actually the wrong ones
 local extra_chars = {
   ["ü"] = 00,
-  ["Ü"] = 00,             -- string_lower doesn't work for these, so we need both
-  ["q"] = 01,
-  ["v"] = 02,
-  ["x"] = 03,
-  ["z"] = 04,
+  ["Ü"] = 00, -- string_lower doesn't work for these, so we need both
+  --["q"] = 01,
+  --["v"] = 02,
+  --["x"] = 03,
+  --["z"] = 04,
   ["ä"] = 05,
   ["Ä"] = 05,
   ["ö"] = 06,
   ["Ö"] = 06,
-  ["?"] = 07,
-  ["."] = 08,
+  --["?"] = 07,
+  --["."] = 08,
   ["á"] = 09,
   ["Á"] = 09,
   ["é"] = 10,
@@ -1646,10 +1681,10 @@ local extra_chars = {
   ["Ě"] = 37,
   ["ç"] = 38,
   ["Ç"] = 38,
-  ["!"] = 39,
+  --["!"] = 39,
   ["_"] = 40,
-  ["-"] = 41,
-  [","] = 42,
+  --["-"] = 41,
+  --[","] = 42,
   [":"] = 43,
   ["~"] = 44, -- use as "fixed camera"
 }
@@ -1677,7 +1712,7 @@ function print_text_ex_hud_font(text, x, y, scale)
         djui_hud_print_text(render, x + space, y, scale);
         space = space + djui_hud_measure_text(render) * scale
         djui_hud_render_texture_tile(EX_HUD_FONT, x + space, y - (3 * scale), scale, scale, (tex % 8) * 32, (tex // 8) *
-        32, 32, 32)
+          32, 32, 32)
         space = space + djui_hud_measure_text(char) * scale
         render = ""
       elseif charSkip > 0 then -- prevent game crash

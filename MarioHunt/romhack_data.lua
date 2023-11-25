@@ -727,7 +727,7 @@ local romhack_data = { -- supported rom hack data
   -- no requirements
   parseStars = true, -- automatically generate star list (this hack is too large I can't be bothered)
   stalk = true, -- the hack is confusing, so let people warp
-  no_bowser = true, -- don't display killing bowser as win condition
+  no_bowser = true, -- default win condition does not involve killing bowser
   ommSupport = false,
 
   star_data = {}, -- filled when parsed
@@ -981,11 +981,7 @@ local romhack_data = { -- supported rom hack data
 
   -- condition is "kill bowser" if any%, or simply "get X stars" otherwise
   runner_victory = function(m)
-    if gGlobalSyncTable.starRun == -1 then
-      return m.action == ACT_JUMBO_STAR_CUTSCENE
-    else
-      return m.numStars >= gGlobalSyncTable.starRun
-    end
+    return m.action == ACT_JUMBO_STAR_CUTSCENE
   end,
 },
 
@@ -1173,7 +1169,7 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
   end
 
   if ROMHACK.parseStars then
-    for course=COURSE_MIN,COURSE_MAX-1 do
+    for course=0,COURSE_MAX-1 do
       parse_course_stars(course, course_to_level[course] or 0)
     end
   end
@@ -1186,6 +1182,7 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
 
   if settingRomHack then
     gGlobalSyncTable.starRun = ROMHACK.default_stars
+    gGlobalSyncTable.noBowser = ROMHACK.no_bowser or false
     gGlobalSyncTable.romhackFile = romhack_file
   end
   return romhack_file
@@ -1193,6 +1190,11 @@ end
 
 -- uses level_script_parse to setup romhack data
 function parse_course_stars(course, level)
+  if level_is_vanilla_level(level) then
+    print(level,"is vanilla",course)
+    ROMHACK.star_data[course] = {}
+    return
+  end
   PARSE_COURSE = course
   PARSE_LEVEL = level
   PARSE_AREA = 1
@@ -1220,7 +1222,7 @@ function parse_course_stars(course, level)
     if (PARSE_FOUND_STARS[i] or (i==7 and course <= 15 and course > 0)) then
       ROMHACK.star_data[course][i] = PARSE_FOUND_STARS[i] or 1 -- 100 coin star is always area 1
 
-      if ROMHACK.starNames == nil or ROMHACK.starNames[course*10+i] == nil then
+      if ROMHACK.starNames[course*10+i] == nil then
         ROMHACK.starNames[course*10+i] = PARSE_STAR_NAMES[course*10+i]
       end
 

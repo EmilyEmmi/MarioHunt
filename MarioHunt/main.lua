@@ -1,4 +1,4 @@
--- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hun\\\\t\\#dcdcdc\\ (v2.31) !
+-- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hun\\\\t\\#dcdcdc\\ (v2.32) !
 -- incompatible: gamemode
 -- description: A gamemode based off of Beyond's concept.\n\nHunters stop Runners from clearing the game!\n\nProgramming by EmilyEmmi, TroopaParaKoopa, Blocky, Sunk, and Sprinter05.\n\nSpanish Translation made with help from KanHeaven and SonicDark.\nGerman Translation made by N64 Mario.\nBrazillian Portuguese translation made by PietroM.\nFrench translation made by Skeltan.\n\n\"Shooting Star Summit\" port by pieordie1
 
@@ -27,6 +27,7 @@ if network_is_server() then
   gGlobalSyncTable.runnerLives = 1      -- the lives runners get (0 is a life)
   gGlobalSyncTable.runTime = 7200       -- time runners must stay in stage to leave (default: 4 minutes)
   gGlobalSyncTable.starRun = 70         -- stars runners must get to face bowser; star doors and infinite stairs will be disabled accordingly
+  gGlobalSyncTable.noBowser = false     -- ignore bowser requirement; only stars are needed
   gGlobalSyncTable.allowSpectate = true -- hunters can spectate
   gGlobalSyncTable.starMode = false     -- use stars collected instead of timer
   gGlobalSyncTable.weak = false         -- cut invincibility frames in half
@@ -78,6 +79,7 @@ gServerSettings.playerInteractions = PLAYER_INTERACTIONS_PVP
 gServerSettings.bubbleDeath = 0
 gServerSettings.skipIntro = 1
 gServerSettings.playerKnockbackStrength = 20
+gServerSettings.enablePlayerList = 1
 -- level settings for better experience
 gLevelValues.visibleSecrets = 1
 gLevelValues.previewBlueCoins = 1
@@ -108,7 +110,7 @@ local deathTimer = 900         -- for extreme mode
 local localPrevCourse = 0      -- for entrance popups
 local lastObtainable = -1      -- doesn't display if it's the same number
 local leader = false           -- if we're winning in minihunt
-local month = 0                -- the current month of the year, for holiday easter eggs
+month = 0                      -- the current month of the year, for holiday easter eggs
 local parkourTimer = 0         -- timer for parkour
 
 OmmEnabled = false             -- is true if using OMM Rebirth
@@ -214,10 +216,13 @@ function do_game_start(data, self)
     save_file_set_using_backup_slot(gGlobalSyncTable.otherSave)
     if (string.lower(msg) == "reset") then -- buggy
       print("did reset")
-      save_file_erase_current_backup_save()
-      save_file_reload(1)
-    elseif wasOtherSave ~= gGlobalSyncTable.otherSave then
-      save_file_reload(1)
+      --save_file_erase_current_backup_save()
+      local file = get_current_save_file_num() - 1
+      for course = 0, 25 do
+        save_file_remove_star_flags(file, course - 1, 0xFF)
+      end
+      save_file_clear_flags(0xFFFFFFFF) -- ALL OF THEM
+      save_file_do_save(file, 1)
     end
   end
 end
@@ -690,14 +695,22 @@ function update()
   end
 
   -- detect victory for runners
-  if gGlobalSyncTable.mhState == 2 and gGlobalSyncTable.mhMode ~= 2 and ROMHACK and ROMHACK.runner_victory and ROMHACK.runner_victory(gMarioStates[0]) then
-    network_send_include_self(true, {
-      id = PACKET_GAME_END,
-      winner = 1,
-    })
-    rejoin_timer = {}
-    gGlobalSyncTable.mhState = 4
-    gGlobalSyncTable.mhTimer = 20 * 30 -- 20 seconds
+  if gGlobalSyncTable.mhState == 2 and gGlobalSyncTable.mhMode ~= 2 then
+    local win = false
+    if gGlobalSyncTable.noBowser then
+      win = gMarioStates[0].numStars >= gGlobalSyncTable.starRun
+    else
+      win = ROMHACK and ROMHACK.runner_victory and ROMHACK.runner_victory(gMarioStates[0])
+    end
+    if win then
+      network_send_include_self(true, {
+        id = PACKET_GAME_END,
+        winner = 1,
+      })
+      rejoin_timer = {}
+      gGlobalSyncTable.mhState = 4
+      gGlobalSyncTable.mhTimer = 20 * 30 -- 20 seconds
+    end
   end
 
   if warpCooldown > 0 then warpCooldown = warpCooldown - 1 end
@@ -863,7 +876,7 @@ function on_course_sync()
     gLevelValues.starHeal = false
 
     save_file_set_using_backup_slot(gGlobalSyncTable.otherSave)
-    save_file_reload(1)
+    --save_file_reload(1)
     if ROMHACK.stalk then
       stalk_command("", true)
       popup_sound(SOUND_GENERAL2_RIGHT_ANSWER)
@@ -1048,12 +1061,18 @@ function load_settings(miniOnly, starOnly)
       end
     end
   end
-  -- special case
+  -- special cases
   if not (miniOnly or starOnly) then
     local fileName = string.gsub(gGlobalSyncTable.romhackFile, " ", "_")
     option = mod_storage_load(fileName)
+    local optionNoBow = mod_storage_load(fileName.."_noBow")
     if option ~= nil and tonumber(option) ~= nil then
       gGlobalSyncTable.starRun = tonumber(option)
+    end
+    if optionNoBow == "true" then
+      gGlobalSyncTable.noBowser = true
+    elseif optionNoBow == "false" then
+      gGlobalSyncTable.noBowser = false
     end
   end
 end
@@ -1085,11 +1104,13 @@ function save_settings()
       end
     end
   end
-  -- special case
+  -- special cases
   option = gGlobalSyncTable.starRun
+  local optionNoBow = gGlobalSyncTable.noBowser
   local fileName = string.gsub(gGlobalSyncTable.romhackFile, " ", "_")
   if fileName ~= "custom" and option ~= nil then
     mod_storage_save(fileName, tostring(option))
+    mod_storage_save(fileName.."_noBow", tostring(optionNoBow))
   end
 end
 
@@ -1187,6 +1208,11 @@ function list_settings()
         value = gGlobalSyncTable[setting]
         if value == -1 then
           value = "\\#5aff5a\\Any%"
+        else
+          value = "\\#ffff5a\\" .. value .. " Star"
+        end
+        if gGlobalSyncTable.noBowser then
+          value = value .. "\\#ff5a5a\\" .. " (No Bowser)"
         end
       end
     elseif (name == "menu_campaign") then -- minihunt campaign
@@ -1320,7 +1346,7 @@ function show_rules()
   elseif (gGlobalSyncTable.starRun) == -1 then
     local bad = ROMHACK["badGuy_" .. lang] or ROMHACK.badGuy or "Bowser"
     runGoal = trans("any_bowser", bad)
-  elseif ROMHACK == nil or ROMHACK.no_bowser ~= true then
+  elseif gGlobalSyncTable.noBowser ~= true then
     local bad = ROMHACK["badGuy_" .. lang] or ROMHACK.badGuy or "Bowser"
     runGoal = trans("collect_bowser", gGlobalSyncTable.starRun, bad)
   else
@@ -1733,6 +1759,24 @@ function remove_color(text, get_color)
   return text
 end
 
+-- stops color text at the limit selected
+function cap_color_text(text, limit)
+  local slash = false
+  local capped_text = ""
+  local chars = 0
+  for i = 1, text:len() do
+    local char = text:sub(i, i)
+    if char == "\\" then
+      slash = not slash
+    elseif not slash then
+      chars = chars + 1
+      if chars > limit then break end
+    end
+    capped_text = capped_text .. char
+  end
+  return capped_text
+end
+
 -- converts hex string to RGB values
 function convert_color(text)
   if text:sub(2, 2) ~= "#" then
@@ -1813,6 +1857,16 @@ function get_custom_star_name(course, starNum)
     end
   end
   if ROMHACK.vagueName then
+    return ("Star " .. starNum)
+  end
+  -- fix garbage data
+  if course == 0 then
+    if starNum < 4 then
+      return "Toad Star " .. starNum
+    else
+      return "Mips Star " .. starNum - 3
+    end
+  elseif course > 15 then
     return ("Star " .. starNum)
   end
   return get_star_name(course, starNum)
@@ -2695,7 +2749,7 @@ function on_interact(m, o, type, value)
     if (np.currLevelNum == LEVEL_BOWSER_1 or np.currLevelNum == LEVEL_BOWSER_2) then -- is a key (stars in bowser levels are technically keys)
       sMario.allowLeave = true
 
-      -- send message
+      -- send message if we don't already have this key
       network_send_include_self(false, {
         id = PACKET_RUNNER_COLLECT,
         runnerID = np.globalIndex,
@@ -3059,9 +3113,7 @@ function on_course_enter()
   if gGlobalSyncTable.mhMode == 2 and gGlobalSyncTable.mhState == 2 then -- unlock cannon and caps in minihunt
     local file = get_current_save_file_num() - 1
     local np = gNetworkPlayers[0]
-    save_file_set_flags(SAVE_FLAG_HAVE_METAL_CAP)
-    save_file_set_flags(SAVE_FLAG_HAVE_VANISH_CAP)
-    save_file_set_flags(SAVE_FLAG_HAVE_WING_CAP)
+    save_file_set_flags(SAVE_FLAG_HAVE_METAL_CAP | SAVE_FLAG_HAVE_VANISH_CAP | SAVE_FLAG_HAVE_WING_CAP)
     save_file_set_star_flags(file, np.currCourseNum, 0x80)
 
     -- for Board Bowser's Sub
