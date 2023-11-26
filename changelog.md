@@ -1,4 +1,8 @@
 # Changelog
+## v2.32 (minor fix)
+### Fixes:
+  - Disabled lobby music on MacOSX to prevent game crash (EmeraldLockdown)
+  - Removed "WIP" from name
 ## v2.32
 ### Additions:
   - Added a new option: "Defeat Bowser". Toggle it off to end the match as soon as the needed Stars are collected. Not available in MiniHunt.
