@@ -151,7 +151,7 @@ function menu_reload()
     { name = ("menu_allow_spectate"), option = GST.allowSpectate,  desc = ("spectator_desc") },
     { name = ("menu_star_mode"),      option = GST.starMode,       desc = ("starmode_desc"),         invalid = (GST.mhMode == 2) },
     { name = ("menu_category"),       currNum = GST.starRun,       maxNum = maxStars,                minNum = (GST.noBowser and 1) or -1, desc = ("category_desc"),     invalid = (GST.mhMode == 2) },
-    { name = ("menu_defeat_bowser"),  option = not GST.noBowser,   invalid = (GST.mhMode == 2 or (ROMHACK and ROMHACK.isUnder)) },
+    { name = ("menu_defeat_bowser"),  option = not GST.noBowser,   invalid = (GST.mhMode == 2 or (ROMHACK and (ROMHACK.no_bowser ~= nil))) },
     { name = ("menu_time"),           currNum = GST.runTime // 30, maxNum = 3600,                    desc = ("time_desc"),                time = true },
     { name = ("menu_auto"),           invalid = (GST.mhMode ~= 2), currNum = auto,                   minNum = -1,                         maxNum = MAX_PLAYERS - 1,     desc = ("auto_desc"),                                        format = { "auto", "~" } },
     { name = ("menu_anarchy"),        currNum = GST.anarchy,       minNum = 0,                       maxNum = 3,                          desc = ("menu_anarchy_desc"), format = { "~", "lang_runners", "lang_hunters", "lang_all" } },
@@ -354,7 +354,7 @@ function action_setup()
         menu_reload()
         menu_enter(marioHuntMenu, currentOption)
       end,
-      [5] = function(option) menu_enter(settingsMenu) end,
+      [5] = function() menu_enter(settingsMenu) end,
       [6] = function()
         halt_command()
         close_menu()

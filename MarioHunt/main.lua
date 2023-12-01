@@ -1,4 +1,4 @@
--- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hun\\\\t\\#dcdcdc\\ (v2.32) !
+-- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hun\\\\t\\#dcdcdc\\ (v2.32.1) !
 -- incompatible: gamemode
 -- description: A gamemode based off of Beyond's concept.\n\nHunters stop Runners from clearing the game!\n\nProgramming by EmilyEmmi, TroopaParaKoopa, Blocky, Sunk, and Sprinter05.\n\nSpanish Translation made with help from KanHeaven and SonicDark.\nGerman Translation made by N64 Mario.\nBrazillian Portuguese translation made by PietroM.\nFrench translation made by Skeltan.\n\n\"Shooting Star Summit\" port by pieordie1
 
@@ -72,9 +72,12 @@ if network_is_server() then
   gGlobalSyncTable.forceSpectate = false -- force all players to spectate unless otherwise stated
 end
 
-if get_os_name() ~= "Mac OSX" then -- bandaid fix for macOS.
-  smlua_audio_utils_replace_sequence(0x53, 0x25, 65, "Shooting_Star_Summit") -- for lobby; hopefully there's no conflicts
+if get_os_name() ~= "Mac OSX" then -- replacing sequnce past 0x47 crashes the game on mac
+  custom_seq = 0x53
+else
+  custom_seq = 0x41
 end
+smlua_audio_utils_replace_sequence(custom_seq, 0x25, 65, "Shooting_Star_Summit") -- for lobby; hopefully there's no conflicts
 
 -- force pvp, knockback, skip intro, and no bubble death
 gServerSettings.playerInteractions = PLAYER_INTERACTIONS_PVP
@@ -112,11 +115,12 @@ local deathTimer = 900         -- for extreme mode
 local localPrevCourse = 0      -- for entrance popups
 local lastObtainable = -1      -- doesn't display if it's the same number
 local leader = false           -- if we're winning in minihunt
+local scoreboard = {}           -- table of everyone's score
 month = 0                      -- the current month of the year, for holiday easter eggs
 local parkourTimer = 0         -- timer for parkour
 
 OmmEnabled = false             -- is true if using OMM Rebirth
-ACT_OMM_GRAB_STAR = 1073746688 -- the grab star action in OMM Rebirth (might change with updates, idk)
+local ACT_OMM_STAR_DANCE = nil -- the grab star action in OMM Rebirth (might change with updates, idk)
 local ommStarID = nil          -- the object id of the star we got; for OMM
 local ommStar = nil            -- what star we just got; for omm (gotStar is set to nil earlier)
 local ommRenameTimer = 0       -- after someone gets the same kind of star, there is a timer until someone can have their star renamed on their end
@@ -146,18 +150,18 @@ end
 -- handle game starting (all players)
 function do_game_start(data, self)
   save_settings()
-  omm_disable_non_stop_mode(gGlobalSyncTable.mhMode == 2) -- change non stop mode setting for minihunt
+  omm_disable_mode_for_minihunt(gGlobalSyncTable.mhMode == 2) -- change non stop mode setting for minihunt
   menu = false
   showingStats = false
-  local msg = data.cmd or ""
+  local cmd = data.cmd or ""
 
   if gGlobalSyncTable.mhMode == 2 then
     gGlobalSyncTable.mhState = 2
 
-    if string.lower(msg) ~= "continue" then
+    if string.lower(cmd) ~= "continue" then
       gGlobalSyncTable.mhTimer = gGlobalSyncTable.runTime or 0
     end
-  elseif string.lower(msg) ~= "continue" then
+  elseif string.lower(cmd) ~= "continue" then
     deathTimer = 1830                  -- start with 60 seconds
     gGlobalSyncTable.mhState = 1
     gGlobalSyncTable.mhTimer = 15 * 30 -- 15 seconds
@@ -168,15 +172,15 @@ function do_game_start(data, self)
   end
 
   if network_is_server() and gGlobalSyncTable.mhMode == 2 then
-    if tonumber(msg) ~= nil and tonumber(msg) > 0 and (tonumber(msg) % 1 == 0) then
-      gGlobalSyncTable.campaignCourse = tonumber(msg)
+    if tonumber(cmd) ~= nil and tonumber(cmd) > 0 and (tonumber(cmd) % 1 == 0) then
+      gGlobalSyncTable.campaignCourse = tonumber(cmd)
     else
       gGlobalSyncTable.campaignCourse = 0
     end
     random_star(nil, gGlobalSyncTable.campaignCourse)
   end
 
-  if string.lower(msg) ~= "continue" then
+  if string.lower(cmd) ~= "continue" then
     local m = gMarioStates[0]
     m.health = 0x880
     SVcln = nil
@@ -189,6 +193,7 @@ function do_game_start(data, self)
     local sMario = gPlayerSyncTable[0]
     sMario.totalStars = 0
     leader = false
+    scoreboard = {}
     if sMario.team == 1 then
       sMario.runnerLives = gGlobalSyncTable.runnerLives
       sMario.runTime = 0
@@ -208,15 +213,14 @@ function do_game_start(data, self)
 
     warp_beginning()
 
-    local wasOtherSave = gGlobalSyncTable.otherSave
-    if (string.lower(msg) == "main") then
+    if (string.lower(cmd) == "main") then
       gGlobalSyncTable.otherSave = false
-    elseif (string.lower(msg) == "alt") or (string.lower(msg) == "reset") then
+    elseif (string.lower(cmd) == "alt") or (string.lower(cmd) == "reset") then
       gGlobalSyncTable.otherSave = true
     end
     gGlobalSyncTable.bowserBeaten = false
     save_file_set_using_backup_slot(gGlobalSyncTable.otherSave)
-    if (string.lower(msg) == "reset") then -- buggy
+    if (string.lower(cmd) == "reset") then
       print("did reset")
       --save_file_erase_current_backup_save()
       local file = get_current_save_file_num() - 1
@@ -646,24 +650,29 @@ function new_runner(includeLocal)
   local closestDist = 0
 
   -- get current hunters
+  local runnerCount = 0
   for i = startingI, (MAX_PLAYERS - 1) do
     local np = gNetworkPlayers[i]
     local sMario = gPlayerSyncTable[i]
-    if np.connected and sMario.team ~= 1 and sMario.spectator ~= 1 then
-      table.insert(currHunterIDs, np.localIndex)
-      if (not includeLocal) and is_player_active(gMarioStates[i]) ~= 0 then -- give to closest mario
-        local dist = dist_between_objects(gMarioStates[i].marioObj, gMarioStates[0].marioObj)
-        if closest == -1 or dist < closestDist then
-          closestDist = dist
-          closest = i
+    if np.connected and sMario.spectator ~= 1 then
+      if sMario.team ~= 1 then
+        table.insert(currHunterIDs, np.localIndex)
+        if (not includeLocal) and is_player_active(gMarioStates[i]) ~= 0 then -- give to closest mario
+          local dist = dist_between_objects(gMarioStates[i].marioObj, gMarioStates[0].marioObj)
+          if closest == -1 or dist < closestDist then
+            closestDist = dist
+            closest = i
+          end
         end
+      else
+        runnerCount = runnerCount + 1
       end
     end
   end
   if #currHunterIDs < 1 then
     if not includeLocal then
-      if gGlobalSyncTable.mhMode == 2 then -- singleplayer minihunt
-        gGlobalSyncTable.mhTimer = 1       -- end game
+      if gGlobalSyncTable.mhMode == 2 and runnerCount == 0 then -- singleplayer minihunt
+        gGlobalSyncTable.mhTimer = 1 -- end game
         return nil
       else
         return gNetworkPlayers[0].globalIndex
@@ -683,10 +692,10 @@ function new_runner(includeLocal)
   return np.globalIndex
 end
 
-function omm_disable_non_stop_mode(disable)
+function omm_disable_mode_for_minihunt(disable)
   if OmmEnabled then
     gLevelValues.disableActs = not disable
-    return _G.OmmApi.omm_disable_feature("trueNonStop", disable)
+    _G.OmmApi.omm_disable_feature("trueNonStop", disable)
   end
 end
 
@@ -818,9 +827,10 @@ function on_course_sync()
       _G.OmmApi.omm_resolve_cappy_mario_interaction = omm_attack
       _G.OmmApi.omm_allow_cappy_mario_interaction = omm_allow_attack
       _G.OmmApi.omm_disable_feature("lostCoins", true)
-      _G.OmmApi.omm_force_setting_value("player", 2)
-      _G.OmmApi.omm_force_setting_value("damage", 20)
-      _G.OmmApi.omm_force_setting_value("bubble", 0)
+      _G.OmmApi.omm_force_setting("player", 2)
+      _G.OmmApi.omm_force_setting("damage", 20)
+      _G.OmmApi.omm_force_setting("bubble", 0)
+      ACT_OMM_STAR_DANCE = _G.OmmApi.ACT_OMM_STAR_DANCE
     end
     if gGlobalSyncTable.romhackFile == "vanilla" then
       omm_replace(OmmEnabled)
@@ -965,6 +975,7 @@ function on_course_sync()
     -- start out as hunter
     become_hunter(sMario)
     sMario.totalStars = 0
+    leader, scoreboard = calculate_placement()
     sMario.pause = gGlobalSyncTable.pause or false
     sMario.forceSpectate = gGlobalSyncTable.forceSpectate or false
     sMario.fasterActions = (mod_storage_load("fasterActions") ~= "false")
@@ -977,7 +988,7 @@ function on_course_sync()
       set_lobby_music(month)
       --play_music(0, custom_seq, 1)
     end
-    omm_disable_non_stop_mode(gGlobalSyncTable.mhMode == 2) -- change non stop mode setting for minihunt
+    omm_disable_mode_for_minihunt(gGlobalSyncTable.mhMode == 2) -- change non stop mode setting for minihunt
 
     menu_reload()
     action_setup()
@@ -1112,7 +1123,9 @@ function save_settings()
   local fileName = string.gsub(gGlobalSyncTable.romhackFile, " ", "_")
   if fileName ~= "custom" and option ~= nil then
     mod_storage_save(fileName, tostring(option))
-    mod_storage_save(fileName.."_noBow", tostring(optionNoBow))
+    if (ROMHACK == nil or ROMHACK.no_bowser == nil) and (optionNoBow or mod_storage_load(fileName.."_noBow")) then
+      mod_storage_save(fileName.."_noBow", tostring(optionNoBow))
+    end
   end
 end
 
@@ -1538,7 +1551,7 @@ function on_hud_render()
   local screenWidth = djui_hud_get_screen_width()
   local width = djui_hud_measure_text(remove_color(text)) * scale
   if width > screenWidth - 10 then -- shrink to fit
-    scale = scale / (width / (screenWidth - 10))
+    scale = scale * (screenWidth - 10) / width
     width = screenWidth - 10
   end
 
@@ -1609,9 +1622,8 @@ function on_hud_render()
     end
   end
 
-  -- star name for minihunt
+  -- star name + scoreboard for minihunt
   if gGlobalSyncTable.mhMode == 2 and gGlobalSyncTable.mhState == 2 then
-    local np = gNetworkPlayers[0]
     text = get_custom_star_name(level_to_course[gGlobalSyncTable.gameLevel] or 0, gGlobalSyncTable.getStar)
     width = djui_hud_measure_text(text) * scale
     local screenHeight = djui_hud_get_screen_height()
@@ -1623,6 +1635,104 @@ function on_hud_render()
 
     djui_hud_set_color(255, 255, 255, 255);
     djui_hud_print_text(text, x, y, scale);
+
+    -- render the scoreboard
+    --[[scoreboard = {}
+    for i=1,16 do
+      table.insert(scoreboard, {0, 2})
+    end
+    table.insert(scoreboard, {0, 1})]]
+    if #scoreboard > 0 then
+      local place = 0
+      local scores = {}
+      local maxWidthTable = {0, 0, 0}
+      local lastScore = 0
+      local sameScoreCounter = 1
+
+      for i,scoreTable in ipairs(scoreboard) do
+        local index = scoreTable[1]
+        local score = scoreTable[2]
+        local placeText = ""
+        local nameText = ""
+
+        local np = gNetworkPlayers[index]
+        if np.connected then
+          if score == lastScore then
+            sameScoreCounter = sameScoreCounter + 1
+          else
+            place = place + sameScoreCounter
+            sameScoreCounter = 1
+            lastScore = score
+          end
+          local playerColor = network_get_player_text_color_string(np.localIndex)
+          nameText = nameText .. playerColor .. np.name
+          nameText = cap_color_text(nameText, 16)
+
+          nameText = nameText .. ":  "
+
+          -- Generate place text (ordinal number rules)
+          local digit = place % 10
+          -- for German, we can skip this whole check because it's just the number
+          -- for French, every number other than 1st follows the same pattern
+          if lang == "de" or (place > 10 and (place < 20 or lang == "fr")) then
+            placeText = trans("place_score",place)
+          elseif digit == 1 then
+            placeText = trans("place_score_1",place)
+          elseif digit == 2 then
+            placeText = trans("place_score_2",place)
+          elseif digit == 3 then
+            placeText = trans("place_score_3",place)
+          else
+            placeText = trans("place_score",place)
+          end
+
+          -- Gold, silver, and bronze
+          if place == 1 then
+            placeText = "\\#e3bc2d\\"..placeText.."\\ffffff\\"
+          elseif place == 2 then
+            placeText = "\\#c5d8de\\"..placeText.."\\ffffff\\"
+          elseif place == 3 then
+            placeText = "\\#b38752\\"..placeText.."\\ffffff\\"
+          end
+
+          placeText = placeText .. ": "
+
+          local scoreText = tostring(score)
+          if index == 0 then
+            scoreText = "\\#ffff5a\\"..scoreText
+          end
+
+          table.insert(scores, {placeText, nameText, scoreText})
+          for i,text in ipairs(scores[#scores]) do
+            local tWidth = djui_hud_measure_text(remove_color(text))
+            if tWidth > maxWidthTable[i] then
+              maxWidthTable[i] = tWidth
+            end
+          end
+        end
+      end
+
+      scale = 0.25
+      x = 5
+      y = (screenHeight - 32 * #scores * scale) * 0.5
+      if y < 32 then -- shrink to fit
+        scale = (screenHeight - 64)/(32*#scores)
+        y = 32
+      end
+      width = (maxWidthTable[1] + maxWidthTable[2] + maxWidthTable[3]) * scale
+      djui_hud_set_color(0, 0, 0, 128);
+      djui_hud_render_rect(x - 5, y, width + 10, #scores * 32 * scale);
+
+      for a,textTable in ipairs(scores) do
+        for b,text in ipairs(textTable) do
+          djui_hud_set_color(255, 255, 255, 255)
+          djui_hud_print_text_with_color(text, x, y, scale)
+          x = x + maxWidthTable[b] * scale
+        end
+        y = y + 32 * scale
+        x = 5
+      end
+    end
   elseif showSpeedrunTimer and gGlobalSyncTable.mhMode ~= 2 then
     local miliseconds = math.floor(gGlobalSyncTable.speedrunTimer / 30 % 1 * 100)
     local seconds = gGlobalSyncTable.speedrunTimer // 30 % 60
@@ -2120,6 +2230,7 @@ local faster_actions = {
 }
 
 -- based off of example
+---@param m MarioState
 function mario_update(m)
   if not didFirstJoinStuff then return end
 
@@ -2236,7 +2347,7 @@ function mario_update(m)
         sMario.runnerLives = data.lives
       end
       sMario.totalStars = data.stars or 0
-      leader = calculate_leader()
+      leader,scoreboard = calculate_placement()
       global_popup_lang("rejoin_success", data.name, nil, 1)
       rejoin_timer[discordID] = nil
     end
@@ -2262,8 +2373,13 @@ function mario_update(m)
         djui_chat_message_create(text)
 
         local ref = "parkourRecord"
-        if OmmEnabled then ref = "parkourRecordOmm" end
+        if OmmEnabled then ref = "pRecordOmm" end
         local record = mod_storage_load(ref)
+
+        if (not record) and OmmEnabled then
+          record = mod_storage_load("parkourRecordOmm")
+        end
+
         if tonumber(record) == nil or tonumber(record) > time then
           play_star_fanfare()
           djui_chat_message_create(trans("new_record"))
@@ -2368,7 +2484,7 @@ function mario_update(m)
 
   -- Rename stars in OMM (I'm trying my best to correct desync issues)
   if OmmEnabled and m.playerIndex == 0 and ommStarID then
-    if (m.action == ACT_OMM_GRAB_STAR and m.actionTimer == 35) then
+    if (m.action == ACT_OMM_STAR_DANCE and m.actionTimer == 35) then
       network_send(true, {
         id = PACKET_OMM_STAR_RENAME,
         act = ommStar,
@@ -2440,7 +2556,7 @@ function runner_update(m, sMario)
   -- invincibility timers for certain actions
   local runner_invincible = {
     [ACT_PICKING_UP_BOWSER] = 90, -- 3 seconds
-    [ACT_RELEASING_BOWSER] = 10,
+    [ACT_RELEASING_BOWSER] = 20,
     [ACT_READING_NPC_DIALOG] = 30,
     [ACT_READING_AUTOMATIC_DIALOG] = 30,
     [ACT_READING_SIGN] = 20,
@@ -2454,8 +2570,12 @@ function runner_update(m, sMario)
     [ACT_SPAWN_NO_SPIN_LANDING] = 100,
     [ACT_IN_CANNON] = 10,
     [ACT_PICKING_UP] = 10,    -- can't differentiate if this is a heavy object
-    [ACT_OMM_GRAB_STAR] = 40, -- the action is 80 frames long
+    
   }
+  if ACT_OMM_STAR_DANCE then
+    runner_invincible[ACT_OMM_STAR_DANCE] = 40 -- the action is 80 frames long
+  end
+
   local runner_camping = {
     [ACT_READING_NPC_DIALOG] = 1,
     [ACT_READING_AUTOMATIC_DIALOG] = 1,
@@ -2498,7 +2618,7 @@ function runner_update(m, sMario)
   if (sMario.hard == 1) and m.health > 0x400 then
     m.health = 0x400
     if m.playerIndex == 0 then deathTimer = 900 end
-  elseif (sMario.hard == 2) or leader then -- extreme mode
+  elseif (sMario.hard == 2) or (leader and gGlobalSyncTable.firstTimer) then -- extreme mode
     if (sMario.hard == 2) then
       if m.health > 0xFF and ((m.hurtCounter <= 0 and m.action ~= ACT_BURNING_FALL and m.action ~= ACT_BURNING_GROUND and m.action ~= ACT_BURNING_JUMP) or (m.healCounter > 0 and m.action == ACT_LAVA_BOOST)) then
         m.health = 500
@@ -2554,6 +2674,7 @@ function runner_update(m, sMario)
           level = np.currLevelNum,
           course = np.currCourseNum,
           area = np.currAreaIndex,
+          noSound = (m.action == ACT_OMM_STAR_DANCE),
         })
 
         if (sMario.hard == 2 or leader) then deathTimer = deathTimer + 300 end
@@ -2750,6 +2871,13 @@ function on_interact(m, o, type, value)
     local np = gNetworkPlayers[m.playerIndex]
     if (np.currLevelNum == LEVEL_BOWSER_1 or np.currLevelNum == LEVEL_BOWSER_2) then -- is a key (stars in bowser levels are technically keys)
       sMario.allowLeave = true
+
+      -- don't display message if the door is unlocked (doesn't apply when key is held because the flag gets set before this runs)
+      if np.currCourseNum == COURSE_BITDW and ((save_file_get_flags() & (SAVE_FLAG_UNLOCKED_BASEMENT_DOOR)) ~= 0) then
+        return 0
+      elseif np.currCourseNum == COURSE_BITFS and ((save_file_get_flags() & (SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)) ~= 0) then
+        return 0
+      end
 
       -- send message if we don't already have this key
       network_send_include_self(false, {
@@ -3111,7 +3239,7 @@ function on_course_enter()
     --play_music(0, custom_seq, 1)
   end
 
-  omm_disable_non_stop_mode(gGlobalSyncTable.mhMode == 2)                -- change non stop mode setting for minihunt
+  omm_disable_mode_for_minihunt(gGlobalSyncTable.mhMode == 2)                -- change non stop mode setting for minihunt
   if gGlobalSyncTable.mhMode == 2 and gGlobalSyncTable.mhState == 2 then -- unlock cannon and caps in minihunt
     local file = get_current_save_file_num() - 1
     local np = gNetworkPlayers[0]
@@ -3136,32 +3264,61 @@ function on_course_enter()
   end
 end
 
--- recalculate leader in minihunt
-function calculate_leader()
-  if gGlobalSyncTable.mhMode ~= 2 or gGlobalSyncTable.firstTimer == false then
-    return false
+-- calculates all player's placements in minihunt
+function calculate_placement()
+  local leader = false
+  local foundOne = false
+  local scoreboard = {}
+  
+  if gGlobalSyncTable.mhMode ~= 2 then
+    return false,scoreboard
   end
+
   local toBeat = gPlayerSyncTable[0].totalStars
-  if toBeat < 1 then return false end
+  if toBeat > 0 then
+    leader = true
+    table.insert(scoreboard, {0, toBeat})
+  end
+
   for i = 1, MAX_PLAYERS - 1 do
-    if gNetworkPlayers[i].connected and gPlayerSyncTable[i].totalStars and gPlayerSyncTable[i].totalStars > toBeat then
-      return false
+    if gNetworkPlayers[i].connected then
+      if gPlayerSyncTable[i].spectator ~= 1 then
+        foundOne = true
+      end
+      if gPlayerSyncTable[i].totalStars and gPlayerSyncTable[i].totalStars ~= 0 then
+        if gPlayerSyncTable[i].totalStars > toBeat then
+          leader = false
+        end
+        table.insert(scoreboard, {i, gPlayerSyncTable[i].totalStars})
+      end
     end
   end
-  return true
+
+  if not foundOne then
+    return false,{}
+  end
+
+  -- sort
+  if #scoreboard > 1 then
+    table.sort(scoreboard, function(a, b)
+      return a[2] > b[2]
+    end)
+  end
+
+  return leader, scoreboard
 end
 
 function on_packet_runner_collect(data, self)
   runnerID = data.runnerID
   if runnerID ~= nil then
-    leader = calculate_leader()
+    leader,scoreboard = calculate_placement()
     local np = network_player_from_global_index(runnerID)
     local playerColor = network_get_player_text_color_string(np.localIndex)
     local place = get_custom_level_name(data.course, data.level, data.area)
     if data.star ~= nil then -- star
       local name = get_custom_star_name(data.course, data.star)
 
-      if not self then
+      if (not self) and data.noSound ~= true then
         popup_sound(SOUND_MENU_STAR_SOUND)
       end
 
@@ -3302,6 +3459,7 @@ function on_game_end(data, self)
     local weWon = true
     local singlePlayer = true
     local record = false
+    local totalStarsAcrossAll = 0
     for i = 0, (MAX_PLAYERS - 1) do
       local sMario = gPlayerSyncTable[i]
       local np = gNetworkPlayers[i]
@@ -3320,15 +3478,18 @@ function on_game_end(data, self)
         singlePlayer = false
       end
 
-      if np.connected and sMario.totalStars ~= nil and sMario.totalStars >= winCount then
-        local playerColor = network_get_player_text_color_string(np.localIndex)
-        local name = playerColor .. np.name
-        if sMario.totalStars == winCount then
-          table.insert(winners, name)
-        else
-          winners = { name }
-          winCount = sMario.totalStars
-          if i ~= 0 then weWon = false end
+      if np.connected and sMario.totalStars ~= nil then
+        totalStarsAcrossAll = totalStarsAcrossAll + sMario.totalStars
+        if sMario.totalStars >= winCount then
+          local playerColor = network_get_player_text_color_string(np.localIndex)
+          local name = playerColor .. np.name
+          if sMario.totalStars == winCount then
+            table.insert(winners, name)
+          else
+            winners = { name }
+            winCount = sMario.totalStars
+            if i ~= 0 then weWon = false end
+          end
         end
       end
     end
@@ -3464,18 +3625,21 @@ end
 
 -- for global popups, so it appears in their language
 function global_popup_lang(langID, format, format2_, lines)
-  network_send_include_self(false, {
+  network_send(false, {
     id = PACKET_LANG_POPUP,
     langID = langID,
     format = format,
     format2 = format2_,
     lines = lines,
   })
+  djui_popup_create(trans(langID, format, format2_), lines)
 end
 
 function on_packet_lang_popup(data, self)
   djui_popup_create(trans(data.langID, data.format, data.format2), data.lines)
-  leader = calculate_leader()
+  if data.langID == "rejoin_success" then
+    leader,scoreboard = calculate_placement()
+  end
 end
 
 -- popup for this player's role changing

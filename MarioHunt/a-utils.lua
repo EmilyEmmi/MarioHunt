@@ -114,6 +114,7 @@ function start_game(msg)
       runners = runners + 1
     end
   end
+
   if runners < 1 then
     if gGlobalSyncTable.mhMode ~= 2 then
       djui_chat_message_create(trans("error_no_runners"))
@@ -137,10 +138,8 @@ function start_game(msg)
     end
   end
 
-  local cmd = "none"
-  if msg ~= nil and msg ~= "" then
-    cmd = msg
-  end
+  local cmd = msg
+  if cmd == "" then cmd = "none" end
   network_send_include_self(true, {
     id = PACKET_MH_START,
     cmd = cmd,
@@ -471,7 +470,7 @@ function change_game_mode(msg,mode)
       gGlobalSyncTable.mhTimer = 0
     end
     
-    omm_disable_non_stop_mode(false)
+    omm_disable_mode_for_minihunt(false)
   elseif mode == 1 or string.lower(msg) == "switch" then
     gGlobalSyncTable.mhMode = 1
 
@@ -487,7 +486,7 @@ function change_game_mode(msg,mode)
       gGlobalSyncTable.mhTimer = 0
     end
     
-    omm_disable_non_stop_mode(false)
+    omm_disable_mode_for_minihunt(false)
   elseif mode == 2 or string.lower(msg) == "mini" then
     local np = gNetworkPlayers[0]
     gGlobalSyncTable.mhMode = 2
@@ -500,7 +499,7 @@ function change_game_mode(msg,mode)
 
     gGlobalSyncTable.gameLevel = np.currLevelNum
     gGlobalSyncTable.getStar = np.currActNum
-    omm_disable_non_stop_mode(true)
+    omm_disable_mode_for_minihunt(true)
   else
     return false
   end
@@ -548,7 +547,6 @@ function mod_storage_save_fix_bug(key, value_)
   local value = value_
   local old = mod_storage_load(key)
   if old ~= nil then
-    print(old)
     while string.len(old) - 4 > string.len(value) do
       old = string.sub(old,1,-5)
       mod_storage_save(key, old)
@@ -590,7 +588,7 @@ end
 
 function set_lobby_music(month)
   if month ~= 10 and month ~= 12 then
-    set_background_music(0,0x53,0)
+    set_background_music(0,custom_seq,0)
   elseif month == 10 then
     set_background_music(0,SEQ_LEVEL_SPOOKY,0)
   else
@@ -605,4 +603,9 @@ end
 
 function is_zero(int)
   return (int == 0 and 1) or 0
+end
+
+-- linear interpolation
+function lerp(a, b, t)
+  return a * (1-t) + b * t
 end

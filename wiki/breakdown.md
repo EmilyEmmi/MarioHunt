@@ -154,7 +154,7 @@ Princess Peach's Castle. Unfortunatly, the Toads and Princess Peach have been se
 
 If you've read the [advice page](advice.md), you'll know how dangerous this castle is. Luckily, there's some special techniques you can use to gain the upper hand.
 
-### Painting/Victory Skip
+### Painting Skip
 By pausing right before entering a painting, then unpausing, you can skip the transition to get into levels faster. Remember that this only works for paintings; other kinds of warps, like for the Secret Aquarium, won't work.
 
 ### Exiting Course

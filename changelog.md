@@ -1,7 +1,21 @@
 # Changelog
+## v2.33
+### Addition:
+  - Added leaderboard during MiniHunt!
+### Adjustments:
+  - Increased grace period after throwing Bowser
+  - **API CHANGE:** *no_bowser* now FORCES the default option for the Defeat Bowser value.
+  - "Leader Death Timer" no longer applies while playing solo
+### Fixes:
+  - Fixed lobby music on Mac OSX(?)
+  - Fixed star popup sound playing twice in OMM
+  - Fixed OMM Rebirth v1.2 not being compatible
+  - Fixed playing with all Runners being mistaken for Solo mode
+  - Fixed many spectate-related issues, such as being able to throw Cappy
+  - Fixed Leader Death Timer option not disabling immediately when disabled mid-game
 ## v2.32 (minor fix)
 ### Fixes:
-  - Disabled lobby music on MacOSX to prevent game crash (EmeraldLockdown)
+  - Disabled lobby music on Mac OSX to prevent game crash (EmeraldLockdown)
   - Removed "WIP" from name
 ## v2.32
 ### Additions:

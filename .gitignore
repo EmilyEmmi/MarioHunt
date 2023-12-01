@@ -5,4 +5,5 @@
 *.json
 MarioHunt/actors/demon/
 MarioHunt/levels/lobby/
-MarioHunt/skybox
+MarioHunt/skybox/
+unobs/

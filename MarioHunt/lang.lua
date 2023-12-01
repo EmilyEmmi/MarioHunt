@@ -337,6 +337,10 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   place_2 = "\\#c5d8de\\[2nd Place]",
   place_3 = "\\#b38752\\[3rd Place]",
   place = "\\#e7a1ff\\[%dth Place]", -- thankfully we don't go up to 21
+  place_score_1 = "%dst",
+  place_score_2 = "%dnd",
+  place_score_3 = "%drd",
+  place_score = "%dth",
 
   -- chat roles
   role_lead = "\\#9a96ff\\[Lead MH Dev]",
@@ -397,6 +401,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_save_continue = "Continue (no warping back)",
   menu_random = "Random",
   menu_campaign = "Campaign",
+  menu_coop = "Coop",
 
   menu_gamemode = "Gamemode",
   menu_metal = "Seeker Appearence",
@@ -724,6 +729,10 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   place_2 = "\\#c5d8de\\[2do Lugar]",
   place_3 = "\\#b38752\\[3er Lugar]",
   place = "\\#e7a1ff\\[%do Lugar]", -- thankfully we don't go up to 21
+  place_score_1 = "%der",
+  place_score_2 = "%ddo",
+  place_score_3 = "%der",
+  place_score = "%do",
 
   -- command descriptions
   page = "\\#ffff5a\\Página %d/%d", -- page for mariohunt command
@@ -1079,6 +1088,10 @@ langdata["de"] = -- by N64 Mario
   place_2 = "\\#c5d8de\\[Platz 2]",
   place_3 = "\\#b38752\\[Platz 3]",
   place = "\\#e7a1ff\\[Platz %d]", -- thankfully we don't go up to 21
+  place_score_1 = "%d",
+  place_score_2 = "%d",
+  place_score_3 = "%d",
+  place_score = "%d",
 
   -- command descriptions
   start_desc = "[CONTINUE|MAIN|ALT|RESET] - Startet das Spiel; Fügen sie \"continue\" hinzu, um um nicht zum Anfang teleportiert zu werden; Fügen sie \"alt\" hinzu, für einen Alternativen Speicherstand; Fügen sie \"main\" hinzu, für die Hauptspeicher Datei",
@@ -1480,6 +1493,10 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   place_2 = "\\#c5d8de\\[2ndo Lugar]",
   place_3 = "\\#b38752\\[3ro Lugar]",
   place = "\\#e7a1ff\\[%do Lugar]", -- thankfully we don't go up to 21
+  place_score_1 = "%dro",
+  place_score_2 = "%dndo",
+  place_score_3 = "%dro",
+  place_score = "%do",
 
   -- command descriptions
   start_desc = "[CONTINUE|MAIN|ALT|RESET] - Inicia a rodada; adicione \"continue\" para que não seja teleportado para o início; adicione \"alt\" para uma save file alternativa (bugado); adicione \"main\" para a save file principal; adicione \"reset\" para resetar a sua save file (bugado)",
@@ -1914,6 +1931,10 @@ langdata["fr"] = -- By Skeltan
   place_2 = "\\#c5d8de\\[2ème Place]",
   place_3 = "\\#b38752\\[3ème Place]",
   place = "\\#e7a1ff\\[%dème Place]", -- thankfully we don't go up to 21
+  place_score_1 = "%dère",
+  place_score_2 = "%dème",
+  place_score_3 = "%dème",
+  place_score = "%dème",
 
   -- chat roles
   role_lead = "\\#9a96ff\\[Dev Principal MH]",

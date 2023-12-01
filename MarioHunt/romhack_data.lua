@@ -618,6 +618,7 @@ local romhack_data = { -- supported rom hack data
   default_stars = 30,
   max_stars = 30,
   ommSupport = false, -- does not have default omm support
+  no_bowser = false, -- can't disable
   badGuy = "The Shitilizer", -- this will display in the rules
   badGuy_es = "El Shitilizer",
   badGuy_de = "Den Shitilizer",
@@ -727,7 +728,6 @@ local romhack_data = { -- supported rom hack data
   -- no requirements
   parseStars = true, -- automatically generate star list (this hack is too large I can't be bothered)
   stalk = true, -- the hack is confusing, so let people warp
-  no_bowser = true, -- default win condition does not involve killing bowser
   ommSupport = false,
 
   star_data = {}, -- filled when parsed
@@ -1034,10 +1034,6 @@ local romhack_data = { -- supported rom hack data
   },
 
   mini_exclude = {}, -- none!
-
-  runner_victory = function(m)
-    return m.numStars >= gGlobalSyncTable.starRun
-  end,
 },
 
 default = {

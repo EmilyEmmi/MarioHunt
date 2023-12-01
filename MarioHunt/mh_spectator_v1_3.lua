@@ -3,12 +3,10 @@
 
 --E_MODEL_MARIO = smlua_model_util_get_id("mario_geo")
 
-ACT_SPECTATE = allocate_mario_action(ACT_FLAG_IDLE)
-ACT_SPECTATE_UW = allocate_mario_action(ACT_GROUP_SUBMERGED | ACT_FLAG_SWIMMING | ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_WATER_OR_TEXT) -- this isn't even used for the pause anymore lol
+ACT_SPECTATE = allocate_mario_action(ACT_GROUP_CUTSCENE)
 function nothing(m) -- guess what this does
 end
 hook_mario_action(ACT_SPECTATE, nothing)
-hook_mario_action(ACT_SPECTATE_UW, nothing)
 
 local Rmax = MAX_PLAYERS
 
@@ -142,11 +140,7 @@ function mario_update_local(m)
         MSP.marioObj.oIntangibleTimer = -1
         MSP.health = 0x880
 
-        if MSP.waterLevel < MSP.pos.y then
-          set_mario_action(MSP, ACT_SPECTATE, 0)
-        else
-          set_mario_action(MSP, ACT_SPECTATE_UW, 0)
-        end
+        set_mario_action(MSP, ACT_SPECTATE, 0)
 
         if free_camera == 0 then
             MSP.freeze = -1
