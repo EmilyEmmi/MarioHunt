@@ -3,7 +3,9 @@ These likely won't be necessary, since the menu exists now. However, I have kept
 
 Important commands are in bold. All commands are moderator, host, or MarioHunt developer only. If you are still confused, read the wiki [here](wiki/home.md)
 
-**/mh**: Displays command list. Add a number to go to a certain page. Do /mh [COMMAND] to run the specified command. Do /mh [COMMAND] [PARAMETER] to add parameters.
+**/mh**: Displays command list. Add a number to go to a certain page. Do /mh [COMMAND] to run the specified command. Do /mh [COMMAND] [PARAMETER] to add parameters. If nothing is entered, the menu will be opened.
+
+**/mh help** [NUM|COMMAND]: Browse available commands. Enter a page number, or a specific command to get information about that command.
 
 **/mh start** [CONTINUE|MAIN|ALT|RESET] - Starts the game. Must have at least 1 runner. Add "continue" to skip timer sequence, add "main" to use main save file, add "alt" to use alt save file (buggy), and add "reset" to reset the alt save file (also buggy).
 
@@ -17,7 +19,7 @@ Important commands are in bold. All commands are moderator, host, or MarioHunt d
 
 /mh stars [NUM] - For Star Mode, sets amount of stars runners need to get to leave a course.
 
-/mh category [INT] - Sets number of stars runners need to collect total. Changing this opens doors, disables infinite stairs, etc.
+/mh category [INT] - Sets number of stars runners need to collect total. Changing this opens doors, disables infinite stairs, etc. To set this to any%, enter "any" or -1.
 
 **/mh flip [NAME|ID]** - Switches team of specified player (or yourself if not specified).
 
@@ -25,7 +27,7 @@ Important commands are in bold. All commands are moderator, host, or MarioHunt d
 
 /mh leave [NAME|ID] - Lets the specified player leave the course (or yourself if not specified).
 
-**/mh mode [NORMAL|SWITCH|MINI]** - Change game mode. In Runner Switch mode, when a runner is defeated, a random hunter becomes a runner. MiniHunt is a new gamemode described in the [wiki](wiki/home.md).
+**/mh mode [NORMAL|SWAP|MINI]** - Change game mode. In Runner Switch mode, when a runner is defeated, a random hunter becomes a runner. MiniHunt is a new gamemode described in the [wiki](wiki/home.md).
 
 /mh starmode [ON|OFF] - Toggles using stars to leave a stage as opposed to the timer, like in the old days of MarioHunt.
 
@@ -49,11 +51,15 @@ Important commands are in bold. All commands are moderator, host, or MarioHunt d
 
 /mh blacklist [ADD|REMOVE|LIST|RESET|SAVE|RESET,COURSE,ACT] - Manage the blacklist for MiniHunt. For example, do /mh blacklist add bob 2 to blacklist Footrace With Koopa The Quick.
 
+/mh stalking [ON|OFF] - Enables the /stalk command. OFF by default.
+
 /mh stop - Stops the game.
 <br/>
 <br/>
 <br/>
 In addition, the following commands are available for all players, unless specified:
+
+/mh - Opens the menu. This is the only aspect of this command available for non-moderators.
 
 /tc [MSG|ON|OFF] - Send message to team only. ON enables this without having to type /tc every time.
 
@@ -61,10 +67,12 @@ In addition, the following commands are available for all players, unless specif
 
 /spectate [NAME|ID|OFF] - Hunters only. Spectate the specified player, or unspectate. Use /spectate runner to automatically focus on Runners.
 
-/stats - Displays a table of stats for all players. Navigate with the Joystick or DPad, A, and B. Press START to close.
+/stats - Displays a table of stats for all players. Navigate with the Joystick or DPad and A. Press START or B to close.
 
 /skip - Vote to skip a star in MiniHunt. Half the lobby must agree.
 
-/timer [ON|OFF] - Show/hide the speedrun timer in Normal or Switch mode.
+/timer [ON|OFF] - Show/hide the speedrun timer in Normal or Swap mode.
 
-/stalk [NAME|ID|OFF] - Ztar Attack 2 only; warp to the same level as the specified Runner, or the first Runner if not specified.
+/stalk [NAME|ID|OFF] - Warp to the same area as the specified Runner, or the first Runner if not specified. There is a 5 second frozen timer upon use.
+For all Bowser arenas, the player will be warped to the start of the respective Bowser level. For the town in Wet-Dry World, some areas of the slide in Tall, Tall Mountain, the Eyerok fight in Shifting Sand Land, and the sub area of Dire Dire Docks, the player will be warped to the start of the level.
+Enabling this will also automatically run this command for new players.

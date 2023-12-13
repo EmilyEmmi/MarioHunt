@@ -3,8 +3,6 @@ local djui_chat_message_create,network_send,tonumber = djui_chat_message_create,
 
 -- main command
 function mario_hunt_command(msg)
-  local np = gNetworkPlayers[0]
-
   if not has_mod_powers(0) and msg ~= "unmod" and msg ~= "" and msg ~= "menu" then
     djui_chat_message_create(trans("not_mod"))
     return true
@@ -239,8 +237,8 @@ function add_runner(msg)
     end
   end
 
-  if runners == 0 then -- calculate good amount of runners
-    runners = (currPlayers+2)//4-currRunners -- 3 hunters per runner (4 max with 16 player lobby)
+  if runners == 0 then
+    runners = ideal_runners(currPlayers)-currRunners
     if runners <= 0 then
       djui_chat_message_create(trans("no_runners_added"))
       return true
@@ -301,8 +299,8 @@ function runner_randomize(msg)
     end
   end
 
-  if runners == 0 then -- calculate good amount of runners
-    runners = (#currPlayerIDs+2)//4 -- 3 hunters per runner (4 max with 16 player lobby)
+  if runners == 0 then
+    runners = ideal_runners(#currPlayerIDs)
     if runners <= 0 then
       djui_chat_message_create(trans("must_have_one"))
       return true
@@ -336,6 +334,13 @@ function runner_randomize(msg)
   text = text:sub(1,-3)
   djui_chat_message_create(text)
   return true
+end
+
+-- calculate good amount of runners (40% except when there's 5)
+function ideal_runners(num)
+  if num == 5 then return 1 end -- exception
+
+  return math.max(1, math.floor(num * 0.4))
 end
 
 function become_runner(sMario)
@@ -395,11 +400,6 @@ function stars_needed_command(msg)
 end
 
 function auto_command(msg)
-  if gGlobalSyncTable.mhMode ~= 2 then
-    djui_chat_message_create(trans("wrong_mode"))
-    return true
-  end
-
   local num = tonumber(msg)
   if string.lower(msg) == "on" then
     num = 99
@@ -455,47 +455,53 @@ function star_count_command(msg)
 end
 
 function change_game_mode(msg,mode)
+  local prevMode = gGlobalSyncTable.mhMode
+  local miniSwitch = false
+  if prevMode == mode then return true end
+
   if mode == 0 or string.lower(msg) == "normal" then
     gGlobalSyncTable.mhMode = 0
+    miniSwitch = (gGlobalSyncTable.mhMode == 2) ~= (prevMode == 2)
 
     -- defaults
     gGlobalSyncTable.runnerLives = 1
-    gGlobalSyncTable.runTime = 7200 -- 4 minutes
-    gGlobalSyncTable.anarchy = 0
-    gGlobalSyncTable.dmgAdd = 0
-    if gGlobalSyncTable.starMode then gGlobalSyncTable.runTime = 2 end
-
-    gGlobalSyncTable.gameAuto = 0
-    if gGlobalSyncTable.mhState == 0 then
-      gGlobalSyncTable.mhTimer = 0
+    if miniSwitch then
+      gGlobalSyncTable.runTime = 7200 -- 4 minutes
+      gGlobalSyncTable.anarchy = 0
+      gGlobalSyncTable.dmgAdd = 0
+      if gGlobalSyncTable.starMode then gGlobalSyncTable.runTime = 2 end
+      gGlobalSyncTable.gameAuto = 0
     end
     
     omm_disable_mode_for_minihunt(false)
-  elseif mode == 1 or string.lower(msg) == "switch" then
+  elseif mode == 1 or string.lower(msg) == "swap" or string.lower(msg) == "switch" then
     gGlobalSyncTable.mhMode = 1
+    miniSwitch = (gGlobalSyncTable.mhMode == 2) ~= (prevMode == 2)
 
     -- defaults
     gGlobalSyncTable.runnerLives = 0
-    gGlobalSyncTable.runTime = 7200 -- 4 minutes
-    gGlobalSyncTable.anarchy = 0
-    gGlobalSyncTable.dmgAdd = 0
-    if gGlobalSyncTable.starMode then gGlobalSyncTable.runTime = 2 end
-
-    gGlobalSyncTable.gameAuto = 0
-    if gGlobalSyncTable.mhState == 0 then
-      gGlobalSyncTable.mhTimer = 0
+    if miniSwitch then
+      gGlobalSyncTable.runTime = 7200 -- 4 minutes
+      gGlobalSyncTable.anarchy = 0
+      gGlobalSyncTable.dmgAdd = 0
+      if gGlobalSyncTable.starMode then gGlobalSyncTable.runTime = 2 end
+      gGlobalSyncTable.gameAuto = 0
     end
     
     omm_disable_mode_for_minihunt(false)
   elseif mode == 2 or string.lower(msg) == "mini" then
     local np = gNetworkPlayers[0]
     gGlobalSyncTable.mhMode = 2
+    miniSwitch = (gGlobalSyncTable.mhMode == 2) ~= (prevMode == 2)
     
     -- defaults
     gGlobalSyncTable.runnerLives = 0
-    gGlobalSyncTable.runTime = 9000 -- 5 minutes
-    gGlobalSyncTable.anarchy = 1
-    gGlobalSyncTable.dmgAdd = 2
+    if miniSwitch then
+      gGlobalSyncTable.runTime = 9000 -- 5 minutes
+      gGlobalSyncTable.anarchy = 1
+      gGlobalSyncTable.dmgAdd = 2
+      gGlobalSyncTable.gameAuto = 0
+    end
 
     gGlobalSyncTable.gameLevel = np.currLevelNum
     gGlobalSyncTable.getStar = np.currActNum
@@ -504,7 +510,12 @@ function change_game_mode(msg,mode)
     return false
   end
 
-  load_settings(true)
+  -- only reload settings if we changed from mini to standard or vice versa
+  if miniSwitch then
+    load_settings(true)
+  else -- load lives setting only
+    load_settings(false, false, true)
+  end
   return true
 end
 
@@ -587,7 +598,7 @@ function get_role_name_and_color(sMario)
 end
 
 function set_lobby_music(month)
-  if month ~= 10 and month ~= 12 then
+  if noSeason or (month ~= 10 and month ~= 12) then
     set_background_music(0,custom_seq,0)
   elseif month == 10 then
     set_background_music(0,SEQ_LEVEL_SPOOKY,0)

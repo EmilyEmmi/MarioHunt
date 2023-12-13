@@ -58,7 +58,7 @@ function do_warp(msg)
     level = string_to_level[args[1]] or 16
   end
   local area = tonumber(args[2]) or 1
-  local act = tonumber(args[3]) or 0
+  local act = tonumber(args[3]) or (level_to_course[level] and level_to_course[level] < 16 and level_to_course[level] > 0 and 1) or 0
   local node = tonumber(args[4])
   if node == nil then
     djui_chat_message_create("Warping to level "..level.." area "..area.." act "..act)
@@ -186,13 +186,11 @@ function star_mode_command(msg,bool)
   if bool == true or string_lower(msg) == "on" then
     gGlobalSyncTable.starMode = true
     gGlobalSyncTable.runTime = 2
-    load_settings(false, true)
     djui_chat_message_create(trans("using_stars"))
     return true
   elseif bool == false or string_lower(msg) == "off" then
     gGlobalSyncTable.starMode = false
     gGlobalSyncTable.runTime = 7200
-    load_settings(false, true)
     djui_chat_message_create(trans("using_timer"))
     return true
   end
@@ -207,6 +205,17 @@ function allow_spectate_command(msg)
   elseif string_lower(msg) == "off" then
     gGlobalSyncTable.allowSpectate = false
     djui_chat_message_create(trans("no_spectate"))
+    return true
+  end
+  return false
+end
+
+function allow_stalk_command(msg)
+  if string_lower(msg) == "on" then
+    gGlobalSyncTable.allowStalk = true
+    return true
+  elseif string_lower(msg) == "off" then
+    gGlobalSyncTable.allowStalk = false
     return true
   end
   return false
@@ -257,8 +266,16 @@ function desync_fix_command(msg)
   for i=1,(MAX_PLAYERS-1) do
     local sMario = gPlayerSyncTable[i]
     local oldTeam = sMario.team or 0
+    local oldStars = sMario.totalStars or 0
+    if oldTeam == 1 then
+      local oldLives = sMario.runnerlives
+      sMario.runnerLives = -1
+      sMario.runnerLives = oldLives
+    end
     sMario.team = -1
     sMario.team = oldTeam
+    sMario.totalStars = -1
+    sMario.totalStars = oldStars
   end
   return true
 end
@@ -269,23 +286,27 @@ function halt_command(msg)
     id = PACKET_GAME_END,
     winner = -1,
   })
-  gGlobalSyncTable.mhTimer = 20 * 30 -- 20 seconds
+  if gGlobalSyncTable.gameAuto ~= 0 then
+    gGlobalSyncTable.mhTimer = 20 * 30 -- 20 seconds
+  else
+    gGlobalSyncTable.mhTimer = 0
+  end
   return true
 end
 
--- TroopaParaKoopa's metal command
-function metal_command(msg)
+-- TroopaParaKoopa's metal command (now obsolete)
+--[[function metal_command(msg)
   if string_lower(msg) == "on" then
       gGlobalSyncTable.metal = true
-      djui_chat_message_create(trans("now_metal"))
+      djui_chat_message_create(trans("hunter_metal"))
       return true
   end
   if string_lower(msg) == "off" then
       gGlobalSyncTable.metal = false
-      djui_chat_message_create(trans("not_metal"))
+      djui_chat_message_create(trans("hunter_normal"))
       return true
   end
-end
+end]]
 
 function weak_command(msg)
   if string_lower(msg) == "on" then
@@ -505,9 +526,10 @@ function setup_commands()
   table.insert(marioHuntCommands, {"leave", "allowleave", allow_leave_command})
   table.insert(marioHuntCommands, {"mode", nil, change_game_mode})
   table.insert(marioHuntCommands, {"starmode", nil, star_mode_command})
-  table.insert(marioHuntCommands, {"spectator", nil, allow_spectate_command})
+  table.insert(marioHuntCommands, {"spectator", "allowspectate", allow_spectate_command})
+  table.insert(marioHuntCommands, {"stalking", "allowstalk", allow_stalk_command})
   table.insert(marioHuntCommands, {"pause", "freeze", pause_command})
-  table.insert(marioHuntCommands, {"metal", "seeker", metal_command})
+  --table.insert(marioHuntCommands, {"metal", "seeker", metal_command})
   table.insert(marioHuntCommands, {"hack", "romhack", rom_hack_command})
   table.insert(marioHuntCommands, {"weak", nil, weak_command})
   table.insert(marioHuntCommands, {"auto", nil, auto_command})
@@ -528,7 +550,6 @@ function setup_commands()
   table.insert(marioHuntCommands, {"langtest", nil, lang_test, true})
   table.insert(marioHuntCommands, {"unmod", nil, unmod, true})
   table.insert(marioHuntCommands, {"gfield", nil, get_field_global, true})
-  table.insert(marioHuntCommands, {"debug-move", nil, (function() gMarioStates[0].action = ACT_DEBUG_FREE_MOVE return true end), true})
   table.insert(marioHuntCommands, {"wing-cap", nil, (function() gMarioStates[0].flags = gMarioStates[0].flags | MARIO_WING_CAP play_sound(SOUND_GENERAL_SHORT_STAR, gMarioStates[0].marioObj.header.gfx.cameraToObject) play_cap_music(SEQ_EVENT_POWERUP) play_character_sound(gMarioStates[0], CHAR_SOUND_HERE_WE_GO) return true end), true})
   table.insert(marioHuntCommands, {"set-fov", nil, (function(msg) set_override_fov(tonumber(msg) or 45) return true end), true})
   table.insert(marioHuntCommands, {"kill-bowser", nil, kill_bowser, true})

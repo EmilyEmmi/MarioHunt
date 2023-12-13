@@ -110,7 +110,7 @@ function menu_reload()
     { name = ("menu_start"),      title = ("menu_mh") },
     { name = ("menu_run_random"), currNum = 0,          minNum = 0, maxNum = MAX_PLAYERS - 1, desc = ("random_desc"),                 format = { "auto" } },
     { name = ("menu_run_add"),    currNum = 0,          minNum = 0, maxNum = MAX_PLAYERS - 1, desc = ("add_desc"),                    format = { "auto" } },
-    { name = ("menu_gamemode"),   currNum = GST.mhMode, maxNum = 2, desc = ("mode_desc"),     format = { "normal", "switch", "mini" } },
+    { name = ("menu_gamemode"),   currNum = GST.mhMode, maxNum = 2, desc = ("mode_desc"),     format = { "normal", "swap", "mini" } },
     { name = ("menu_settings") },
     { name = ("menu_stop"),       desc = ("stop_desc") },
     { name = ("menu_back") },
@@ -146,27 +146,29 @@ function menu_reload()
   if auto == 99 then auto = -1 end
   settingsMenu = {
     { name = ("menu_run_lives"),      currNum = GST.runnerLives,   maxNum = 99,                      desc = ("lives_desc"),               title = ("menu_settings") },
-    { name = ("menu_metal"),          option = GST.metal,          desc = ("metal_desc") },
-    { name = ("menu_weak"),           option = GST.weak,           desc = ("weak_desc") },
-    { name = ("menu_allow_spectate"), option = GST.allowSpectate,  desc = ("spectator_desc") },
+    { name = ("menu_time"),           currNum = GST.runTime // 30, maxNum = 3600,                    desc = ("time_desc"),                time = true },
     { name = ("menu_star_mode"),      option = GST.starMode,       desc = ("starmode_desc"),         invalid = (GST.mhMode == 2) },
     { name = ("menu_category"),       currNum = GST.starRun,       maxNum = maxStars,                minNum = (GST.noBowser and 1) or -1, desc = ("category_desc"),     invalid = (GST.mhMode == 2) },
     { name = ("menu_defeat_bowser"),  option = not GST.noBowser,   invalid = (GST.mhMode == 2 or (ROMHACK and (ROMHACK.no_bowser ~= nil))) },
-    { name = ("menu_time"),           currNum = GST.runTime // 30, maxNum = 3600,                    desc = ("time_desc"),                time = true },
-    { name = ("menu_auto"),           invalid = (GST.mhMode ~= 2), currNum = auto,                   minNum = -1,                         maxNum = MAX_PLAYERS - 1,     desc = ("auto_desc"),                                        format = { "auto", "~" } },
+    { name = ("menu_auto"),           currNum = auto,              minNum = -1,                         maxNum = MAX_PLAYERS - 1,     desc = ("auto_desc"),                                        format = { "auto", "~" } },
+    { name = ("menu_nerf_vanish"),    option = GST.nerfVanish,     desc = ("menu_nerf_vanish_desc") },
+    { name = ("menu_allow_spectate"), option = GST.allowSpectate,  desc = ("spectator_desc") },
+    { name = ("menu_allow_stalk"),    option = GST.allowStalk,     desc = ("stalking_desc"), invalid = (GST.mhMode == 2) },
+    { name = ("menu_weak"),           option = GST.weak,           desc = ("weak_desc") },
     { name = ("menu_anarchy"),        currNum = GST.anarchy,       minNum = 0,                       maxNum = 3,                          desc = ("menu_anarchy_desc"), format = { "~", "lang_runners", "lang_hunters", "lang_all" } },
     { name = ("menu_dmgAdd"),         currNum = GST.dmgAdd,        minNum = 0,                       maxNum = 8,                          desc = ("menu_dmgAdd_desc"),  format = { [9] = "OHKO" } },
-    { name = ("menu_nerf_vanish"),    option = GST.nerfVanish,     desc = ("menu_nerf_vanish_desc") },
-    { name = ("menu_first_timer"),    option = GST.firstTimer,     desc = ("menu_first_timer_desc"), invalid = (GST.mhMode ~= 2) },
     { name = ("menu_blacklist"),      desc = ("blacklist_desc") },
     { name = ("menu_default"),        desc = ("default_desc") },
     { name = ("menu_back") },
     { name = ("main_menu") },
     name = "settingsMenu",
-    back = 16,
+    back = 15,
   }
   if GST.starMode and GST.mhMode ~= 2 then
-    settingsMenu[7] = { name = ("menu_stars"), currNum = GST.runTime, maxNum = 7, desc = ("stars_desc") }
+    settingsMenu[2] = { name = ("menu_stars"), currNum = GST.runTime, maxNum = 7, desc = ("stars_desc") }
+  end
+  if GST.mhMode == 2 then
+    settingsMenu[3] = { name = ("menu_first_timer"),    option = GST.firstTimer,     desc = ("menu_first_timer_desc"), }
   end
 
   -- name gets overriden
@@ -192,30 +194,32 @@ function menu_reload()
   }
 
   playerSettingsMenu = {
-    { name = ("hard_mode"),        title = ("menu_settings_player"),                 option = (gPlayerSyncTable[0].hard == 1), desc = ("hard_info_short") },
-    { name = ("extreme_mode"),     option = (gPlayerSyncTable[0].hard == 2),         desc = ("extreme_info_short") },
-    { name = ("menu_timer"),       option = showSpeedrunTimer,                       invalid = (GST.mode == 2),                desc = ("menu_timer_desc") },
-    { name = ("menu_tc"),          option = (gPlayerSyncTable[0].teamChat or false), desc = ("menu_tc_desc"),                  invalid = disable_chat_hook },
-    { name = ("menu_unknown"),     option = demonOn,                                 invalid = true,                           desc = ("menu_secret") },
-    { name = ("menu_hide_hud"),    option = mhHideHud,                               desc = ("hidehud_desc") },
+    { name = ("menu_app"),         title = ("menu_settings_player"),                 currNum = hunterAppearance,                       maxNum = 2, format = {"~","metal","glow"}, desc = ("app_desc") },
+    { name = ("menu_timer"),       option = showSpeedrunTimer,                       invalid = (GST.mode == 2), desc = ("menu_timer_desc") },
     { name = ("menu_fast"),        option = gPlayerSyncTable[0].fasterActions,       desc = ("menu_fast_desc") },
     { name = ("menu_popup_sound"), option = playPopupSounds },
+    { name = ("menu_season"),      option = not noSeason,                            desc = ("menu_season_desc") },
+    { name = ("menu_hide_hud"),    option = mhHideHud,                               desc = ("hidehud_desc") },
+    { name = ("menu_tc"),          option = (gPlayerSyncTable[0].teamChat or false), desc = ("menu_tc_desc"),                  invalid = disable_chat_hook },
+    { name = ("hard_mode"),        option = (gPlayerSyncTable[0].hard == 1), desc = ("hard_info_short") },
+    { name = ("extreme_mode"),     option = (gPlayerSyncTable[0].hard == 2),         desc = ("extreme_info_short") },
+    { name = ("menu_unknown"),     option = demonOn,                                 invalid = true,                           desc = ("menu_secret") },
     { name = ("menu_hide_roles"),  invalid = (get_true_roles() == 0),                desc = ("menu_hide_roles_desc") },
     { name = ("menu_back") },
     name = "playerSettingsMenu",
-    back = 10,
+    back = 12,
   }
   if demonOn or demonUnlocked then
-    playerSettingsMenu[5].name = ("menu_demon")
-    playerSettingsMenu[5].desc = ("menu_demon_desc")
-    playerSettingsMenu[5].invalid = false
+    playerSettingsMenu[10].name = ("menu_demon")
+    playerSettingsMenu[10].desc = ("menu_demon_desc")
+    playerSettingsMenu[10].invalid = false
   end
 
   miscMenu = {
     { name = ("free_camera"),         title = ("menu_misc"),                                                                                            invalid = ((not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), desc = ("menu_free_cam_desc") },
     { name = ("menu_spectate_run"),   invalid = ((not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), desc = ("menu_spectate_run_desc") },
     { name = ("menu_exit_spectate"),  invalid = (gPlayerSyncTable[0].forceSpectate or gPlayerSyncTable[0].spectator ~= 1),                              desc = ("menu_exit_spectate_desc") },
-    { name = ("menu_stalk_run"),      invalid = ((not ROMHACK.stalk) or GST.mhMode == 2 or GST.mhState ~= 2),                                           desc = ("menu_stalk_run_desc") },
+    { name = ("menu_stalk_run"),      invalid = ((not gGlobalSyncTable.allowStalk) or GST.mhMode == 2 or GST.mhState ~= 2),                                           desc = ("menu_stalk_run_desc") },
     { name = ("menu_skip"),           invalid = (GST.mhState ~= 2 or GST.mhMode ~= 2 or iVoted),                                                        desc = ("menu_skip_desc") },
     { name = ("menu_blacklist_list"), desc = ("menu_blacklist_list_desc") },
     { name = ("menu_back") },
@@ -246,7 +250,7 @@ function one_player_reload()
   onePlayerMenu = {
     { name = ("menu_flip"),          title = "PLAYER_S",                                                                                                                           invalid = not has_mod_powers(0),              desc = ("flip_desc") },
     { name = ("menu_spectate"),      invalid = (focusPlayerOrCourse == 0 or (not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), desc = ("menu_spectate_desc") },
-    { name = ("menu_stalk"),         invalid = (focusPlayerOrCourse == 0 or (not ROMHACK.stalk) or STP.team ~= 1 or GST.mhMode == 2 or GST.mhState ~= 2),                          desc = ("menu_stalk_desc") },
+    { name = ("menu_stalk"),         invalid = (focusPlayerOrCourse == 0 or (not gGlobalSyncTable.allowStalk) or STP.team ~= 1 or GST.mhMode == 2 or GST.mhState ~= 2),                          desc = ("menu_stalk_desc") },
     { name = ("menu_pause"),         option = STP.pause,                                                                                                                           invalid = not has_mod_powers(0),              desc = ("pause_desc") },
     { name = ("menu_forcespectate"), option = STP.forceSpectate,                                                                                                                   invalid = not has_mod_powers(0),              desc = ("forcespectate_desc") },
     { name = ("menu_allowleave"),    invalid = (not has_mod_powers(0)) or (GST.mhMode == 2),                                                                                       desc = ("leave_desc") },
@@ -335,88 +339,72 @@ local menuActions = {}
 function action_setup()
   menuActions = {
     mainMenu = {
-      [1] = function() menu_enter(marioHuntMenu) end,
-      [2] = function() menu_enter(playerSettingsMenu) end,
-      [3] = show_rules,
-      [4] = list_settings,
-      [5] = function() menu_enter(LanguageMenu) end,
-      [6] = function() menu_enter(miscMenu) end,
-      [7] = function() menu_enter(playerMenu) end,
-      [8] = function() showingStats = true end,
-      [9] = close_menu,
+      function() menu_enter(marioHuntMenu) end,
+      function() menu_enter(playerSettingsMenu) end,
+      show_rules,
+      list_settings,
+      function() menu_enter(LanguageMenu) end,
+      function() menu_enter(miscMenu) end,
+      function() menu_enter(playerMenu) end,
+      function() showingStats = true end,
+      close_menu,s
     },
     marioHuntMenu = {
-      [1] = function() if gGlobalSyncTable.mhMode ~= 2 then menu_enter(startMenu) else menu_enter(startMenuMini) end end,
-      [2] = function(option) runner_randomize(option.currNum) end,
-      [3] = function(option) add_runner(option.currNum) end,
-      [4] = function(option)
+      function() if gGlobalSyncTable.mhMode ~= 2 then menu_enter(startMenu) else menu_enter(startMenuMini) end end,
+      function(option) runner_randomize(option.currNum) end,
+      function(option) add_runner(option.currNum) end,
+      function(option)
         change_game_mode("", option.currNum)
         menu_reload()
         menu_enter(marioHuntMenu, currentOption)
       end,
-      [5] = function() menu_enter(settingsMenu) end,
-      [6] = function()
+      function() menu_enter(settingsMenu) end,
+      function()
         halt_command()
         close_menu()
       end,
-      [7] = function() menu_enter() end,
+      function() menu_enter() end,
     },
     startMenu = {
-      [1] = function() start_game("main") end,
-      [2] = function() start_game("alt") end,
-      [3] = function() start_game("reset") end,
-      [4] = function() start_game("continue") end,
-      [5] = function() menu_enter(marioHuntMenu) end,
-      [6] = function() menu_enter() end,
+      function() start_game("main") end,
+      function() start_game("alt") end,
+      function() start_game("reset") end,
+      function() start_game("continue") end,
+      function() menu_enter(marioHuntMenu) end,
+      function() menu_enter() end,
     },
     startMenuMini = {
-      [1] = function() start_game("") end,
-      [2] = function(option) start_game(tostring(option.currNum)) end,
-      [3] = function() menu_enter(marioHuntMenu) end,
-      [4] = function() menu_enter() end,
+      function() start_game("") end,
+      function(option) start_game(tostring(option.currNum)) end,
+      function() menu_enter(marioHuntMenu) end,
+      function() menu_enter() end,
     },
     -- player menu is special case
 
     -- language is a special case
     settingsMenu = {
-      [1] = function(option) runner_lives(tostring(option.currNum)) end,
-      [2] = function(option)
-        option.option = not option.option
-        gGlobalSyncTable.metal = option.option
-        if not option.option then
-          djui_chat_message_create(trans("not_metal"))
+      function(option) runner_lives(tostring(option.currNum)) end,
+      function(option)
+        if gGlobalSyncTable.mhMode ~= 2 and gGlobalSyncTable.starMode then
+          stars_needed_command(option.currNum)
         else
-          djui_chat_message_create(trans("now_metal"))
+          time_needed_command(option.currNum)
         end
       end,
-      [3] = function(option)
+      function(option)
         option.option = not option.option
-        gGlobalSyncTable.weak = option.option
-        if not option.option then
-          djui_chat_message_create(trans("not_weak"))
+        if gGlobalSyncTable.mhMode == 2 then
+          gGlobalSyncTable.firstTimer = option.option
         else
-          djui_chat_message_create(trans("now_weak"))
+          star_mode_command("", option.option)
+          menu_reload()
+          menu_enter(settingsMenu, currentOption)
         end
       end,
-      [4] = function(option)
-        option.option = not option.option
-        gGlobalSyncTable.allowSpectate = option.option
-        if not option.option then
-          djui_chat_message_create(trans("no_spectate"))
-        else
-          djui_chat_message_create(trans("can_spectate"))
-        end
-      end,
-      [5] = function(option)
-        option.option = not option.option
-        star_mode_command("", option.option)
-        menu_reload()
-        menu_enter(settingsMenu, currentOption)
-      end,
-      [6] = function(option)
+      function(option)
         star_count_command(option.currNum)
       end,
-      [7] = function(option)
+      function(option)
         option.option = not option.option
         gGlobalSyncTable.noBowser = not option.option
         if gGlobalSyncTable.noBowser and gGlobalSyncTable.starRun < 1 then
@@ -425,14 +413,7 @@ function action_setup()
         menu_reload()
         menu_enter(settingsMenu, currentOption)
       end,
-      [8] = function(option)
-        if gGlobalSyncTable.mhMode ~= 2 and gGlobalSyncTable.starMode then
-          stars_needed_command(option.currNum)
-        else
-          time_needed_command(option.currNum)
-        end
-      end,
-      [9] = function(option)
+      function(option)
         if option.currNum < 0 then
           gGlobalSyncTable.gameAuto = 99,
               djui_chat_message_create(trans("auto_on"))
@@ -457,91 +438,125 @@ function action_setup()
           end
         end
       end,
-      [10] = function(option)
-        gGlobalSyncTable.anarchy = option.currNum
-        djui_chat_message_create(trans("anarchy_set_" .. gGlobalSyncTable.anarchy))
-      end,
-      [11] = function(option)
-        gGlobalSyncTable.dmgAdd = option.currNum
-        djui_chat_message_create(trans("dmgAdd_set", gGlobalSyncTable.dmgAdd))
-      end,
-      [12] = function(option)
+      function(option)
         option.option = not option.option
         gGlobalSyncTable.nerfVanish = option.option
       end,
-      [13] = function(option)
+      function(option)
         option.option = not option.option
-        gGlobalSyncTable.firstTimer = option.option
+        gGlobalSyncTable.allowSpectate = option.option
+        if not option.option then
+          djui_chat_message_create(trans("no_spectate"))
+        else
+          djui_chat_message_create(trans("can_spectate"))
+        end
       end,
-      [14] = function()
+      function(option)
+        option.option = not option.option
+        gGlobalSyncTable.allowStalk = option.option
+      end,
+      function(option)
+        option.option = not option.option
+        gGlobalSyncTable.weak = option.option
+        if not option.option then
+          djui_chat_message_create(trans("not_weak"))
+        else
+          djui_chat_message_create(trans("now_weak"))
+        end
+      end,
+      function(option)
+        gGlobalSyncTable.anarchy = option.currNum
+        djui_chat_message_create(trans("anarchy_set_" .. gGlobalSyncTable.anarchy))
+      end,
+      function(option)
+        gGlobalSyncTable.dmgAdd = option.currNum
+        djui_chat_message_create(trans("dmgAdd_set", gGlobalSyncTable.dmgAdd))
+      end,
+      function()
         menu_enter(blacklistMenu)
       end,
-      [15] = function()
+      function()
         default_settings()
         menu_reload()
         menu_enter(settingsMenu, currentOption)
       end,
-      [16] = function() menu_enter(marioHuntMenu, 5) end,
-      [17] = function() menu_enter() end,
+      function() menu_enter(marioHuntMenu, 5) end,
+      function() menu_enter() end,
     },
     onePlayerMenu = {
-      [1] = function()
+      function()
         change_team_command(focusPlayerOrCourse)
         menu_reload()
         menu_enter(onePlayerMenu, currentOption)
       end,
-      [2] = function() spectate_command(focusPlayerOrCourse) end,
-      [3] = function() stalk_command(focusPlayerOrCourse) end,
-      [4] = function(option)
+      function() spectate_command(focusPlayerOrCourse) end,
+      function() stalk_command(focusPlayerOrCourse) end,
+      function(option)
         option.option = not option.option
         pause_command(focusPlayerOrCourse)
       end,
-      [5] = function(option)
+      function(option)
         option.option = not option.option
         force_spectate_command(focusPlayerOrCourse)
       end,
-      [6] = function() allow_leave_command(focusPlayerOrCourse) end,
-      [7] = function(option) set_life_command(focusPlayerOrCourse .. " " .. option.currNum) end,
-      [8] = function() menu_enter(playerMenu, focusPlayerOrCourse + 1) end,
-      [9] = function() menu_enter(nil, 7) end,
+      function() allow_leave_command(focusPlayerOrCourse) end,
+      function(option) set_life_command(focusPlayerOrCourse .. " " .. option.currNum) end,
+      function() menu_enter(playerMenu, focusPlayerOrCourse + 1) end,
+      function() menu_enter(nil, 7) end,
     },
     allPlayerMenu = {
-      [1] = function(option)
+      function(option)
         option.option = not option.option
         pause_command("all")
       end,
-      [2] = function(option)
+      function(option)
         option.option = not option.option
         force_spectate_command("all")
       end,
-      [3] = function() menu_enter(playerMenu, MAX_PLAYERS + 1) end,
-      [4] = function() menu_enter(nil, 7) end,
+      function() menu_enter(playerMenu, MAX_PLAYERS + 1) end,
+      function() menu_enter(nil, 7) end,
     },
     playerSettingsMenu = {
-      [1] = function(option)
-        option.option = not option.option
-        if option.option then
-          hard_mode_command("on")
+      function(option)
+        hunterAppearance = option.currNum
+        if hunterAppearance == 1 then
+          djui_chat_message_create(trans("hunter_metal"))
+        elseif hunterAppearance == 2 then
+          djui_chat_message_create(trans("hunter_glow"))
         else
-          hard_mode_command("off")
+          djui_chat_message_create(trans("hunter_normal"))
         end
-        currMenu[2].option = false
+        mod_storage_save_fix_bug("hunterApp", tostring(option.currNum))
       end,
-      [2] = function(option)
-        option.option = not option.option
-        if option.option then
-          hard_mode_command("ex on")
-        else
-          hard_mode_command("off")
-        end
-        currMenu[1].option = false
-      end,
-      [3] = function(option)
+      function(option)
         option.option = not option.option
         showSpeedrunTimer = option.option
         mod_storage_save_fix_bug("showSpeedrunTimer", tostring(option.option))
       end,
-      [4] = function(option)
+      function(option)
+        option.option = not option.option
+        gPlayerSyncTable[0].fasterActions = option.option
+        mod_storage_save_fix_bug("fasterActions", tostring(option.option))
+      end,
+      function(option)
+        option.option = not option.option
+        playPopupSounds = option.option
+        mod_storage_save_fix_bug("playPopupSounds", tostring(option.option))
+      end,
+      function(option)
+        option.option = not option.option
+        noSeason = not option.option
+        mod_storage_save_fix_bug("noSeason", tostring(not option.option))
+        set_season_lighting(month, gNetworkPlayers[0].currLevelNum)
+        if gGlobalSyncTable.mhState == 0 then
+          set_lobby_music(month)
+        end
+      end,
+      function(option)
+        option.option = not option.option
+        mhHideHud = option.option
+      end,
+      function(option)
         option.option = not option.option
         gPlayerSyncTable[0].teamChat = option.option
         if option.option then
@@ -550,54 +565,58 @@ function action_setup()
           djui_chat_message_create(trans("tc_toggle", trans("off")))
         end
       end,
-      [5] = function(option)
+      function(option)
+        option.option = not option.option
+        if option.option then
+          hard_mode_command("on")
+        else
+          hard_mode_command("off")
+        end
+        currMenu[currentOption+1].option = false
+      end,
+      function(option)
+        option.option = not option.option
+        if option.option then
+          hard_mode_command("ex on")
+        else
+          hard_mode_command("off")
+        end
+        currMenu[currentOption-1].option = false
+      end,
+      function(option)
         option.option = not option.option
         demonOn = option.option
       end,
-      [6] = function(option)
-        option.option = not option.option
-        mhHideHud = option.option
-      end,
-      [7] = function(option)
-        option.option = not option.option
-        gPlayerSyncTable[0].fasterActions = option.option
-        mod_storage_save_fix_bug("fasterActions", tostring(option.option))
-      end,
-      [8] = function(option)
-        option.option = not option.option
-        playPopupSounds = option.option
-        mod_storage_save_fix_bug("playPopupSounds", tostring(option.option))
-      end,
-      [9] = function() menu_enter(hideRolesMenu, 1) end,
-      [10] = function() menu_enter(nil, 2) end,
+      function() menu_enter(hideRolesMenu, 1) end,
+      function() menu_enter(nil, 2) end,
     },
     miscMenu = {
-      [1] = function()
+      function()
         spectate_command("")
         menu_reload()
         currMenu = miscMenu
       end,
-      [2] = function()
+      function()
         spectate_command("runner")
         menu_reload()
         currMenu = miscMenu
       end,
-      [3] = function(option)
+      function(option)
         spectate_command("off")
         option.invalid = true
       end,
-      [4] = function() stalk_command("") end,
-      [5] = function()
+      function() stalk_command("") end,
+      function()
         skip_command("")
         close_menu()
       end,
-      [6] = function() blacklist_command("list") end,
-      [7] = function() menu_enter(nil, 6) end,
+      function() blacklist_command("list") end,
+      function() menu_enter(nil, 6) end,
     },
     -- blacklistMenu is another special case
     -- same for the course menu
     hideRolesMenu = {
-      [1] = function(option)
+      function(option)
         option.option = not option.option
         if option.option then
           gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 2
@@ -606,7 +625,7 @@ function action_setup()
         end
         mod_storage_save_fix_bug("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
-      [2] = function(option)
+      function(option)
         option.option = not option.option
         if option.option then
           gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 4
@@ -615,7 +634,7 @@ function action_setup()
         end
         mod_storage_save_fix_bug("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
-      [3] = function(option)
+      function(option)
         option.option = not option.option
         if option.option then
           gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 8
@@ -624,7 +643,7 @@ function action_setup()
         end
         mod_storage_save_fix_bug("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
-      [4] = function(option)
+      function(option)
         option.option = not option.option
         if option.option then
           gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 16
@@ -633,7 +652,7 @@ function action_setup()
         end
         mod_storage_save_fix_bug("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
-      [5] = function(option)
+      function(option)
         option.option = not option.option
         if option.option then
           gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 32
@@ -642,14 +661,14 @@ function action_setup()
         end
         mod_storage_save_fix_bug("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
-      [6] = function()
+      function()
         gPlayerSyncTable[0].role = get_true_roles()
         menu_reload()
         menu_enter(hideRolesMenu, 6)
         mod_storage_save_fix_bug("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
-      [7] = function() menu_enter(playerSettingsMenu, 10) end,
-      [8] = function() menu_enter(nil, 2) end,
+      function() menu_enter(playerSettingsMenu, 11) end,
+      function() menu_enter(nil, 2) end,
     },
   }
 end
@@ -1728,7 +1747,7 @@ end
 --hook_event(HOOK_ON_HUD_RENDER, handleMenu)
 hook_event(HOOK_BEFORE_MARIO_UPDATE, menu_controls)
 hook_event(HOOK_UPDATE, function()
-  if gPlayerSyncTable[0].pause and ranMenuThisFrame == false then
+  if paused and ranMenuThisFrame == false then
     menu_controls(m0)
   end
   ranMenuThisFrame = false

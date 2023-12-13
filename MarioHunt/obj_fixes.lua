@@ -30,30 +30,40 @@ end
 
 hook_event(HOOK_ON_OBJECT_UNLOAD, on_object_unload)
 
--- FINALLY prevent chest answers from resetting (still a bit buggy but it's better)
-local function bhv_custom_chest_loop(obj)
-    if obj.oTreasureChestIsLastInteractionIncorrect == 1 then
-        obj.oTreasureChestIsLastInteractionIncorrect = 0
-        obj.oTreasureChestCurrentAnswer = obj.unused1
-    else
-        obj.unused1 = obj.oTreasureChestCurrentAnswer
-    end
+-- Prevent hunters from interacting with chests
+local function bhv_custom_chest_bottom_init(o)
+    o.oFlags = o.oFlags | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
+    cur_obj_update_floor_height()
+    bhv_treasure_chest_bottom_init()
+    o.oIntangibleTimer = -1
 end
+---@param o Object
+local function bhv_custom_chest_bottom_loop(o)
+    local player = nearest_mario_state_to_object(o)
 
-local function bhv_custom_chest_bottom_loop(obj)
-    if obj.oAction == 2 then
-        if obj.oPrevAction == 1 then
-            cur_obj_change_action(1)
-        elseif obj.oTimer > 100 then
-            cur_obj_change_action(0)
+    -- Prevent opening the wrong chest in omm
+    if OmmEnabled and o.parentObj.oTreasureChestIsLastInteractionIncorrect ~= 0 then
+        o.parentObj.oTreasureChestCurrentAnswer = o.unused1
+        o.oAction = (o.unused1 > o.oBehParams2ndByte and 1) or 0
+        o.parentObj.oTreasureChestIsLastInteractionIncorrect = 0
+    end
+
+    if o.oAction == 1 or (o.oAction == 0 and player and gPlayerSyncTable[player.playerIndex].team == 1 and is_point_within_radius_of_mario(o.oPosX, o.oPosY, o.oPosZ, 150) and obj_check_if_facing_toward_angle(o.oMoveAngleYaw, player.marioObj.header.gfx.angle.y + 0x8000, 0x3000)) then
+        bhv_treasure_chest_bottom_loop()
+    elseif o.oAction == 2 then
+        bhv_treasure_chest_bottom_loop()
+        if player and gPlayerSyncTable[player.playerIndex].team ~= 1 then
+            o.oAction = 0
         end
+    else
+        cur_obj_push_mario_away_from_cylinder(150.0, 150.0)
+        o.oInteractStatus = 0
     end
+
+    o.unused1 = o.parentObj.oTreasureChestCurrentAnswer
 end
 
-hook_behavior_custom(id_bhvTreasureChestsJrb, false, nil, bhv_custom_chest_loop)
-hook_behavior_custom(id_bhvTreasureChestsShip, false, nil, bhv_custom_chest_loop)
-hook_behavior_custom(id_bhvTreasureChests, false, nil, bhv_custom_chest_loop)
-hook_behavior_custom(id_bhvTreasureChestBottom, false, nil, bhv_custom_chest_bottom_loop)
+hook_behavior_custom(id_bhvTreasureChestBottom, true, bhv_custom_chest_bottom_init, bhv_custom_chest_bottom_loop)
 
 -- Replace all Hearts with 1Ups
 local function bhv_replace_with_1up(o)
@@ -64,11 +74,20 @@ local function bhv_replace_with_1up(o)
             o.oPosX, o.oPosY, o.oPosZ,
             nil
         )
-        obj_mark_for_deletion(o)
+        obj_mark_for_deletion(o) 
+    end
+end
+-- Fix extreme mode
+local function bhv_recovery_heart_loop(o)
+    local m = gMarioStates[0]
+    local sMario = gPlayerSyncTable[0]
+    if sMario.hard == 2 and sMario.team == 1 and (o.oSpinningHeartTotalSpin + o.oAngleVelYaw) >= 0x10000 and dist_between_objects(o, m.marioObj) < 1000 then
+        m.capTimer = 60
+        m.flags = m.flags | MARIO_METAL_CAP
     end
 end
 
-hook_behavior_custom(id_bhvRecoveryHeart, false, bhv_replace_with_1up, nil)
+hook_behavior_custom(id_bhvRecoveryHeart, false, bhv_replace_with_1up, bhv_recovery_heart_loop)
 
 -- make the key grabbable sooner
 local function custom_key_loop(o)

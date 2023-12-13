@@ -4,7 +4,7 @@
 
 Welcome to the MarioHunt Wiki! Feel free to contribute any additional advice via a Pull Request.
 ALSO: Throughout this wiki, "Standard Mode" or "Standard Modes" will be referenced.
-This refers to both Normal and Switch mode, which have similar gameplay.
+This refers to both Normal and Swap mode, which have similar gameplay.
 
 ## Getting Started
 [Running a Game](running.md)

@@ -70,7 +70,6 @@ local cData = {
 function mario_dfm(m)
     if STP.spectator == 1 and free_camera == 1 and not (menu or showingStats) then
         local speed = 0
-        local floorHeight = 0
 
         set_mario_animation(m, MARIO_ANIM_A_POSE)
 
@@ -219,30 +218,29 @@ function mario_update_local(m)
             end
         end
 
-        if STI.spectator == 0 then
+        if free_camera == 1 then
+          number = 0
+          if not is_game_paused() then
+            mario_dfm(m)
+          end
+        elseif STI.spectator == 0 then
+          vec3f_copy(cData.focus,MSI.pos)
+          cData.focus.y = cData.focus.y + 120
+        end
 
-            if free_camera == 1 then
+        update_spectator_camera(MSP, MSI)
+
+        if free_camera == 0 and obj_get_first_with_behavior_id(id_bhvActSelector) == nil and (NPI.currLevelNum ~= NPP.currLevelNum or NPI.currAreaIndex ~= NPP.currAreaIndex or NPI.currActNum ~= NPP.currActNum) then
+            number = number + 1
+            if number >= 35 then
               number = 0
-              if not is_game_paused() then
-                mario_dfm(m)
-              end
-            else
-              vec3f_copy(cData.focus,MSI.pos)
-              cData.focus.y = cData.focus.y + 120
-            end
 
-            update_spectator_camera(MSP, MSI)
-
-            if free_camera == 0 and obj_get_first_with_behavior_id(id_bhvActSelector) == nil and (NPI.currLevelNum ~= NPP.currLevelNum or NPI.currAreaIndex ~= NPP.currAreaIndex or NPI.currActNum ~= NPP.currActNum) then
-                number = number + 1
-                if number >= 35 then
-                  number = 30
-
-                    if not warp_to_level(NPI.currLevelNum, NPI.currAreaIndex, NPI.currActNum) then -- these areas don't have an entrance node, so use their death nodes as the entrance
-                      warp_to_warpnode(NPI.currLevelNum, NPI.currAreaIndex, NPI.currActNum, 0xF0)
-                    end
+                if not warp_to_level(NPI.currLevelNum, NPI.currAreaIndex, NPI.currActNum) then -- these areas don't have an entrance node, so use their death nodes as the entrance
+                  warp_to_warpnode(NPI.currLevelNum, NPI.currAreaIndex, NPI.currActNum, 0xF0)
                 end
             end
+        elseif free_camera == 0 then
+            number = 30
         end
 
     else

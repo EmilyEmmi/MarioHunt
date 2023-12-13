@@ -1,4 +1,66 @@
 # Changelog
+## v2.4
+### Additions:
+  - Added Hunter Glow option, which makes Hunters glow red
+  - Added the ability to turn off seasonal changes
+  - Added "Allow 'Stalking'" option, which toggles the /stalk command previously enabled in romhacks such as Ztar Attack 2
+    - Also available as the command /mh stalking
+  - If spectate is disabled, /spectate's description will be changed to "This command has been disabled."
+  - Added message when using an old version of OMM Rebirth
+  - **Runners may now leave any course except Bowser In The Sky when enough stars are collected**
+    - Does not apply for all ROM hacks, does not apply in any%
+  - A message now appears whenever any setting is changed
+  - Updated Spanish, French, German, and Brazillian Portuguese translations (KanHeaven, Skeltan, N64-Mario, PietroM, respectively)
+### Adjustments:
+  - "Seeker Appearence" (sic) has been changed to "Hunter Appearance"
+    - **Now a user preference instead of a host option**
+    - Combined with the new "Hunter Glow" option
+  - Renamed "Switch" mode to "Swap" mode
+  - Auto mode can now be used with every mode
+    - In Normal and Swap mode, this uses the "Reset Alt Save" option
+  - /stalk now forces a 5 second cooldown
+  - Some popups/feedback now display "This command has been disabled" instead of "Not available in this mode" for more clarity
+  - Changed layout of Settings and Game Settings menus
+  - Updated Ztar Attack 2 support
+  - "Stop" command will not warp players back to the lobby
+  - Hunters can no longer read boss or Bob-Omb Buddy dialog
+    - Thanks to Glaze-eta for this suggestion!
+  - Hunters can no longer /stalk into Bowser fights (suggested)
+  - Adjusted the "ideal runner" formula, used for the "Auto" options
+    - Now 40% of the lobby becomes Runners, EXCEPT for 5 in which case only 1 runner is selected
+    - Full details for a 16 player lobby:
+      | Players | Runners |
+      |---------|---------|
+      | 2-5     | 1       |
+      | 6-7     | 2       |
+      | 8-9     | 3       |
+      | 10-12   | 4       |
+      | 13-14   | 5       |
+      | 15-16   | 6       |
+  - "Blast Away The Wall" and "Can The Eel Come Out To Play?" are now flagged as act-specific
+  - Death timer no longer applies during the starting time of the game
+  - Hearts now grant a temporary metal cap when playing in Extreme mode
+  - Hunters can no longer interact with chests at all
+  - The chests now reset when getting a wrong answer once again
+    - Does not apply when using OMM Rebirth
+### Fixes/Backend changes:
+  - Fixed already-collected stars decreasing the "Can leave" timer
+  - Fixed being able to skip the starting platform in the parkour challenge
+  - Fixed unfinished translations for French (Skeltan)
+  - Fixed translation errors for Spanish (KanHeaven)
+  - Updated some missing translations for German (N64-Mario)
+  - Fixed being unable to open the MH menu during the start of the game
+  - Fixed commands not accepting player names with colors
+  - Fixed Runners being able to use /stalk without being able to leave the course
+  - Fixed stalking with 0 health
+  - Fixed settings for gamemode not being loaded when someone other than the host changes settings
+  - Fixed some settings resetting when switching game modes
+  - More performance improvements (maybe)
+  - Fixed treasure chests getting desynced
+  - Fixed desync command restoring runner lives in some scenarios
+  - Fixed wiggler boss room being unenterable in OMM Rebirth
+  - Fixed being unable to move Free Camera if previously spectating a spectator
+  - Runners can now die to quicksand in course 0
 ## v2.33
 ### Addition:
   - Added leaderboard during MiniHunt!

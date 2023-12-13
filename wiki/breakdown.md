@@ -267,31 +267,43 @@ ColbyRayz! discovered that if you fly to edge of the stage, you'll leave the cou
 ## Jolly Roger Bay (JRB)
 ![Jolly Roger Bay. The area is covered in a thick, blue-green mist. A mastless ship can be seen floating off to the right. Several stalagmites are poking out of the water.](img/jrb.png)
 
-Wait, I thought Cool Cool Mountain was Course 3? Nope, the first water level is, but everyone would prefer to put it off for later. The swimming physics haven't exactly aged well, especially for any poor keyboard players. Water levels in MarioHunt are not fun, because Mario lost his gills in the jump to 3D. Not only does the water's surface heal Runners much slower, but Hunters have an upgraded punch that travels faster. Don't expect smooth sailing, considering the sunken ship.
+Wait, I thought Cool Cool Mountain was Course 3? Nope, the first water level is, but everyone would prefer to put it off for later. The swimming physics haven't exactly aged well, especially for any poor keyboard players. Water levels in MarioHunt are not fun, because Mario lost his gills in the jump to 3D. Not only does the water's surface heal Runners much slower, but Hunters have an upgraded punch that travels faster. The worst part is that most of the Stars here are unobtainable in Act 1. Don't expect smooth sailing, considering the sunken ship.
 
 ### Plunder In The Sunken Ship
 TERRIBLE. First, push your nose against Unagi, then swim up for air. Hopefully, Unagi moves out of the entrance. After making your way inside, grab the Treasure Chest that's placed away from the others, then grab the rest in a clockwise motion, starting with the one in the top left (when facing towards the other end of the ship).
 
 ![Bottom Left, Top Left, Top Right, Bottom Middle.](img/ship_chest_order.png)
 
-Finally, swim quickly to the box to avoid having to platform. If the Hunters corner you while in the ship, you're done for. Thankfully, the chests don't reset, so you don't have to worry as much about guessing wrong.
+Finally, swim quickly to the box to avoid having to platform. If the Hunters corner you while in the ship, you're done for. Thankfully, the Hunters cannot open the chests themselves.
 
-If you're using OMM Rebirth, you can simply open the box using Cappy (although the chests will be needed in order to leave).
+If you're using OMM Rebirth, you can simply open the Exclamation Box using Cappy (although the chests will be needed in order to leave).
 
 ### Can The Eel Come Out To Play?
-INSERT STAR DESCRIPTION
+Another difficult star. Unlike the sunken ship star, you'll have to loiter around Unagi for a bit before he'll come out to play. Once he does, quickly swim into his tail to get the star.
 
 ### Treasure Of The Ocean Cave
-INSERT STAR DESCRIPTION
+Probably your best bet if you're entering this level for the first time. After swimming into the titular Ocean Cave, reach the chests and open them in this order: Up, Left, Right, Down. You'll need to dodge the Hunters until the Star appears.
+
+Advice for swimming in general: Try to swim erratically so it's harder for Hunters to hit you. To swim as quickly as possible, press A at the end of each stroke, in a rhythm. In OMM Rebirth, you can swim much faster by first Ground-Pounding, then holding B. This will drain your air much faster, but you can easily outswim the Hunters. Be sure to grab some coins so you're less vulnerable when you reach the cave.
 
 ### Red Coins On The Ship Afloat
-INSERT STAR DESCRIPTION
+Unfortunately, three of the red coins are on the ship, which isn't available in Act 1. While one can be reached with a Long Jump, the other two, as well as the star itself, cannot be reached with the vanilla moveset.
+
+Many of the red coins are also hidden within clams. You'll have to swim next to the clam, then stop before it opens. Otherwise, you'll be knocked back. When Faster Swimming is enabled, this will warp you to the surface, making this even more frustrating. There are no red coins in the Ocean Cave.
+
+In OMM Rebirth, you can simply throw Cappy upwards to collect the red coins. For collecting the star, you can jump from the Blast To The Stone Pillar ledge, or perform a [Vertical Cap Bounce](advice.md#vertical-cap-bounce). If you can't do this, you'll have to enter the Ship, then open the chests to get the ship to appear on the water's surface. You can also collect the coins in the clams by simply throwing Cappy at them.
 
 ### Blast To The Stone Pillar
-INSERT STAR DESCRIPTION
+You'll need the cannon for this Star, which can't be opened in Act 1. Once the cannon is opened, aim for directly above the stalagmite, about the center of the cloud in the background.
+
+![Aim directly above the stalagmite, about the center of the cloud.](img/jrb_cannon.png)
+
+But what if I told you don't actually need the cannon? [This pretty controversial trick](https://www.youtube.com/watch?v=6Z-IvLlzesQ) lets you simple *walk* up the pole. For coop, the trick is significantly easier on keyboard.
+
+And for OMM Rebirth, you can just like, wall jump or something. You can actually Spin Jump straight up the stalagmites, even.
 
 ### Through The Jet Stream
-INSERT STAR DESCRIPTION
+Usually, you need the Metal Cap for this Star. However, with some practice, you can actually reach the Star just by swimming. Press A about the end of each stroke to swim as fast as possible.
 
 ### 100 Coins Star (JRB)
-INSERT STAR DESCRIPTION
+This is only barely possible in Act 1. There are only 104 coins in this entire course, so exactly 100 can be obtained in Act 1. Obviously, this is a bit easier in OMM. Overall, I wouldn't recommend attempting this star at all.

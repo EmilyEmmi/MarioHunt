@@ -718,10 +718,10 @@ mh gfield\
 mh complete\
 mh wing-cap\
 mh set-fov\
-mh debug-move\
 mh djui\
 mh hidehud\
 mh print\
+\
 Enjoy this sweet\
 knowledge!"))
 
@@ -846,6 +846,37 @@ local skip = {
 function auto_skip(id)
   if id == gBehaviorValues.dialogs.Mips1Dialog or id == gBehaviorValues.dialogs.Mips2Dialog then return false end -- always skip mips dialog
   if id == gBehaviorValues.dialogs.TuxieMotherDialog or id == gBehaviorValues.dialogs.TuxieMotherBabyFoundDialog then return false end -- always skip mother dialog
+
+  -- skip boss dialog if hunter
+  if gPlayerSyncTable[0].team ~= 1 then
+    local skip_boss = {
+      [gBehaviorValues.dialogs.Bowser1Dialog] = 1,
+      [gBehaviorValues.dialogs.Bowser1DefeatedDialog] = 1,
+      [gBehaviorValues.dialogs.Bowser2Dialog] = 1,
+      [gBehaviorValues.dialogs.Bowser2DefeatedDialog] = 1,
+      [gBehaviorValues.dialogs.Bowser3Dialog] = 1,
+      [gBehaviorValues.dialogs.Bowser3DefeatedDialog] = 1,
+      [gBehaviorValues.dialogs.Bowser3Defeated120StarsDialog] = 1,
+      [gBehaviorValues.dialogs.KingBobombIntroDialog] = 1,
+      [gBehaviorValues.dialogs.KingBobombCheatDialog] = 1,
+      [gBehaviorValues.dialogs.KingBobombDefeatDialog] = 1,
+      [gBehaviorValues.dialogs.KingWhompDialog] = 1,
+      [gBehaviorValues.dialogs.KingWhompDefeatDialog] = 1,
+      [gBehaviorValues.dialogs.WigglerDialog] = 1,
+      [gBehaviorValues.dialogs.WigglerAttack1Dialog] = 1,
+      [gBehaviorValues.dialogs.WigglerAttack2Dialog] = 1,
+      [gBehaviorValues.dialogs.WigglerAttack3Dialog] = 1,
+      [gBehaviorValues.dialogs.EyerokIntroDialog] = 1,
+      [gBehaviorValues.dialogs.EyerokDefeatedDialog] = 1,
+      [gBehaviorValues.dialogs.TuxieMotherBabyWrongDialog] = 1,
+      [gBehaviorValues.dialogs.BobombBuddyBob1Dialog] = 1,
+      [gBehaviorValues.dialogs.BobombBuddyBob2Dialog] = 1,
+      [gBehaviorValues.dialogs.BobombBuddyOther1Dialog] = 1,
+      [gBehaviorValues.dialogs.BobombBuddyOther2Dialog] = 1,
+    }
+
+    if skip_boss[id] then return false end
+  end
 
   if gGlobalSyncTable.romhackFile ~= "vanilla" then return end
 

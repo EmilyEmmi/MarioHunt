@@ -1,5 +1,5 @@
 # Da Rulz (Standard Modes)
-This includes rules for both Normal and Switch mode. Click [here](mini.md) for MiniHunt rules.
+This includes rules for both Normal and Swap mode. Click [here](mini.md) for MiniHunt rules.
 
 ## THE GOAL:
 **Runners** have to beat the game.
@@ -7,11 +7,11 @@ For vanilla, this simply means defeating Bowser and collecting the Grand Star.
 
 **Hunters** have a different goal depending on the mode.
   - NORMAL: Stop the Runners. This usually just means beating them up.
-  - SWITCH: Defeat a Runner to become a Runner. **Hunters can't win** in this mode, so their goal is to become a Runner.
+  - SWAP: Defeat a Runner to become a Runner. **Hunters can't win** in this mode, so their goal is to become a Runner.
 
 Runners only have a certain amount of lives. When they run out:
   - NORMAL: They become Hunters. After all Runners are eliminated, Hunters win.
-  - SWITCH: Whoever killed them (or a random player, if no one did) becomes a Runner.
+  - SWAP: Whoever killed them (or a random player, if no one did) becomes a Runner.
 
 ## THE TIMER:
 Runners have a timer for when they can leave a stage. The time starts at one of the following, whichever is lowest:

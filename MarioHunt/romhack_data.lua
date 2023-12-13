@@ -30,8 +30,8 @@ local romhack_data = { -- supported rom hack data
     -- all one table now!
     star_data = {
       [COURSE_BOB] = {8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8},
-      [COURSE_WF] = {8 | STAR_ACT_SPECIFIC, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8, 8},
-      [COURSE_JRB] = {8 | STAR_ACT_SPECIFIC, 1, 1, 1, 1, 1 | STAR_NOT_ACT_1, 1},
+      [COURSE_WF] = {8 | STAR_ACT_SPECIFIC, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8},
+      [COURSE_JRB] = {8 | STAR_ACT_SPECIFIC, 1 | STAR_ACT_SPECIFIC, 1, 1, 1, 1 | STAR_NOT_ACT_1, 1},
       [COURSE_CCM] = {8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8},
       [COURSE_BBH] = {8 | STAR_ACT_SPECIFIC, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8, 8},
       [COURSE_LLL] = {1, 1, 1, 1, 8, 8, 1},
@@ -424,11 +424,12 @@ local romhack_data = { -- supported rom hack data
 ["Ztar Attack 2"] = {
   name = "\\#0c33c2\\Ztar Attack \\#c20c0c\\2",
   default_stars = -1, -- no stars required!
-  max_stars = 90,
+  max_stars = 91,
   -- no requirements!
   stalk = true, -- makes this hack less annoying
   starColor = {r = 145,g = 207,b = 187}, -- stars are light green
   ommSupport = false, -- does not have default omm support
+  final = -1,
 
   -- cancel visible secrets (so they so show up as stars)
   special_run = function(m,gotStar)
@@ -495,7 +496,7 @@ local romhack_data = { -- supported rom hack data
     [222] = "Deep In The Cavern",
     [223] = "Scaling The Ice",
     [224] = "The Crystal Maze",
-    [225] = "A Brainwashed King",
+    [226] = "A Brainwashed King",
     -- 5-4
     [181] = "Bowser's Beautiful Garden",
     [182] = "Castle Siege",
@@ -508,7 +509,8 @@ local romhack_data = { -- supported rom hack data
     -- extra levels
     [231] = "A Hundred Coins Of Chaos", -- Negative Realm
     [191] = "Quizmaster", -- The Super Quiz
-    [253] = "Thanks For Playing!", -- The End
+    [251] = "Thanks For Playing!", -- The End
+    [253] = "The Princess's Present", -- The End
     -- Gaell's Dream
     [241] = "Stars Across Time And Space",
     [242] = "The End Of Time",
@@ -521,7 +523,10 @@ local romhack_data = { -- supported rom hack data
   },
 
   runner_victory = function(m) -- red switch is after bowser
-    if (save_file_get_flags() & SAVE_FLAG_HAVE_WING_CAP) ~= 0 and m.numStars >= gGlobalSyncTable.starRun then
+    if (save_file_get_flags() & SAVE_FLAG_HAVE_WING_CAP) ~= 0 and not gGlobalSyncTable.bowserBeaten then
+      gGlobalSyncTable.bowserBeaten = true
+    end
+    if gGlobalSyncTable.bowserBeaten and m.numStars >= gGlobalSyncTable.starRun then
       return true
     end
     return false
@@ -626,6 +631,7 @@ local romhack_data = { -- supported rom hack data
   isUnder = true, -- activates special star detection
   noLobby = true,
   starColor = {r = 0, g = 255, b = 255}, -- light blue
+  final = -1,
 
   -- prevents moving at start, disables some things
   special_run = function(m,gotStar)
@@ -723,12 +729,13 @@ local romhack_data = { -- supported rom hack data
 ["B3313"] = {
   name = "B3313",
   default_stars = 30, -- just a number
-  max_stars = 120, -- unknown how many stars there actually are
+  max_stars = 120, -- unknown how many stars there actually are (auto-generated)
   vagueName = true, -- the names are all identical, just use course numbers
   -- no requirements
   parseStars = true, -- automatically generate star list (this hack is too large I can't be bothered)
   stalk = true, -- the hack is confusing, so let people warp
   ommSupport = false,
+  final = -1,
 
   star_data = {}, -- filled when parsed
 
@@ -1067,7 +1074,12 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
   local romhack_file = gGlobalSyncTable.romhackFile
   ROMHACK = romhack_data[romhack_file]
   if initial and usingOMM then
-    djui_popup_create(trans("omm_detected"), 1)
+    local verstring = (_G.OmmVersion and _G.OmmVersion:sub(9)) or "Unknown"
+    if tonumber(verstring) and tonumber(verstring) >= 1.2 then
+      djui_popup_create(trans("omm_detected"), 1)
+    else
+      djui_popup_create(trans("omm_bad_version","1.2",verstring), 3)
+    end
   end
 
   local found_121 = false
@@ -1170,13 +1182,13 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
     end
   end
 
-  if (ROMHACK ~= nil and ROMHACK.stalk == nil) then
-    update_chat_command_description("stalk", "- " .. trans("wrong_mode"))
-  else
-    update_chat_command_description("stalk", trans("stalk_desc"))
-  end
-
   if settingRomHack then
+    gGlobalSyncTable.allowStalk = ROMHACK.stalk or false
+    if (ROMHACK ~= nil and ROMHACK.stalk == nil) then
+      update_chat_command_description("stalk", "- " .. trans("command_disabled"))
+    else
+      update_chat_command_description("stalk", trans("stalk_desc"))
+    end
     gGlobalSyncTable.starRun = ROMHACK.default_stars
     gGlobalSyncTable.noBowser = ROMHACK.no_bowser or false
     gGlobalSyncTable.romhackFile = romhack_file
@@ -1464,6 +1476,7 @@ end
 -- runs for all players unless dontReload is true
 function on_black_changed(tag, oldVal, newVal)
   if oldVal ~= newVal and (not dontReload) then
+    print("updated blacklist")
     setup_mini_blacklist(newVal)
   elseif dontReload then
     dontReload = false

@@ -1,5 +1,5 @@
 # Advice
-This is advice for Normal and Switch mode. These tips should apply regardless of the romhack.
+This is advice for Normal and Swap mode. These tips should apply regardless of the romhack.
 
 # Runners
 
@@ -64,10 +64,9 @@ You can't dive in that!
 Generally, you'll want to **Roll** by crouching and mashing B.
 Roll down a slope, and you'll go even faster.
 
-But what if there was a way to go fast in the *air*? Well, let me introduce you to the most broken tech in gaming history (citation needed)...
+However, there's even more crazy tech you can do with this moveset...
 
 ### Gork Jump
-#### (idk why it's called this)
 
 This tech lets you to travel INSANE distances in the air. Here's how to do it:
 
@@ -75,10 +74,24 @@ This tech lets you to travel INSANE distances in the air. Here's how to do it:
 
 2: Throw Cappy.
 
-3: Quickly jump and hold Y to spin.
+3: Hold Y and immediately jump to perform a Spin Jump.
 
-Now you have all of the speed of a downward roll, but in the air. Better yet, if you jump as you hit the ground, you **still keep the speed**.
-It travels so far, you can collect Mario Wings To The Sky without the cannon or wing cap!
+Now you have all of the speed of a downward roll, but in the air. Better yet, if you jump as you hit the ground, you **still keep the speed**. You can also kick for a small burst of height.
+It travels so far, you can collect Mario Wings To The Sky without the cannon or wing cap, with the help of this second technique.
+
+### Vertical Cap Bounce
+
+This semi-precise trick is great for reaching high areas. Here's how to do it:
+
+1: Be in midair. When performing this from the ground, it's best to use a Spin Jump, since they're quick to perform and go incredibly high. You can also do a Kick right before this trick for just a *bit* of extra height.
+
+2: Let go of the Left Stick and throw Cappy straight upwards (X while holding DPAD-UP or X + A simultaneously, although the latter is tricky). This will cancel all of your horizontal momentum, which is necessary.
+
+3: Kick with B, then immediately Air Dive (Z, then B again). If all went well, you'll jump off of Cappy, and can follow up with a Spin or Kick. You can start moving the stick as soon as you Air Dive. If you miss Cappy, you either dived too late or started moving too early.
+
+Both of these tricks are seen [here](https://youtu.be/rNW1cAagrWc?t=39) (video by ColbyRayz!).
+
+For more OMM Rebirth tech, check out [this video](https://www.youtube.com/watch?v=xVvl9tYUbgA) by Key's Artworks.
 
 # Hunters
 
@@ -100,4 +113,4 @@ You can also grab the Metal Cap to deal double damage. Combine this with a Groun
 
 Cappy is also a great murder weapon.
 Type /omm, and set him to *Damage*.
-He'll deal two damage to any Runners he hits, and you can use the D-Pad to home in.
+He'll deal one HP to any Runners he hits, and you can use the D-Pad to home in.

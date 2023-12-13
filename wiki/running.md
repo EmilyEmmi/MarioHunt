@@ -1,5 +1,5 @@
 # Running a Game
-**FIRST: If you are playing in one of the Standard modes (Normal and Switch) make sure you start with an empty save file!** Unless you're continuing a past game, of course. Don't worry about this with MiniHunt.
+**FIRST: If you are playing in one of the Standard modes (Normal and Swap) make sure you reset the save file (/mh start reset, or "Reset Alt Save") in the menu. ** Unless you're continuing a past game, of course. Don't worry about this with MiniHunt.
 
 Previously, you had to type commands for every single thing. However, thanks to Blocky, there is now a built-in menu that can do it instead. If you would like to know the commands anyway, check [here](commands.md).
 
