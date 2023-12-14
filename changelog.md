@@ -1,4 +1,15 @@
 # Changelog
+## v2.4.1
+### Additions:
+  - Added the ability to change the countdown until Hunters can move
+    - Thanks to BizzareScape for this suggestion!
+### Adjustments:
+  - The starting game timer now has lower priority over the camp timer
+  - The starting game timer now only appears in the castle
+### Fixes:
+  - Fixed a very exploitable bug, which I am not going to mention to prevent abuse
+  - Runners may now win or lose during the starting timer
+  - Fixed being Hunters being unable to win in Normal mode if the host is paused
 ## v2.4
 ### Additions:
   - Added Hunter Glow option, which makes Hunters glow red

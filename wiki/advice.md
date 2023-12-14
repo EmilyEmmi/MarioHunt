@@ -67,6 +67,7 @@ Roll down a slope, and you'll go even faster.
 However, there's even more crazy tech you can do with this moveset...
 
 ### Gork Jump
+#### (idk why it's called this)
 
 This tech lets you to travel INSANE distances in the air. Here's how to do it:
 
@@ -74,7 +75,7 @@ This tech lets you to travel INSANE distances in the air. Here's how to do it:
 
 2: Throw Cappy.
 
-3: Hold Y and immediately jump to perform a Spin Jump.
+3: Hold Y and immediatly jump to perform a Spin Jump.
 
 Now you have all of the speed of a downward roll, but in the air. Better yet, if you jump as you hit the ground, you **still keep the speed**. You can also kick for a small burst of height.
 It travels so far, you can collect Mario Wings To The Sky without the cannon or wing cap, with the help of this second technique.
@@ -87,7 +88,7 @@ This semi-precise trick is great for reaching high areas. Here's how to do it:
 
 2: Let go of the Left Stick and throw Cappy straight upwards (X while holding DPAD-UP or X + A simultaneously, although the latter is tricky). This will cancel all of your horizontal momentum, which is necessary.
 
-3: Kick with B, then immediately Air Dive (Z, then B again). If all went well, you'll jump off of Cappy, and can follow up with a Spin or Kick. You can start moving the stick as soon as you Air Dive. If you miss Cappy, you either dived too late or started moving too early.
+3: Kick with B, then immediatly Air Dive (Z, then B again). If all went well, you'll jump off of Cappy, and can follow up with a Spin or Kick. You can start moving the stick as soon as you Air Dive. If you miss Cappy, you either dived too late or started moving too early.
 
 Both of these tricks are seen [here](https://youtu.be/rNW1cAagrWc?t=39) (video by ColbyRayz!).
 

@@ -131,9 +131,6 @@ function mario_update_local(m)
 
     if STP.spectator == 1 then
 
-        if (MSP.action == ACT_START_SLEEPING) then
-            set_mario_action(MSP, ACT_WAKING_UP, 0)
-        end
 
         MSP.marioObj.header.gfx.node.flags = MSP.marioObj.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
         MSP.marioObj.oIntangibleTimer = -1

@@ -159,7 +159,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   new_record = "\\#ffff5a\\NEW RECORD!!!",
   on = "\\#5aff5a\\ON",
   off = "\\#ff5a5a\\OFF",
-  frozen = "Frozen for %d", -- needs translated (in seconds)
+  frozen = "Frozen for %d",
 
   -- popups
   lost_life = "%s\\#ffa0a0\\ lost a life!",
@@ -185,7 +185,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   incompatible_hack = "WARNING: Hack does not have compatibility!",
   vanilla = "Using vanilla game",
   omm_detected = "OMM Rebirth detected!",
-  omm_bad_version = "\\#ff5a5a\\OMM Rebirth is outdated!\\#ffffff\\\nMinimum version: %s\nYour version: %s", -- needs translated
+  omm_bad_version = "\\#ff5a5a\\OMM Rebirth is outdated!\\#ffffff\\\nMinimum version: %s\nYour version: %s",
   warp_spam = "Slow down with the warps!",
   no_valid_star = "Could not find a valid star!",
   custom_enter = "%s\\#ffffff\\ entered\n%s", -- same as coop
@@ -203,8 +203,8 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   not_mod = "You don't have the AUTHORITY to run this command, you fool!",
   no_such_player = "No such player exists",
   bad_id = "Invalid player ID!",
-  command_disabled = "This command is disabled.", -- needs translated
-  change_setting = "Setting change:", -- needs translated
+  command_disabled = "This command is disabled.",
+  change_setting = "Setting change:",
 
   -- more command feedback
   bad_param = "Invalid parameters!",
@@ -239,8 +239,8 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   player_paused = "%s has been paused",
   player_unpaused = "%s has been unpaused",
   hunter_metal = "All hunters are metal",
-  hunter_normal = "All hunters appear normal", -- needs translated
-  hunter_glow = "All hunters glow red", -- needs translated
+  hunter_normal = "All hunters appear normal",
+  hunter_glow = "All hunters glow red",
   now_weak = "All players have half invincibility frames",
   not_weak = "All players have normal invincibility frames",
   auto_on = "Games will start automatically",
@@ -368,7 +368,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   starmode_desc = "[ON|OFF] - Toggles using stars collected instead of time",
   spectator_desc = "[ON|OFF] - Toggles Hunters' ability to spectate",
   pause_desc = "[NAME|ID|ALL] - Toggles pause status for specified players, or all if not specified",
-  app_desc = "Changes the appearance of Hunters.", -- needs translated
+  app_desc = "Changes the appearance of Hunters.",
   hack_desc = "[STRING] - Sets current rom hack",
   weak_desc = "[ON|OFF] - Cuts invincibility frames in half for all players",
   auto_desc = "[ON|OFF|NUM] - Start games automatically",
@@ -377,7 +377,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   stop_desc = "- Stop the game",
   default_desc = "- Set settings to default",
   blacklist_desc = "[ADD|REMOVE|LIST|RESET|SAVE|LOAD,COURSE,ACT] - Blacklist stars in MiniHunt",
-  stalking_desc = "[ON|OFF] - Allow warping to a Runner's level with /stalk", -- needs translated
+  stalking_desc = "[ON|OFF] - Allow warping to a Runner's level with /stalk",
 
   -- Blocky's menu
   main_menu = "Main Menu",
@@ -409,7 +409,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_coop = "Coop",
 
   menu_gamemode = "Gamemode",
-  menu_app = "Hunter Appearance", -- needs translated
+  menu_app = "Hunter Appearance",
   menu_weak = "Weak Mode",
   menu_allow_spectate = "Allow Spectating",
   menu_star_mode = "Star Mode",
@@ -428,7 +428,9 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_first_timer = "Leader Death Timer",
   menu_first_timer_desc = "Gives the leader in MiniHunt a death timer.",
   menu_defeat_bowser = "Defeat %s",
-  menu_allow_stalk = "Allow 'Stalking'", -- needs translated
+  menu_allow_stalk = "Allow 'Stalking'",
+  menu_countdown = "Countdown",
+  menu_countdown_desc = "How long Hunters must wait before starting.",
 
   menu_flip = "Flip Team",
   menu_spectate = "Spectate",
@@ -800,7 +802,7 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   menu_campaign = "Campaña",
 
   menu_gamemode = "Modo de juego",
-  menu_app = "Cazadores con apariencia de Metal", -- Needs re-translated
+  menu_app = "Cazadores con apariencia de Metal",
   menu_weak = "Modo débil",
   menu_allow_spectate = "Permitir espectadores",
   menu_star_mode = "Modo de estrellas",

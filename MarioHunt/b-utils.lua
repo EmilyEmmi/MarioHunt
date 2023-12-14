@@ -268,7 +268,7 @@ function desync_fix_command(msg)
     local oldTeam = sMario.team or 0
     local oldStars = sMario.totalStars or 0
     if oldTeam == 1 then
-      local oldLives = sMario.runnerlives
+      local oldLives = sMario.runnerLives -- I wrote "runnerlives" instead before smh
       sMario.runnerLives = -1
       sMario.runnerLives = oldLives
     end

@@ -1,4 +1,4 @@
--- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hun\\\\t\\#dcdcdc\\ (v2.4) !
+-- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hun\\\\t\\#dcdcdc\\ (v2.4.1) !
 -- incompatible: gamemode
 -- description: A gamemode based off of Beyond's concept.\n\nHunters stop Runners from clearing the game!\n\nProgramming by EmilyEmmi, TroopaParaKoopa, Blocky, Sunk, and Sprinter05.\n\nSpanish Translation made with help from KanHeaven and SonicDark.\nGerman Translation made by N64 Mario.\nBrazillian Portuguese translation made by PietroM.\nFrench translation made by Skeltan.\n\n\"Shooting Star Summit\" port by pieordie1
 
@@ -80,6 +80,7 @@ if network_is_server() then
   GST.bowserBeaten = false  -- used for some rom hacks as a two-part completion process
   GST.ee = false            -- used for SM74
   GST.forceSpectate = false -- force all players to spectate unless otherwise stated
+  GST.countdown = 300       -- countdown before hunters can move (normal/swap), default 300 (10 s)
 end
 
 if get_os_name() ~= "Mac OSX" then -- replacing sequnce past 0x47 crashes the game on mac
@@ -175,7 +176,7 @@ function do_game_start(data, self)
   elseif string.lower(cmd) ~= "continue" then
     deathTimer = 1830     -- start with 60 seconds
     GST.mhState = 1
-    GST.mhTimer = 15 * 30 -- 15 seconds
+    GST.mhTimer = 5 * 30 + GST.countdown -- 5 seconds + countdown setting
   else
     deathTimer = 900      -- start with 30 seconds
     GST.mhState = 2
@@ -398,7 +399,7 @@ function calculate_leave_requirements(sMario, runTime, gotStar)
     star_data_table = { 8 } -- treat DDD as only having star 1
   end
 
-  -- if a "exit" star was obtained, allow leaving immediatly
+  -- if a "exit" star was obtained, allow leaving immediately
   if gotStar and star_data_table[gotStar] and star_data_table[gotStar] & STAR_EXIT ~= 0 then
     local skip_rule = (gLevelValues.disableActs and star_data_table[gotStar] & STAR_APPLY_NO_ACTS == 0)
     if not skip_rule then
@@ -599,7 +600,7 @@ function on_death(m, nonStandard)
     killCombo = 0
 
     -- change to hunter
-    if GST.mhState == 2 and sMario0.team == 1 and sMario0.runnerLives <= 0 then
+    if (GST.mhState == 1 or GST.mhState == 2) and sMario0.team == 1 and sMario0.runnerLives <= 0 then
       runner = true
       m.numLives = 100
       become_hunter(sMario0)
@@ -623,7 +624,7 @@ function on_death(m, nonStandard)
       end
     end
 
-    if sMario0.runnerLives ~= nil and GST.mhState == 2 then
+    if sMario0.runnerLives ~= nil and (GST.mhState == 1 or GST.mhState == 2) then
       sMario0.runnerLives = sMario0.runnerLives - 1
       runner = true
     end
@@ -718,7 +719,7 @@ function update()
   end
 
   -- detect victory for runners
-  if GST.mhState == 2 and GST.mhMode ~= 2 and sMario0.team == 1 then
+  if (GST.mhState == 1 or GST.mhState == 2) and GST.mhMode ~= 2 and sMario0.team == 1 then
     local win = false
     if GST.noBowser then
       win = m0.numStars >= GST.starRun
@@ -792,7 +793,7 @@ function update()
         end
       end
 
-      if GST.mhMode ~= 2 and (GST.mhState ~= 0 and (GST.mhState == 2 or (GST.mhState < 3 and GST.mhTimer < 300))) then
+      if GST.mhMode ~= 2 and (GST.mhState ~= 0 and (GST.mhState == 2 or (GST.mhState < 3 and GST.mhTimer < GST.countdown))) then
         GST.speedrunTimer = GST.speedrunTimer + 1
       end
 
@@ -813,6 +814,36 @@ function update()
             end
           end
         end
+      end
+    end
+  end
+
+  -- detect victory for hunters (only host to avoid disconnect bugs)
+  if network_is_server() and (GST.mhState == 1 or GST.mhState == 2) and GST.mhMode == 0 then
+    -- check for runners
+    local stillrunners = false
+    for i = 0, (MAX_PLAYERS - 1) do
+      if PST[i].team == 1 and NetP[i].connected then
+        stillrunners = true
+        break
+      end
+    end
+
+    if stillrunners == false then
+      for id, data in pairs(rejoin_timer) do
+        if data.timer > 0 and data.runner then
+          stillrunners = true
+          break
+        end
+      end
+      if stillrunners == false then
+        network_send_include_self(true, {
+          id = PACKET_GAME_END,
+          winner = 0,
+        })
+        rejoin_timer = {}
+        GST.mhState = 3
+        GST.mhTimer = 20 * 30 -- 20 seconds
       end
     end
   end
@@ -1038,7 +1069,7 @@ function load_settings(miniOnly, starOnly, lifeOnly)
   if not network_is_server() then return end
 
   local settings = { "mhMode", "runnerLives", "starMode", "runTime", "allowSpectate", "weak", "campaignCourse",
-    "gameAuto", "dmgAdd", "anarchy", "nerfVanish", "firstTimer" }
+    "gameAuto", "dmgAdd", "anarchy", "nerfVanish", "firstTimer", "countdown" }
   for i, setting in ipairs(settings) do
     local option = mod_storage_load(setting)
 
@@ -1116,7 +1147,7 @@ function save_settings()
   if not network_is_server() then return end
 
   local settings = { "runnerLives", "starMode", "runTime", "allowSpectate", "weak", "mhMode", "campaignCourse",
-    "gameAuto", "dmgAdd", "anarchy", "nerfVanish", "firstTimer" }
+    "gameAuto", "dmgAdd", "anarchy", "nerfVanish", "firstTimer", "countdown" }
   for i, setting in ipairs(settings) do
     local option = GST[setting]
 
@@ -1188,6 +1219,7 @@ function default_settings()
   GST.campaignCourse = 0
   GST.nerfVanish = true
   GST.firstTimer = true
+  GST.countdown = 300
   save_settings()
   return true
 end
@@ -1308,6 +1340,10 @@ function get_setting_as_string(name, value)
     if GST.mhMode == 2 then
       value = nil
     end
+  elseif name == "menu_countdown" then
+    local seconds = value // 30 % 60
+    local minutes = (value // 1800)
+    value = "\\#ffff5a\\" .. string.format("%d:%02d", minutes, seconds)
   end
 
   if value == true then
@@ -1525,9 +1561,7 @@ function on_hud_render()
 
   local text = ""
   -- yay long if statement
-  if GST.mhState == 1 then -- game start timer
-    text = timer_hud()
-  elseif tonumber(sMario0.pause) then
+  if tonumber(sMario0.pause) then
     text = timer_hud(sMario0)
   elseif GST.mhState == 0 then
     text = unstarted_hud(sMario0)
@@ -1535,6 +1569,8 @@ function on_hud_render()
     text = camp_hud(sMario0)
   elseif GST.mhState ~= nil and GST.mhState >= 3 then -- game end
     text = victory_hud()
+  elseif GST.mhState == 1 and np0.currCourseNum == 0 then -- game start timer
+    text = timer_hud()
   elseif sMario0.team == 1 then                       -- do runner hud
     text = runner_hud(sMario0)
   else                                                -- do hunter hud
@@ -1869,13 +1905,13 @@ end
 
 function timer_hud(sMario)
   -- set timer text
-  local frames = (sMario and sMario.pause) or GST.mhTimer
+  local frames = (sMario and sMario.pause) or (GST.mhTimer)
   local seconds = math.ceil(frames / 30)
   local text = ""
   if not sMario then
     text = trans("until_hunters", seconds)
-    if seconds > 10 then
-      text = trans("until_runners", (seconds - 10))
+    if frames > GST.countdown then
+      text = trans("until_runners", (seconds - GST.countdown//30))
     end
   else
     text = trans("frozen", seconds)
@@ -2829,36 +2865,6 @@ function hunter_update(m)
   elseif m.action ~= ACT_IN_CANNON then
     campTimer = nil
   end
-
-  -- detect victory for hunters (only host to avoid disconnect bugs)
-  if network_is_server() then
-    -- check for runners
-    local stillrunners = false
-    for i = 0, (MAX_PLAYERS - 1) do
-      if PST[i].team == 1 and NetP[i].connected then
-        stillrunners = true
-        break
-      end
-    end
-
-    if stillrunners == false and GST.mhState < 3 and GST.mhMode == 0 then
-      for id, data in pairs(rejoin_timer) do
-        if data.timer > 0 and data.runner then
-          stillrunners = true
-          break
-        end
-      end
-      if stillrunners == false then
-        network_send_include_self(true, {
-          id = PACKET_GAME_END,
-          winner = 0,
-        })
-        rejoin_timer = {}
-        GST.mhState = 3
-        GST.mhTimer = 20 * 30 -- 20 seconds
-      end
-    end
-  end
 end
 
 function before_set_mario_action(m, action)
@@ -3043,7 +3049,7 @@ function do_pause()
   -- only during timer or pause
   if sMario0.pause
       or (GST.mhState == 1
-        and sMario0.spectator ~= 1 and (sMario0.team ~= 1 or GST.mhTimer > 10 * 30)) then -- runners get 10 second head start
+        and sMario0.spectator ~= 1 and (sMario0.team ~= 1 or GST.countdown - GST.mhTimer < 0)) then -- runners get 10 second head start
     if not paused then
       djui_popup_create(trans("paused"), 1)
       paused = true
@@ -3952,11 +3958,11 @@ hook_on_sync_table_change(GST, "mhState", "change_state", on_state_changed)
 
 -- setting changes
 local settings = { "runnerLives", "starMode", "runTime", "allowSpectate", "weak", "campaignCourse",
-  "gameAuto", "dmgAdd", "anarchy", "nerfVanish", "firstTimer", "allowStalk", "starRun", "noBowser" }
+  "gameAuto", "dmgAdd", "anarchy", "nerfVanish", "firstTimer", "allowStalk", "starRun", "noBowser", "countdown" }
 local settingName = { "menu_run_lives", "menu_star_mode", "menu_time", "menu_allow_spectate", "menu_weak",
   "menu_campaign",
   "menu_auto", "menu_dmgAdd", "menu_anarchy", "menu_nerf_vanish", "menu_first_timer", "menu_allow_stalk", "menu_category",
-  "menu_defeat_bowser" }
+  "menu_defeat_bowser", "menu_countdown" }
 for i, setting in ipairs(settings) do
   hook_on_sync_table_change(GST, setting, settingName[i], on_setting_changed)
 end
