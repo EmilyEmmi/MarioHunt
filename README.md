@@ -1,6 +1,6 @@
 <img src="wiki\img\logo.png" alt="MarioHunt" width="800"/>
 
-### v2.3 (wip) (view changelog [here](changelog.md))
+### v2.4.1 (view changelog [here](changelog.md))
 
 ## [Trailer](https://www.youtube.com/watch?v=hyuXu4Bzugs&ab_channel=N64Mario)
 
@@ -20,7 +20,7 @@ A mod for sm64ex-coop
 <br/>
 Main Programming by **EmilyEmmi**
 
-Some additional programming by **TroopaParaKoopa** and **EmeraldLockdown**
+Some additional programming by **TroopaParaKoopa**, **EmeraldLockdown** and **Isaac**
 
 Some assets made by **N64-Mario**
 
@@ -32,7 +32,7 @@ Spectator mod by **Sprinter05**
 
 Mute mod created by **Beard**
 
-Also special thanks to **ColbyRayz!** for testing and support
+Also special thanks to **ColbyRayz!** and **Key's Artworks** for testing and support
 <br/>
 <br/>
 <br/>
