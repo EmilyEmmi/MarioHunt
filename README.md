@@ -28,6 +28,8 @@ Automatic Doors and Disable Star Spawn Cutscenes by **Blocky** and **Sunk**
 
 Menu framework created by **Blocky**
 
+MH Lobby logo created by **LeoHaha**
+
 Spectator mod by **Sprinter05**
 
 Mute mod created by **Beard**
