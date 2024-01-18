@@ -22,23 +22,21 @@ IF something you want to translate does not use this table, you can add it to yo
 function trans(id,format,format2_,lang_)
   local usingLang = lang_ or lang or "en"
   local format2 = format2_ or 10
-  if id == nil then
+  if not id then
     return "INVALID"
   elseif month == 13 and not noSeason then
-    if id == "menu_mh" then
-      id = "menu_mh_egg"
-    elseif id == "rules_desc" then
-      id = "rules_desc_egg"
+    if id == "menu_mh" or id == "rules_desc" or id == "up_to_date" or id == "has_update" then
+      id = id .. "_egg"
     end
   end
-  if langdata == nil then return id end
+  if not langdata then return id end
 
-  if langdata[usingLang] == nil then
+  if not langdata[usingLang] then
     usingLang = "en"
   end
 
   local translation = langdata[usingLang][id] or langdata["en"][id] or id
-  if format ~= nil then
+  if format then
     translation = string.format(translation,format,format2)
   end
   return translation
@@ -46,7 +44,7 @@ end
 -- this is for scenarios where a word needs to be plural or not plural (usually "life/lives")
 function trans_plural(id,format,format2_,lang_)
   local num = tonumber(format2_) or tonumber(format) or 0
-  if num ~= 1 or id == nil then
+  if num ~= 1 or not id then
     return trans(id,format,format2_,lang_)
   else
     return trans(id.."_one",format,format2_,lang_)
@@ -80,6 +78,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   stats_desc = "- Show/hide stat table",
   stalk_desc = "[NAME|ID] - Warps to the level the specified player is in, or the first Runner",
   spectate_desc = "[NAME|ID|OFF] - Spectate the specified player, free camera if not specified, or OFF to turn off", -- not to be confused with spectator_desc
+  target_desc = "[NAME|ID] - Set this Runner as your target, which displays their location at all times.", -- needs ES translation
 
   -- roles
   runner = "Runner",
@@ -192,6 +191,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   vanish_custom = "Hold \\#ffff5a\\B\\#ffffff\\ to vanish!",
   got_all_stars = "You have enough stars!",
   unstuck = "Attempted to fix state",
+  use_out = "Use /mh out to warp everyone out of this level", -- needs ES translation
   stars_in_area = "%d star(s) available here!",
   demon_unlock = "Unlocked Green Demon mode!",
   hit_switch_red = "%s\\#ffa0a0\\ hit the\n\\#df5050\\Red Switch!", -- dark red (unique)
@@ -205,6 +205,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   bad_id = "Invalid player ID!",
   command_disabled = "This command is disabled.",
   change_setting = "Setting change:",
+  you_are_muted = "You are muted.", -- needs ES translation
 
   -- more command feedback
   bad_param = "Invalid parameters!",
@@ -241,6 +242,11 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   hunter_metal = "All hunters are metal",
   hunter_normal = "All hunters appear normal",
   hunter_glow = "All hunters glow red",
+  hunter_outline = "All hunters have an outline", -- needs ES translation
+  runner_sparkle = "All runners now sparkle", -- needs ES translation
+  runner_normal = "All runners appear normal",
+  runner_glow = "All runners now glow", -- needs ES translation
+  runner_outline = "All runners have an outline", -- needs ES translation
   now_weak = "All players have half invincibility frames",
   not_weak = "All players have normal invincibility frames",
   auto_on = "Games will start automatically",
@@ -263,6 +269,15 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   anarchy_set_2 = "Hunters can attack their teammates",
   anarchy_set_3 = "Players can attack their teammates",
   dmgAdd_set = "Runners will now take %d extra damage from PVP attacks.",
+  dmgAdd_set_ohko = "Runners will now die in one hit", -- needs ES translation
+  voidDmg_set = "Players will take %d damage from falling into the void or quicksand.", -- needs ES translation
+  voidDmg_set_ohko = "Players will instantly die from falling into the void or quicksand.", -- needs ES translation
+  target_hunters_only = "Only Hunters can set a target.", -- needs ES translation
+  muted = "\\#ffff00\\%s\\#ffffff\\ was muted by \\#ffff00\\%s\\#ffffff\\.", -- needs ES translation
+  unmuted = "\\#ffff00\\%s\\#ffffff\\ was unmuted by \\#ffff00\\%s\\#ffffff\\.", -- needs ES translation
+  you_muted = "You muted \\#ffff00\\%s\\#ffffff\\.", -- needs ES translation
+  you_unmuted = "You unmuted \\#ffff00\\%s\\#ffffff\\.", -- needs ES translation
+  mute_auto = "\\#ffff00\\%s\\#ffffff\\ was muted automatically.", -- needs ES translation
 
   -- team chat
   tc_toggle = "Team chat is %s!",
@@ -368,7 +383,8 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   starmode_desc = "[ON|OFF] - Toggles using stars collected instead of time",
   spectator_desc = "[ON|OFF] - Toggles Hunters' ability to spectate",
   pause_desc = "[NAME|ID|ALL] - Toggles pause status for specified players, or all if not specified",
-  app_desc = "Changes the appearance of Hunters.",
+  hunter_app_desc = "Changes the appearance of Hunters.",
+  runner_app_desc = "Changes the appearance of Runners.",
   hack_desc = "[STRING] - Sets current rom hack",
   weak_desc = "[ON|OFF] - Cuts invincibility frames in half for all players",
   auto_desc = "[ON|OFF|NUM] - Start games automatically",
@@ -378,6 +394,9 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   default_desc = "- Set settings to default",
   blacklist_desc = "[ADD|REMOVE|LIST|RESET|SAVE|LOAD,COURSE,ACT] - Blacklist stars in MiniHunt",
   stalking_desc = "[ON|OFF] - Allow warping to a Runner's level with /stalk",
+  mute_desc = "[NAME|ID] - Mutes a player, preventing them from chatting", -- needs ES translation
+  unmute_desc = "[NAME|ID] - Unmutes a player, allowing them to chat again", -- needs ES translation
+  out_desc = "- Kicks everyone out of this level", -- needs ES translation
 
   -- Blocky's menu
   main_menu = "Main Menu",
@@ -409,7 +428,8 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_coop = "Coop",
 
   menu_gamemode = "Gamemode",
-  menu_app = "Hunter Appearance",
+  menu_hunter_app = "Hunter Appearance",
+  menu_runner_app = "Runner Appearance",
   menu_weak = "Weak Mode",
   menu_allow_spectate = "Allow Spectating",
   menu_star_mode = "Star Mode",
@@ -429,8 +449,12 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_first_timer_desc = "Gives the leader in MiniHunt a death timer.",
   menu_defeat_bowser = "Defeat %s",
   menu_allow_stalk = "Allow 'Stalking'",
-  menu_countdown = "Countdown",
-  menu_countdown_desc = "How long Hunters must wait before starting.",
+  menu_countdown = "Countdown", -- needs ES translation
+  menu_countdown_desc = "How long Hunters must wait before starting.", -- needs ES translation
+  menu_voidDmg = "Void DMG", -- needs ES translation
+  menu_voidDmg_desc = "Damage dealt to players falling into the void or quicksand.", -- needs ES translation
+  menu_double_health = "Double Runner Health", -- needs ES translation
+  menu_double_health_desc = "Runners get 16 points of health instead of 8.", -- needs ES translation
 
   menu_flip = "Flip Team",
   menu_spectate = "Spectate",
@@ -441,6 +465,8 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_allowleave = "Allow to Leave",
   menu_setlife = "Set Lives",
   menu_players_all = "All Players",
+  menu_target = "Set as Target", -- needs ES translation
+  menu_mute = "Mute", -- needs ES translation
 
   menu_timer = "Speedrun Timer",
   menu_timer_desc = "[ON|OFF] - Show a timer at the bottom of the screen in Standard modes.",
@@ -482,6 +508,12 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_blacklist_reset_desc = "Reset the blacklist to the default.",
   menu_toggle_all = "Toggle All",
 
+  -- updater
+  up_to_date = "\\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\ is up to date!", -- needs translation
+  up_to_date_egg = "\\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\ is up to date!", -- needs translation
+  has_update = "An update is avalible for \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\!", -- needs translation
+  has_update_egg = "An update is avalible for \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\!", -- needs translation
+
   -- These commands only appear to me, so I wouldn't bother translating them. You can delete these lines and everything should still work.
   print_desc = "[STRING] - Outputs message to console",
   warp_desc = "[LEVEL|COURSE,AREA,ACT,NODE] - Warp to level",
@@ -500,13 +532,13 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   ["kill-bowser_desc"] = "- Kills Bowser, if he exists",
 }
 
-langdata["es"] = -- massively improved by KanHeaven and SonicDark
+langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by EpikCool
 {
   -- fullname for auto select
   fullname = "Spanish",
 
   -- name in the built-in menu
-  name_menu = "Español",
+  name_menu = "Español (LatAm)", -- I wanted to keep the name shorter
 
   -- global command info
   to_switch = "Escribe \"/lang %s\" para cambiar idioma",
@@ -602,14 +634,14 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   set_hack = "Romhack seleccionado: %s",
   incompatible_hack = "ADVERTENCIA: ¡Este romhack no es compatible!",
   vanilla = "Usando el juego original",
-  omm_detected = "¡Se detectó OMM Rebirth!",
+  omm_detected = "¡Se Detecto El OMM Rebirth!",
   omm_bad_version = "\\#ff5a5a\\¡OMM Rebirth está desactualizado!\\#ffffff\\\nVersión mínima: %s\nTu versión: %s",
-  warp_spam = "¡Más despacio con los warps!",
+  warp_spam = "¡No te teletransportes tan rapido!",
   no_valid_star = "¡No se ha podido encontrar una estrella válida!",
   custom_enter = "%s\\#ffffff\\ ha entrado a\n%s", -- same as coop
 
   -- command feedback
-  not_mod = "No tienes la AUTORIDAD para usar este comando, ¡tontito!",
+  not_mod = "No tienes la AUTORIDAD para usar este comando, ¡Tonto!",
   no_such_player = "Ese jugador no existe",
   bad_id = "¡ID de jugador inválido!",
   command_disabled = "Este comando está deshabilitado.",
@@ -649,6 +681,7 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   hunter_metal = "Todos los Cazadores son de metal",
   hunter_normal = "Todos los Cazadores se verán normales",
   hunter_glow = "Todos los Cazadores brillarán rojo",
+  runner_normal = "Todos los Corredores se verán normales",
   now_weak = "Todos los jugadores tienen la mitad de invincibility frames",
   not_weak = "Todos los jugadores tienen invincibility frames normales",
   auto_on = "Las partidas empezarán automáticamente",
@@ -764,7 +797,8 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   starmode_desc = "[ON|OFF] - Utiliza las estrellas recogidas en lugar del tiempo para que los Corredores puedan abandonar el nivel",
   spectator_desc = "[ON|OFF] - Permite a los cazadores ser espectadores",
   pause_desc = "[NAME|ID|ALL] - Pausa a los jugadores especificados, o a todos si no especificas uno",
-  app_desc = "Cambia la apariencia de los Cazadores.",
+  hunter_app_desc = "Cambia la apariencia de los Cazadores.",
+  runner_app_desc = "Cambia la apariencia de los Corredores.",
   hack_desc = "[STRING] - Selecciona el rom hack actual",
   weak_desc = "[ON|OFF] - Reduce los invincibility frames a la mitad a todos los jugadores",
   auto_desc = "[ON|OFF|NUM] - Inicia la partida automaticamente",
@@ -802,7 +836,8 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   menu_campaign = "Campaña",
 
   menu_gamemode = "Modo de juego",
-  menu_app = "Cazadores con apariencia de Metal",
+  menu_hunter_app = "Apariencia de los Cazadores",
+  menu_runner_app = "Apariencia de los Corredores",
   menu_weak = "Modo débil",
   menu_allow_spectate = "Permitir espectadores",
   menu_star_mode = "Modo de estrellas",
@@ -858,12 +893,12 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   menu_toggle_all = "Alternar todos",
 
   -- unorganized
-  lang_desc = "%s - Ajusta el idioma",
-  got_all_stars = "¡Tienes suficientes estrellas!",
-  menu_hide_roles_desc = "Oculta tus roles en el chat.",
+  lang_desc = "%s - Ajusta el Lenguaje",
+  got_all_stars = "¡Tienen la Cantidad necesaria de estrellas!",
+  menu_hide_roles_desc = "Esconder tus Roles en el chat.",
   spectate_desc = "[NAME|ID|OFF] - Sé espectador del jugador especificado, cámara libre si no es especificado, o OFF para salir",
-  tc_desc = "[ON|OFF|MSG] - Envía un mensaje solamente a tu equipo; ON para aplicar a todos los mensajes",
-  stars_in_area = "¡Hay %d estrella(s) disponible(s) aquí!",
+  tc_desc = "[ON|OFF|MSG] - Envía un mensaje Uniquamente a tu equipo; ON para aplicar a todos los mensajes",
+  stars_in_area = "¡Hay %d estrella(s) Sin recolectar(se) aquí!",
   role_cont = "\\#ff9696\\[MH Colaborador]",
   role_trans = "\\#ffd996\\[MH Traductor]",
   role_lead = "\\#9a96ff\\[MH Programadora Líder]",
@@ -875,32 +910,32 @@ langdata["es"] = -- massively improved by KanHeaven and SonicDark
   menu_nerf_vanish = "Nerfear Gorra de Invisibilidad",
   stat_placement = "Puesto en 64 Tour",
   menu_fast = "Acciones más rápidas",
-  new_record = "\\#ffff5a\\¡¡¡NUEVO RÉCORD!!!",
+  new_record = "\\#ffff5a\\¡¡¡HICISTE NUEVO RÉCORD!!!",
   anarchy_set_2 = "Los cazadores ahora pueden atacar a sus compañeros de equipo",
-  no_runners_added = "No se agregaron Corredores",
+  no_runners_added = "No agregaron corredores",
   menu_first_timer_desc = "Agrega al líder en MiniHunt un temporizador de muerte.",
   role_dev = "\\#96ecff\\[MH Programador]",
   menu_nerf_vanish_desc = "Nerfea la gorra de invisibilidad haciéndola activable (con B) y se acaba más rápido cuando se usa.",
-  unstuck = "Se intentó reparar el nivel",
+  unstuck = "Se Reparo El Nivel",
   menu_list_settings = "Lista de Ajustes",
   anarchy_set_3 = "Los jugadores ahora pueden atacar a sus compañeros de equipo",
   menu_fast_desc = "Te recuperarás, lanzarás objetos, y abrirás puertas más rápido.",
-  menu_hide_hud = "Esconder interfaz",
-  hidehud_desc = "- Esconde todos los elementos de la interfaz.",
+  menu_hide_hud = "Esconder El hud",
+  hidehud_desc = "- Esconde todos los Todo  el Hud Completo.",
   dmgAdd_set = "Los corredores ahora tomarán %d daño extra de los ataques PVP.",
-  hard_desc = "[EX|ON|OFF,ON|OFF] - Activa el modo difícil para ti",
-  menu_dmgAdd = "Aumentar daño del corredor",
+  hard_desc = "[EX|ON|OFF,ON|OFF] - Se Activara El Modo Dificil Para a ti",
+  menu_dmgAdd = "Aumentar el daño al Corredor",
   menu_anarchy_desc = "Permite que el equipo especificado pueda atacarse entre sí.",
   rules_desc = "- Muestra las reglas de MarioHunt",
-  rules_desc_egg = "- Muestra las reglas de LuigiHunt",
-  menu_anarchy = "Fuego Amigo",
+  rules_desc_egg = "- Oye Descubriste El Luigi Hunt Que suerte!",
+  menu_anarchy = "Atacar a Amigo",
   mh_desc = "[COMMAND,ARGS] - Ejecuta comandos; escribe nada o \"menu\" para abrir el menú",
-  vanish_custom = "¡Mantén \\#ffff5a\\B\\#ffffff\\ para volverte invisible!",
+  vanish_custom = "¡Mantiene el boton \\#ffff5a\\B\\#ffffff\\ para volverte invisible!",
   menu_list_settings_desc = "Lista todos los ajustes para esta partida.",
   anarchy_set_1 = "Los corredores ahora pueden atacar a sus compañeros de equipo",
   anarchy_set_0 = "Los jugadores ya no pueden atacar a sus compañeros de equipo",
   menu_dmgAdd_desc = "Agrega la cantidad de daño especificada a los corredores.",
-  mini_score = "Puntuación: %d",
+  mini_score = "Puntaje: %d",
   stats_desc = "- Muestra/oculta la tabla de estadísticas",
 }
 
@@ -1005,6 +1040,7 @@ langdata["de"] = -- by N64 Mario
   hit_switch_green = "%s drückte den\n\\#50b05a\\Grünen Schalter!",
   hit_switch_blue = "%s drückte den\n\\#5050e3\\Blauen Schalter!",
   hit_switch_yellow = "%s drückte den\n\\#e3b050\\Gelben Schalter...",
+  use_out = "Benutze /mh out, um alle aus diesem Level zu warpen",
 
   -- command feedback
   not_mod = "Du hast nicht die BERECHTIGUNG diesen Befehl auszuführen.",
@@ -1012,6 +1048,7 @@ langdata["de"] = -- by N64 Mario
   bad_id = "Ungültige Spieler ID!",
   command_disabled = "Dieser Befehl ist deaktiviert.",
   change_setting = "Einstellungsänderung:",
+  you_are_muted = "Du bist stummgeschaltet.",
 
   -- more command feedback
   bad_param = "Ungültige Parameter!",
@@ -1047,6 +1084,7 @@ langdata["de"] = -- by N64 Mario
   hunter_metal = "Alle Jäger sind Metall",
   hunter_normal = "Alle Jäger sehen normal aus",
   hunter_glow = "All Jäger glühen rot",
+  runner_normal = "Alle Läufer sehen normal aus",
   now_weak = "Alle Spieler haben Halbunbesiegbarkeitsrahmen",
   not_weak = "Alle Spieler haben normale Unbesiegbarkeitsrahmen",
   auto_on = "Spiele werden automatisch starten",
@@ -1069,8 +1107,8 @@ langdata["de"] = -- by N64 Mario
   "\n\\#ffffff\\Tippe /hard ON wenn sie für die Herausforderungen bereit sind.",
   hard_mode = "Harter Modus",
   extreme_mode = "Extrem Modus",
-  hard_info_short = "Hälfte des Lebens, wasser heilt nicht, und ein Leben.",
-  extreme_info_short = "Einen Powermeter, einen Leben und Todestimer.",
+  hard_info_short = "Hälfte des Powermeters, Wasser heilt nicht und nur ein Leben.",
+  extreme_info_short = "Einen Schadenspunkt, einen Leben und Todestimer.",
 
   -- spectator
   hunters_only = "Nur Jäger können zuschauen!",
@@ -1130,11 +1168,23 @@ langdata["de"] = -- by N64 Mario
   starmode_desc = "[ON|OFF] - Schaltet die gesammelten Sterne anstelle der Zeit um",
   spectator_desc = "[ON|OFF] - Schaltet die Fähigkeit von Jägern, zuzuschauen",
   pause_desc = "[NAME|ID|ALL] - Schaltet den Pausenstatus für bestimmte Spieler um, oder für alle, wenn nicht angegeben",
-  app_desc = "Verändert das Aussehen von Jägern.",
+  hunter_app_desc = "Verändert das Aussehen von Jägern.",
+  runner_app_desc = "Verändert das Aussehen von Läufern.",
   hack_desc = "[STRING] - Legt den aktuellen Rom Hack fest",
   weak_desc = "[ON|OFF] - Halbiert die Unbesiegbarkeitsrahmen für alle Spieler",
   auto_desc = "[ON|OFF] - Startet Spiele automatisch",
   stalking_desc = "[ON|OFF] - Erlaube auf das Level, bei dem sich der Läufer befindet mit /stalk zu warpen",
+  hidehud_desc = "Verstecke alle HUD Elemente.",
+  mute_desc = "[NAME|ID] - Mutes a player, preventing them from chatting",
+  unmute_desc = "[NAME|ID] - Unmutes a player, allowing them to chat again",
+  out_desc = "- Kicks everyone out of this level",
+
+  -- mute
+  muted = "\\#ffff00\\%s\\#ffffff\\ wurde von \\#ffff00\\%s\\#ffffff\\ stummgeschaltet.",
+  unmuted = "Die Stummschaltung von \\#ffff00\\%s\\#ffffff\\ wurde von \\#ffff00\\%s\\#ffffff\\ aufgehoben.",
+  you_muted = "Du hast \\#ffff00\\%s\\#ffffff\\ stummgeschaltet.",
+  you_unmuted = "Du hast die Stummschaltung von \\#ffff00\\%s\\#ffffff\\ aufgehoben.",
+  mute_auto = "\\#ffff00\\%s\\#ffffff\\ wurde automatisch stummgeschaltet.",
 
   -- Blocky's menu
   main_menu = "Hauptmenü",
@@ -1158,6 +1208,20 @@ langdata["de"] = -- by N64 Mario
   menu_allow_stalk = "'Stalking' erlauben",
   menu_season = "Ändert die Jahreszeit",
   menu_season_desc = "Lustige visuelle Veränderungen je nach Datum.",
+  menu_countdown = "Countdown",
+  menu_countdown_desc = "Wie lange Jäger warten müssen, bevor sie beginnen können.",
+  menu_voidDmg = "Abgrund Schaden",
+  menu_voidDmg_desc = "Schaden, der Spielern zugefügt wird, die in den Abgrund oder Treibsand fallen.",
+  menu_double_health = "Doppel Läufer Leben",
+  menu_double_health_desc = "Läufer erhalten 16 statt 8 Schadenspunkte.",
+  menu_target = "Als Ziel festlegen",
+  menu_mute = "Stummschalten",
+
+  -- updater (difference for "_egg" is Luigi instead of Mario)
+  up_to_date = "\\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\ ist auf dem neuesten Stand!",
+  up_to_date_egg = "\\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\ ist auf dem neuesten Stand!",
+  has_update = "Ein Update ist verfügbar für \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\!",
+  has_update_egg = "Ein Update ist verfügbar für \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\!",
 
   -- unsorted
   lang_desc = "%s - Sprache wechseln",
@@ -1212,7 +1276,8 @@ langdata["de"] = -- by N64 Mario
   menu_blacklist_list_desc = "Listet alle auf der schwarzen Liste stehenden Sterne in MiniHunt für diesen Server auf.",
   menu_pause = "Pause",
   menu_players_all = "Alle Spieler",
-  menu_app = "Aussehen von Jägern",
+  menu_hunter_app = "Aussehen von Jägern",
+  menu_runner_app = "Aussehen von Läufern",
   menu_toggle_all = "Alles umschalten",
   menu_blacklist_reset_desc = "Setzt die schwarze Liste auf den Standard zurück.",
   unstuck = "Es wurde versucht den aktuellen Zustand zu beheben",
@@ -1230,10 +1295,9 @@ langdata["de"] = -- by N64 Mario
   menu_spectate_run = "Läufer zuschauen",
   anarchy_set_3 = "Spieler können ihre Mitspieler attackieren",
   menu_free_cam_desc = "Aktiviere die freie Kamera im Zuschauermodus.",
-  menu_fast_desc = "Sie werfen Gegenstände und öffnen Türen schneller.",
+  menu_fast_desc = "Man wirft Gegenstände und öffnet Türen schneller.",
   menu_secret = "Das ist ein Geheimnis. Wie schaltet man es frei?",
-  menu_hide_hud = "Verstecke HUD",
-  menu_hide_hud_desc = "Verstecke alle HUD Elemente.",
+  menu_hide_hud = "Verstecke alle HUD Elemente",
   menu_stalk = "Warpe zum Level",
   dmgAdd_set = "Läufer nehmen jetzt %d zusätzlichen Schaden durch PvP-Angriffe.",
   hard_desc = "[EX|ON|OFF,ON|OFF] - Schalte den Harter Modus für Sie selbst um",
@@ -1292,6 +1356,7 @@ langdata["de"] = -- by N64 Mario
   blacklist_save = "Schwarze Liste gespeichert!",
   blacklist_load = "Schwarze Liste geladen!",
   demon_unlock = "Green Demon Modus freigeschaltet!",
+  target_desc = "[NAME|ID] - Lege diesen Läufer als Ihr Ziel fest, das jederzeit seinen Standort anzeigt.",
 }
 
 langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
@@ -1457,6 +1522,11 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   hunter_metal = "Todos os Caçadores serão metálicos",
   hunter_normal = "Todos os Caçadores estão com aparência normal.",
   hunter_glow = "Todos os Caçadores brilham em vermelho",
+  hunter_outline = "Todos os Caçadores têm um contorno.",
+  runner_normal = "Todos os Corredores estão com aparência normal.",
+  runner_sparkle = "Todos os Corredores emitem um efeito.",
+  runner_glow = "Todos os Corredores brilham",
+  runner_outline = "Todos os Corredores têm um contorno",
   now_weak = "Todos os jogadores têm meio-frame (quadro) de invencibilidade.",
   not_weak = "Todos os jogadores têm frames (quadros) de invencibilidade.",
   auto_on = "A rodada vai iniciar automaticamente",
@@ -1544,11 +1614,19 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   starmode_desc = "[ON|OFF] - Define que sejam utilizadas estrelas coletadas e não um cronômetro",
   spectator_desc = "[ON|OFF] - Liga para os Caçadores a habilidade de observar a partida",
   pause_desc = "[NAME|ID|ALL] - Aciona o modo pausa para o(s) jogador(es), todos se não for especificado",
-  app_desc = "Muda a aparência dos Caçadores.",
+  hunter_app_desc = "Muda a aparência dos Caçadores.",
+  runner_app_desc = "Muda a aparência dos Corredores.",
   hack_desc = "[STRING] - Seleciona a Rom-Hack atual.",
   weak_desc = "[ON|OFF] - Cortar os quadros de invencibilidade no meio para todos os jogadores",
   auto_desc = "[ON|OFF|NUM] - Inicia partidas automaticamente.",
   stalking_desc = "[ON|OFF] - Permite teleportar para o nível de um caçador com /stalk",
+
+  -- mute
+  muted = "\\#ffff00\\%s\\#ffffff\\ foi silenciado por \\#ffff00\\%s\\#ffffff\\.",
+  unmuted = "\\#ffff00\\%s\\#ffffff\\ permitiu \\#ffff00\\%s\\#ffffff\\ falar novamente.",
+  you_muted = "Você silenciou \\#ffff00\\%s\\#ffffff\\.",
+  you_unmuted = "Você permitiu \\#ffff00\\%s\\#ffffff\\ falar novamente.",
+  mute_auto = "\\#ffff00\\%s\\#ffffff\\ foi silenciado automaticamente.",
 
   -- Blocky's menu
   main_menu = "Menu Principal",
@@ -1564,10 +1642,17 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   menu_stars = "Estrelas",
   menu_tc = "Chat de time",
   menu_defeat_bowser = "Derrote %s",
-  menu_app = "Aparência do Caçador",
+  menu_hunter_app = "Aparência do Caçador",
+  menu_runner_app = "Aparência do Corredor",
   menu_allow_stalk = "Permitir 'Perseguição'",
   menu_season = "Mudanças Temáticas",
   menu_season_desc = "Mudanças visuais divertidas podem acontecer dependendo da data.",
+
+  -- updater (difference for "_egg" is Luigi instead of Mario)
+  up_to_date = "\\#ff5a5a\\Caça\\#00ffff\\Mario\\#ffffff\\ está na versão mais recente!",
+  up_to_date_egg = "\\#ff5a5a\\Caça\\#5aff5a\\Luigi\\#ffffff\\ está na versão mais recente!",
+  has_update = "Uma versão nova de \\#ff5a5a\\Caça\\#00ffff\\Mario\\#ffffff\\ está disponível!",
+  has_update_egg = "Uma versão nova de \\#ff5a5a\\Caça\\#5aff5a\\Luigi\\#ffffff\\ está disponível!",
 
   -- not really organized
   lang_desc = "%s - Trocar linguagem",
@@ -1648,6 +1733,10 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   hidehud_desc = "- Esconder todos os elementos do HUD.",
   menu_stalk = "Teleportar para a fase",
   dmgAdd_set = "Corredores agora tomarão %d de dano extra por ataques PvP.",
+  dmgAdd_set_ohko = "Os Corredores morrerão após um único dano",
+  voidDmg_set = "Jogadores tomarão um dano de %d por cair em buracos ou em areia movediça.",
+  voidDmg_set_ohko = "Jogadores morrerão instantaneamente após cair em um buraco ou em areia movediça.",
+  target_hunters_only = "Apenas Caçadores podem selecionar um alvo.",
   hard_desc = "[EX|ON|OFF,ON|OFF] - Ligar o Modo Difícil apenas para você",
   is_spectator = "* ESSE JOGADOR ESTÁ OBSERVANDO  *",
   menu_setlife = "Definir vidas extras",
@@ -1707,6 +1796,20 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   menu_time = "Tempo",
   desync_desc = "- Tenta arrumar problemas de dessincronizacão",
   role_cont = "\\#ff9696\\[Contribuidor MH]",
+  target_desc = "[NAME|ID] - Selecionar este Corredor como seu alvo. Ele estará em destaque na tela a todo tempo.",
+  use_out = "Use /mh out para expulsar todos de um mundo.",
+  you_are_muted = "Você está silenciado.",
+  out_desc = "- Expulsa todos de um mundo",
+  menu_countdown = "Contagem Regressiva",
+  menu_countdown_desc = "Quanto um Caçador deve esperar até começar.",
+  menu_voidDmg = "DN. de Buraco",
+  menu_voidDmg_desc = "Dano que um jogador recebe ao cair num buraco sem fundo ou areia movediça.",
+  menu_double_health = "Dobro da Barra de Vida do Corredor",
+  menu_double_health_desc = "Caçadores têm direito à 16 pontos de vida ao invés de 8.",
+  menu_target = "Selecionar como Alvo",
+  menu_mute = "Silenciar",
+  mute_desc = "[NAME|ID] - Silencia um jogador, fazendo com que ele não fale mais no chat",
+  unmute_desc = "[NAME|ID] - Permite que um jogador silenciado volte a falar no chat",
 
   ["set-fov_desc"] = "[NUM] - Modifica o campo de visão; deixe em branco para resetar.", -- I accidently added a dev command to be translated, oops
 }
@@ -1842,6 +1945,7 @@ langdata["fr"] = -- By Skeltan
   bad_id = "ID de joueur invalide!",
   command_disabled = "Cette commande est désactivée.",
   change_setting = "Paramètre changé:",
+  you_are_muted = "Vous êtes muet.", 
 
   -- more command feedback
   bad_param = "Paramètres Invalides!",
@@ -1864,7 +1968,7 @@ langdata["fr"] = -- By Skeltan
   new_category = "Il s'agit désormais d'un speedrun %d étoile(s)",
   new_category_any = "Il s'agit désormais d'un speedrun Any%",
   mode_normal = "En mode Normal",
-  mode_switch = "En mode Inversion de Rôles",
+  mode_swap = "En mode Inversion de Rôles",
   mode_mini = "En mode MiniHunt",
   using_stars = "Mode: Étoiles Ramassées",
   using_timer = "Mode: Compte à Rebours",
@@ -1877,6 +1981,7 @@ langdata["fr"] = -- By Skeltan
   hunter_metal = "Tous les Chasseurs sont en métal",
   hunter_normal = "Tous les Chasseurs apparaissent normalement",
   hunter_glow = "Tous les Chasseurs brillent en rouge",
+  runner_normal = "Tous les Coureurs apparaissent normalement",
   now_weak = "Tous les joueurs n'ont plus que la moitié de leurs frames d'invincibilité",
   not_weak = "Tous les joueurs ont leurs frames d'invincibilité par défaut",
   auto_on = "La partie commencera automatiquement",
@@ -1927,7 +2032,7 @@ langdata["fr"] = -- By Skeltan
   extreme_info_short = "Un seul PV, une seule vie, et compte à rebours mortel.",
 
   -- spectator
-  hunters_only = "Seuls les chasseurs peuvent être spectateurs!",
+  hunters_only = "Seuls les Chasseurs peuvent être spectateurs!",
   spectate_disabled = "Le mode spectateur est désactivé!",
   timer_going = "Vous ne pouvez pas être spectateur durant le compte à rebours!", -- now unused
   spectate_self = "Vous ne pouvez être votre propre spectateur!",
@@ -1997,7 +2102,8 @@ langdata["fr"] = -- By Skeltan
   starmode_desc = "[ON|OFF] - Active le Mode Étoiles Ramassées à la place du Mode Compte à Rebours",
   spectator_desc = "[ON|OFF] - Active la capacité des Chasseurs à devenir spectateurs",
   pause_desc = "[NAME|ID|ALL] - Met en pause le joueur spécifié, ou tous les joueurs si rien n'est spécifié",
-  app_desc = "Change l'apparence des Chasseurs.",
+  hunter_app_desc = "Change l'apparence des Chasseurs.",
+  runner_app_desc = "Change l'apparence des Coureurs.",
   hack_desc = "[STRING] - Défini la Rom-Hack actuelle",
   weak_desc = "[ON|OFF] - Divise les frames d'invincibilités par 2 pour tous les joueurs",
   auto_desc = "[ON|OFF|NUM] - Lance la partie automatiquement",
@@ -2035,7 +2141,8 @@ langdata["fr"] = -- By Skeltan
   menu_campaign = "Campagne",
 
   menu_gamemode = "Mode de Jeu",
-  menu_app = "Apparence des Chasseurs",
+  menu_hunter_app = "Apparence des Chasseurs",
+  menu_runner_app = "Apparence des Coureurs",
   menu_weak = "Mode Faible",
   menu_allow_spectate = "Autoriser le mode Spectateur",
   menu_star_mode = "Mode Étoiles Ramassées",
@@ -2047,6 +2154,12 @@ langdata["fr"] = -- By Skeltan
   menu_default = "Réinitialiser par défaut",
   menu_defeat_bowser = "Battez %s",
   menu_allow_stalk = "Autoriser le 'Stalking'",
+  menu_countdown = "Compte à rebours",
+  menu_countdown_desc = "Combien de temps les Chasseurs doivent attendre",
+  menu_voidDmg = "Dégâts du vide",
+  menu_voidDmg_desc = "Dégâts infligés aux joueurs tombant dans le vide ou les sables mouvants.",
+  menu_double_health = "Doubler la vie des Coureurs",
+  menu_double_health_desc = "Les Coureurs ont 16 points de vie au lieu de 8.",
 
   menu_flip = "Inverser l'équipe",
   menu_spectate = "Passer en Mode Spectateur",
@@ -2057,6 +2170,8 @@ langdata["fr"] = -- By Skeltan
   menu_allowleave = "Autoriser à sortir",
   menu_setlife = "Définir les vies",
   menu_players_all = "Tous les Joueurs",
+  menu_target = "Mettre en tant que cible",
+  menu_mute = "Muter",
 
   menu_timer = "Chronomètre de Speedrun",
   menu_timer_desc = "[ON|OFF] - Affiche un chronomètre en bas de l'écran dans les modes Standards.",
@@ -2094,7 +2209,7 @@ langdata["fr"] = -- By Skeltan
   menu_blacklist_reset = "Réinitialiser la liste noire",
   menu_blacklist_reset_desc = "Réinitialise la liste noire par celle par défaut.",
   menu_toggle_all = "Tout activer",
-
+  
   -- unorganized
   lang_desc = "%s - Changer de langue",
   got_all_stars = "Vous avez assez d'étoiles !",
@@ -2119,6 +2234,7 @@ langdata["fr"] = -- By Skeltan
   menu_first_timer_desc = "Donne au leader un timer de mort dans Minihunt.",
   menu_nerf_vanish_desc = "Nerf la casquette d'invisibilité en la rendant commutable et en réduisant sa durée d'utilisation.",
   unstuck = "Tentative de réparer l'État",
+  use_out = "Faites /mh out pour faire sortir tout le monde de ce niveau",
   menu_list_settings = "Paramètre des Listes",
   anarchy_set_3 = "Les joueurs peuvent attaquer leurs coéquipiers",
   menu_fast_desc = "Vous allez régénerer votre vie, lancer des objets et ouvrir les portes plus rapidement.",
@@ -2138,6 +2254,32 @@ langdata["fr"] = -- By Skeltan
   menu_dmgAdd_desc = "Ajoute cette quantité de dégâts supplémentaires aux attaques contre les Coureurs.",
   mini_score = "Score: %d", -- no translation needed for this one
   stats_desc = "- Afficher/Cacher la liste des stats",
+  target_desc = "[NAME|ID] - Défini ce Coureur en tant que cible, ce qui affiche sa position tout le temps.",
+  hunter_outline = "Tous les Chasseurs ont un contour",
+  runner_sparkle = "Tous les Coureurs scintillent",
+  runner_glow = "Tous les Coureurs brillent",
+  runner_outline = "Tous les Coureurs ont un contour",
+  dmgAdd_set_ohko = "Les Coureurs mourront en un coup",
+  voidDmg_set = "Les joueurs prendront %d dégâts s'ils tombent dans le vide ou les sables mouvants.",
+  voidDmg_set_ohko = "Les joueurs mourront instantanément s'ils tombent dans le vide ou les sables mouvants.",
+  target_hunters_only = "Seuls les Chasseurs peuvent mettre une cible.",
+
+  -- mute
+  muted = "\\#ffff00\\%s\\#ffffff\\ a été rendu muet par \\#ffff00\\%s\\#ffffff\\.",
+  unmuted = "\\#ffff00\\%s\\#ffffff\\ a retrouvé la parole grâce à \\#ffff00\\%s\\#ffffff\\.",
+  you_muted = "Vous avez rendu muet \\#ffff00\\%s\\#ffffff\\.",
+  you_unmuted = "Vous avez redonné la parole à \\#ffff00\\%s\\#ffffff\\.",
+  mute_auto = "\\#ffff00\\%s\\#ffffff\\ a été rendu muet automatiquement.",
+
+  mute_desc = "[NAME|ID] - Rend muet un joueur, les empêchant de parler",
+  unmute_desc = "[NAME|ID] - Rétablit la parole d'un joueur",
+  out_desc = "- Fait sortir tout le monde du niveau",
+
+  -- updater
+  up_to_date = "\\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\ est à jour!",
+  up_to_date_egg = "\\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\ est à jour!",
+  has_update = "Une mise à jour est disponible pour \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\!",
+  has_update_egg = "Une mise à jour est disponible pour \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\!"
 }
 
 -- language data ends here
@@ -2157,7 +2299,7 @@ lang_list = lang_list:sub(1,-2) .. "]"
 
 -- this allows players to switch languages
 function switch_lang(msg)
-  if langdata[string.lower(msg)] ~= nil then
+  if langdata[string.lower(msg)] then
     lang = string.lower(msg)
     djui_chat_message_create(trans("switched"))
     update_chat_command_description("mh", trans("mh_desc"))
@@ -2173,6 +2315,7 @@ function switch_lang(msg)
     end
     update_chat_command_description("timer", trans("menu_timer_desc"))
     update_chat_command_description("skip", trans("menu_skip_desc"))
+    update_chat_command_description("target", trans("target_desc"))
     if (gGlobalSyncTable.allowSpectate) then
       update_chat_command_description("spectate", trans("spectate_desc"))
     else
@@ -2189,7 +2332,7 @@ update_chat_command_description("mh", trans("mh_desc")) -- this is the only chat
 
 -- this handles auto select
 for langname,data in pairs(langdata) do
-  if data.fullname == smlua_text_utils_get_language() then
+  if data.fullname == smlua_text_utils_get_language() or (data.fullname == "Spanish" and data.fullname == smlua_text_utils_get_language():sub(1,-3)) then
     lang = langname
     break
   end
@@ -2197,25 +2340,17 @@ end
 
 -- debug command
 function lang_test(msg)
-  local args = {}
-  local lastspace = 0
-  while lastspace ~= nil do
-    lastspace = msg:find(" ")
-    if lastspace ~= nil then
-      local arg = msg:sub(1,lastspace-1)
-      table.insert(args, arg)
-      msg = msg:sub(lastspace+1)
-    else
-      local arg = msg
-      table.insert(args, arg)
-    end
-  end
+  local args = split(msg or "", " ")
   if args[1] == "all" then
     local allLang = {}
     for lang,data in pairs(langdata) do
-      if (args[2] == nil or lang == args[2]) and lang ~= "en" then
+      if ((not args[2]) or lang == args[2]) and lang ~= "en" then
         table.insert(allLang, lang)
       end
+    end
+    if #allLang == 0 then
+      djui_chat_message_create("Invalid language!")
+      return true
     end
     print("Missing translation:")
     for id,phrase in pairs(langdata["en"]) do
@@ -2224,7 +2359,7 @@ function lang_test(msg)
         local translated = trans(id,nil,10,lang)
 
         local noline = ""
-        if langdata[lang][id] == nil then noline = " (no line)" end
+        if not langdata[lang][id] then noline = " (no line)" end
 
         if translated == translated_en then
           djui_chat_message_create(id.." lacks translation for "..langdata[lang].fullname.."!"..noline)

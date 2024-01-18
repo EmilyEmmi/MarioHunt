@@ -27,13 +27,13 @@ That's pretty much all of the rules. Now for what isn't allowed in gameplay.
 
 ## NOT ALLOWED:
    - Skipping ahead: Some players might be clever and try to use Mips Clip or BLJs to skip chunks of the game. Unless this is an any% run, they will be warped back to the start if they try.
-   - Camping: Runners should not hide in unreachable areas. Hunters should not sit in levels, waiting for others to enter. Trying to stay in text boxes or menus for too long will be punished. **Standing next to Stars to prevent Runners from collecting them is also frowned upon.**
-   - Stalling: Runners should not run around aimlessly. This does nothing but waste everyone's time. Runners will be punished for constantly entering the same door over and over.
+   - Camping: Runners should not hide in unreachable areas. Hunters should not sit in levels, waiting for others to enter. Trying to stay in text boxes or menus for too long will be punished or prevented. **Standing next to Stars to prevent Runners from collecting them is also frowned upon.**
+   - Stalling: Runners should not run around aimlessly. This does nothing but waste everyone's time. Runners will be punished for constantly entering the same areas over and over.
    - Cross-Teaming: If you're Hunter, you're Hunter. You can't grab Stars and Red Coins. You *can* grab secrets, attack King Whomp, etc, but this helps the Runners. Don't do it. Pushing the Cap Switches generally helps the Runners too.
 
 ## MORALLY AMBIGUOUS ACTS:
 These are *technically* allowed, but may annoy some people.
    - Glitches: Some runners may try clipping through walls, especially in Hazy Maze Cave. Try to avoid this if you're playing with Hunters who cannot handle this.
-   - Holdable Objects: Hunters can pick up Mips and Tuxie to prevent Runners from benefitting from them. This is somewhat annoying, but even worse in 120 star runs. Don't be surprised if people complain.
+   - Holdable Objects: Hunters can pick up Tuxie to prevent Runners from benefitting from them. This is somewhat annoying, but even worse in 120 star runs. Don't be surprised if people complain. Holding Bowser is also possible as a Hunter, but can be more easily dealt with.
    - Trapping Runners: In BBH and HMC, there are elevators. Hunters could try using these to stop Runners from getting anywhere. Again, this is annoying.
    - WATER: Some romhacks (vanilla WDW does not) require raising and lowering the water to progress. Hunters can prevent Runners from making progress by constantly changing the water level. It WILL upset people.

@@ -34,7 +34,7 @@ local network_player_palette_to_color = network_player_palette_to_color
 local network_is_server = network_is_server
 local is_player_active = is_player_active
 local clampf = clampf
-local hud_render_power_meter_interpolated = hud_render_power_meter_interpolated
+local hud_render_power_meter_interpolated = (_G.mhExists and _G.mhApi.render_power_meter_interpolated) or hud_render_power_meter_interpolated
 local is_game_paused = is_game_paused
 local obj_get_first_with_behavior_id = obj_get_first_with_behavior_id
 
@@ -42,11 +42,11 @@ local obj_get_first_with_behavior_id = obj_get_first_with_behavior_id
 local mhExists = _G.mhExists or false
 local function get_role_name_and_color(index) end
 local function mh_is_spectator(index) return false end
-local function mh_is_menu_open() return false end
+local function get_mh_tag(index) return "" end
 if mhExists then
   mh_is_spectator = _G.mhApi.isSpectator
   get_role_name_and_color = _G.mhApi.get_role_name_and_color
-  mh_is_menu_open = _G.mhApi.isMenuOpen
+  get_mh_tag = _G.mhApi.get_tag
 end
 
 for i in pairs(gActiveMods) do
@@ -115,6 +115,66 @@ local function djui_hud_print_outlined_text_interpolated(text, prevX, prevY, pre
     djui_hud_set_color(255, 255, 255, 255)
 end
 
+-- for tags
+-- removes color string
+local function remove_color(text,get_color)
+    local start = text:find("\\")
+    local next = 1
+    while (next ~= nil) and (start ~= nil) do
+      start = text:find("\\")
+      if start ~= nil then
+        next = text:find("\\",start+1)
+        if next == nil then
+          next = text:len() + 1
+        end
+  
+        if get_color then
+          local color = text:sub(start,next)
+          local render = text:sub(1,start-1)
+          text = text:sub(next+1)
+          return text,color,render
+        else
+          text = text:sub(1,start-1) .. text:sub(next+1)
+        end
+      end
+    end
+    return text
+end
+  
+-- converts hex string to RGB values
+local function convert_color(text)
+    if text:sub(2,2) ~= "#" then
+      return nil
+    end
+    text = text:sub(3,-2)
+    local rstring = text:sub(1,2) or "ff"
+    local gstring = text:sub(3,4) or "ff"
+    local bstring = text:sub(5,6) or "ff"
+    local astring = text:sub(7,8) or "ff"
+    local r = tonumber("0x"..rstring) or 255
+    local g = tonumber("0x"..gstring) or 255
+    local b = tonumber("0x"..bstring) or 255
+    local a = tonumber("0x"..astring) or 255
+    return r,g,b,a
+end
+
+local function djui_hud_print_outlined_text_interpolated_with_color(text, prevX, prevY, prevScale, x, y, scale, alpha, outlineDarkness)
+    local space = 0
+    local color = ""
+    local render = ""
+    text,color,render = remove_color(text,true)
+    local r,g,b,a = 255,255,255,alpha or 255
+    while render ~= nil do
+      if render ~= "" then
+        djui_hud_print_outlined_text_interpolated(render, prevX+space, prevY, prevScale, x+space, y, scale, r, g, b, a, outlineDarkness);
+      end
+      r,g,b,a = convert_color(color)
+      space = space + djui_hud_measure_text(render) * scale
+      text,color,render = remove_color(text,true)
+    end
+    djui_hud_print_outlined_text_interpolated(text, prevX+space, prevY, prevScale, x+space, y, scale, r, g, b, a, outlineDarkness);
+  end
+
 local function name_without_hex(name)
     local s = ''
     local inSlash = false
@@ -141,9 +201,9 @@ local function on_hud_render()
     if gGlobalSyncTable.dist == 0 or (not showSelfTag and network_player_connected_count() == 1) or not gNetworkPlayers[0].currAreaSyncValid or obj_get_first_with_behavior_id(id_bhvActSelector) ~= nil then return end
 
     djui_hud_set_resolution(RESOLUTION_N64)
-    djui_hud_set_font(FONT_NORMAL)
 
     for i = if_then_else(showSelfTag, 0, 1), (MAX_PLAYERS - 1) do
+        djui_hud_set_font(FONT_NORMAL)
         local m = gMarioStates[i]
         local out = { x = 0, y = 0, z = 0 }
         local pos = { x = m.marioObj.header.gfx.pos.x, y = m.pos.y + 210, z = m.marioObj.header.gfx.pos.z }
@@ -157,29 +217,43 @@ local function on_hud_render()
             end
             local name = name_without_hex(gNetworkPlayers[i].name)
             local color = { r = 162, g = 202, b = 234 }
+            local tag = ""
 
-            local roleName = ""
             if not mhExists then
               network_player_palette_to_color(gNetworkPlayers[i], SHIRT, color)
             else
-              local dum = nil -- dummy
-              roleName,dum,color = get_role_name_and_color(i)
+              local dum,dum2,roleColor = get_role_name_and_color(i)
+              color = roleColor
+              tag = get_mh_tag(i)
             end
 
             local measure = djui_hud_measure_text(name) * scale * 0.5
+            
             local alpha = if_then_else(m.action ~= ACT_CROUCHING and m.action ~= ACT_START_CRAWLING and m.action ~= ACT_CRAWLING and m.action ~= ACT_STOP_CRAWLING, 255, 100)
 
             local e = gStateExtras[i]
 
+            local exHealthScale = 1
             djui_hud_print_outlined_text_interpolated(name, e.prevPos.x - measure, e.prevPos.y, e.prevScale, out.x - measure, out.y, scale, color.r, color.g, color.b, alpha, 0.25)
+            if tag ~= "" then
+                local tagMeasure = djui_hud_measure_text(name_without_hex(tag)) * scale * 0.5
+                djui_hud_print_outlined_text_interpolated_with_color(tag, e.prevPos.x - tagMeasure, e.prevPos.y-32*e.prevScale, e.prevScale, out.x - tagMeasure, out.y-32*scale, scale, alpha, 0.25)
+                exHealthScale = 1.3
+            end
 
             if m.playerIndex ~= 0 and showHealth then
                 djui_hud_set_adjusted_color(255, 255, 255, alpha)
                 local healthScale = 75 * scale
                 local prevHealthScale = 75 * e.prevScale
-                hud_render_power_meter_interpolated(m.health,
-                    e.prevPos.x - (prevHealthScale * 0.5), e.prevPos.y - prevHealthScale, prevHealthScale, prevHealthScale,
-                    out.x - (healthScale * 0.5), out.y - healthScale, healthScale, healthScale)
+                if _G.mhExists then 
+                    hud_render_power_meter_interpolated(m.health,
+                        e.prevPos.x - (prevHealthScale * 0.5), e.prevPos.y - prevHealthScale * exHealthScale, prevHealthScale, prevHealthScale,
+                        out.x - (healthScale * 0.5), out.y - healthScale * exHealthScale, healthScale, healthScale, m.playerIndex)
+                else
+                    hud_render_power_meter_interpolated(m.health,
+                        e.prevPos.x - (prevHealthScale * 0.5), e.prevPos.y - prevHealthScale * exHealthScale, prevHealthScale, prevHealthScale,
+                        out.x - (healthScale * 0.5), out.y - healthScale * exHealthScale, healthScale, healthScale)
+                end
             end
 
             e.prevPos.x = out.x
@@ -244,4 +318,8 @@ end
 
 hook_event(HOOK_ON_HUD_RENDER, on_hud_render)
 
-hook_chat_command("nametags", "\\#00ffff\\[show-tag|show-health|distance]", on_nametags_command)
+if SM64COOPDX_VERSION then
+    hook_chat_command("nametags_mh", "\\#00ffff\\[show-tag|show-health|distance]", on_nametags_command)
+else
+    hook_chat_command("nametags", "\\#00ffff\\[show-tag|show-health|distance]", on_nametags_command)
+end

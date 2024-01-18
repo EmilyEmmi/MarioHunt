@@ -6,7 +6,7 @@ function mario_hunt_command(msg)
   if not has_mod_powers(0) and msg ~= "unmod" and msg ~= "" and msg ~= "menu" then
     djui_chat_message_create(trans("not_mod"))
     return true
-  elseif marioHuntCommands == nil or #marioHuntCommands < 1 then
+  elseif not marioHuntCommands or #marioHuntCommands < 1 then
     setup_commands()
   end
 
@@ -28,7 +28,7 @@ function mario_hunt_command(msg)
   elseif usedCmd == "help" then
     local cmdPerPage = 3
 
-    if tonumber(data) == nil and data ~= "" then
+    if not tonumber(data) and data ~= "" then
       local foundCommand = false
       for i,cdata in ipairs(marioHuntCommands) do
         if cdata[1] == data or cdata[2] == data then
@@ -54,7 +54,7 @@ function mario_hunt_command(msg)
     end
     local page = tonumber(usedCmd) or tonumber(data) or 1
     page = math.floor(page)
-    local maxPage = 8
+    local maxPage = 9
     if has_mod_powers(0,true) then maxPage = math.ceil(#marioHuntCommands / cmdPerPage) end
 
     if page > maxPage then
@@ -89,7 +89,7 @@ function mario_hunt_command(msg)
         break
       end
     end
-    if cmd ~= nil then
+    if cmd then
       local func = cmd[3]
 
       if (not func(data)) then
@@ -153,7 +153,7 @@ end
 
 function change_team_command(msg)
   local playerID,np = get_specified_player(msg)
-  if playerID == nil then return true end
+  if not playerID then return true end
 
   local sMario = gPlayerSyncTable[playerID]
   if sMario.team ~= 1 then
@@ -169,24 +169,24 @@ function set_life_command(msg)
   local args = split(msg, " ")
   local lookingFor = ""
   local lives = args[1] or "no"
-  if args[2] ~= nil then
+  if args[2] then
     lookingFor = args[1]
     lives = args[2]
   end
 
   lives = tonumber(lives)
-  if lives == nil or lives < 0 or lives > 100 or math.floor(lives) ~= lives then
+  if not lives or lives < 0 or lives > 100 or math.floor(lives) ~= lives then
     return false
   end
 
   local playerID,np = get_specified_player(lookingFor)
-  if playerID == nil then return true end
+  if not playerID then return true end
 
   local sMario = gPlayerSyncTable[playerID]
   local name = remove_color(np.name)
   if gGlobalSyncTable.mhState == 0 then
     djui_chat_message_create(trans("not_started"))
-  elseif sMario.runnerLives ~= nil then
+  elseif sMario.runnerLives then
     sMario.runnerLives = lives
     djui_chat_message_create(trans_plural("set_lives",name,lives))
   else
@@ -197,7 +197,7 @@ end
 
 function allow_leave_command(msg)
   local playerID,np = get_specified_player(msg)
-  if playerID == nil then return true end
+  if not playerID then return true end
 
   local sMario = gPlayerSyncTable[playerID]
   local name = remove_color(np.name)
@@ -210,7 +210,7 @@ function add_runner(msg)
   local runners = tonumber(msg)
   if msg == "" or msg == 0 or msg == "auto" then
     runners = 0 -- TBD
-  elseif runners == nil or runners ~= math.floor(runners) or runners < 1 then
+  elseif not runners or runners ~= math.floor(runners) or runners < 1 then
     return false
   end
 
@@ -276,9 +276,9 @@ end
 
 function runner_randomize(msg)
   local runners = tonumber(msg)
-  if msg == nil or msg == "" or msg == 99 or msg == 0 or msg == "auto" then
+  if not msg or msg == "" or msg == 99 or msg == 0 or msg == "auto" then
     runners = 0 -- TBD
-  elseif (runners == nil or runners ~= math.floor(runners) or runners < 1) then
+  elseif not (runners or runners ~= math.floor(runners) or runners < 1) then
     return false
   end
 
@@ -359,7 +359,7 @@ end
 
 function runner_lives(msg)
   local num = tonumber(msg)
-  if num ~= nil and num >= 0 and num <= 99 and math.floor(num) == num then
+  if num and num >= 0 and num <= 99 and math.floor(num) == num then
     gGlobalSyncTable.runnerLives = num
     djui_chat_message_create(trans("set_lives_total",num))
     return true
@@ -373,7 +373,7 @@ function time_needed_command(msg)
     return true
   end
   local num = tonumber(msg)
-  if num ~= nil then
+  if num then
     gGlobalSyncTable.runTime = math.floor(num * 30)
     if gGlobalSyncTable.mhMode ~= 2 then
       djui_chat_message_create(trans("need_time_feedback",num))
@@ -391,7 +391,7 @@ function stars_needed_command(msg)
     return true
   end
   local num = tonumber(msg)
-  if num ~= nil and num >= 0 and num < 8 then
+  if num and num >= 0 and num < 8 then
     gGlobalSyncTable.runTime = num
     djui_chat_message_create(trans("need_stars_feedback",num))
     return true
@@ -405,7 +405,7 @@ function auto_command(msg)
     num = 99
   elseif string.lower(msg) == "off" then
     num = 0
-  elseif num == nil or math.floor(num) ~= num then
+  elseif not num or math.floor(num) ~= num then
     return false
   elseif num > (MAX_PLAYERS-1) then
     djui_chat_message_create(trans("must_have_one"))
@@ -438,8 +438,8 @@ end
 
 function star_count_command(msg)
   local num = tonumber(msg)
-  if msg and num == nil and msg:lower() == "any" then num = -1 end
-  if num ~= nil and num >= -1 and num <= ROMHACK.max_stars and math.floor(num) == num then
+  if msg and not num and msg:lower() == "any" then num = -1 end
+  if num and num >= -1 and num <= ROMHACK.max_stars and math.floor(num) == num then
     if gGlobalSyncTable.noBowser and num < 1 then
       return false
     end
@@ -521,7 +521,7 @@ end
 
 -- TroopaParaKoopa's pause mod
 function pause_command(msg)
-  if msg == "all" or msg == nil or msg == "" then
+  if msg == "all" or not msg or msg == "" then
     if gGlobalSyncTable.pause then
       gGlobalSyncTable.pause = false
       for i=0,(MAX_PLAYERS-1) do
@@ -539,7 +539,7 @@ function pause_command(msg)
   end
 
   local playerID,np = get_specified_player(msg)
-  if playerID == nil then return true end
+  if not playerID then return true end
 
   local sMario = gPlayerSyncTable[playerID]
   local name = remove_color(np.name)
@@ -551,19 +551,6 @@ function pause_command(msg)
     djui_chat_message_create(trans("player_paused",name))
   end
   return true
-end
-
--- to get around a weird bug, we save a bunch of shorter values until it's short enough to save without causing issues
-function mod_storage_save_fix_bug(key, value_)
-  local value = value_
-  local old = mod_storage_load(key)
-  if old ~= nil then
-    while string.len(old) - 4 > string.len(value) do
-      old = string.sub(old,1,-5)
-      mod_storage_save(key, old)
-    end
-  end
-  mod_storage_save(key, value)
 end
 
 -- gets the name and color of the user's role (color is either a table or string)
@@ -583,7 +570,7 @@ function get_role_name_and_color(sMario)
       colorString = "\\#00ffff\\"
     end
     roleName = trans("runner")
-  elseif sMario.team == nil then -- joining
+  elseif not sMario.team then -- joining
     color = {r = 169, g = 169, b = 169} -- grey
     colorString = "\\#a9a9a9\\"
     roleName = trans("menu_unknown")
@@ -619,4 +606,133 @@ end
 -- linear interpolation
 function lerp(a, b, t)
   return a * (1-t) + b * t
+end
+
+-- custom bubble action, with some code from the base game bubble action
+ACT_MH_BUBBLE_RETURN = allocate_mario_action(ACT_GROUP_CUTSCENE | ACT_FLAG_PAUSE_EXIT)
+---@param m MarioState
+function act_bubble_return(m)
+  -- create bubble
+  if (not m.bubbleObj and m.playerIndex == 0) then
+    m.bubbleObj = spawn_non_sync_object(id_bhvStaticObject, E_MODEL_BUBBLE_PLAYER, m.pos.x, m.pos.y + 50, m.pos.z, nil)
+    if m.bubbleObj then
+        m.bubbleObj.heldByPlayerIndex = m.playerIndex
+    end
+  end
+
+  -- force inactive state
+  if m.heldObj then mario_drop_held_object(m) end
+  m.heldByObj = nil
+  m.marioObj.oIntangibleTimer = -1
+  m.squishTimer = 0
+  m.bounceSquishTimer = 0
+  m.quicksandDepth = 0
+  set_mario_animation(m, MARIO_ANIM_BEING_GRABBED)
+
+  m.actionTimer = m.actionTimer + 1
+  m.faceAngle.x = 0
+  if m.actionTimer < 15 or (m.playerIndex ~= 0 and m.actionTimer >= 45) then
+    vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
+    vec3s_copy(m.marioObj.header.gfx.angle, m.faceAngle)
+    return
+  elseif m.playerIndex ~= 0 then
+    m.pos.x = m.pos.x + m.vel.x
+    m.pos.y = m.pos.y + m.vel.y
+    m.pos.z = m.pos.z + m.vel.z
+    vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
+    vec3s_copy(m.marioObj.header.gfx.angle, m.faceAngle)
+    return
+  end
+
+  local goToPos = {x = 0, y = 0, z = 0}
+  if prevSafePos.obj and (prevSafePos.obj.oVelX ~= 0 or prevSafePos.obj.oVelY ~= 0 or prevSafePos.obj.oVelZ ~= 0) then
+    prevSafePos.x = prevSafePos.obj.oPosX
+    prevSafePos.y = prevSafePos.obj.oPosY
+    prevSafePos.z = prevSafePos.obj.oPosZ
+  end
+  vec3f_copy(goToPos, prevSafePos)
+  goToPos.y = goToPos.y + 200
+  if m.actionTimer < 45 then
+    m.vel.x = (goToPos.x-m.pos.x)//10
+    m.vel.y = (goToPos.y-m.pos.y)//10
+    m.vel.z = (goToPos.z-m.pos.z)//10
+    m.pos.x = m.pos.x + m.vel.x
+    m.pos.y = m.pos.y + m.vel.y
+    m.pos.z = m.pos.z + m.vel.z
+  else
+    m.faceAngle.x = 0
+    vec3f_copy(m.pos, goToPos)
+  end
+  vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
+  vec3s_copy(m.marioObj.header.gfx.angle, m.faceAngle)
+  bubbled_offset_visual(m)
+  if m.bubbleObj then
+    m.bubbleObj.oPosX = m.pos.x
+    m.bubbleObj.oPosY = m.pos.y + 50
+    m.bubbleObj.oPosZ = m.pos.z
+  end
+
+  if m.actionTimer > 60 then
+    vec3f_copy(m.pos, goToPos)
+    m.vel.x,m.vel.y,m.vel.z = 0,-60,0
+    if m.input & INPUT_NONZERO_ANALOG ~= 0 then
+      m.forwardVel = 5
+      m.faceAngle.y = m.intendedYaw
+    else
+      m.forwardVel = 0
+    end
+    obj_mark_for_deletion(m.bubbleObj)
+    m.bubbleObj = nil
+    m.particleFlags = m.particleFlags | PARTICLE_MIST_CIRCLE
+    play_sound(SOUND_OBJ_DIVING_IN_WATER, m.pos)
+    m.invincTimer = 70
+    m.marioObj.oIntangibleTimer = 0
+    if m.waterLevel > m.pos.y then
+      set_mario_action(m, ACT_WATER_IDLE, 0)
+    elseif m.floor.type == SURFACE_DEATH_PLANE or m.floor.type == SURFACE_INSTANT_QUICKSAND then
+      set_mario_action(m, ACT_TRIPLE_JUMP, 0)
+    else
+      set_mario_action(m, ACT_SOFT_BONK, 0)
+    end
+  end
+end
+hook_mario_action(ACT_MH_BUBBLE_RETURN, act_bubble_return)
+
+-- from base code
+function bubbled_offset_visual(m)
+  if not m then return end
+  -- scary 3d trig ahead
+
+  local forwardOffset = 25;
+  local upOffset = -35;
+
+  -- figure out forward vector
+  local forward = {
+      x = sins(m.faceAngle.y) * coss(m.faceAngle.x),
+      y = -sins(m.faceAngle.x),
+      z = coss(m.faceAngle.y) * coss(m.faceAngle.x),
+  };
+  vec3f_normalize(forward);
+
+  -- figure out right vector
+  local globalUp = { x = 0, y = 1, z = 0 };
+  local right = { x = 0, y = 0, z = 0 };
+  vec3f_cross(right, forward, globalUp);
+  vec3f_normalize(right);
+
+  -- figure out up vector
+  local up = { x = 0, y = 0, z = 0 };
+  vec3f_cross(up, right, forward);
+  vec3f_normalize(up);
+
+  -- offset forward direction
+  vec3f_mul(forward, forwardOffset);
+  vec3f_add(m.marioObj.header.gfx.pos, forward);
+
+  -- offset up direction
+  vec3f_mul(up, upOffset);
+  vec3f_add(m.marioObj.header.gfx.pos, up);
+
+  -- offset global up direction
+  m.marioObj.header.gfx.pos.y = m.marioObj.header.gfx.pos.y - upOffset;
 end

@@ -844,6 +844,14 @@ local skip = {
 }
 
 function auto_skip(id)
+  if is_game_paused() then return end
+  
+  if changed_dialogs[id] then -- red dialog box
+    set_dialog_override_color(255, 100, 100, 180, 255, 255, 255, 255)
+  else
+    reset_dialog_override_color()
+  end
+
   if id == gBehaviorValues.dialogs.Mips1Dialog or id == gBehaviorValues.dialogs.Mips2Dialog then return false end -- always skip mips dialog
   if id == gBehaviorValues.dialogs.TuxieMotherDialog or id == gBehaviorValues.dialogs.TuxieMotherBabyFoundDialog then return false end -- always skip mother dialog
 
@@ -880,12 +888,6 @@ function auto_skip(id)
 
   if gGlobalSyncTable.romhackFile ~= "vanilla" then return end
 
-  if skip[id] and not is_game_paused() then return false end -- prevent softlock when paused and the dialog appears (coop bug)
-
-  if changed_dialogs[id] then -- red dialog box
-    set_dialog_override_color(255, 100, 100, 180, 255, 255, 255, 255)
-  else
-    reset_dialog_override_color()
-  end
+  if skip[id] then return false end -- prevent softlock when paused and the dialog appears (coop bug)
 end
 hook_event(HOOK_ON_DIALOG, auto_skip)

@@ -1,6 +1,6 @@
 <img src="wiki\img\logo.png" alt="MarioHunt" width="800"/>
 
-### v2.4.1 (view changelog [here](changelog.md))
+### v2.5 (wip) (view changelog [here](changelog.md))
 
 ## [Trailer](https://www.youtube.com/watch?v=hyuXu4Bzugs&ab_channel=N64Mario)
 
@@ -8,7 +8,7 @@ Trailer by **N64 Mario**, logo by **N64 Mario** and **Beyond**
 <br/>
 <br/>
 <br/>
-A gamemode based off of Blue Beyond's concept.
+A gamemode based off of Beyond's concept.
 
 Runners have to complete the game, while Hunters must stop them.
 
@@ -24,11 +24,13 @@ Some additional programming by **TroopaParaKoopa**, **EmeraldLockdown** and **Is
 
 Some assets made by **N64-Mario**
 
+Outline model created by **Key's Artworks**
+
 Automatic Doors and Disable Star Spawn Cutscenes by **Blocky** and **Sunk**
 
 Menu framework created by **Blocky**
 
-MH Lobby logo created by **LeoHaha**
+MH Lobby logo and radar graphics created by **LeoHaha**
 
 Spectator mod by **Sprinter05**
 
@@ -38,13 +40,13 @@ Also special thanks to **ColbyRayz!** and **Key's Artworks** for testing and sup
 <br/>
 <br/>
 <br/>
-Spanish Translation made with help from **KanHeaven** and **SonicDark**
+Spanish Translation made with help from **KanHeaven**, **SonicDark**, and **EpikCool**
 
 German Translation made by **N64 Mario**
 
 Brazillian Portuguese Translation made by **PietroM**
 
-French translation made by **Skeltan**
+French translation made by **Skeltan** (some translations provided by **Blocky**)
 
 If you would like to make changes or submit your own translation, check [here](wiki/lang.md) or inside lang.lua for details
 <br/>

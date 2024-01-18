@@ -6,10 +6,13 @@ doorsClosing = false
 
 ---@param o Object
 function door_loop(o)
+  -- fix for replica comet
+  if gNetworkPlayers[0].currLevelNum == LEVEL_TTC and gGlobalSyncTable.romhackFile == "coop-romhacks-star-road" then return end
+
   -- check if the door has enough stars to be opened
   local m = gMarioStates[0]
   local starsNeeded = (o.oBehParams >> 24) or 0 -- this gets the star count
-  if gGlobalSyncTable.starRun ~= nil and gGlobalSyncTable.starRun ~= -1 and gGlobalSyncTable.starRun <= starsNeeded then
+  if gGlobalSyncTable.starRun and gGlobalSyncTable.starRun ~= -1 and gGlobalSyncTable.starRun <= starsNeeded then
     local np = gNetworkPlayers[0]
     starsNeeded = gGlobalSyncTable.starRun
     if (np.currAreaIndex ~= 2) and ROMHACK.ddd == true then
@@ -67,7 +70,7 @@ end
 function star_door_loop(o)
     local m = gMarioStates[0]
     local starsNeeded = (o.oBehParams >> 24) or 0 -- this gets the star count
-    if gGlobalSyncTable.starRun ~= nil and gGlobalSyncTable.starRun ~= -1 and gGlobalSyncTable.starRun <= starsNeeded then
+    if gGlobalSyncTable.starRun and gGlobalSyncTable.starRun ~= -1 and gGlobalSyncTable.starRun <= starsNeeded then
       local np = gNetworkPlayers[0]
       starsNeeded = gGlobalSyncTable.starRun
       if (np.currAreaIndex ~= 2) and ROMHACK.ddd == true then

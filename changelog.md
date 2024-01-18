@@ -1,4 +1,88 @@
 # Changelog
+## v2.5
+### Additions:
+  - Added Runner Appearance, which works the same as Hunter Appearance
+    - "Sparkle" is used instead of metal
+    - Suggested by SilverOrigins
+  - Added Outline option for Runner and Hunter Appearance (**NOT COMPATIBLE WITH DYNOS, SKIN PACKS, ETC. Also only works with Mario at this time, and there may be other issues.**)
+    - Thanks to Key's Artworks for making the models!
+    - Suggested by Key's Artworks and SilverOrigins
+  - Added the ability to "target" a Runner with /target (or in the Players menu). This displays that Runner's location at all times, changes the target of /spectate and /stalk, and changes their radar texture.
+    - Suggested by flipflopbell
+  - Added Lite Mode as a seperate download. It removes:
+    - All custom models (therefore, Outline does not work)
+    - The custom sequence used for the lobby (uses the Title Theme instead)
+    - The lobby level (the entrance level is used instead, like in versions prior to the Lobby being added)
+  - **API CHANGE:** Added disableNonStop, which works with omm and disables non stop mode
+  - **API CHANGE:** Added totalStarCountFunc and getStarFlagsFunc. They take the same arguments as save_file_get_total_star_count and save_file_get_star_flags respectively. Return a value to override the stars in a course, useful if your hack has an *eighth star* or something.
+  - Added support for the following rom hacks:
+    - Lug's Delightful Dioramas
+    - Lug's Delightful Dioramas Green Comet
+    - Star Road: The Replica Comet
+  - Added update checker, though it will not function until version 37 of coop (EmeraldLockdown)
+  - Runner radar now applies in act select
+  - Mute mod is now implemented directly (original code by Beard), via /mh mute and /mh unmute
+    - API mod has been removed from api_stuff
+    - This also fixes many issues and adds language + menu support
+  - Added two new options: *Double Runner Health* and *Void Dmg*
+    - Double Runner Health: Runners have 16 points of health instead of 8. OFF by default.
+    - Void Dmg: Players take this much damage from falling into the void or quicksand (set to OHKO for vanilla behavior). If a player survives, they are returned to the last flat surface they were above. 3 by default.
+    - Both were suggested by Drenchy
+  - Added /mh out, which warps everyone out of the current level (useful for door desyncs)
+### Adjustments:
+  - Commands that take player IDs now use global ids (listed when using /players) instead of local ids (unreadable)
+  - In commands, players can now be referred to by portions of their name: For example, "Emily" will select "EmilyEmmi", and "Colby" will select "ColbyRayz!".
+  - Adjusted vertical wind action: now wind will do a better job of "catching" the player, and cancels into freefall
+    - Blocky suggested not canceling the current action at all, but I couldn't find a non-hacky way to implement this so this will have to do
+  - Vertical wind now triggers the camping timer
+  - Camping timer now no longer appears until 10 seconds remain
+  - Added 5 seconds to the vanish cap when using the Nerf Vanish Cap option (hopefully makes some stars less frustrating)
+  - Runners can now exit during the star dance animation if the "Leave level" option is used
+  - Runners can no longer exit any level when getting enough stars; instead, they can exit the level they are *currently in*, unless that level is BITS
+    - Again, not available with all rom hacks
+    - Suggested by N64-Mario
+  - The warp cooldown is now even smarter: it checks if every other destination is the same (so it now activates for Castle -> BoB -> Castle -> WF -> Castle...)
+  - For unsupported rom hacks, entering the ending level will now count as a victory
+  - For unsupported rom hacks, the ending level can no longer be entered without the necessary stars
+  - Changed radar graphics (LeoHaha)
+  - Disabled Star and Cap Switch dialogs
+  - List Settings no longer lists certain options if they are set to their default values
+  - Hud now appears in Spectator Mode
+  - Increased grace period when collecting a star
+  - Collecting a star now cancels momentum in Stay In Level mode
+  - The rules and info on how to switch languages are no longer shown when joining a lobby if you have at least 1 kill: "List Settings" is used instead
+  - Hard mode and extreme mode notices are now popups
+  - Renamed "Across The Sinking Logs" in Star Road to "Across The Sinking Slabs"
+### Fixes/Backend changes:
+  - Fixed the listed runners overlapping with top-right timer
+  - Fixed star doors not working in Star Road
+  - Fixed star replicas counting towards the needed stars in a level
+  - Fixed the death timer not displaying when in first place in MiniHunt
+  - Fixed spectators getting warped into paintings
+  - Fixed getting softlocked by pausing before some automatic dialog
+  - Fixed getting stuck on act menu in spectator mode (Troopa)
+  - Fixed some minor issues when using sm64coopdx
+  - Acts below Act 1 are no longer treated as Act 1 for act-specific stars
+    - This is because of a change that results in Act 0 not spawning anything act-specific
+    - Not relevant unless the player is warped to Act 0 for whatever reason
+  - **API CHANGE:** Reworked replica stars; now replica stars use the STAR_REPLICA flag
+    - Also added *replica_func*, an optional function that lets the user set custom replica flags (useful if your hack, say, has an *eighth star* tied to something)
+      - See mhSetup.lua for more
+  - Fixed colored radar displaying for OMM Rebirth in SM74 EE
+  - Romhacks will now load correctly even if "ROMHACK - " is placed at the start of the name
+  - Chat features will now disable even if a MH-compatible chat-related mod is on when using another non MH-compatible chat-related mod
+  - "Dormant" stars (when in OMM Rebirth) will no longer be displayed on the radar
+  - Adjusted some translations for German (N64-Mario)
+  - Fixed issue with "In Swap Mode" displaying in English when using French
+  - Made some minor adjustments to Spanish. Now listed as "Español (LatAm)" (Latin American). (EpikCool)
+  - **API CHANGE:** Updated version string in the API that I keep forgetting about
+  - Updated nametags_mh.lua
+  - Typing "single" no longer prompts the user to switch to Spanish
+  - A message no longer appears when switching courses in Campaign
+  - Cheating in KTQ and penguin races is now only checked locally
+  - Fixed votes getting "eaten" when two players vote simultaneously
+  - Fixed the menu close sound constantly playing when switching versions in SM74
+    - As a consequence, only the host may do this now
 ## v2.4.1
 ### Additions:
   - Added the ability to change the countdown until Hunters can move
@@ -54,6 +138,8 @@
   - Hunters can no longer interact with chests at all
   - The chests now reset when getting a wrong answer once again
     - Does not apply when using OMM Rebirth
+  - Glow mode now changes the color of the player's Metal form (so its visible on Mario and Luigi)
+  - Runner and Hunter appearance settings now appear while the game is inactive
 ### Fixes/Backend changes:
   - Fixed already-collected stars decreasing the "Can leave" timer
   - Fixed being able to skip the starting platform in the parkour challenge

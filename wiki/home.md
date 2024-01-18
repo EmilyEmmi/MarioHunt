@@ -9,6 +9,8 @@ This refers to both Normal and Swap mode, which have similar gameplay.
 ## Getting Started
 [Running a Game](running.md)
 
+[Navigating the Menu](menu.md)
+
 [Rules for MarioHunt](rules.md)
 
 [Rules for MiniHunt](mini.md)

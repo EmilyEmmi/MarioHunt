@@ -1,6 +1,6 @@
---[[ This file is a base for making your hack compatible with MarioHunt.
-Be sure to read below.
-]]
+-- name: "MH Setup (Do not enable!)",
+-- incompatible: gamemode
+-- description: "This file is a base for making your hack compatible with MarioHunt. Do not enable this on its own!"
 
 -- various flags used for star_data (see below)
 STAR_EXIT = 0x10 -- player can leave when grabbing this star (use this to avoid getting stuck)
@@ -9,7 +9,8 @@ STAR_ACT_SPECIFIC = 0x40 -- star can only be gotten in this act (use for situati
 STAR_NOT_ACT_1 = 0x80 -- star cannot be gotten in act 1 (useful for situations like the tower in WF)
 STAR_APPLY_NO_ACTS = 0x100 -- applies even if disable acts is on (like in OMM)
 STAR_NOT_BEFORE_THIS_ACT = 0x200 -- star cannot be gotten before this act (so if this is on star 3, it cannot be obtained in acts 1 and 2)
-STAR_MULTIPLE_AREAS = 0x400 -- only needed if your star can be obtained in multiple areas (contact me if this is the case, this is sort of advanced)
+STAR_REPLICA = 0x400 -- is a star replica. interacts with either replica_count or replica_func
+STAR_MULTIPLE_AREAS = 0x800 -- only needed if your star can be obtained in multiple areas (contact me if this is the case, this is sort of advanced)
 STAR_AREA_MASK = 0xF -- 1-15
 
 if not _G.mhExists then return end -- don't load if MarioHunt isn't enabled
@@ -28,9 +29,14 @@ _G.mhApi.romhackSetup = function()
 
     max_stars = 120, -- How many total stars there are (ex: 120 in vanilla)
 
-    -- Setting this removes the rightmost star from all secret levels until reaching this amount of stars
+    -- Setting this removes any star flagged with STAR_REPLICA from all secret levels until reaching this amount of stars
     -- If your hack doesn't have replicas, omit this
     replica_start = 121,
+    -- This is a function that takes the number of stars the local player has. Return TRUE to allow any star flagged with STAR_REPLICA
+    -- Again, omit this if your hack doesn't have replicas
+    replica_func = function(stars)
+      return true
+    end,
 
     -- This enforces star requirements for your rom hack (unless star run is lower) to prevent glitches
     requirements = {
@@ -50,11 +56,12 @@ _G.mhApi.romhackSetup = function()
 
     ddd = true, -- This handles considering Board Bowser's Sub in runs. Omit this unless your hack is a vanilla edit.
     no_bowser = true, -- If your hack's goal doesn't involve beating Bowser, set this to true. Otherwise, omit this. (NOTE: If this is set to FALSE, runner_victory may be omitted)
-    ommSupport = false, -- If your hack doesn't support OMM (most likely it doesn't), set this to false. Otherwise, omit this. (only affects the radar)
+    ommSupport = false, -- If your hack doesn't support OMM's colored star option, set this to false. Otherwise, omit this (only affects the radar)
     heartReplace = true, -- replaces all hearts with 1ups (some hacks require the hearts for lava boosting, so omit this if that's the case)
     stalk = true, -- Enables a feature that lets anyone warp to a runner's level (used in Ztar Attack 2 due to linear nature of hack). Omit this to disable (recommended for most hacks)
     starColor = {r = 92,g = 255,b = 92}, -- this sets the color of the stars for your hack (yellow if omitted). This example makes stars green
-    noLobby = true, -- disables the lobby (but why would you want that? :( )
+    noLobby = true, -- disables the lobby (Used when the lobby would cause issues)
+    disableNonStop = true, -- disables non stop mode for omm
 
     -- This is a complex table that controls when certain stars are obtainable
     -- Each entry is a table with the following format for each entry, with up to 7 entries (1 for each star)
@@ -112,7 +119,8 @@ _G.mhApi.romhackSetup = function()
 
     -- This function detects when runners have won. For a typical hack, this should work
     runner_victory = function(m)
-      return m.action == ACT_JUMBO_STAR_CUTSCENE
+      local np = gNetworkPlayers[m.playerIndex]
+      return m.action == ACT_JUMBO_STAR_CUTSCENE or np.currLevelNum == LEVEL_ENDING
     end,
 
     -- This is an example of an atypical victory condition; bowser is set to beaten when the ending level is accessed, but victory occurs after enough stars are colelcted
@@ -128,17 +136,6 @@ _G.mhApi.romhackSetup = function()
       end
       return false
     end,]]
-
-    -- This is another example, which wins as soon as a runner enters the cake screen
-    --[[
-    runner_victory = function(m)
-      local np = gNetworkPlayers[m.playerIndex]
-      if np.currLevelNum == LEVEL_ENDING then
-        return true
-      end
-      return false
-    end,
-    ]]
 
     ["badguy_pt-br"] = "O Eggman", -- how you would specify for pt-br
   }

@@ -9,7 +9,8 @@ local function hook_behavior_custom(id, override, init, loop)
     hook_behavior(id,
         get_object_list_from_behavior(get_behavior_from_id(id)), -- Automatically get the correct object list
         override, init, loop,
-        "bhvMhCustom" .. get_behavior_name_from_id(id):sub(4) -- Give the behavior a consistent behavior name (for example, bhvTreasureChestsJrb will become bhvMhCustomTreasureChestsJrb)
+        "bhvMhCustom" ..
+        get_behavior_name_from_id(id):sub(4)                     -- Give the behavior a consistent behavior name (for example, bhvTreasureChestsJrb will become bhvMhCustomTreasureChestsJrb)
     )
 end
 
@@ -74,7 +75,7 @@ local function bhv_replace_with_1up(o)
             o.oPosX, o.oPosY, o.oPosZ,
             nil
         )
-        obj_mark_for_deletion(o) 
+        obj_mark_for_deletion(o)
     end
 end
 -- Fix extreme mode
@@ -120,7 +121,6 @@ hook_behavior_custom(id_bhvBowserKey, false, nil, custom_key_loop)
 -- detect cap switches
 local function custom_switch_loop(o)
     if o.oAction == 2 and o.oTimer == 0 and is_nearest_mario_state_to_object(m0, o) ~= 0 then
-
         -- send message
         network_send_include_self(false, {
             id = PACKET_RUNNER_COLLECT,
@@ -130,6 +130,9 @@ local function custom_switch_loop(o)
             area = np0.currAreaIndex,
             switch = o.oBehParams2ndByte,
         })
+    elseif o.oAction == 2 and o.oTimer == 4 then -- disable dialog
+        o.header.gfx.scale.y = 0.1
+        o.oAction = 3
     end
 end
 
@@ -139,15 +142,15 @@ hook_behavior_custom(id_bhvCapSwitch, false, nil, custom_switch_loop)
 function do_star_stuff(radar)
     local didRadar = {}
     if gGlobalSyncTable.mhMode ~= 2 or gNetworkPlayers[0].currLevelNum == gGlobalSyncTable.gameLevel then
-        for id,bhvName in pairs(star_ids) do
+        for id, bhvName in pairs(star_ids) do
             local o = obj_get_first_with_behavior_id(id)
-            while o ~= nil do
-                if o.unused1 == nil then o.unused1 = 0 end
+            while o do
+                if not o.unused1 then o.unused1 = 0 end
 
                 if id == id_bhvSpawnedStar or id == id_bhvSpawnedStarNoLevelExit then
                     if o.oAction == 0 then
-                        o.oPosX,o.oPosY,o.oPosZ = o.oHomeX,o.oHomeY,o.oHomeZ
-                        o.oVelX,o.oVelY,o.oVelZ = 0,0,0
+                        o.oPosX, o.oPosY, o.oPosZ = o.oHomeX, o.oHomeY, o.oHomeZ
+                        o.oVelX, o.oVelY, o.oVelZ = 0, 0, 0
                         o.oForwardVel = 0
                         o.oGravity = 0
                         o.oAction = 3
@@ -170,30 +173,30 @@ function do_star_stuff(radar)
                     end
                 end
 
-                if radar then
+                if radar and o.header.gfx.node.flags & GRAPH_RENDER_ACTIVE ~= 0 then
                     local star = (o.oBehParams >> 24) + 1
-                    if ((star > 0 and star < 8) or ROMHACK.isUnder) and didRadar[star] == nil then
+                    if ((star > 0 and star < 8) or ROMHACK.isUnder) and not didRadar[star] then
                         if gGlobalSyncTable.mhMode ~= 2 then
                             local file = get_current_save_file_num() - 1
                             local course_star_flags = save_file_get_star_flags(file, gNetworkPlayers[0].currCourseNum - 1)
 
                             if course_star_flags & (1 << (star - 1)) == 0 then
-                                if star_radar[star] == nil then
-                                    star_radar[star] = {tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6}
+                                if not star_radar[star] then
+                                    star_radar[star] = { tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6 }
                                 end
                                 render_radar(o, star_radar[star], true)
                                 didRadar[star] = 1
                             end
                         elseif star == gGlobalSyncTable.getStar then
-                            if star_radar[star] == nil then
-                                star_radar[star] = {tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6}
+                            if not star_radar[star] then
+                                star_radar[star] = { tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6 }
                             end
                             render_radar(o, star_radar[star], true)
                             didRadar[star] = 1
 
                             if o.unused1 ~= 5 then
-                            obj_set_model_extended(o, E_MODEL_STAR)
-                            o.unused1 = o.unused1 + 1 -- using this as a flag
+                                obj_set_model_extended(o, E_MODEL_STAR)
+                                o.unused1 = o.unused1 + 1 -- using this as a flag
                             end
                         elseif o.unused1 ~= 5 then
                             obj_set_model_extended(o, E_MODEL_TRANSPARENT_STAR)
@@ -213,9 +216,11 @@ hook_behavior_custom(id_bhvMantaRayWaterRing, false, function(o)
     o.oWaterRingScalePhaseY = (random_u16() & 0xFFF) + 0x1000
     o.oWaterRingScalePhaseZ = (random_u16() & 0xFFF) + 0x1000
     local dest = vec3f_rotate_zxy({ x = 0, y = 1, z = 0 },
-        {x = o.oFaceAnglePitch,
-        y = o.oFaceAngleYaw,
-        z = o.oFaceAngleRoll}
+        {
+            x = o.oFaceAnglePitch,
+            y = o.oFaceAngleYaw,
+            z = o.oFaceAngleRoll
+        }
     )
     o.oWaterRingNormalX = dest.x
     o.oWaterRingNormalY = dest.y
@@ -227,7 +232,75 @@ hook_behavior_custom(id_bhvSnowmansBottom, false, nil, function(o)
     if o.oAction == 0 and m0.action == ACT_READING_NPC_DIALOG and is_point_within_radius_of_mario(o.oPosX, o.oPosY, o.oPosZ, 400) then
         o.oForwardVel = 10
         o.oAction = 1
-        set_mario_action(m0, m0.heldObj == nil and ACT_IDLE or ACT_HOLD_IDLE, 0)
+        set_mario_action(m0, not m0.heldObj and ACT_IDLE or ACT_HOLD_IDLE, 0)
         if (o.coopFlags & COOP_OBJ_FLAG_NON_SYNC) == 0 then network_send_object(o, true) end
     end
 end)
+
+-- outline stuff
+
+local MODEL_MARIO = 0x01                     -- mario_geo
+local MODEL_MARIOS_WINGED_METAL_CAP = 0x85   -- marios_winged_metal_cap_geo
+local MODEL_MARIOS_METAL_CAP = 0x86          -- marios_metal_cap_geo
+local MODEL_MARIOS_WING_CAP = 0x87           -- marios_wing_cap_geo
+local MODEL_MARIOS_CAP = 0x88                -- marios_cap_geo
+
+local MODEL_LUIGI = 0xE3                     -- luigi_geo
+local MODEL_LUIGIS_CAP = 0xE4                -- luigis_cap_geo
+local MODEL_LUIGIS_METAL_CAP = 0xE5          -- luigis_metal_cap_geo
+local MODEL_LUIGIS_WING_CAP = 0xE6           -- luigis_wing_cap_geo
+local MODEL_LUIGIS_WINGED_METAL_CAP = 0xE7   -- luigis_winged_metal_cap_geo
+
+local MODEL_TOAD_PLAYER = 0xE8               -- toad_player_geo
+local MODEL_TOADS_CAP = 0xE9                 -- toads_cap_geo
+local MODEL_TOADS_METAL_CAP = 0xEA           -- toads_metal_cap_geo
+local MODEL_TOADS_WING_CAP = 0xEB            -- toads_wing_cap_geo
+
+local MODEL_WALUIGI = 0xEC                   -- waluigi_geo
+local MODEL_WALUIGIS_CAP = 0xED              -- waluigis_cap_geo
+local MODEL_WALUIGIS_METAL_CAP = 0xEE        -- waluigis_metal_cap_geo
+local MODEL_WALUIGIS_WING_CAP = 0xEF         -- waluigis_wing_cap_geo
+local MODEL_WALUIGIS_WINGED_METAL_CAP = 0xF0 -- waluigis_winged_metal_cap_geo
+
+local MODEL_WARIO = 0xF1                     -- wario_geo
+local MODEL_WARIOS_CAP = 0xF2                -- warios_cap_geo
+local MODEL_WARIOS_METAL_CAP = 0xF3          -- warios_metal_cap_geo
+local MODEL_WARIOS_WING_CAP = 0xF4           -- warios_wing_cap_geo
+local MODEL_WARIOS_WINGED_METAL_CAP = 0xF5   -- warios_winged_metal_cap_geo
+
+-- outline models for each character and caps - order is Red, Blue, Yellow, Purple
+local OUTLINE_MODEL = {}
+if not LITE_MODE then
+    OUTLINE_MODEL = {
+        [MODEL_MARIO] = { smlua_model_util_get_id("h_mario_geo"), smlua_model_util_get_id("r_mario_geo"), smlua_model_util_get_id("rh_mario_geo"), smlua_model_util_get_id("re_mario_geo") },
+        [MODEL_MARIOS_CAP] = { smlua_model_util_get_id("h_marios_cap_geo"), smlua_model_util_get_id("r_marios_cap_geo"), smlua_model_util_get_id("rh_marios_cap_geo"), smlua_model_util_get_id("re_marios_cap_geo") },
+        [MODEL_MARIOS_WING_CAP] = { smlua_model_util_get_id("h_marios_wing_cap_geo"), smlua_model_util_get_id("r_marios_wing_cap_geo"), smlua_model_util_get_id("rh_marios_wing_cap_geo"), smlua_model_util_get_id("re_marios_wing_cap_geo") },
+        [MODEL_MARIOS_METAL_CAP] = { smlua_model_util_get_id("h_marios_metal_cap_geo"), smlua_model_util_get_id("r_marios_metal_cap_geo"), smlua_model_util_get_id("rh_marios_metal_cap_geo"), smlua_model_util_get_id("re_marios_metal_cap_geo") },
+        [MODEL_MARIOS_WINGED_METAL_CAP] = { smlua_model_util_get_id("h_marios_winged_metal_cap_geo"), smlua_model_util_get_id("r_marios_winged_metal_cap_geo"), smlua_model_util_get_id("rh_marios_winged_metal_cap_geo"), smlua_model_util_get_id("re_marios_winged_metal_cap_geo") },
+    }
+end
+
+local E_MODEL_CAKE = E_MODEL_MARIOS_WING_CAP -- cake model does not exist yet --((not LITE_MODE) and smlua_model_util_get_id("cake_geo"))
+if not LITE_MODE then
+    function on_obj_set_model(o, model)
+        if model == 0x7A and month == 14 then -- star model changes on anniversary
+            obj_set_model_extended(o, E_MODEL_CAKE)
+        elseif (runnerAppearance == 3 or hunterAppearance == 3) and OUTLINE_MODEL[model] then
+            local np = network_player_from_global_index(o.globalPlayerIndex)
+            if not np then return end
+            local sMario = gPlayerSyncTable[np.localIndex]
+            local modelIndex = 1
+            if sMario.team == 1 then
+                if runnerAppearance ~= 3 then return end
+                modelIndex = (sMario.hard or 0) + 2
+            elseif hunterAppearance ~= 3 then
+                return
+            end
+            if OUTLINE_MODEL[model][modelIndex] then
+                obj_set_model_extended(o, OUTLINE_MODEL[model][modelIndex])
+            end
+        end
+    end
+
+    hook_event(HOOK_OBJECT_SET_MODEL, on_obj_set_model)
+end

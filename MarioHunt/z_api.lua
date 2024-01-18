@@ -1,7 +1,7 @@
 -- named this way so it loads last
 
 _G.mhExists = true -- use this to detect MarioHunt
-_G.mhVersion = "v2.2" -- version string
+-- version string is now defined in updates.lua
 _G.mhApi = {}
 
 -- check mhSetup.lua for more info
@@ -84,6 +84,9 @@ _G.mhApi.valid_star = valid_star -- takes course, act, bool if we're *not* in mi
 _G.mhApi.mod_powers = has_mod_powers -- the first argument is the local player index, the second is a bool if we're only looking for a dev
 _G.mhApi.global_popup_lang = global_popup_lang -- takes language parameters and the lines paramter; check lang.lua
 _G.mhApi.get_tag = get_tag -- takes index, returns string for tag shown in chat (like [DEV] or [1st Place])
+_G.mhApi.render_power_meter = render_power_meter_mariohunt
+_G.mhApi.render_power_meter_interpolated = render_power_meter_interpolated_mariohunt
+_G.mhApi.apply_double_health = apply_double_health
 
 -- this gets the local player's current kill combo
 _G.mhApi.getKillCombo = get_kill_combo

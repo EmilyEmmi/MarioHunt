@@ -23,7 +23,7 @@ For standard MarioHunt, select 0 (default).
 
 **Reset To Defaults:** Changed too many settings? This will reset everything back to default (including the gamemode).
 
-**Auto Game:** Feeling lazy? In MiniHunt, turn this on and new games will be started **automatically!** It'll even pick a good amount of Runners for you if you select ANY (located left of 0).
+**Auto Game:** Feeling lazy? Turn this on and new games will be started **automatically!** It'll even pick a good amount of Runners for you if you select ANY (located left of 0).
 Now you can go eat lunch or something (though I would have at least one moderator on to handle any rude players).
 
 **Category:** If you want a shorter game, try a different category!
@@ -46,14 +46,14 @@ Now it's time to decide who gets to be Runner.
 First, go to the MarioHunt menu and use **Randomize Runners** with however many you wish.
 
 Now you're ready to- wait, hold on, what if someone wants to *not* be Runner?
-Well then, navigate to the Players menu and select their name. Then select the **Flip Team** option.
+Well then, navigate to the Players menu and select their name. Then select the **Flip Team** option. Alternatively, you can press X while selecting their name, or click on their role with the mouse.
 You can also use this to flip a Hunter to a Runner, if someone *really* wants to be Runner.
 
 If you're sure everyone is happy with their teams, it's time to...
 ## STEP 3: START THE GAME!!!
-Go to the MarioHunt menu, select Start, and select an option (usually "Main" or "Start"). That's it!
+Go to the MarioHunt menu, select Start, and select an option (usually "Main" or "Start"). If this is the second game you're playing in Standard mode, select "Reset Alt Save" to reset the save file. That's it!
 
-But don't forget that you can do stuff mid-game, too. If there aren't enough Runners, use **Add Runners** to add more runners at random.
+But don't forget that you can do stuff mid-game, too. If there aren't enough Runners, use **Add Runners** to add more runners at random (or select "auto").
 You can also use **Flip Team** in case someone loses their role by disconnecting.
 
 That's it! If you want to know how to play, check the [MarioHunt rules](rules.md) or [MiniHunt rules](mini.md).

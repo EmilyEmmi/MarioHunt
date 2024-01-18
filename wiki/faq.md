@@ -67,7 +67,6 @@ Tell them to type /rules.
 ## But they don't speak my language!
 You can still try to tell them; they might understand the command format.
 Or, if their language is supported, write "/lang [their language abbreviation]" in the chat.
-Switching languages also displays the rules.
 
 ## How do I unlock the secret option?
 Your pursuit for this is as a 1UP pursues Mario.

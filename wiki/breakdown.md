@@ -222,17 +222,19 @@ Whomp's Fortress is the second stage, and quite the step up from Bob-Omb Battlef
 Unlike BoB, a lot of these stars are very fast. This is a great course for getting stars, despite the risks.
 
 ### Chip Off Whomp's Block
-A tricky first star, like Big Bob-Omb on the Summit. Your first task is to make your way to the top of the fortress. Going the normal route will require riding an elevator, which will easily let Hunters attack you. Instead, perform a side-flip or triple jump followed by a wall jump next to the Piranha Plant midway up the fortress. You can reach the floating island and skip right to King Whomp.
+A tricky first star, like Big Bob-Omb on the Summit. Your first task is to make your way to the top of the fortress. Going the normal route will require riding an elevator, which will easily let Hunters attack you. Instead, you can climb the large pole above the Shoot Into The Wild Blue area. For an even faster trick, perform a side-flip or triple jump followed by a wall jump next to the Piranha Plant midway up the fortress. You can reach the floating island and skip right to King Whomp.
 
 ![We gather here today to mourn the loss of half of this stage.](img/wf_skip.png)
 
 Since this is a boss fight, you'll be at the mercy of Hunters the whole time. However, this fight is trivial if you know this trick. Right when King Whomp tries to crush you, jump and do a Ground Pound. He'll phase right through you, and you'll be able to hit him immediately.
 
+In OMM Rebirth, you can actually defeat King Whomp instantly by getting crushed while wearing the Metal Cap. This is probably unnecessary, since most players enter this stage long before unlocking the Metal Cap.
+
 ### To The Top Of The Fortress
 Take the same route as before, then you half to climb the tower. Jump across the platforms quickly, or do a careful wall jump onto the final platform. This last platform is an elevator, which is why being fast is priority #1. If the Hunters reach the top first, they can simply kick you off and prevent you from reaching the star.
 
 ### Shoot Into The Wild Blue
-"Shoot?" Yeah, right. Go below the platform with the star and perform a triple jump or side-flip followed by a wall jump to get onto the platform easily. Just be careful- this area is close to the void.
+"Shoot?" Yeah, right. Go below the platform with the star and perform a triple jump or side-flip followed by a wall jump to get onto the platform easily. Just be careful- this area is close to the void. A harder but less risky strategy is to jump from above and perform an air kick onto the platform.
 
 ### Red Coins On The Floating Isle
 If you took the shortcut, you'll have to go back for the red coins near the rotating bridge. Otherwise, getting this star should be a quick endeavor. Again, be careful near the star, as it's close to the edge of the stage. You should also take this opportunity to get the 100 coin star.
@@ -250,7 +252,9 @@ Show up to this star and talk to the Bob-Omb Buddy, being sure not to get kicked
 Or if you're insane, you can do [cannonless](https://ukikipedia.net/wiki/Cannonless).
 
 ### 100 Coins Star (WF)
-There are 141 coins in this level. All of these are easily accessible, and because the stage is small, quick to obtain. You can actually get 10 coins from each Whomp- jump on its back five times before destroying it. Show up with a fellow Runner to tackle this star in record time. Also take advantage of the hidden warp to avoid getting kicked off of the stage.
+There are 141 coins in this level. All of these are easily accessible, and because the stage is small, quick to obtain. You can actually get 10 coins from each Whomp- jump or kick on its back five times before destroying it. Show up with a fellow Runner to tackle this star in record time. Also take advantage of the hidden warp to avoid getting kicked off of the stage.
+
+Some extra coins can be gotten in OMM Rebirth by letting Thwomps crush you while wearing the Metal Cap.
 
 ## Tower Of The Wing Cap (TotWC)
 ![Tower Of The Wing Cap. There are 4 pointed towers arranged across from each other in a square-like shape, and a larger, flatter tower in the center. Several coins are floating in the sky, including 4 coin rings, each with 2 red coins in the center.](img/totwc.png)
@@ -306,4 +310,4 @@ And for OMM Rebirth, you can just like, wall jump or something. You can actually
 Usually, you need the Metal Cap for this Star. However, with some practice, you can actually reach the Star just by swimming. Press A about the end of each stroke to swim as fast as possible.
 
 ### 100 Coins Star (JRB)
-This is only barely possible in Act 1. There are only 104 coins in this entire course, so exactly 100 can be obtained in Act 1. Obviously, this is a bit easier in OMM. Overall, I wouldn't recommend attempting this star at all.
+This is only barely possible in Act 1. There are only 104 coins in this entire course (the lowest in the game, even lower than the infamous 106 in Dire Dire Docks), so exactly 100 can be obtained in Act 1. Obviously, this is a bit easier in OMM. Overall, I wouldn't recommend attempting this star at all.

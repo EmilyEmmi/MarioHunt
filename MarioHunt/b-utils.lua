@@ -20,7 +20,7 @@ function random_u16()
 end
 
 -- localize some functions
-local djui_chat_message_create,warp_to_level,warp_to_warpnode,tonumber,string_lower,mod_storage_save,mod_storage_load = djui_chat_message_create,warp_to_level,warp_to_warpnode,tonumber,string.lower,mod_storage_save_fix_bug,mod_storage_load
+local djui_chat_message_create,warp_to_level,warp_to_warpnode,tonumber,string_lower,mod_storage_save,mod_storage_load = djui_chat_message_create,warp_to_level,warp_to_warpnode,tonumber,string.lower,mod_storage_save,mod_storage_load
 
 function if_then_else(cond, if_true, if_false)
   if cond then return if_true end
@@ -54,13 +54,13 @@ function do_warp(msg)
   if args[1] and string.sub(args[1],1,1) == "c" then
     level = course_to_level[tonumber(string.sub(args[1],2))]
   end
-  if level == nil then
+  if not level then
     level = string_to_level[args[1]] or 16
   end
   local area = tonumber(args[2]) or 1
   local act = tonumber(args[3]) or (level_to_course[level] and level_to_course[level] < 16 and level_to_course[level] > 0 and 1) or 0
   local node = tonumber(args[4])
-  if node == nil then
+  if not node then
     djui_chat_message_create("Warping to level "..level.." area "..area.." act "..act)
     if warp_to_level(level, area, act) or warp_to_warpnode(level, area, act, 0xF0) then
       if gGlobalSyncTable.mhMode == 2 then
@@ -167,7 +167,7 @@ end
 
 function get_location(msg)
   local playerID,np = get_specified_player(msg)
-  if playerID ~= nil then
+  if playerID then
     local course = np.currCourseNum
     local level = np.currLevelNum
     local area = np.currAreaIndex
@@ -175,6 +175,20 @@ function get_location(msg)
     djui_chat_message_create(string.format("%s (C%d, L%d, A%d)",name,course,level,area))
     print(name,course,level,area)
   end
+  return true
+end
+
+function mute_command(msg)
+  local player,np = get_specified_player(msg)
+  if not np then return true end
+  network_send_include_self(true, {id = PACKET_MUTE_PLAYER, playerIndex = np.globalIndex, muter = gNetworkPlayers[0].globalIndex, mute = true})
+  return true
+end
+
+function unmute_command(msg)
+  local player,np = get_specified_player(msg)
+  if not np then return true end
+  network_send_include_self(true, {id = PACKET_MUTE_PLAYER, playerIndex = np.globalIndex, muter = gNetworkPlayers[0].globalIndex, mute = false})
   return true
 end
 
@@ -241,7 +255,7 @@ function force_spectate_command(msg)
   end
 
   local playerID,np = get_specified_player(msg)
-  if playerID == nil then return true end
+  if not playerID then return true end
 
   local sMario = gPlayerSyncTable[playerID]
   local name = remove_color(np.name)
@@ -276,6 +290,23 @@ function desync_fix_command(msg)
     sMario.team = oldTeam
     sMario.totalStars = -1
     sMario.totalStars = oldStars
+  end
+  return true
+end
+
+function out_command(msg)
+  for i=1,MAX_PLAYERS-1 do
+    local m = gMarioStates[i]
+    if is_player_in_local_area(m) ~= 0 then
+      network_send_to(i, true, {
+        id = PACKET_GET_OUTTA_HERE,
+      })
+    end
+  end
+  if gNetworkPlayers[0].currCourseNum == 0 then
+    warp_to_level(LEVEL_BOB, 1, 1)
+  else
+    warp_beginning()
   end
   return true
 end
@@ -325,7 +356,7 @@ end
 dontReload = false -- if we just changed the blacklist, don't reload the table because it's updated for us
 function blacklist_command(msg)
   local args = split(msg, " ")
-  if args[1] == nil then return false end
+  if not args[1] then return false end
   local action = string_lower(args[1])
   if action == "list" then
     djui_chat_message_create(trans("blacklist_list"))
@@ -339,13 +370,13 @@ function blacklist_command(msg)
     end
   elseif action == "add" then
     local stringCourse = ""
-    if args[2] ~= nil then stringCourse = string_lower(args[2]) end
+    if args[2] then stringCourse = string_lower(args[2]) end
     local course = tonumber(args[2]) or string_to_course[stringCourse]
     local act = tonumber(args[3])
-    if course == nil then return false end
+    if not course then return false end
     if course < 1 or course > 24 then return false end
 
-    if act ~= nil then
+    if act then
       if act < 1 or act > 7 then
         return false
       elseif not valid_star(course, act, false, true) then
@@ -372,7 +403,7 @@ function blacklist_command(msg)
     gGlobalSyncTable.blacklistData = encrypt_black()
 
     local starString = ""
-    if act ~= nil then
+    if act then
       starString = string.format("%s - %s (Course %d, Star %d)",get_custom_level_name(course, course_to_level[course], 1),get_custom_star_name(course,act),course,act)
     else
       starString = string.format("%s (Course %d)",get_custom_level_name(course, course_to_level[course], 1), course)
@@ -380,20 +411,20 @@ function blacklist_command(msg)
     djui_chat_message_create(trans("blacklist_add",starString))
   elseif action == "remove" then
     local stringCourse = ""
-    if args[2] ~= nil then stringCourse = string_lower(args[2]) end
+    if args[2] then stringCourse = string_lower(args[2]) end
     local course = tonumber(args[2]) or string_to_course[stringCourse]
     local act = tonumber(args[3])
-    if course == nil then return false end
+    if not course then return false end
     if course < 1 or course > 24 then return false end
 
-    if act ~= nil then
+    if act then
       local starID = course*10+act
       if act < 1 or act > 7 then
         return false
       elseif valid_star(course, act, false, true) then
         djui_chat_message_create(trans("blacklist_remove_already"))
         return true
-      elseif mini_blacklist[starID] == nil then
+      elseif not mini_blacklist[starID] then
         djui_chat_message_create(trans("blacklist_remove_invalid"))
         return true
       end
@@ -404,7 +435,7 @@ function blacklist_command(msg)
       for act=1,7 do
         local starID = course*10+act
         local valid = valid_star(course, act, false, true)
-        if (not valid) and mini_blacklist[starID] ~= nil then
+        if (not valid) and mini_blacklist[starID] then
           mini_blacklist[starID] = nil
           allwhitelist = false
           invalid = false
@@ -424,7 +455,7 @@ function blacklist_command(msg)
     gGlobalSyncTable.blacklistData = encrypt_black()
 
     local starString = ""
-    if act ~= nil then
+    if act then
       starString = string.format("%s - %s (Course %d, Star %d)",get_custom_level_name(course, course_to_level[course], 1),get_custom_star_name(course,act),course,act)
     else
       starString = string.format("%s (Course %d)",get_custom_level_name(course, course_to_level[course], 1), course)
@@ -508,6 +539,35 @@ function complete_command(msg)
   return true
 end
 
+function render_power_meter_mariohunt(health, x, y, width, height, index)
+  if not apply_double_health(index or 0) then return hud_render_power_meter(health, x, y, width, height) end
+  local doubleHealth = 2*health-0xFF
+  if health >= 0x500 then
+    hud_render_power_meter(doubleHealth-0x801, x, y, width, height)
+    djui_hud_set_font(FONT_HUD)
+    djui_hud_print_text("+8", x+width/2, y+height/2, math.min(width,height)/64)
+  else
+    hud_render_power_meter(doubleHealth, x, y, width, height)
+  end
+end
+
+function render_power_meter_interpolated_mariohunt(health, prevX, prevY, prevWidth, prevHeight, x, y, width, height, index)
+  if not apply_double_health(index or 0) then return hud_render_power_meter_interpolated(health, prevX, prevY, prevWidth, prevHeight, x, y, width, height) end
+  local doubleHealth = 2*health-0xFF
+  if health >= 0x500 then
+    hud_render_power_meter_interpolated(doubleHealth-0x801, prevX, prevY, prevWidth, prevHeight, x, y, width, height)
+    djui_hud_set_font(FONT_HUD)
+    djui_hud_print_text_interpolated("+8", prevX+prevWidth/2, prevY+prevHeight/2, math.min(prevWidth,prevHeight)/64, x+width/2, y+height/2, math.min(width,height)/64)
+  else
+    hud_render_power_meter_interpolated(doubleHealth, prevX, prevY, prevWidth, prevHeight, x, y, width, height)
+  end
+end
+
+function apply_double_health(index)
+  local sMario = gPlayerSyncTable[index]
+  return sMario and gGlobalSyncTable.doubleHealth and sMario.team == 1 and sMario.hard ~= 2 and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2)
+end
+
 -- main command
 hook_chat_command("mh", "[COMMAND,ARGS] - Runs commands; type nothing or \"menu\" to open the menu", mario_hunt_command)
 function setup_commands()
@@ -535,10 +595,13 @@ function setup_commands()
   table.insert(marioHuntCommands, {"auto", nil, auto_command})
   table.insert(marioHuntCommands, {"forcespectate", nil, force_spectate_command})
   table.insert(marioHuntCommands, {"desync", "fixdesync", desync_fix_command})
+  table.insert(marioHuntCommands, {"out", "getout", out_command})
   table.insert(marioHuntCommands, {"stop", "halt", halt_command})
   table.insert(marioHuntCommands, {"default", nil, default_settings})
   table.insert(marioHuntCommands, {"blacklist", "black", blacklist_command})
   table.insert(marioHuntCommands, {"hidehud", "hide", function() mhHideHud = not mhHideHud return true end})
+  table.insert(marioHuntCommands, {"mute", nil, mute_command})
+  table.insert(marioHuntCommands, {"unmute", nil, unmute_command})
 
   -- debug
   table.insert(marioHuntCommands, {"print", nil, print, true})

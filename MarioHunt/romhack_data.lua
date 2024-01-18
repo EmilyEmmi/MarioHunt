@@ -5,7 +5,8 @@ STAR_ACT_SPECIFIC = 0x40 -- star can only be gotten in this act
 STAR_NOT_ACT_1 = 0x80 -- star cannot be gotten in act 1
 STAR_APPLY_NO_ACTS = 0x100 -- applies even if disable acts is on (like in OMM)
 STAR_NOT_BEFORE_THIS_ACT = 0x200 -- star cannot be gotten before this act
-STAR_MULTIPLE_AREAS = 0x400 -- only needed if your star can be obtained in only certain areas
+STAR_REPLICA = 0x400 -- replica flag (uses replica_start or replica_func)
+STAR_MULTIPLE_AREAS = 0x800 -- only needed if your star can be obtained in only certain areas
 STAR_AREA_MASK = 0xF -- 1-15
 
 local romhack_data = { -- supported rom hack data
@@ -121,15 +122,15 @@ local romhack_data = { -- supported rom hack data
       [COURSE_WDW] = {8 | STAR_ACT_SPECIFIC | STAR_IGNORE_STARMODE, 8, 8, 8, 8, 8, 8}, -- ignored in star mode because it's glitchy
       [COURSE_THI] = {8, 8 | STAR_ACT_SPECIFIC, 8, 8, 8 | STAR_NOT_BEFORE_THIS_ACT, 8 | STAR_ACT_SPECIFIC | STAR_EXIT, 8},
       [COURSE_RR] = {8, 8, 8 | STAR_IGNORE_STARMODE | STAR_APPLY_NO_ACTS, 8, 8, 8 | STAR_EXIT | STAR_APPLY_NO_ACTS, 8}, -- don't get trapped in In The Cage
-      [COURSE_BITDW] = {8, 0, 0, 8},
-      [COURSE_BITFS] = {8, 0, 0, 0, 8},
-      [COURSE_BITS] = {8, 0, 0, 0, 0, 8},
-      [COURSE_PSS] = {8, 8, 0, 0, 0, 8},
-      [COURSE_COTMC] = {8, 0, 0, 0, 8},
-      [COURSE_TOTWC] = {8, 0, 0, 0, 0, 8},
-      [COURSE_VCUTM] = {8, 0, 0, 0, 0, 8},
-      [COURSE_WMOTR] = {8, 0, 0, 0, 0, 8},
-      [COURSE_SA] = {8, 8 | STAR_IGNORE_STARMODE | STAR_APPLY_NO_ACTS, 0, 0, 0, 8}, -- can fail time challenge
+      [COURSE_BITDW] = {8, 0, 0, 8 | STAR_REPLICA},
+      [COURSE_BITFS] = {8, 0, 0, 0, 8 | STAR_REPLICA},
+      [COURSE_BITS] = {8, 0, 0, 0, 0, 8 | STAR_REPLICA},
+      [COURSE_PSS] = {8, 8, 0, 0, 0, 8 | STAR_REPLICA},
+      [COURSE_COTMC] = {8, 0, 0, 0, 8 | STAR_REPLICA},
+      [COURSE_TOTWC] = {8, 0, 0, 0, 0, 8 | STAR_REPLICA},
+      [COURSE_VCUTM] = {8, 0, 0, 0, 0, 8 | STAR_REPLICA},
+      [COURSE_WMOTR] = {8, 0, 0, 0, 0, 8 | STAR_REPLICA},
+      [COURSE_SA] = {8, 8 | STAR_IGNORE_STARMODE | STAR_APPLY_NO_ACTS, 0, 0, 0, 8 | STAR_REPLICA}, -- can fail time challenge
       [COURSE_CAKE_END] = {0, 8},
     },
 
@@ -153,7 +154,7 @@ local romhack_data = { -- supported rom hack data
 
     -- custom star names!
     starNames = {
-      [161] = "Across The Sinking Logs",
+      [161] = "Across The Sinking Slabs",
       [164] = "Replica Of The Tall Logs",
       [171] = "Castle Detour",
       [175] = "Replica Of The Fire Statue",
@@ -165,7 +166,7 @@ local romhack_data = { -- supported rom hack data
       [201] = "Coins In The Cave",
       [205] = "Replica Of The Cave Entrance",
       [211] = "Windy Red Coin Search",
-      [216] = "Replica Of The Airship",
+      [216] = "Replica Of The Flying Ship",
       [221] = "Hidden In The Light",
       [226] = "Replica Of The Cogs",
       [231] = "On Top Of The World",
@@ -195,6 +196,57 @@ local romhack_data = { -- supported rom hack data
       end
       return false
     end,
+},
+
+-- Replica Comet
+["coop-romhacks-star-road"] = {
+  name = "Star Road: The Replica Comet",
+  inherit = "star-road",
+  max_stars = 150,
+
+  -- new replicas
+  star_data = {
+    [COURSE_NONE] = {8, 8, 8, 8, 8 | STAR_REPLICA, 8 | STAR_REPLICA, 8 | STAR_REPLICA},
+    [COURSE_BITDW] = {8, 0, 0, 8 | STAR_REPLICA, 0, 8 | STAR_REPLICA},
+    [COURSE_BITFS] = {8, 0, 0, 0, 0, 8 | STAR_REPLICA | STAR_EXIT | STAR_APPLY_NO_ACTS},
+    [COURSE_BITS] = {8, 0, 0, 0, 8 | STAR_REPLICA, 8 | STAR_REPLICA},
+    [COURSE_PSS] = {8, 8, 0, 0, 8 | STAR_REPLICA | STAR_EXIT, 8 | STAR_REPLICA, 8 | STAR_REPLICA},
+    [COURSE_COTMC] = {8, 0, 0, 0, 8 | STAR_REPLICA, 8 | STAR_REPLICA | STAR_EXIT | STAR_APPLY_NO_ACTS},
+    [COURSE_TOTWC] = {8, 0, 0, 8 | STAR_REPLICA, 8 | STAR_REPLICA, 8 | STAR_REPLICA},
+    [COURSE_VCUTM] = {8, 0, 0, 8 | STAR_REPLICA | STAR_EXIT | STAR_APPLY_NO_ACTS, 8 | STAR_REPLICA | STAR_APPLY_NO_ACTS, 8 | STAR_REPLICA, 8 | STAR_REPLICA},
+    [COURSE_WMOTR] = {8, 0, 8 | STAR_REPLICA | STAR_EXIT | STAR_APPLY_NO_ACTS, 8 | STAR_REPLICA, 8 | STAR_REPLICA, 8 | STAR_REPLICA, 8 | STAR_REPLICA},
+    [COURSE_SA] = {8, 8 | STAR_IGNORE_STARMODE | STAR_APPLY_NO_ACTS, 0, 0, 8 | STAR_REPLICA, 8 | STAR_REPLICA, 8 | STAR_REPLICA}, -- can fail time challenge
+    [COURSE_CAKE_END] = {0, 8, 0, 8 | STAR_REPLICA},
+  },
+
+  -- contains the new replicas
+  starNames = {
+    [5] = "Replica Of The Blocked Moat",
+    [6] = "Replica Of Star Leap's Peak",
+    [7] = "Replica Of The Special World",
+    [166] = "Replica Of The Steep Slope",
+    [176] = "Replica Of The Bill Blasters",
+    [185] = "Replica Of The Shining Star",
+    [195] = "Replica Of The Shifting Saws",
+    [197] = "Replica Of The Mountain Crate",
+    [206] = "Replica Of The Flaming Flow",
+    [214] = "Replica Of The Windy Mill",
+    [215] = "Replica Of The Distant Hill",
+    [224] = "Replica Of The Metal Box",
+    [225] = "Replica Of The Perilous Pipe",
+    [227] = "Replica Of The Hidden Entrance",
+    [233] = "Replica Of The Slippery Roof",
+    [234] = "Replica Of The World's End",
+    [235] = "Replica Of The Hidden Window",
+    [237] = "Replica Of The Palace Window",
+    [245] = "Replica Of The Scenic Pipe",
+    [247] = "Replica Of The Raceside Pipe",
+    [254] = "Replica Of The Castle View",
+  },
+
+  mini_exclude = {
+    [227] = 1, -- uses hidden entrance
+  }
 },
 
 ["sm74"] = {
@@ -336,16 +388,17 @@ local romhack_data = { -- supported rom hack data
     -- prevent swap except by host
     special_run = function(m,gotStar)
       if m.playerIndex ~= 0 then return end
-      local np = gNetworkPlayers[m.playerIndex]
+      --- @type NetworkPlayer
+      local np = gNetworkPlayers[0]
       if gotStar and gGlobalSyncTable.ee and np.currLevelNum == LEVEL_SA then
         m.pos.x,m.pos.y,m.pos.z = 6044,136,-5564 -- make this level possible without dying
         set_mario_action(m, ACT_SPAWN_NO_SPIN_AIRBORNE, 0)
       end
       if (np.currAreaIndex == 1) == gGlobalSyncTable.ee and gPlayerSyncTable[0].spectator ~= 1 then
-        if has_mod_powers(0) then
+        if network_is_server() then
           gGlobalSyncTable.ee = (np.currAreaIndex ~= 1)
+          warpCooldown = 0
           close_menu()
-          return
         else
           if gGlobalSyncTable.ee then
             djui_chat_message_create(trans("using_ee"))
@@ -354,7 +407,6 @@ local romhack_data = { -- supported rom hack data
           end
           close_menu()
           warp_to_level(np.currLevelNum, np.currAreaIndex ~ 3, np.currActNum)
-          return
         end
       end
     end,
@@ -1043,17 +1095,202 @@ local romhack_data = { -- supported rom hack data
   mini_exclude = {}, -- none!
 },
 
+["ldd"] = {
+  name = "Lug's Delightful Dioramas",
+  default_stars = 64,
+  max_stars = 74,
+
+  starColor = {r = 255,g = 255,b = 255}, -- stars are white
+  disableNonStop = true, -- omm actually disables non stop for this hack
+  ommSupport = false, -- stars are always white, even in omm
+  no_bowser = true, -- no bowser.
+  final = -1,
+
+  -- warp to sweet delight after getting spectral spectacle star
+  special_run = function(m,gotStar)
+    if m.playerIndex == 0 and gotStar == 1 and gNetworkPlayers[0].currLevelNum == LEVEL_BITFS then
+      warp_to_level(LEVEL_BITS, 1, 0)
+    end
+  end,
+
+  -- so many act specific stars...
+  star_data = {
+    [COURSE_NONE] = {8, 8, 8},
+    [COURSE_BOB] = {8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC},
+    [COURSE_WF] = {8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_ACT_SPECIFIC},
+    [COURSE_JRB] = {8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_EXIT, 8 | STAR_ACT_SPECIFIC},
+    [COURSE_CCM] = {8 | STAR_ACT_SPECIFIC, 8, 8, 8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC},
+    [COURSE_BBH] = {8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_EXIT, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC},
+    [COURSE_LLL] = {8, 8, 8, 8, 8, 8, 8}, -- actually not any act specific stars
+
+    [COURSE_BITDW] = {8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT},
+    [COURSE_BITFS] = {8},
+    [COURSE_BITS] = {},
+    [COURSE_PSS] = {8, 8, 8},
+    [COURSE_COTMC] = {8, 8, 8},
+    [COURSE_TOTWC] = {8, 8, 8},
+    [COURSE_VCUTM] = {8, 8, 8},
+    [COURSE_WMOTR] = {8, 8, 8},
+    [COURSE_SA] = {8, 8, 8},
+
+    -- do not exist
+    [COURSE_SSL] = {},
+    [COURSE_DDD] = {},
+    [COURSE_SL] = {},
+    [COURSE_WDW] = {},
+    [COURSE_TTM] = {},
+    [COURSE_THI] = {},
+    [COURSE_TTC] = {},
+    [COURSE_RR] = {},
+  },
+
+  requirements = {
+    [LEVEL_HMC] = 30, -- Scorching Jaws
+    [LEVEL_CASTLE_COURTYARD] = 8,
+    [LEVEL_BITFS] = 50, -- Spectral Spectacle
+    [LEVEL_BITS] = 51, -- A Sweet Delight
+  },
+
+  starNames = {
+    -- Tilted Side
+    [161] = "Slip On The Red Towers",
+    [162] = "Slidin' On Down",
+    [163] = "Canyon Underside",
+
+    [171] = "8 Fantastic Feats", -- Spectral Spectacle
+
+    -- Yellow Side
+    [191] = "Height Of The Desert",
+    [192] = "Sandy Secrets",
+    [193] = "A Side Of Red Coins",
+
+    -- Green Side
+    [201] = "Burning Up The Tree",
+    [202] = "Boxed-In Secrets",
+    [203] = "Present In The Canyon",
+
+    -- Red Side
+    [211] = "Climb Up Chuckya Towers",
+    [212] = "Back To Roots",
+    [213] = "Wall Jump In The Wireframe",
+
+    -- Blue Side
+    [221] = "Slip In The Cages",
+    [222] = "Rush Down Poison Way",
+    [223] = "Deserted Red Coins",
+
+    -- Purple Side
+    [231] = "Poisoned Wireframe",
+    [232] = "A Leap of Faith or 8",
+    [233] = "The Abandoned Canyon",
+
+    -- Orange Side
+    [241] = "Grand View From The Canyon",
+    [242] = "Red Towers, Red Guys",
+    [243] = "Beat Up Brick Guy",
+  },
+},
+
+["ldd_green_comet"] = {
+  name = "LDD - Green Comet",
+  inherit = "ldd",
+  default_stars = 42,
+  max_stars = 80,
+
+  starColor = {r = 0,g = 255,b = 0}, -- guess what color the stars are
+
+  -- actually no act specific stars (but a lot of them are exit stars)
+  star_data = {
+    [COURSE_NONE] = {},
+    [COURSE_BOB] = {8, 8, 8, 8, 8, 8},
+    [COURSE_WF] = {8, 8 | STAR_EXIT, 8, 8, 8, 8 | STAR_EXIT},
+    [COURSE_JRB] = {8 | STAR_EXIT, 8 | STAR_ACT_SPECIFIC, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_ACT_SPECIFIC | STAR_EXIT, 8 | STAR_EXIT},
+    [COURSE_CCM] = {8, 8, 8, 8, 8, 8},
+    [COURSE_BBH] = {8, 8, 8, 8, 8, 8},
+    [COURSE_LLL] = {8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT, 8, 8, 8 | STAR_EXIT},
+
+    [COURSE_BITDW] = {8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT},
+    [COURSE_BITFS] = {8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT},
+    [COURSE_BITS] = {},
+    [COURSE_PSS] = {8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT, 8, 8 | STAR_EXIT},
+    [COURSE_COTMC] = {8, 8, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT},
+    [COURSE_TOTWC] = {8, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT},
+    [COURSE_VCUTM] = {8, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT},
+    [COURSE_WMOTR] = {8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT},
+    [COURSE_SA] = {8, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT},
+  },
+
+  special_run = function(m, gotStar) end, -- override
+
+  -- if I named all of these I'd have to name the other 42, haha no
+  starNames = {
+    -- Tilted Side
+    [161] = "Green Star 1",
+    [162] = "Green Star 2",
+    [163] = "Green Star 3",
+    [164] = "Green Star 4",
+    [165] = "Green Star 5",
+
+    [171] = "Green Star 1", -- Spectral Spectacle
+    [172] = "Green Star 2",
+    [173] = "Green Star 3",
+
+    -- Yellow Side
+    [191] = "Green Star 1",
+    [192] = "Green Star 2",
+    [193] = "Green Star 3",
+    [194] = "Green Star 4",
+    [195] = "Green Star 5",
+
+    -- Green Side
+    [201] = "Green Star 1",
+    [202] = "Green Star 2",
+    [203] = "Green Star 3",
+    [204] = "Green Star 4",
+    [205] = "Green Star 5",
+
+    -- Red Side
+    [211] = "Green Star 1",
+    [212] = "Green Star 2",
+    [213] = "Green Star 3",
+    [214] = "Green Star 4",
+    [215] = "Green Star 5",
+
+    -- Blue Side
+    [221] = "Green Star 1",
+    [222] = "Green Star 2",
+    [223] = "Green Star 3",
+    [224] = "Green Star 4",
+    [225] = "Green Star 5",
+
+    -- Purple Side
+    [231] = "Green Star 1",
+    [232] = "Green Star 2",
+    [233] = "Green Star 3",
+    [234] = "Green Star 4",
+    [235] = "Green Star 5",
+
+    -- Orange Side
+    [241] = "Green Star 1",
+    [242] = "Green Star 2",
+    [243] = "Green Star 3",
+    [244] = "Green Star 4",
+    [245] = "Green Star 5",
+  },
+},
+
 default = {
     name = "Default",
     default_stars = -1,
     max_stars = 255,
-    requirements = {[LEVEL_BOWSER_3] = 255}, -- block off Bowser 3 until needed stars are collected
+    requirements = {[LEVEL_BOWSER_3] = 255, [LEVEL_ENDING] = 255}, -- block off Bowser 3 until needed stars are collected
     parseStars = true, -- automatically generate star list
 
     star_data = {}, -- assume every secret stage has 1 star
 
     runner_victory = function(m)
-      return m.action == ACT_JUMBO_STAR_CUTSCENE
+      local np = gNetworkPlayers[m.playerIndex]
+      return m.action == ACT_JUMBO_STAR_CUTSCENE or np.currCourseNum == COURSE_CAKE_END
     end,
 },
 
@@ -1083,13 +1320,13 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
   end
 
   local found_121 = false
-  if ROMHACK == nil and settingRomHack then
-    if _G.mhApi == nil or _G.mhApi.romhackSetup == nil then
+  if not ROMHACK and settingRomHack then
+    if not _G.mhApi or not _G.mhApi.romhackSetup then
       romhack_file = "vanilla"
       for i,mod in pairs(gActiveMods) do
         if mod.enabled then
           if mod.incompatible and string.find(mod.incompatible,"romhack") then -- is a romhack
-            romhack_file = mod.relativePath
+            romhack_file = mod.relativePath:gsub("ROMHACK - ","")
             found_121 = false
           elseif mod.incompatible and string.find(mod.incompatible,"gamemode") then -- is mariohunt
             if string.find(mod.basePath,"sm64ex/-coop") then
@@ -1099,7 +1336,7 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
             found_121 = true
           elseif not disable_chat_hook then -- disable hook for some mods
             local name = mod.name:lower()
-            if (not (_G.mhApi.chatValidFunction or _G.mhApi.chatModifyFunction)) and (name:find("mute") or name:find("swear filter") or name:find("nicknames")) then
+            if (name:find("mute") or name:find("swear filter") or name:find("nicknames")) and not name:find("(mh)") then
               disable_chat_hook = true
             end
           end
@@ -1111,7 +1348,7 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
       romhack_file = "custom"
     end
   end
-  if romhack_file == "custom" and (_G.mhApi ~= nil and _G.mhApi.romhackSetup ~= nil) then
+  if romhack_file == "custom" and (_G.mhApi and _G.mhApi.romhackSetup) then
     ROMHACK = _G.mhApi.romhackSetup()
     print("Romhack is",ROMHACK.name,"custom")
   end
@@ -1121,12 +1358,33 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
     omm_replace(usingOMM)
   end
 
+  -- inherit
+  if ROMHACK and ROMHACK.inherit then
+    local new_rom = romhack_data[ROMHACK.inherit]
+    if new_rom then
+      print("Inheriting data from",ROMHACK.inherit)
+      for i,v in pairs(ROMHACK) do
+        if type(v) ~= "table" then
+          new_rom[i] = v
+        else
+          if not new_rom[i] then
+            new_rom[i] = {}
+          end
+          for a,b in pairs(v) do
+            new_rom[i][a] = b
+          end
+        end
+      end
+      ROMHACK = new_rom
+    end
+  end
+
   if found_121 then
     ROMHACK.star_data[COURSE_NONE] = {8, 8, 8, 8, 8, 8}
     ROMHACK.starNames[6] = "Red Coins at Midnight"
   end
 
-  if ROMHACK == nil then
+  if not ROMHACK then
     romhack_file = "default"
     ROMHACK = romhack_data["default"]
     print("Not compatible!")
@@ -1136,19 +1394,19 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
     djui_popup_create(trans("set_hack",ROMHACK.name), 1)
   end
 
-  if ROMHACK.starColor ~= nil then
+  if ROMHACK.starColor then
     defaultStarColor = ROMHACK.starColor
   else
     defaultStarColor = {r = 255,g = 255,b = 92} -- yellow
   end
 
-  if initial and ROMHACK.otherStarIds ~= nil then
+  if initial and ROMHACK.otherStarIds then
     local otherStarIds = ROMHACK.otherStarIds() or {}
     for id,name in pairs(otherStarIds) do
       star_ids[id] = name
     end
   end
-  if initial and ROMHACK.otherStarSources ~= nil then
+  if initial and ROMHACK.otherStarSources then
     local otherStarSources = ROMHACK.otherStarSources() or {}
     for id,data in pairs(otherStarSources) do
       star_sources[id] = data
@@ -1156,11 +1414,11 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
   end
 
   -- support for old format
-  if ROMHACK.star_data == nil then
+  if not ROMHACK.star_data then
     ROMHACK.star_data = {}
     for level,course in pairs(level_to_course) do
       if ROMHACK.starCount[level] then
-        if ROMHACK.star_data[course] == nil then ROMHACK.star_data[course] = {} end
+        if not ROMHACK.star_data[course] then ROMHACK.star_data[course] = {} end
         if ROMHACK.starCount[level] > 0 then
           for i=1,ROMHACK.starCount[level] do
             local starNum = i
@@ -1184,7 +1442,7 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
 
   if settingRomHack then
     gGlobalSyncTable.allowStalk = ROMHACK.stalk or false
-    if (ROMHACK ~= nil and ROMHACK.stalk == nil) then
+    if (ROMHACK and not ROMHACK.stalk) then
       update_chat_command_description("stalk", "- " .. trans("command_disabled"))
     else
       update_chat_command_description("stalk", trans("stalk_desc"))
@@ -1210,9 +1468,9 @@ function parse_course_stars(course, level)
   PARSE_MINI_EXCLUDE = {}
   PARSE_STAR_NAMES = {}
 
-  if ROMHACK.mini_exclude == nil then ROMHACK.mini_exclude = {} end
-  if ROMHACK.starNames == nil then ROMHACK.starNames = {} end
-  if ROMHACK.star_data[course] == nil then ROMHACK.star_data[course] = {} end
+  if not ROMHACK.mini_exclude then ROMHACK.mini_exclude = {} end
+  if not ROMHACK.starNames then ROMHACK.starNames = {} end
+  if not ROMHACK.star_data[course] then ROMHACK.star_data[course] = {} end
 
   local exText = ""
   local renumText = ""
@@ -1230,7 +1488,7 @@ function parse_course_stars(course, level)
     if (PARSE_FOUND_STARS[i] or (i==7 and course <= 15 and course > 0)) then
       ROMHACK.star_data[course][i] = PARSE_FOUND_STARS[i] or 1 -- 100 coin star is always area 1
 
-      if ROMHACK.starNames[course*10+i] == nil then
+      if not ROMHACK.starNames[course*10+i] then
         ROMHACK.starNames[course*10+i] = PARSE_STAR_NAMES[course*10+i]
       end
 
@@ -1272,7 +1530,7 @@ function parse_stars(area, bhvData, macroBhvIds, macroBhvArgs)
 
     local neededByte2
     local custom_name
-    if star_sources[obj_id] ~= nil then
+    if star_sources[obj_id] then
       neededByte2 = star_sources[obj_id][1] or 0
       custom_name = star_sources[obj_id][2]
     end
@@ -1332,7 +1590,7 @@ function parse_stars(area, bhvData, macroBhvIds, macroBhvArgs)
     end
 
     if (starNum > 0 and starNum < 8) and (
-    ROMHACK.game_exclude == nil or ROMHACK.game_exclude[PARSE_COURSE*10+starNum] == nil or
+    not ROMHACK.game_exclude or not ROMHACK.game_exclude[PARSE_COURSE*10+starNum] or
     ROMHACK.game_exclude[PARSE_COURSE*10+starNum] == PARSE_AREA
     ) then
       custom_name = custom_name .. " (" .. starNum ..")"
@@ -1342,14 +1600,14 @@ function parse_stars(area, bhvData, macroBhvIds, macroBhvArgs)
         print(custom_name, PARSE_COURSE, PARSE_AREA)
       end
       
-      if PARSE_FOUND_STARS[starNum] == nil then
+      if not PARSE_FOUND_STARS[starNum] then
         PARSE_FOUND_STARS[starNum] = PARSE_AREA | STAR_APPLY_NO_ACTS
       else
         PARSE_FOUND_STARS[starNum] = PARSE_FOUND_STARS[starNum] & ~STAR_AREA_MASK
         PARSE_FOUND_STARS[starNum] = PARSE_FOUND_STARS[starNum] | (STAR_MULTIPLE_AREAS << (PARSE_AREA-1))
       end
 
-      if mini_invalid and PARSE_MINI_EXCLUDE[starNum] == nil then
+      if mini_invalid and not PARSE_MINI_EXCLUDE[starNum] then
         PARSE_MINI_EXCLUDE[starNum] = 1
       elseif PARSE_AREA ~= 1 and (not mini_invalid) then
         PARSE_MINI_EXCLUDE[starNum] = PARSE_AREA
@@ -1392,13 +1650,13 @@ end
 -- it probably also erases some other stuff but oh well
 function deleteStarRoadStuff(m)
     local starsNeeded = gGlobalSyncTable.starRun
-    if starsNeeded == nil or starsNeeded == -1 or starsNeeded > m.numStars then return end -- only if have enough for run
+    if not starsNeeded or starsNeeded == -1 or starsNeeded > m.numStars then return end -- only if have enough for run
     local np = gNetworkPlayers[0]
     if m.playerIndex ~= 0 or np.currCourseNum ~= COURSE_NONE then return end -- only for local and in castle
 
     local obj = obj_get_first(OBJ_LIST_SURFACE)
 
-    while obj ~= nil do
+    while obj do
         local objID = get_id_from_behavior(obj.behavior)
         if objID > id_bhv_max_count then
           print("deleted",objID,(obj.oBehParams >> 24))
@@ -1414,7 +1672,7 @@ function setup_mini_blacklist(blacklistData)
   mini_blacklist = {}
   if blacklistData and blacklistData ~= "none" then
     decrypt_black(blacklistData)
-  elseif ROMHACK.mini_exclude ~= nil then
+  elseif ROMHACK.mini_exclude then
     for id,value in pairs(ROMHACK.mini_exclude) do
       if value == 1 then
         mini_blacklist[id] = 1
@@ -1461,7 +1719,7 @@ function encrypt_black()
         doAct = course
         doCourse = 0
       end]]
-      if mini_blacklist[doCourse*10+doAct] ~= nil then
+      if mini_blacklist[doCourse*10+doAct] then
         courseData = courseData + 2^(act-1)
       end
     end

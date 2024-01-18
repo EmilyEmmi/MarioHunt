@@ -7,7 +7,7 @@ function remove_timestop()
     ---@type Camera
     local c = gMarioStates[0].area.camera
 
-    if m == nil or c == nil then
+    if not m or not c then
         return
     end
 
@@ -17,9 +17,9 @@ function remove_timestop()
         m.freeze = 0
         if c.cutscene == CUTSCENE_ENTER_BOWSER_ARENA then
           local bowser = obj_get_first_with_behavior_id(id_bhvBowser)
-          if bowser ~= nil and bowser.oAction == 5 then
+          if bowser and bowser.oAction == 5 then
             local np = gNetworkPlayers[0]
-            if np.currLevelNum == LEVEL_BOWSER_2 then
+            if bowser.oBehParams2ndByte == 0x01 then
               bowser.oAction = 13
             else
               bowser.oAction = 0

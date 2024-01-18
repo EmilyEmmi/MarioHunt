@@ -67,6 +67,8 @@ local cData = {
     goalDist = 1000,
 }
 
+hook_event(HOOK_USE_ACT_SELECT, function () if STP.spectator == 1 then return false end end) -- troopa moment
+
 function mario_dfm(m)
     if STP.spectator == 1 and free_camera == 1 and not (menu or showingStats) then
         local speed = 0
@@ -131,7 +133,6 @@ function mario_update_local(m)
 
     if STP.spectator == 1 then
 
-
         MSP.marioObj.header.gfx.node.flags = MSP.marioObj.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
         MSP.marioObj.oIntangibleTimer = -1
         MSP.health = 0x880
@@ -170,11 +171,11 @@ function mario_update_local(m)
 
         if free_camera == 0 then
             if runnerFocus ~= 0 then
-              if STI ~= nil and STI.team == 1 then
+              if STI and STI.team == 1 then
                 runnerFocus = i
               else
                 local focusSMario = gPlayerSyncTable[runnerFocus]
-                if focusSMario == nil or focusSMario.team ~= 1 then
+                if not focusSMario or focusSMario.team ~= 1 then
                   for a=1,(Rmax-1) do
                     local sMario = gPlayerSyncTable[a]
                     if sMario.team == 1 then
@@ -227,7 +228,7 @@ function mario_update_local(m)
 
         update_spectator_camera(MSP, MSI)
 
-        if free_camera == 0 and obj_get_first_with_behavior_id(id_bhvActSelector) == nil and (NPI.currLevelNum ~= NPP.currLevelNum or NPI.currAreaIndex ~= NPP.currAreaIndex or NPI.currActNum ~= NPP.currActNum) then
+        if free_camera == 0 and not obj_get_first_with_behavior_id(id_bhvActSelector) and (NPI.currLevelNum ~= NPP.currLevelNum or NPI.currAreaIndex ~= NPP.currAreaIndex or NPI.currActNum ~= NPP.currActNum) then
             number = number + 1
             if number >= 35 then
               number = 0
@@ -274,7 +275,7 @@ function mario_update_local(m)
         end
 
         if SVtp == 1 then
-            if SVcln == nil then
+            if not SVcln then
                 warp_beginning()
                 SVtp = 3
                 return
@@ -322,7 +323,7 @@ function enable_spectator(m)
 
   vec3f_copy(cData.focus,MSP.pos)
   cData.focus.y = cData.focus.y + 120
-  if m.area.camera ~= nil then
+  if m.area.camera then
     cData.yaw = m.area.camera.yaw
   else
     cData.yaw = 0
@@ -393,13 +394,13 @@ function spectated()
                 djui_hud_print_text(text3, xpos3, ypos3, 0.5)
             end
 
-            if MSI.health ~= nil and free_camera == 0 then
+            if MSI.health and free_camera == 0 then
               local screenWidth = djui_hud_get_screen_width()
               local screenHeight = djui_hud_get_screen_height()
 
               local xposH = screenWidth - 170
               local yposH = screenHeight - 170
-              hud_render_power_meter(MSI.health,xposH,yposH,180,180)
+              render_power_meter_mariohunt(MSI.health,xposH,yposH,180,180,MSI.playerIndex)
             end
         end
     end
@@ -419,7 +420,7 @@ function update_spectator_camera(m, s)
     vec3f_copy(LLS.curFocus, cData.focus)
     vec3f_copy(LLS.goalFocus, cData.focus)
     vec3f_copy(m.area.camera.focus, cData.focus)
-    if m.currentRoom ~= s.currentRoom and free_camera == 0 then
+    if m.currentRoom ~= s.currentRoom and free_camera == 0 and (s.action ~= ACT_DEATH_EXIT) then
         vec3f_copy(m.pos,s.pos)
     end
     LLS.posHSpeed = 0
@@ -528,9 +529,22 @@ function spectate_command(msg)
     return true
   end
 
-  if msg == "" then
+  if msg == "free" then
     runnerFocus = 0
     free_camera = 1
+    enable_spectator(m)
+    djui_chat_message_create(trans("spectator_controls"))
+  elseif msg == "" then
+    if runnerTarget == -1 then
+      runnerFocus = 0
+      free_camera = 1
+      enable_spectator(m)
+      djui_chat_message_create(trans("spectator_controls"))
+    else
+      runnerFocus = runnerTarget
+      i = runnerTarget
+      free_camera = 0
+    end
     enable_spectator(m)
     djui_chat_message_create(trans("spectator_controls"))
     return true
@@ -570,7 +584,7 @@ function spectate_command(msg)
   end
 
   runnerFocus = 0
-  if playerID == nil then
+  if not playerID then
     return true
   end
   free_camera = 0
