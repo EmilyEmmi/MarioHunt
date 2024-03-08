@@ -69,9 +69,7 @@ _G.mhApi.get_role_name_and_color = function(index)
 end
 
 -- checks if a menu is open
-_G.mhApi.isMenuOpen = function()
-  return (menu or showingStats)
-end
+_G.mhApi.isMenuOpen = is_menu_open
 
 -- making some things global
 _G.mhApi.interactionIsValid = on_interact

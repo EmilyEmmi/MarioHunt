@@ -78,7 +78,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   stats_desc = "- Show/hide stat table",
   stalk_desc = "[NAME|ID] - Warps to the level the specified player is in, or the first Runner",
   spectate_desc = "[NAME|ID|OFF] - Spectate the specified player, free camera if not specified, or OFF to turn off", -- not to be confused with spectator_desc
-  target_desc = "[NAME|ID] - Set this Runner as your target, which displays their location at all times.", -- needs ES translation
+  target_desc = "[NAME|ID] - Set this Runner as your target, which displays their location at all times.",
 
   -- roles
   runner = "Runner",
@@ -131,9 +131,6 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   spectate = "type \"/spectate\" to spectate",
   mini_goal = "\\#ffff5a\\Whoever collects the most stars in %d:%02d wins!\\#ffffff\\",
   fun = "Have fun!",
-  article_0 = "The", -- masculine, definite, singular article (unused)
-  article_1 = "The", -- feminine, definite singular article (unused)
-  article_2 = "The", -- neutral, definite singular article (unused)
 
   -- hud, extra desc, and results text (%s is a placeholder for names, and %d is a placeholder for a number)
   win = "%s\\#ffffff\\ win!", -- team name is placed here
@@ -169,6 +166,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   rejoin_start = "%s\\#ffa0a0\\ has two minutes to rejoin.",
   rejoin_success = "%s\\#ffa0a0\\ rejoined in time!",
   rejoin_fail = "%s\\#ffa0a0\\ did not reconnect in time.",
+  leave_error = "%s\\#ffa0a0\\ left due to an error.",
   using_ee = "This is using Extreme Edition only.",
   not_using_ee = "This is using Standard Edition only.",
   killed = "%s\\#ffa0a0\\ killed %s!",
@@ -191,7 +189,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   vanish_custom = "Hold \\#ffff5a\\B\\#ffffff\\ to vanish!",
   got_all_stars = "You have enough stars!",
   unstuck = "Attempted to fix state",
-  use_out = "Use /mh out to warp everyone out of this level", -- needs ES translation
+  use_out = "Use /mh out to warp everyone out of this level",
   stars_in_area = "%d star(s) available here!",
   demon_unlock = "Unlocked Green Demon mode!",
   hit_switch_red = "%s\\#ffa0a0\\ hit the\n\\#df5050\\Red Switch!", -- dark red (unique)
@@ -205,7 +203,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   bad_id = "Invalid player ID!",
   command_disabled = "This command is disabled.",
   change_setting = "Setting change:",
-  you_are_muted = "You are muted.", -- needs ES translation
+  you_are_muted = "You are muted.",
 
   -- more command feedback
   bad_param = "Invalid parameters!",
@@ -242,11 +240,13 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   hunter_metal = "All hunters are metal",
   hunter_normal = "All hunters appear normal",
   hunter_glow = "All hunters glow red",
-  hunter_outline = "All hunters have an outline", -- needs ES translation
-  runner_sparkle = "All runners now sparkle", -- needs ES translation
+  hunter_outline = "All hunters have an outline",
+  hunter_color = "All hunters have the Burgundy palette", -- (check official lang for palette name)
+  runner_sparkle = "All runners now sparkle",
   runner_normal = "All runners appear normal",
-  runner_glow = "All runners now glow", -- needs ES translation
-  runner_outline = "All runners have an outline", -- needs ES translation
+  runner_glow = "All runners now glow",
+  runner_outline = "All runners have an outline",
+  runner_color = "All runners have the Azure palette", -- (check official lang for palette name)
   now_weak = "All players have half invincibility frames",
   not_weak = "All players have normal invincibility frames",
   auto_on = "Games will start automatically",
@@ -269,15 +269,15 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   anarchy_set_2 = "Hunters can attack their teammates",
   anarchy_set_3 = "Players can attack their teammates",
   dmgAdd_set = "Runners will now take %d extra damage from PVP attacks.",
-  dmgAdd_set_ohko = "Runners will now die in one hit", -- needs ES translation
-  voidDmg_set = "Players will take %d damage from falling into the void or quicksand.", -- needs ES translation
-  voidDmg_set_ohko = "Players will instantly die from falling into the void or quicksand.", -- needs ES translation
-  target_hunters_only = "Only Hunters can set a target.", -- needs ES translation
-  muted = "\\#ffff00\\%s\\#ffffff\\ was muted by \\#ffff00\\%s\\#ffffff\\.", -- needs ES translation
-  unmuted = "\\#ffff00\\%s\\#ffffff\\ was unmuted by \\#ffff00\\%s\\#ffffff\\.", -- needs ES translation
-  you_muted = "You muted \\#ffff00\\%s\\#ffffff\\.", -- needs ES translation
-  you_unmuted = "You unmuted \\#ffff00\\%s\\#ffffff\\.", -- needs ES translation
-  mute_auto = "\\#ffff00\\%s\\#ffffff\\ was muted automatically.", -- needs ES translation
+  dmgAdd_set_ohko = "Runners will now die in one hit",
+  voidDmg_set = "Players will take %d damage from falling into the void or quicksand.",
+  voidDmg_set_ohko = "Players will instantly die from falling into the void or quicksand.",
+  target_hunters_only = "Only Hunters can set a target.",
+  muted = "\\#ffff00\\%s\\#ffffff\\ was muted by \\#ffff00\\%s\\#ffffff\\.",
+  unmuted = "\\#ffff00\\%s\\#ffffff\\ was unmuted by \\#ffff00\\%s\\#ffffff\\.",
+  you_muted = "You muted \\#ffff00\\%s\\#ffffff\\.",
+  you_unmuted = "You unmuted \\#ffff00\\%s\\#ffffff\\.",
+  mute_auto = "\\#ffff00\\%s\\#ffffff\\ was muted automatically.",
 
   -- team chat
   tc_toggle = "Team chat is %s!",
@@ -350,6 +350,10 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   stat_placement = "64 Tour Placement",
   stat_wins_ex_standard = "Wins (Extreme Mode)",
   stat_wins_ex = "Wins (Extreme Mode, MiniHunt/pre v2.3)",
+  stat_playtime = "Playtime (Hours)",
+  stat_parkour_time = "Fastest Parkour Time",
+  stat_parkour_time_omm = "Fastest Parkour Time (OMM)",
+  stat_parkour_time_other = "Fastest Parkour Time (Moveset)",
 
   -- placements
   place_1 = "\\#e3bc2d\\[1st Place]",
@@ -375,7 +379,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   lives_desc = "[INT] - Sets the amount of lives Runners have, from 0 to 99 (note: 0 lives is still 1 life)",
   time_desc = "[NUM] - Sets the amount of time Runners have to wait to leave, in seconds, or the length of the game in MiniHunt.",
   stars_desc = "[INT] - Sets the amount of stars Runners must collect to leave, from 0 to 7 (only in star mode)",
-  category_desc = "[INT] - Sets the amount of stars Runners must have to face Bowser. Set to -1 for any%.",
+  category_desc = "[INT] - Sets the amount of stars Runners must have to face Bowser.",
   flip_desc = "[NAME|ID] - Flips the team of the specified player",
   setlife_desc = "[NAME|ID|INT,INT] - Sets the specified lives for the specified runner",
   leave_desc = "[NAME|ID] - Allows the specified player to leave the level if they are a runner",
@@ -394,9 +398,9 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   default_desc = "- Set settings to default",
   blacklist_desc = "[ADD|REMOVE|LIST|RESET|SAVE|LOAD,COURSE,ACT] - Blacklist stars in MiniHunt",
   stalking_desc = "[ON|OFF] - Allow warping to a Runner's level with /stalk",
-  mute_desc = "[NAME|ID] - Mutes a player, preventing them from chatting", -- needs ES translation
-  unmute_desc = "[NAME|ID] - Unmutes a player, allowing them to chat again", -- needs ES translation
-  out_desc = "- Kicks everyone out of this level", -- needs ES translation
+  mute_desc = "[NAME|ID] - Mutes a player, preventing them from chatting",
+  unmute_desc = "[NAME|ID] - Unmutes a player, allowing them to chat again",
+  out_desc = "- Kicks everyone out of this level",
 
   -- Blocky's menu
   main_menu = "Main Menu",
@@ -449,12 +453,17 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_first_timer_desc = "Gives the leader in MiniHunt a death timer.",
   menu_defeat_bowser = "Defeat %s",
   menu_allow_stalk = "Allow 'Stalking'",
-  menu_countdown = "Countdown", -- needs ES translation
-  menu_countdown_desc = "How long Hunters must wait before starting.", -- needs ES translation
-  menu_voidDmg = "Void DMG", -- needs ES translation
-  menu_voidDmg_desc = "Damage dealt to players falling into the void or quicksand.", -- needs ES translation
-  menu_double_health = "Double Runner Health", -- needs ES translation
-  menu_double_health_desc = "Runners get 16 points of health instead of 8.", -- needs ES translation
+  menu_countdown = "Countdown",
+  menu_countdown_desc = "How long Hunters must wait before starting.",
+  menu_voidDmg = "Void DMG",
+  menu_voidDmg_desc = "Damage dealt to players falling into the void or quicksand.",
+  menu_double_health = "Double Runner Health",
+  menu_double_health_desc = "Runners get 16 points of health instead of 8.",
+  menu_free_roam = "Free Roam",
+  menu_free_roam_desc = "Disables Star and Key requirements for doors and most levels.",
+  menu_star_heal = "Star Heal",
+  menu_stalk_timer = "Stalk Cooldown", -- needs translation
+  menu_stalk_timer_desc = "Time the player is frozen for after using /stalk.", -- needs translation
 
   menu_flip = "Flip Team",
   menu_spectate = "Spectate",
@@ -465,8 +474,8 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_allowleave = "Allow to Leave",
   menu_setlife = "Set Lives",
   menu_players_all = "All Players",
-  menu_target = "Set as Target", -- needs ES translation
-  menu_mute = "Mute", -- needs ES translation
+  menu_target = "Set as Target",
+  menu_mute = "Mute",
 
   menu_timer = "Speedrun Timer",
   menu_timer_desc = "[ON|OFF] - Show a timer at the bottom of the screen in Standard modes.",
@@ -485,6 +494,14 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_popup_sound = "Popup Sounds",
   menu_season = "Seasonal Changes",
   menu_season_desc = "Fun visual changes depending on the date.",
+  menu_radar = "Radar",
+  menu_radar_desc = "Shows where Runners and important objects are.",
+  menu_minimap = "Minimap",
+  menu_minimap_desc = "Shows a map of the whole level.",
+  menu_romhack_cam = "Romhack Cam", -- (cam is short for camera)
+  menu_romhack_cam_desc = "Enables romhack camera at all times.", -- (cam is short for camera)
+  menu_invinc_particle = "Sparkle I-Frames", -- needs translation (I-Frames is short for invincibility/invulnerability frames)
+  menu_invinc_particle_desc = "Replaces the \"blinking\" effect when Mario takes damage with sparkle particles.", -- needs translation
 
   menu_free_cam_desc = "Enter Free Camera in Spectator Mode.",
   menu_spectate_run = "Spectate Runner",
@@ -509,10 +526,60 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_toggle_all = "Toggle All",
 
   -- updater
-  up_to_date = "\\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\ is up to date!", -- needs translation
-  up_to_date_egg = "\\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\ is up to date!", -- needs translation
-  has_update = "An update is avalible for \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\!", -- needs translation
-  has_update_egg = "An update is avalible for \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\!", -- needs translation
+  up_to_date = "\\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\ is up to date!",
+  up_to_date_egg = "\\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\ is up to date!",
+  has_update = "An update is avalible for \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\!",
+  has_update_egg = "An update is avalible for \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\!",
+
+  -- tips (needs translation)
+  -- I totally understand if you don't want to translate all of these.
+  tip = "Tip: ",
+  tip_1 = "Press L + Start, or type /mh, to open the menu. You can configure settings here!",
+  tip_2 = "Ground pounds deal 3 damage to other players.",
+  tip_3 = "A kick will deal 2 damage and send players flying!",
+  tip_4 = "For commands such as /spectate and /target, you can enter partial names and they'll still work (ex: entering \"Emily\" will refer to EmilyEmmi)",
+  tip_5 = "You can change settings mid-game in the menu.",
+  tip_6 = "If something goes wrong, type /mh pause to pause all players. Type it again to unpause.",
+  tip_7 = "Is someone spamming or using slurs? Use /mh mute to mute them!",
+  tip_8 = "You can pause the game before collecting a star or key and Exit Course to skip the animation.",
+  tip_9 = "You can target a Runner with /target. This will display their location at the top of the screen.",
+  tip_10 = "You can configure personal settings in the menu (L + Start).",
+  tip_11 = "No need to restart the server! Select \"Reset Alt Save\" in \"Start\" to reset all progress.",
+  tip_12 = "You can obtain Runner role by defeating a Runner.",
+  tip_13 = "Like in vanilla Mario 64, 0 lives still counts as a life.",
+  tip_14 = "Major glitches, such as LBLJ, are useless outside of Any%.",
+  tip_15 = "In-game signs may contain more helpful tips!",
+  tip_16 = "Dire Dire Docks may be entered at one less star than the actual category.",
+  tip_17 = "Set Cappy to \"Damage\" to use him as a ranged weapon. He deals 1 damage.",
+  tip_18 = "Cappy can pick up objects, such as Coins and Secrets.",
+  tip_19 = "Use the D-Pad to throw Cappy in different directions.",
+  tip_20 = "Check out Key's Artwork's video on YouTube to learn about OMM tech!",
+  tip_21 = "If objects in a level start to disappear or warps stop working, use /mh out in that level to force that level to reload.",
+  tip_22 = "Use /mh desync if you think a desync error has occured.",
+  tip_23 = "Killing another player will restore all of your health.",
+  tip_24 = "You can see progress on keys, caps, and secret stages in the Pause menu in the castle.",
+  tip_25 = "Runners can hurt each other in this mode!",
+  tip_26 = "Falling off in cap stages counts as losing a life.",
+  tip_27 = "Blue coin switches will respawn.",
+  tip_28 = "You can pick another act to throw off Hunters.",
+  tip_29 = "It's a holiday! If you don't like the effects, turn off \"Seasonal Changes\" in the menu.",
+  tip_30 = "You can spy on Runners with /spectate.",
+  tip_31 = "Use /stalk to warp to a level another Runner is in!",
+  tip_32 = "Learning speedrunning techniques is a good way to improve your game.",
+  tip_33 = "You can phase through Whomps by ground-pounding or kicking as they fall.",
+  tip_34 = "The fastest way to perform a Triple Jump is by kicking for the first jump.",
+  tip_35 = "Metal form deals double damage to opponents.",
+  tip_36 = "The Vanish Cap will only take effect when holding B.",
+  tip_37 = "Cap timers don't drain inside of cannons.",
+  tip_38 = "Don't linger on the Act Select for too long!",
+  tip_39 = "Dives are fast, and diving into another player can help you evade attacks.",
+  tip_40 = "Falling off will deal damage instead of instantly killing you.",
+  tip_41 = "1-Ups will restore all of your health.",
+  tip_42 = "Use the Players menu for commands that target a specific player, such as flipping teams.",
+  tip_43 = "The MarioHunt menu allows for starting games and configuring game settings.",
+  tip_44 = "You can hide your chat role in Settings.",
+  tip_45 = "Runners wearing the Metal Cap can still be hurt by Hunters.",
+  tip_46 = "In the menu, be sure to press A to save your changed settings!",
 
   -- These commands only appear to me, so I wouldn't bother translating them. You can delete these lines and everything should still work.
   print_desc = "[STRING] - Outputs message to console",
@@ -527,22 +594,23 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   location_desc = "[NAME|ID] - Get your location, or whoever is specified",
   complete_desc = "- 100%s the save file",
   djui_desc = "- Opens djui menu",
+  swarp_desc = "- Does special warp (-1, -2, -3, -8, or -9)",
   ["set-fov_desc"] = "[NUM] - Sets your fov; leave blank to reset",
-  ["wing-cap_desc"] = "- Grants wing cap - Troopa if you abuse this I will break your knees",
+  ["wing-cap_desc"] = "- Grants wing cap",
   ["kill-bowser_desc"] = "- Kills Bowser, if he exists",
 }
 
-langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by EpikCool
+langdata["es"] = -- By Kanheaven and SonicDark, with newer lines by EpikCool and corrected errors by green
 {
   -- fullname for auto select
   fullname = "Spanish",
 
   -- name in the built-in menu
-  name_menu = "Español (LatAm)", -- I wanted to keep the name shorter
+  name_menu = "Español (US)", -- I wanted to keep the name shorter
 
   -- global command info
   to_switch = "Escribe \"/lang %s\" para cambiar idioma",
-  switched = "¡Cambiaste a español!",
+  switched = "¡Cambiaste a Español!",
   rule_command = "Escribe /rules para mostrar este mensaje otra vez",
   stalk = "¡Escribe /stalk para teletransportarte a los corredores!",
 
@@ -574,19 +642,16 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   mini_collect = "Sé el primero en \\#ffff5a\\recolectar la estrella\\#ffffff\\.",
   collect_only = "Recolecten \\#ffff5a\\%d estrella(s)\\#ffff5a\\.",
   thats_you = "(¡ese eres tú!)",
-  banned_glitchless = "NO: Traicionar a tu equipo, BLJs, atravesar paredes, frenar el avance del juego, campear.",
-  banned_general = "NO: Traicionar a tu equipo, frenar el avance del juego, campear.",
+  banned_glitchless = "NO: traicionar a tu equipo, BLJs, atravesar paredes, frenar el avance del juego, campear.",
+  banned_general = "NO: traicionar a tu equipo, frenar el avance del juego, campear.",
   time_needed = "%d:%02d para salir de cualquier nivel; recolecta estrellas para reducir este tiempo",
   stars_needed = "%d estrella(s) para salir de cualquier nivel",
   become_hunter = "únete a los \\#ff5a5a\\Cazadores\\#ffffff\\ cuando hayas sido eliminado",
   become_runner = "elimina a un \\#00ffff\\Corredor\\#ffffff\\ para volverte uno", -- this was changed
   infinite_lives = "Vidas infinitas",
   spectate = "escribe \"/spectate\" para ser un espectador",
-  mini_goal = "\\#ffff5a\\¡Quien recolecte la mayor cantidad de estrellas en %d:%02d gana!\\#ffffff\\",
+  mini_goal = "\\#ffff5a\\¡Quien recolecte la mayor cantidad de estrellas en %d:%02d, gana!\\#ffffff\\",
   fun = "¡Diviértete!",
-  article_0 = "El", -- masculine, singular definite article (unused)
-  article_1 = "La", -- feminine, singular definite article (unused)
-  article_2 = "El", -- masc is used as neutral (unused)
 
   -- hud, extra desc, and results text
   win = "¡%s\\#ffffff\\ ganan!",
@@ -618,12 +683,13 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   got_star = "¡%s\\#ffa0a0\\ consiguió una estrella!",
   got_key = "¡%s\\#ffa0a0\\ consiguió una llave!",
   rejoin_start = "%s\\#ffa0a0\\ tiene dos minutos para volver a unirse.",
-  rejoin_success = "¡%s\\#ffa0a0\\ volvió a tiempo!",
-  rejoin_fail = "%s\\#ffa0a0\\ no volvió a tiempo.", -- changed recently
-  using_ee = "\\#ffa0a0\\La partida está teniendo lugar en Extreme Edition.",
-  not_using_ee = "\\#ffa0a0\\La partida está teniendo lugar en Normal Edition.",
+  rejoin_success = "¡%s\\#ffa0a0\\ regresó a tiempo!",
+  rejoin_fail = "%s\\#ffa0a0\\ no regresó a tiempo.",
+  leave_error = "%s\\#ffa0a0\\ se desconecto por un error.",
+  using_ee = "\\#ffa0a0\\La partida está teniendo lugar en Modo Extremo.",
+  not_using_ee = "\\#ffa0a0\\La partida está teniendo lugar en Modo Normal.",
   killed = "¡%s\\#ffa0a0\\ mató a %s!",
-  sidelined = "¡%s\\#ffa0a0\\ eliminó a %s!",
+  sidelined = "¡%s\\#ffa0a0\\ acabó con %s!",
   paused = "Has sido pausado.",
   unpaused = "Ya no estás pausado.",
   kill_combo_2 = "¡%s\\#ffa0a0\\ hizo una \\#ffff5a\\doble\\#ffa0a0\\ muerte!",
@@ -636,7 +702,7 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   vanilla = "Usando el juego original",
   omm_detected = "¡Se Detecto El OMM Rebirth!",
   omm_bad_version = "\\#ff5a5a\\¡OMM Rebirth está desactualizado!\\#ffffff\\\nVersión mínima: %s\nTu versión: %s",
-  warp_spam = "¡No te teletransportes tan rapido!",
+  warp_spam = "¡No te teletransportes tan rápido!",
   no_valid_star = "¡No se ha podido encontrar una estrella válida!",
   custom_enter = "%s\\#ffffff\\ ha entrado a\n%s", -- same as coop
 
@@ -644,7 +710,7 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   not_mod = "No tienes la AUTORIDAD para usar este comando, ¡Tonto!",
   no_such_player = "Ese jugador no existe",
   bad_id = "¡ID de jugador inválido!",
-  command_disabled = "Este comando está deshabilitado.",
+  command_disabled = "Este comando está desactivado.",
   change_setting = "Ajuste modificado:",
 
   -- more command feedback
@@ -672,8 +738,8 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   mode_mini = "En modo MiniHunt",
   using_stars = "Usando estrellas recolectadas",
   using_timer = "Usando tiempo",
-  can_spectate = "Los cazadores ahora pueden ser espectadores",
-  no_spectate = "Los cazadores ya no pueden ser espectadores",
+  can_spectate = "Los Cazadores ahora pueden ser espectadores",
+  no_spectate = "Los Cazadores ya no pueden ser espectadores",
   all_paused = "Todos los jugadores han sido pausados",
   all_unpaused = "Todos los jugadores ya no están pausados",
   player_paused = "%s ha sido pausado",
@@ -681,24 +747,30 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   hunter_metal = "Todos los Cazadores son de metal",
   hunter_normal = "Todos los Cazadores se verán normales",
   hunter_glow = "Todos los Cazadores brillarán rojo",
+  hunter_outline = "Ahora Todos los Cazadores tienen el aspecto Outline",
+  hunter_color = "Todos los Cazadores tendran un aspecto con color Borgoña",
   runner_normal = "Todos los Corredores se verán normales",
-  now_weak = "Todos los jugadores tienen la mitad de invincibility frames",
-  not_weak = "Todos los jugadores tienen invincibility frames normales",
-  auto_on = "Las partidas empezarán automáticamente",
-  auto_off = "Las partidas no empezarán automáticamente",
-  force_spectate = "Todos serán forzados al modo espectador",
-  force_spectate_off = "El modo espectador ya no es forzado",
-  force_spectate_one = "%s será un espectador",
-  force_spectate_one_off = "%s ya no es forzado a ser un espectador",
-  blacklist_add = "%s agregado a la lista negra",
-  blacklist_remove = "%s removido de la lista negra",
-  blacklist_add_already = "Esa estrella o nivel ya está en la lista negra.",
-  blacklist_remove_already = "Esa estrella o nivel no está en la lista negra.",
-  blacklist_remove_invalid = "No puedes agregar a la lista negra a esa estrella o nivel.",
+  runner_sparkle = "Ahora todos los Corredores tendran el aspecto Brillante",
+  runner_glow = "Ahora todos los Corredores tendran glow",
+  runner_outline = "Ahora Todos los Corredores tienen el aspecto Outline",
+  runner_color = "Ahora Todos los Corredores tender un aspecto de color Celeste",
+  now_weak = "Todos los jugadores tienen la mitad de Invincibility Frames",
+  not_weak = "Todos los jugadores tienen Invincibility Frames normales",
+  auto_on = "Las partidas iniciarán automáticamente",
+  auto_off = "Las partidas no iniciarán automáticamente",
+  force_spectate = "Todos serán forzados al modo Espectador",
+  force_spectate_off = "El modo Espectador ya no es forzado",
+  force_spectate_one = "%s será un Espectador",
+  force_spectate_one_off = "%s ya no es forzado a ser un Espectador",
+  blacklist_add = "%s agregado a la Lista Negra",
+  blacklist_remove = "%s removido de la Lista Negra",
+  blacklist_add_already = "Esa estrella o nivel ya está en la Lista Negra.",
+  blacklist_remove_already = "Esa estrella o nivel no está en la Lista Negra.",
+  blacklist_remove_invalid = "No puedes agregar a esa estrella o nivel a la Lista Negra .",
   blacklist_list = "Lista Negra:",
-  blacklist_reset = "¡La lista negra ha sido reiniciada!",
-  blacklist_save = "¡La lista negra ha sido guardada!",
-  blacklist_load = "¡La lista negra ha sido cargada!",
+  blacklist_reset = "¡La Lista Negra ha sido reiniciada!",
+  blacklist_save = "¡La Lista Negra ha sido guardada!",
+  blacklist_load = "¡La Lista negra ha sido cargada!",
 
   -- team chat
   tc_toggle = "¡El chat de equipo está %s!",
@@ -733,10 +805,10 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   extreme_info_short = "Un punto de salud, una vida, y Temporizador de Muerte.",
 
   -- spectator
-  hunters_only = "¡Solo los Cazadores pueden ser espectadores!",
-  spectate_disabled = "¡Modo espectador desactivado!",
-  timer_going = "¡No puedes ser espectador cuando el tiempo corre!", -- now unused
-  spectate_self = "¡No puedes ser espectador de ti mismo!",
+  hunters_only = "¡Sólo los Cazadores pueden ser espectadores!",
+  spectate_disabled = "¡Modo Espectador desactivado!",
+  timer_going = "¡No puedes ser Espectador cuando el tiempo corre!", -- now unused
+  spectate_self = "¡No puedes ser Espectador de ti mismo!",
   spectator_controls = "Controles:"..
   "\nDPAD-UP: Desactiva la interfaz"..
   "\nDPAD-DOWN: Cambia la vista entre cámara libre/punto de vista del jugador"..
@@ -745,7 +817,7 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   "\nA: Moverse hacia arriba"..
   "\nZ: Moverse hacia abajo"..
   "\nType \"/spectate OFF\" para cancelar",
-  spectate_off = "Dejaste de ser espectador.",
+  spectate_off = "Dejaste de ser Espectador.",
   empty = "VACÍO (%d )",
   free_camera = "CÁMARA LIBRE",
   spectate_mode = "- MODO ESPECTADOR -",
@@ -770,6 +842,10 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   stat_mini_stars = "Récord de estrellas en MiniHunt",
   stat_wins_ex_standard = "Victorias (Modo Extremo)",
   stat_wins_ex = "Victorias (Modo Extremo, MiniHunt/pre v2.3)",
+  stat_playtime = "Jugado (Horas)",
+  stat_parkour_time = "Tiempo Mas Rápido En Parkour",
+  stat_parkour_time_omm = "Tiempo Mas Rápido En Parkour (OMM)",
+  stat_parkour_time_other = "Tiempo Mas Rápido En Parkour (Moveset)",
 
   -- placements
   place_1 = "\\#e3bc2d\\[1er Lugar]",
@@ -785,28 +861,28 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   page = "\\#ffff5a\\Página %d/%d", -- page for mariohunt command
   start_desc = "[CONTINUE|MAIN|ALT|RESET] - Inicia la partida; agrega \"continue\" para no ser enviado al principio; agrega \"alt\" para usar una ranura de guardado alternativa; agrega \"main\" para usar la ranura de guardado principal; agrega \"reset\" para reiniciar la ranura de guardado",
   add_desc = "[INT] - Agrega la cantidad especificada de Corredores de manera aleatoria",
-  random_desc = "[INT] - Escoge la cantidad de corredores",
+  random_desc = "[INT] - Escoge la cantidad de Corredores",
   lives_desc = "[INT] - Ajusta la cantidad de vidas de los Corredores, de 0 a 99 (nota: 0 vidas es aún 1 vida)",
   time_desc = "[NUM] - Ajusta la cantidad de tiempo que deben esperar los Corredores para salir del nivel, en segundos",
   stars_desc = "[INT] - Ajusta la cantidad de estrellas que los Corredores deben recolectar para salir del nivel, de 0 a 7 (sólo en star mode)",
-  category_desc = "[INT] - Ajusta la cantidad de estrellas que los Corredores deben recolectar para enfrentarse a Bowser. Ajústalo a -1 para any%.",
+  category_desc = "[INT] - Ajusta la cantidad de estrellas que los Corredores deben recolectar para enfrentarse a Bowser.",
   flip_desc = "[NAME|ID] - Cambia el equipo del jugador especificado",
-  setlife_desc = "[NAME|ID|INT,INT] - Ajusta las vidas especificadas para el corredor especificado",
+  setlife_desc = "[NAME|ID|INT,INT] - Ajusta las vidas especificadas para el Corredor especificado",
   leave_desc = "[NAME|ID] - Permite al jugador especificado, o a ti mismo, si no especificas a uno, abandonar el nivel si es un corredor.",
   mode_desc = "[NORMAL|SWAP|MINI] - Cambia el modo de juego; Swap cambia a los corredores cuando uno es eliminado",
   starmode_desc = "[ON|OFF] - Utiliza las estrellas recogidas en lugar del tiempo para que los Corredores puedan abandonar el nivel",
-  spectator_desc = "[ON|OFF] - Permite a los cazadores ser espectadores",
+  spectator_desc = "[ON|OFF] - Permite a los Cazadores ser espectadores",
   pause_desc = "[NAME|ID|ALL] - Pausa a los jugadores especificados, o a todos si no especificas uno",
   hunter_app_desc = "Cambia la apariencia de los Cazadores.",
   runner_app_desc = "Cambia la apariencia de los Corredores.",
-  hack_desc = "[STRING] - Selecciona el rom hack actual",
-  weak_desc = "[ON|OFF] - Reduce los invincibility frames a la mitad a todos los jugadores",
+  hack_desc = "[STRING] - Selecciona el romhack actual",
+  weak_desc = "[ON|OFF] - Reduce los Invincibility Frames a la mitad a todos los jugadores",
   auto_desc = "[ON|OFF|NUM] - Inicia la partida automaticamente",
   forcespectate_desc = "[NAME|ID|ALL] - Fuerza el modo espectador para este jugador o todos los jugadores",
   desync_desc = "- Intenta arreglar los errores causados por desync",
   stop_desc = "- Detén la partida",
   default_desc = "- Restablece la configuración a la predeterminada",
-  blacklist_desc = "[ADD|REMOVE|LIST|RESET|SAVE|LOAD,COURSE,ACT] - Agrega estrellas a la lista negra en MiniHunt",
+  blacklist_desc = "[ADD|REMOVE|LIST|RESET|SAVE|LOAD,COURSE,ACT] - Agrega estrellas a la Lista Negra en MiniHunt",
   stalking_desc = "[ON|OFF] - Permite ir al nivel en el que se encuentra un Corredor con /stalk",
 
   -- Blocky's menu
@@ -839,7 +915,7 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   menu_hunter_app = "Apariencia de los Cazadores",
   menu_runner_app = "Apariencia de los Corredores",
   menu_weak = "Modo débil",
-  menu_allow_spectate = "Permitir espectadores",
+  menu_allow_spectate = "Permitir Espectadores",
   menu_star_mode = "Modo de estrellas",
   menu_category = "Categoría",
   menu_time = "Tiempo",
@@ -848,6 +924,7 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   menu_blacklist = "Lista Negra de MiniHunt",
   menu_default = "Reiniciar",
   menu_defeat_bowser = "Derrota a %s",
+  menu_allow_stalk = "Permitir 'Stalking'",
 
   menu_players_all = "Todos los jugadores",
   menu_flip = "Cambiar Equipo",
@@ -869,12 +946,18 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   menu_secret = "Esto es un secreto. ¿Cómo se desbloquea?",
   menu_season = "Cambios de estación",
   menu_season_desc = "Divertidos cambios visuales según la fecha.",
+  menu_radar = "Radar",
+  menu_radar_desc = "Muestra adonde Corredores y objetos están en el mapa.",
+  menu_minimap = "Mapa",
+  menu_minimap_desc = "Muestra el mapa completo.",
+  menu_romhack_cam = "Cámara romhack", -- -- (cam is short for camera)
+  menu_romhack_cam_desc = "Activa la 'Cámara romhack' en todo momento.", -- -- (cam is short for camera)
 
   menu_free_cam_desc = "Usa la Cámara Libre en el modo Espectador.",
   menu_spectate_run = "Observar Corredor",
   menu_spectate_run_desc = "Automáticamente observarás al primer Corredor.",
   menu_exit_spectate = "Salir del modo Espectador",
-  menu_exit_spectate_desc = "Sal del modo Espectador.",
+  menu_exit_spectate_desc = "Saldrás del modo Espectador.",
   menu_stalk_run = "Ir al nivel del Corredor",
   menu_stalk_run_desc = "Ve al nivel en el que está el primer Corredor.",
   menu_skip = "Saltar",
@@ -892,51 +975,147 @@ langdata["es"] = -- By Kanheaven and SonicDark, with some minor adjustments by E
   menu_blacklist_reset_desc = "Reinicia la Lista Negra a los valores predeterminados.",
   menu_toggle_all = "Alternar todos",
 
+  -- updater (difference for "_egg" is Luigi instead of Mario)
+  up_to_date = "\\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\ está actualizado!",
+  up_to_date_egg = "\\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\ está Actualizado!!",
+  has_update = "Hay una actualización para \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\!",
+  has_update_egg = "Hay una actualización para \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\!",
+
   -- unorganized
-  lang_desc = "%s - Ajusta el Lenguaje",
-  got_all_stars = "¡Tienen la Cantidad necesaria de estrellas!",
+  lang_desc = "%s - Ajusta el lenguaje",
+  got_all_stars = "¡Tienes las estrellas suficientes!",
   menu_hide_roles_desc = "Esconder tus Roles en el chat.",
   spectate_desc = "[NAME|ID|OFF] - Sé espectador del jugador especificado, cámara libre si no es especificado, o OFF para salir",
-  tc_desc = "[ON|OFF|MSG] - Envía un mensaje Uniquamente a tu equipo; ON para aplicar a todos los mensajes",
-  stars_in_area = "¡Hay %d estrella(s) Sin recolectar(se) aquí!",
-  role_cont = "\\#ff9696\\[MH Colaborador]",
-  role_trans = "\\#ffd996\\[MH Traductor]",
-  role_lead = "\\#9a96ff\\[MH Programadora Líder]",
+  tc_desc = "[ON|OFF|MSG] - Envía un mensaje únicamente a tu equipo; ON para aplicar a todos los mensajes",
+  stars_in_area = "¡Hay %d estrella(s) sin recolectar(se) aquí!",
+  role_cont = "\\#ff9696\\[Colaborador/a de MH]",
+  role_trans = "\\#ffd996\\[Traductor/a de MH]",
+  role_lead = "\\#9a96ff\\[Programadora Líder de MH]",
   menu_first_timer = "Temporizador de Muerte del Líder",
   menu_popup_sound = "Sonidos de mensajes emergentes",
-  stalk_desc = "[NAME|ID] - Viaja al nivel en el que el jugador especificado está, o en el que está el primer corredor",
+  stalk_desc = "[NAME|ID] - Viaja al nivel del jugador que está especificado, o en el que se encuentra el primer corredor",
   menu_hide_roles = "Ocultar mis roles",
   open_menu = "Escribe /mh o presiona L + Start para abrir el menú",
   menu_nerf_vanish = "Nerfear Gorra de Invisibilidad",
   stat_placement = "Puesto en 64 Tour",
   menu_fast = "Acciones más rápidas",
-  new_record = "\\#ffff5a\\¡¡¡HICISTE NUEVO RÉCORD!!!",
-  anarchy_set_2 = "Los cazadores ahora pueden atacar a sus compañeros de equipo",
-  no_runners_added = "No agregaron corredores",
-  menu_first_timer_desc = "Agrega al líder en MiniHunt un temporizador de muerte.",
-  role_dev = "\\#96ecff\\[MH Programador]",
+  new_record = "\\#ffff5a\\¡¡¡LOGRASTE UN NUEVO RÉCORD!!!",
+  anarchy_set_2 = "Los Cazadores ahora pueden atacar a sus compañeros de equipo",
+  no_runners_added = "No se agregaron Corredores",
+  menu_first_timer_desc = "Agrega al líder, en MiniHunt, un temporizador de muerte.",
+  role_dev = "\\#96ecff\\[Programador/a de MH]",
   menu_nerf_vanish_desc = "Nerfea la gorra de invisibilidad haciéndola activable (con B) y se acaba más rápido cuando se usa.",
-  unstuck = "Se Reparo El Nivel",
+  unstuck = "Se reparó el nivel",
   menu_list_settings = "Lista de Ajustes",
   anarchy_set_3 = "Los jugadores ahora pueden atacar a sus compañeros de equipo",
   menu_fast_desc = "Te recuperarás, lanzarás objetos, y abrirás puertas más rápido.",
-  menu_hide_hud = "Esconder El hud",
-  hidehud_desc = "- Esconde todos los Todo  el Hud Completo.",
+  menu_hide_hud = "Esconder la HUD",
+  hidehud_desc = "- Esconde todos los elementos de la HUD.",
   dmgAdd_set = "Los corredores ahora tomarán %d daño extra de los ataques PVP.",
-  hard_desc = "[EX|ON|OFF,ON|OFF] - Se Activara El Modo Dificil Para a ti",
-  menu_dmgAdd = "Aumentar el daño al Corredor",
+  hard_desc = "[EX|ON|OFF,ON|OFF] - Se activara el Modo Difícil para a ti",
+  menu_dmgAdd = "Aumentar el daño hacia Corredor",
   menu_anarchy_desc = "Permite que el equipo especificado pueda atacarse entre sí.",
   rules_desc = "- Muestra las reglas de MarioHunt",
-  rules_desc_egg = "- Oye Descubriste El Luigi Hunt Que suerte!",
-  menu_anarchy = "Atacar a Amigo",
+  rules_desc_egg = "Muestra las reglas de LuigiHunt!",
+  menu_anarchy = "Fuego Amigo",
   mh_desc = "[COMMAND,ARGS] - Ejecuta comandos; escribe nada o \"menu\" para abrir el menú",
-  vanish_custom = "¡Mantiene el boton \\#ffff5a\\B\\#ffffff\\ para volverte invisible!",
+  vanish_custom = "¡Mantiene el botón \\#ffff5a\\B\\#ffffff\\ para volverte invisible!",
   menu_list_settings_desc = "Lista todos los ajustes para esta partida.",
-  anarchy_set_1 = "Los corredores ahora pueden atacar a sus compañeros de equipo",
+  anarchy_set_1 = "Los Corredores ahora pueden atacar a sus compañeros de equipo",
   anarchy_set_0 = "Los jugadores ya no pueden atacar a sus compañeros de equipo",
-  menu_dmgAdd_desc = "Agrega la cantidad de daño especificada a los corredores.",
+  menu_dmgAdd_desc = "Agrega la cantidad de daño especificada contra los corredores.",
   mini_score = "Puntaje: %d",
-  stats_desc = "- Muestra/oculta la tabla de estadísticas",
+  stats_desc = "- Muestra/Oculta la tabla de estadísticas",
+
+  -- v2.5
+  target_desc = "[NAME|ID] - Coloca a este Corredor como tu objetivo, lo que revela su posición en todo momento.",
+  use_out = "Usa /mh out para expulsar a todos fuera de este nivel",
+
+  you_are_muted = "Estas silenciado",
+
+  dmgAdd_set_ohko = "Ahora todos los corredores moriran de un solo golpe",
+  voidDmg_set = "los jugadores tomaran %d daño cayendo al vacio o a arenas movedizas.",
+  voidDmg_set_ohko = "Los jugadores seran instantaneamente muertos al vacio o a las arenas movedizas.",
+  target_hunters_only = "Sólo los cazadores puede los corredores como objetivo.",
+
+  muted = "\\#ffff00\\%s\\#ffffff\\ fue silenciado por \\#ffff00\\%s\\#ffffff\\.",
+  unmuted = "\\#ffff00\\%s\\#ffffff\\ fue desilenciado por \\#ffff00\\%s\\#ffffff\\.",
+  you_muted = "Fuiste silenciado \\#ffff00\\%s\\#ffffff\\.",
+  you_unmuted = "Fuiste desilenciado \\#ffff00\\%s\\#ffffff\\.",
+  mute_auto = "\\#ffff00\\%s\\#ffffff\\ fue silenciado automaticamente",
+
+  mute_desc = "[NAME|ID] - Silencia a un jugador, impidiendole poder chatear",
+  unmute_desc = "[NAME|ID] - Desilencia a un jugador, permitiendole chatear de nuevo",
+  out_desc = "- Expulsa a todos los jugadores de este nivel",
+
+  menu_countdown = "Temporizador",
+  menu_countdown_desc = "Que tanto deben esperar los Corredores antes de comenzar.",
+  menu_voidDmg = "Daño del Vacío",
+  menu_voidDmg_desc = "Daño infligido a los jugadores que caen al vacío o arenas movedizas.",
+  menu_double_health = "Multiplicar la Barra de Vida del Corredor",
+  menu_double_health_desc = "El Corredor obtiene 16 puntos de vida, en vez de 8.",
+
+  -- v2.6
+  menu_free_roam = "Movimiento Libre",
+  menu_free_roam_desc = "Desactiva el requisito de estrellas y llaves para ciertas puertas y los demás niveles.",
+
+  menu_target = "Colocar como Objetivo",
+  menu_mute = "Silenciar",
+
+  menu_invinc_particle = "I-Frames Brillantes", -- (I-Frames is short for invincibility/invulnerability frames) 
+  menu_invinc_particle_desc = "Reemplaza el efecto \"parpadeante\" cuando Mario recibe daño con partículas Brillantes.",
+  menu_stalk_timer = "Cooldown para 'Stalk'",
+  menu_stalk_timer_desc = "Tiempo que el jugador es congelado luego de usar /stalk.",
+  menu_star_heal = "Curación de Estrellas",
+
+  -- tips
+  tip = "Consejo: ",
+  tip_1 = "¡Presiona L + Start, o escribe /mh, para abrir el menú. Puedes configurar opciones aquí!",
+  tip_2 = "Los Ground pounds hacen 3 de daño a los otros jugadores.",
+  tip_3 = "¡Una patada puede hacer 2 de daño y sacar a jugadores volando!",
+  tip_4 = "Para ciertos comandos como /spectate y /target, puedes escribir los nombres parcialmente y seguiran funcionando. (ej: colocando \"Emily\" se referirá a EmilyEmmi)",
+  tip_5 = "Puedes cambiar configuraciones en mitad de una partida desde el menú.",
+  tip_6 = "Si algo sale mal, escribe /mh pause para pausar a todos los jugadores. Escribelo de nuevo para despausar a todos.",
+  tip_7 = "¿Hay alguien saturando el chat o siendo grosero? ¡Utiliza /mh mute para silenciarlos!",
+  tip_8 = "Puedes pausar el juego antes de recolectar una estrella o llave y darle a Exit Course para saltar la animación.",
+  tip_9 = "Puedes seleccionar a un corredor como tu objetivo con /target. Esto revelará su ubicación en la parte superior de tu pantalla.",
+  tip_10 = "Puedes configurar opciones personales en el menú (L + Start).",
+  tip_11 = "¡No necesitas reiniciar el servidor! Selecciona \"Reiniciar ranura alternativa\" en \"Inicio\" para reiniciar todo el progreso.",
+  tip_12 = "Puedes obtener el rol de Corredor al eliminar un Corredor.",
+  tip_13 = "Como en Mario 64 vanilla, 0 vidas todavía cuentan como una vida.",
+  tip_14 = "Muchos glitches, tales como el LBLJ, son inútiles fuera de Any%.",
+  tip_15 = "¡Los carteles en juego pueden contener consejos útiles!",
+  tip_16 = "Dire Dire Docks puede ser ingresado con una estrella menos que la categoria actual.",
+  tip_17 = "Pon a Cappy en \"Damage\" para usarlo como un arma de rango. Él quita 1 de daño.",
+  tip_18 = "Cappy puede recoger objetos, tales como Monedas y Secretos.",
+  tip_19 = "Usa el D-Pad para lanzar a Cappy en diferentes direcciones.",
+  tip_20 = "¡Mira el video de Key's Artwork en YouTube para aprender acerca de tecnología OMM!",
+  tip_21 = "Si los objetos en un nivel empiezan a desaparecer o los teletransportes no funcionan, utiliza /mh out en ese nivel para forcar al nivel a recargarse.",
+  tip_22 = "Utiliza /mh desync si tu piensas que ocurrió un error de desincronización.",
+  tip_23 = "Matar a otro jugador puede restaurar toda tu vida.",
+  tip_24 = "Puedes ver el progreso en llaves, gorros, y escenarios secretos en el menú de Pausa en el castillo.",
+  tip_25 = "¡Los Corredores se pueden lastimar uno al otro en este modo!",
+  tip_26 = "Caerse en los escenarios de gorros cuenta como perder una vida.",
+  tip_27 = "Los interruptores de monedas Azules reaparecen.",
+  tip_28 = "Puedes escoger otro acto para escabullirte de los Cazadores.",
+  tip_29 = "¡Es una Celebración! Si no te gustan los efectos, deshabilitalos con \"Cambios de estación\" en el menú.",
+  tip_30 = "Puedes espiar a los Corredores con /spectate.",
+  tip_31 = "¡Utiliza /stalk para teletransportarte al nivel en el que se encuentra otro Corredor!",
+  tip_32 = "Aprender técnicas de speedrunning es una buena manera para mejorar tu juego.",
+  tip_33 = "Puedes atravesar Whomps mediante ground-pounding o patear mientras caen.",
+  tip_34 = "La mejor manera de realizar un Salto Triple es mediante patear para el primer salto.",
+  tip_35 = "La forma Metal hace el doble de daño a tus oponentes.",
+  tip_36 = "La Gorra de Invisibilidad solo tendrá efecto cuando se mantiene el botón B.",
+  tip_37 = "Los temporizadores de gorros no se gastan mientras estés en un cañón.",
+  tip_38 = "¡No te quedes demasiado tiempo en el Selector de Actos!",
+  tip_39 = "Las Zambullidas son rápidas, y zambullirse hacía otro jugador puede ayudarte a evadir ataques.",
+  tip_40 = "Caerte de lugares altos puede quitarte vida en vez de matarte instantaneamente.",
+  tip_41 = "Los 1-Ups van a restaurar toda tu vida.",
+  tip_42 = "Utiliza el menú de Jugadores para comandos que se centran en un jugador específico, como cambiar equipos.",
+  tip_43 = "El menú de MarioHunt te permite comenzar partidas y configurar ajustes del juego.",
+  tip_44 = "Puedes esconder tu rol de chat en Ajustes.",
+  tip_45 = "Los Corredores que visten el Gorro de Metal pueden aún ser dañados por los Cazadores.",
+  tip_46 = "¡En el menú, asegurate de presionar A para guardar tus ajustes cambiados!",
 }
 
 langdata["de"] = -- by N64 Mario
@@ -984,9 +1163,6 @@ langdata["de"] = -- by N64 Mario
   spectate = "gebe \"/spectate\" ein, um zuzuschauen",
   mini_goal = "\\#ffff5a\\Wer auch immer die meisten Sterne in %d:%02d sammelt, gewinnt\\#ffffff\\",
   fun = "Viel Spaß!",
-  article_0 = "Den", -- masculine, accusative article (unused)
-  article_1 = "Die", -- feminine,  accusative article (unused)
-  article_2 = "Das", -- neuter,    accusative article (unused)
 
   -- hud, extra desc, and results text
   win = "%s\\#ffffff\\ haben gewonnen!",
@@ -1018,7 +1194,7 @@ langdata["de"] = -- by N64 Mario
   got_key = "%s\\#ffa0a0\\ hat einen Schlüssel bekommen!",
   rejoin_start = "%s\\#ffa0a0\\ hat zwei Minuten um erneut beizutreten.",
   rejoin_success = "%s\\#ffa0a0\\ ist das Spiel pünktlich erneut beigetreten!",
-  rejoin_fail = "%s\\#ffa0a0\\ ist nicht in Zeit beigetreten.", -- changed recently
+  rejoin_fail = "%s\\#ffa0a0\\ ist nicht in Zeit beigetreten.",
   using_ee = "Dies verwendet nur die Extreme Edition.",
   not_using_ee = "Dies verwendet nur die Standard Version.",
   killed = "%s\\#ffa0a0\\ hat %s getötet!",
@@ -1160,7 +1336,7 @@ langdata["de"] = -- by N64 Mario
   lives_desc = "[INT] - Legt die Anzahl der Leben fest, die Läufer haben, von 0 zu 99 (Notiz: 0 Leben ist immer noch 1 Leben)",
   time_desc = "[NUM] - Legt fest, wie lange Läufer maximal warten müssen, bis sie verlassen können, in Sekunden",
   stars_desc = "[INT] - Legt die maximale Anzahl an Sternen fest, die Läufer sammeln müssen, um verlassen zu können, from 0 to 7 (only in star mode)",
-  category_desc = "[INT] - Legt die Anzahl der Sterne fest, die Läufer haben müssen, um gegen Bowser anzutreten. Leg auf -1 für any%.",
+  category_desc = "[INT] - Legt die Anzahl der Sterne fest, die Läufer haben müssen, um gegen Bowser anzutreten.",
   flip_desc = "[NAME|ID] - Dreht das Team des angegebenen Spielers um",
   setlife_desc = "[NAME|ID|INT,INT] - Legt die angegebenen Leben für den angegebenen Läufer",
   leave_desc = "[NAME|ID] - Ermöglicht dem angegebenen Spieler, das Level zu verlassen, wenn die Person ein Läufer ist",
@@ -1174,7 +1350,7 @@ langdata["de"] = -- by N64 Mario
   weak_desc = "[ON|OFF] - Halbiert die Unbesiegbarkeitsrahmen für alle Spieler",
   auto_desc = "[ON|OFF] - Startet Spiele automatisch",
   stalking_desc = "[ON|OFF] - Erlaube auf das Level, bei dem sich der Läufer befindet mit /stalk zu warpen",
-  hidehud_desc = "Verstecke alle HUD Elemente.",
+  hidehud_desc = "- Verstecke alle HUD Elemente.",
   mute_desc = "[NAME|ID] - Mutes a player, preventing them from chatting",
   unmute_desc = "[NAME|ID] - Unmutes a player, allowing them to chat again",
   out_desc = "- Kicks everyone out of this level",
@@ -1357,6 +1533,24 @@ langdata["de"] = -- by N64 Mario
   blacklist_load = "Schwarze Liste geladen!",
   demon_unlock = "Green Demon Modus freigeschaltet!",
   target_desc = "[NAME|ID] - Lege diesen Läufer als Ihr Ziel fest, das jederzeit seinen Standort anzeigt.",
+
+  -- v2.6
+  leave_error = "%s\\#ffa0a0\\ hat aufgrund eines Fehlers verlassen.",
+  hunter_color = "Alle Jäger haben die Burgund Farbpalette", -- (check official lang for palette name)
+  runner_color = "Alle Jäger haben die Azureblau Farbpalette", -- (check official lang for palette name)
+  stat_playtime = "Spielzeit (Stunden)",
+  stat_parkour_time = "Schnellste Parkour Zeit",
+  stat_parkour_time_omm = "Schnellste Parkour Zeit (OMM)",
+  stat_parkour_time_other = "Schnellste Parkour Zeit (Moveset)",
+  menu_free_roam = "Frei Herumlaufen",
+  menu_free_roam_desc = "Deaktiviert die Stern- und Schlüsselanforderungen für Türen und die meisten Level.",
+  menu_radar = "Radar",
+  menu_radar_desc = "Zeigt an, wo sich Läufer und wichtige Objekte befinden.",
+  menu_minimap = "Minikarte",
+  menu_minimap_desc = "Zeigt eine Karte des gesamten Levels.",
+  menu_romhack_cam = "Romhack-Kamera", -- (cam is short for camera)
+  menu_romhack_cam_desc = "Aktiviert die Romhack-Kamera in allen Zeiten.", -- (cam is short for camera)
+  menu_star_heal = "Sternenheilung",
 }
 
 langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
@@ -1421,10 +1615,6 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   spectate = "use o comando \"/spectate\" para observar a partida",
   mini_goal = "\\#ffff5a\\Quem coletar mais estrelas em %d:%02d ganha!\\#ffffff\\",
   fun = "Se divirta!",
-  -- idk if this is even correct
-  article_0 = "O", -- masculine, singular definite article (unused)
-  article_1 = "A", -- feminine, singular definite article (unused)
-  article_2 = "O", -- masc is used by default (unused)
 
   -- hud, extra desc, and results text (%s is a placeholder for names, and %d is a placeholder for a number)
   win = "%s\\#ffffff\\ Ganham!", -- team name is placed here
@@ -1456,7 +1646,7 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   got_key = "%s\\#ffa0a0\\ pegou uma das chaves!",
   rejoin_start = "%s\\#ffa0a0\\ tem dois minutos para entrar novamente na partida.",
   rejoin_success = "%s\\#ffa0a0\\ entrou à tempo!",
-  rejoin_fail = "%s\\#ffa0a0\\ Não reconectou a tempo.", -- changed recently
+  rejoin_fail = "%s\\#ffa0a0\\ Não reconectou a tempo.",
   using_ee = "Este servidor está usando a versão Extrema.",
   not_using_ee = "Este servidor usa a versão normal.",
   killed = "%s\\#ffa0a0\\ derrotou %s!",
@@ -1606,7 +1796,7 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   lives_desc = "[INT] - Seleciona o máximo de vidas dos corredores, de 0 até 99 (Não esqueça: 0 vidas ainda contam como 1!)",
   time_desc = "[NUM] - Define o tempo que os Corredores tem que aguardar para sair, em segundos, ou o tempo total do jogo na Mini-Caça.",
   stars_desc = "[INT] - Define quantas estrelas os Corredores devem coletar para sair, de 0 a 7 (apenas no Modo Estrela)",
-  category_desc = "[INT] - Define quantas estrelas o jogador deve ter para enfrentar o Bowser. Definida para -1 numa any%.",
+  category_desc = "[INT] - Define quantas estrelas o jogador deve ter para enfrentar o Bowser.",
   flip_desc = "[NAME|ID] - Troca o jogador especificado de equipe",
   setlife_desc = "[NAME|ID|INT,INT] - Muda o número de vidas com o selecionado para os Corredores",
   leave_desc = "[NAME|ID] - Permitir que um jogador em específico saia da fase.",
@@ -1810,6 +2000,24 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   menu_mute = "Silenciar",
   mute_desc = "[NAME|ID] - Silencia um jogador, fazendo com que ele não fale mais no chat",
   unmute_desc = "[NAME|ID] - Permite que um jogador silenciado volte a falar no chat",
+  
+  -- v2.6
+  leave_error = "%s\\#ffa0a0\\ saiu devido um erro.",
+  hunter_color = "Todos os Corredores têm a paleta Burgundy.", -- (check official lang for palette name)
+  runner_color = "Todos os Corredores têm a paleta Azure.", -- (check official lang for palette name)
+  stat_playtime = "Tempo de jogo (em horas)",
+  stat_parkour_time = "Tempo mais rápido no Parkour",
+  stat_parkour_time_omm = "Tempo mais rápido no Parkour (OMM)",
+  stat_parkour_time_other = "Tempo mais rápido no Parkour (Moveset)",
+  menu_free_roam = "Andar Livremente",
+  menu_free_roam_desc = "Desabilita qualquer requerimento de Estrelas e Chaves em portas e níveis.",
+  menu_radar = "Radar",
+  menu_radar_desc = "Mostra onde Corredores e objetos importantes estão.",
+  menu_minimap = "Mini-mapa",
+  menu_minimap_desc = "Exibe um mapa do nível inteiro.",
+  menu_romhack_cam = "Câmera de Rom Hack", -- (cam is short for camera)
+  menu_romhack_cam_desc = "Habilita câmera de Rom Hack.", -- (cam is short for camera)
+  menu_star_heal = "Recuperação por Estrela",
 
   ["set-fov_desc"] = "[NUM] - Modifica o campo de visão; deixe em branco para resetar.", -- I accidently added a dev command to be translated, oops
 }
@@ -1873,14 +2081,11 @@ langdata["fr"] = -- By Skeltan
   time_needed = "%d:%02d pour sortir de n'importe quel niveau; collectez des étoiles pour réduire le compte à rebours",
   stars_needed = "%d étoile(s) pour sortir de n'importe quel niveau",
   become_hunter = "devenez \\#ff5a5a\\Chasseurs\\#ffffff\\ une fois vaincu",
-  become_runner = "éliminez un \\#00ffff\\Coureur\\#ffffff\\ pour en devenir un", 
+  become_runner = "éliminez un \\#00ffff\\Coureur\\#ffffff\\ pour en devenir un",
   infinite_lives = "Vies Illimités",
   spectate = "faites \"/spectate\" pour devenir spectateur",
   mini_goal = "\\#ffff5a\\Celui qui collecte le plus d'étoiles en %d:%02d gagne!\\#ffffff\\",
   fun = "Amusez-vous bien!",
-  article_0 = "Le", -- masculine, singular definite article (unused)
-  article_1 = "La", -- feminine, singular definite article (unused)
-  article_2 = "Le", -- neutral article (unused)
 
   -- hud, extra desc, and results text (%s is a placeholder for names, and %d is a placeholder for a number)
   win = "%s\\#ffffff\\ ont gagné!", -- team name is placed here
@@ -1898,7 +2103,7 @@ langdata["fr"] = -- By Skeltan
   no_runners = "Pas de \\#00ffff\\Coureurs!",
   camp_timer = "Restez en mouvement! \\#ff5a5a\\(%d)",
   game_over = "La partie est terminée!",
-  winners = "Gagnants: ", 
+  winners = "Gagnants: ",
   no_winners = "\\#ff5a5a\\Pas de gagnants!",
   death_timer = "Mort",
   on = "\\#5aff5a\\ACTIVÉ",
@@ -1945,7 +2150,7 @@ langdata["fr"] = -- By Skeltan
   bad_id = "ID de joueur invalide!",
   command_disabled = "Cette commande est désactivée.",
   change_setting = "Paramètre changé:",
-  you_are_muted = "Vous êtes muet.", 
+  you_are_muted = "Vous êtes muet.",
 
   -- more command feedback
   bad_param = "Paramètres Invalides!",
@@ -2065,7 +2270,7 @@ langdata["fr"] = -- By Skeltan
   stat_kills = "Kills",
   stat_combo = "Record de Kills",
   stat_wins_hard_standard = "Victoires (Mode Difficile)",
-  stat_wins_hard = "Victoires (Mode Difficile, Minihunt/pré v2.3)", 
+  stat_wins_hard = "Victoires (Mode Difficile, Minihunt/pré v2.3)",
   stat_mini_stars = "Maximum d'étoiles en une partie de MiniHunt",
   stat_placement = "Placement du 64 Tour",
   stat_wins_ex_standard = "Victoires (Mode Extrême)",
@@ -2094,7 +2299,7 @@ langdata["fr"] = -- By Skeltan
   lives_desc = "[INT] - Défini le nombre de vies que les Coureurs ont, de 0 à 99 (note: 0 vies équivaut toujours à 1 vie)",
   time_desc = "[NUM] - Défini le temps que les Coureurs doivent attendre pour sortir, en secondes",
   stars_desc = "[INT] - Défini le nombre d'étoiles que les Coureurs doivent ramasser pour sortir, de 0 à 7 (seulement en mode Étoiles Ramassées)",
-  category_desc = "[INT] - Défini le nombre d'étoiles que les Coureurs doivent ramasser pour faire face à Bowser. Indiquez -1 pour du Any%.",
+  category_desc = "[INT] - Défini le nombre d'étoiles que les Coureurs doivent ramasser pour faire face à Bowser.",
   flip_desc = "[NAME|ID] - Inverse l'équipe du joueur spécifié",
   setlife_desc = "[NAME|ID|INT,INT] - Défini le nombre de vies spécifié pour le Coureur spécifié",
   leave_desc = "[NAME|ID] - Autorise le joueur spécifié à sortir du niveau si il est Coureur",
@@ -2279,7 +2484,958 @@ langdata["fr"] = -- By Skeltan
   up_to_date = "\\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\ est à jour!",
   up_to_date_egg = "\\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\ est à jour!",
   has_update = "Une mise à jour est disponible pour \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\!",
-  has_update_egg = "Une mise à jour est disponible pour \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\!"
+  has_update_egg = "Une mise à jour est disponible pour \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\!",
+
+  -- version 2.6 stuff I don't feel like sorting
+  leave_error = "%s\\#ffa0a0\\ est parti à cause d'une erreur.",
+  hunter_color = "Tous les chasseurs ont la palette Bordeaux",
+  runner_color = "Tous les coureurs ont la palette Azur",
+  stat_playtime = "Temps de jeu (Heures)",
+  stat_parkour_time = "Meilleur Temps Parcours",
+  stat_parkour_time_omm = "Meilleur Temps Parcours (OMM)",
+  stat_parkour_time_other = "Meilleur Temps Parcours (Moveset)",
+  menu_free_roam = "Accès Libre",
+  menu_free_roam_desc = "Désactive le nombre d'étoile nécessaire pour accéder à la plupart des niveaux et ouvre toutes les portes à clés.",
+  menu_radar = "Radar",
+  menu_radar_desc = "Affiche à l'écran l'emplacement des Coureurs et des objets importants.",
+  menu_minimap = "Minimap",
+  menu_minimap_desc = "Affiche la carte de tout le niveau.",
+  menu_romhack_cam = "Romhack Cam",
+  menu_romhack_cam_desc = "Active la Romhack Cam partout.",
+  menu_star_heal = "Soin Étoile",
+}
+
+langdata["it"] = -- by Mr. L-ore
+{
+  -- fullname for auto select (make sure this matches in-game under Misc -> Languages)
+  fullname = "Italian",
+
+  -- name in the built-in menu
+  name_menu = "Italiano",
+
+  -- global command info
+  to_switch = "Scrvi \"/lang %s\" per cambiare lingua",
+  switched = "Cambiata ad Italiano!", -- Replace "English" with the name of this language
+  rule_command = "Scrivi /rules per mostrare di nuovo questo messaggio",
+  open_menu = "Scrivi /mh o premi L + Start per aprire il menu",
+  stalk = "Usa /stalk per teletrasportarti dai Corridori!",
+  rules_desc = "- Mostra le regole di MarioHunt",
+  rules_desc_egg = "- Mostra le regole di LuigiHunt",
+  mh_desc = "[COMMAND,ARGS] - Esegue i comandi; scrivi \"menu\" o lascia vuoto per aprire il menu",
+  lang_desc = "%s - Cambia lingua",
+  hard_desc = "[EX|ON|OFF,ON|OFF] - Imposta la difficolta difficile per te stesso",
+  tc_desc = "[ON|OFF|MSG] - Manda messaggi solo alla tua squadra; attivalo per influenzare tutti i messaggi",
+  stats_desc = "- Mostra/nascondi tavola delle statistiche",
+  stalk_desc = "[NAME|ID] - Teletrasportati al livello spegificato, o a quello del Corridore in prima posizione",
+  spectate_desc = "[NAME|ID|OFF] - Guarda il giocatore specificato, muoviti in giro liberamente, o disattiva quest'opzione", -- not to be confused with spectator_desc
+  target_desc = "[NAME|ID] - Imposta questo Corridore come tuo bersaglio, e vedi dove si trova in tempo reale.",
+
+  -- roles
+  runner = "Corridore",
+  runners = "Corridori",
+  short_runner = "Corr.", -- unused
+  hunters = "Cacciatori",
+  hunter = "Cacciatore",
+  spectator = "Spettatore",
+  player = "Giocatore",
+  players = "Giocatori",
+  all = "Tutti",
+
+  -- rules
+  --[[
+    This is laid out as follows:
+    {welcome|welcome_mini}
+    {runners}{shown_above|thats_you}{any_bowser|collect_bowser|mini_collect}
+    {hunters}{thats_you}{all_runners|any_runners}
+    {rule_lives_one|rule_lives}{time_needed|stars_needed}{become_hunter|become_runner}
+    {infinite_lives}{spectate}
+    {banned_glitchless|banned_general}{fun}
+
+    I highly recommend testing this in-game
+    Also:
+    \\#ffffff\\ = white (default)
+    \\#00ffff\\ = cyan (for Runner team name)
+    \\#ff5a5a\\ = red (for Hunter team name and popups)
+    \\#ffff5a\\ = yellow
+    \\#5aff5a\\ = green
+    \\#b45aff\\ = purple (for Extreme Mode)
+  ]]
+  welcome = "Benvenuto alla \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\! COME GIOCARE:",
+  welcome_mini = "Benvenuto alla \\#ffff5a\\Mini\\#ff5a5a\\Hunt\\#ffffff\\! COME GIOCARE:",
+  welcome_egg = "Benvenuto alla \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\! COME GIOCARE:",
+  all_runners = "Sconfiggi tutti i \\#00ffff\\Corridori\\#ffffff\\.",
+  any_runners = "Sconfiggi dei \\#00ffff\\Corridori\\#ffffff\\.",
+  shown_above = "(mostrato sopra)",
+  any_bowser = "Sconfiggi %s in \\#ffff5a\\qualsiasi\\#ffffff\\ modo sia necessario.",
+  collect_bowser = "Ottieni \\#ffff5a\\%d stella/e\\#ffffff\\ e sconfiggi %s.",
+  mini_collect = "Sii il primo ad \\#ffff5a\\ottenere la stella\\#ffffff\\.",
+  collect_only = "Ottieni \\#ffff5a\\%d stella/e\\#ffffff\\.",
+  thats_you = "(sei tu!)",
+  banned_glitchless = "VIETATO: Il cross teaming, il BLJ, l'attraversamento dei muri, perdere tempo, camperare.",
+  banned_general = "VIETATO: Il cross teaming, perdere tempo, camperare.",
+  time_needed = "%d:%02d per abbandonare un'area; ottieni le stelle per diminuire",
+  stars_needed = "%d stella/e necessarie per abbandonare un'area",
+  become_hunter = "Diventi un \\#ff5a5a\\Cacciatore\\#ffffff\\ quando vieni sconfitto",
+  become_runner = "Sconfiggi un \\#00ffff\\Corridore\\#ffffff\\ per diventarne uno",
+  infinite_lives = "Vite infinite",
+  spectate = "scrivi \"/spectate\" per assistere alla partita",
+  mini_goal = "\\#ffff5a\\Chi tiesce a prendere più stelle in %d:%02d vince!\\#ffffff\\",
+  fun = "Divertiti!",
+
+  -- hud, extra desc, and results text (%s is a placeholder for names, and %d is a placeholder for a number)
+  win = "%s\\#ffffff\\ Vince!", -- team name is placed here
+  can_leave = "\\#5aff5a\\Puoi uscire",
+  cant_leave = "\\#ff5a5a\\Non puoi uscire",
+  time_left = "Potrai uscire tra \\#ffff5a\\%d:%02d",
+  stars_left = "Ti servono \\#ffff5a\\%d stella/e\\#ffffff\\ per uscire",
+  in_castle = "Nel Castello",
+  until_hunters = "%d secondo/i prima che i \\#ff5a5a\\Cacciatori\\#ffffff\\ inizino",
+  until_runners = "%d secondo/i prima che i \\#00ffff\\Corridori\\#ffffff\\ inizino",
+  lives_one = "1 vita",
+  lives = "%d vite",
+  stars_one = "1 stella",
+  stars = "%d stelle",
+  no_runners = "Nessun \\#00ffff\\Corridore!",
+  camp_timer = "Continua a muoverti! \\#ff5a5a\\(%d)",
+  game_over = "La partita è finita!",
+  winners = "Vincitori: ",
+  no_winners = "\\#ff5a5a\\Nessun vincitore!",
+  death_timer = "Morte",
+  mini_score = "Punteggio: %d",
+  new_record = "\\#ffff5a\\NUOVO RECORD!!!",
+  on = "\\#5aff5a\\ON",
+  off = "\\#ff5a5a\\OFF",
+  frozen = "Congelato per %d",
+
+  -- popups
+  lost_life = "%s\\#ffa0a0\\ ha perso una vita!",
+  lost_all = "%s\\#ffa0a0\\ ha perso tutte le vite!",
+  now_role = "%s\\#ffa0a0\\ è ora un %s\\#ffa0a0\\.",
+  got_star = "%s\\#ffa0a0\\ ha ottenuto una stella!",
+  got_key = "%s\\#ffa0a0\\ ha ottenuto una chiave!",
+  rejoin_start = "%s\\#ffa0a0\\ ha due minuti per rientrare.",
+  rejoin_success = "%s\\#ffa0a0\\ è rientrato in tempo!",
+  rejoin_fail = "%s\\#ffa0a0\\ non è rientrato in tempo.",
+  using_ee = "Questa è solo la Modalità Estrema.",
+  not_using_ee = "Questa è solo la Versione Standard.",
+  killed = "%s\\#ffa0a0\\ ha ucciso %s!",
+  sidelined = "%s\\#ffa0a0\\ ha dato il colpo di grazia a %s!",
+  paused = "Sei stato messo in pausa.",
+  unpaused = "Non sei più in pausa.",
+  kill_combo_2 = "%s\\#ffa0a0\\ ha effettuato una \\#ffff5a\\doppia\\#ffa0a0\\ uccisione!",
+  kill_combo_3 = "%s\\#ffa0a0\\ ha effettuato una \\#ffff5a\\tripla\\#ffa0a0\\ uccisione!",
+  kill_combo_4 = "%s\\#ffa0a0\\ ha effettuato una \\#ffff5a\\quadrupla\\#ffa0a0\\ uccisione!",
+  kill_combo_5 = "%s\\#ffa0a0\\ ha effettuato una \\#ffff5a\\quintupla\\#ffa0a0\\ uccisione!",
+  kill_combo_large = "\\#ffa0a0\\Wow! %s\\#ffa0a0\\ ha effettuato \\#ffff5a\\%d\\#ffa0a0\\ uccisioni di fila!",
+  set_hack = "Hack impostata a %s",
+  incompatible_hack = "ATTENZIONE: l'Hack non è compatibile!",
+  vanilla = "Usando il gioco base",
+  omm_detected = "OMM Rebirth rilevato!",
+  omm_bad_version = "\\#ff5a5a\\OMM Rebirth è datato!\\#ffffff\\\nVersione richiesta: %s\nLa tua versione: %s",
+  warp_spam = "Rallenta coi teletrasporti!",
+  no_valid_star = "Impossibile trovare una stella corrispondente!",
+  custom_enter = "%s\\#ffffff\\ è entrato in\n%s", -- same as coop
+  vanish_custom = "Tieni premuto \\#ffff5a\\B\\#ffffff\\ per scomparire!",
+  got_all_stars = "Hai abbastanza stelle!",
+  unstuck = "Tentativo di sistemare lo stato",
+  use_out = "Usa /mh out per teletrasportare tutti fuori dall'area",
+  stars_in_area = "%d stella/e disponibili qui!",
+  demon_unlock = "Modalità demone verde sbloccata!",
+  hit_switch_red = "%s\\#ffa0a0\\ ha colpito il\n\\#df5050\\Bottone Rosso!", -- dark red (unique)
+  hit_switch_green = "%s\\#ffa0a0\\ ha colppito il\n\\#50b05a\\Bottone Verde!", -- dark green (unique)
+  hit_switch_blue = "%s\\#ffa0a0\\ ha colpito il\n\\#5050e3\\Bottone Blu!", -- dark blue (unique)
+  hit_switch_yellow = "%s\\#ffa0a0\\ ha colpito il\n\\#e3b050\\Bottone Giallo...", -- orangeish (unique)
+
+  -- command feedback
+  not_mod = "Sciocco, non hai l'AUTORITÀ di eseguire questo comando!",
+  no_such_player = "Non esiste un giocatore con quel nome",
+  bad_id = "ID giocatore invalido!",
+  command_disabled = "questo comando è disabilitato.",
+  change_setting = "cambiamento delle opzioni:",
+  you_are_muted = "Sei stato silenziato.",
+
+  -- more command feedback
+  bad_param = "Parametri non validi!",
+  bad_command = "Comando non valido!",
+  error_no_runners = "Impossibile partire con 0 Corridori!",
+  set_team = "la squadra di %s è stata impostata a '%s'", -- First %s is player name, second is team name (now unused)
+  not_started = "La partita non è ancora iniziata",
+  set_lives_one = "%s ha 1 vita",
+  set_lives = "%s ha %d vite",
+  not_runner = "%s non è un Corridore",
+  may_leave = "%s può abbandonare",
+  must_have_one = "Deve esserci almeno 1 Cacciatore",
+  added = "Aggiunti i Corridori: ", -- list comes afterward
+  no_runners_added = "Nessun Corridore aggiunto",
+  runners_are = "I Corridori sono: ",
+  set_lives_total = "Vite dei corridori impostate a %d",
+  wrong_mode = "Non disponibile in questa modalità",
+  need_time_feedback = "I corridori possono andarsene tra %d secondo/i",
+  game_time = "La partita durerà %d secondo/i",
+  need_stars_feedback = "I corridori hanno bisogno di %d stella/e",
+  new_category = "Ora questa è una %d star run",
+  new_category_any = "Ora questa è una any%",
+  mode_normal = "In modalità Normale",
+  mode_swap = "In modalità Invertita",
+  mode_mini = "In modalità MiniHunt",
+  using_stars = "Usando le stelle ottenute",
+  using_timer = "Usando il timer",
+  can_spectate = "Adesso i Cacciatori potranno assistere alla partita",
+  no_spectate = "Adesso i Cacciatori non potranno più assistere",
+  all_paused = "Tutti i giocatori messi in pausa",
+  all_unpaused = "Tutti i giocatori non sono più in pausa",
+  player_paused = "%s è stato messo in pausa",
+  player_unpaused = "%s non è più in pausa",
+  hunter_metal = "Tutti i cacciatori sono metallici",
+  hunter_normal = "Tutti i cacciatori sono normali",
+  hunter_glow = "Tutti i cacciatori si illuminano di rosso",
+  hunter_outline = "Tutti i cacciatori sono evidenziati",
+  runner_sparkle = "Tutti i corridori brillano",
+  runner_normal = "Tutti i corridori sono normali",
+  runner_glow = "Tutti i corridori si illuminano",
+  runner_outline = "Tutti i corridori sono evidenziati",
+  now_weak = "Tutti i giocatori hanno metà dei fotogrammi di invincibilità",
+  not_weak = "Tutti i giocatori hanno i fotogrammi di invincibilità normali",
+  auto_on = "Le partite inizieranno automaticamente",
+  auto_off = "Le partite non inizieranno automaticamente",
+  force_spectate = "Tutti dovranno assistere",
+  force_spectate_off = "Non si è più forzati ad assistere",
+  force_spectate_one = "%s deve assistere",
+  force_spectate_one_off = "%s non deve più assistere",
+  blacklist_add = "%s è stata bloccata",
+  blacklist_remove = "%s è stata sbloccata",
+  blacklist_add_already = "Quella stella è già stata bloccata.",
+  blacklist_remove_already = "Quella stella o area non è bloccata.",
+  blacklist_remove_invalid = "Impossibile bloccare quellala stella del livello.",
+  blacklist_list = "Bloccate:",
+  blacklist_reset = "Lista delle stelle bloccate reimpostata!",
+  blacklist_save = "Lista delle stelle bloccate salvata!",
+  blacklist_load = "Lista delle stelle bloccate caricata!",
+  anarchy_set_0 = "I Giocatori non possonno attaccare i loro compagni di squadra",
+  anarchy_set_1 = "I Corridori possonno attaccare i loro compagni di squadra",
+  anarchy_set_2 = "I Cacciatori possonno attaccare i loro compagni di squadra",
+  anarchy_set_3 = "I Giocatori possonno attaccare i loro compagni di squadra",
+  dmgAdd_set = "I Corridori prenderanno %d danni extra dagli attacchi avversari.",
+  dmgAdd_set_ohko = "I Corridori moriranno in un solo colpo",
+  voidDmg_set = "I giocatori prenderanno %d danni se cadono nel vuoto o nelle sabbie mobili.",
+  voidDmg_set_ohko = "I giocatori moriranno istantaneamente se cadono nel vuoto o nelle sabbie mobili.",
+  target_hunters_only = "Solo i Cacciatori possono impostare un bersaglio.",
+  muted = "\\#ffff00\\%s\\#ffffff\\ è stato mutato da \\#ffff00\\%s\\#ffffff\\.",
+  unmuted = "\\#ffff00\\%s\\#ffffff\\ è stato smutato da\\#ffff00\\%s\\#ffffff\\.",
+  you_muted = "Hai mutato \\#ffff00\\%s\\#ffffff\\.",
+  you_unmuted = "Hai smutato \\#ffff00\\%s\\#ffffff\\.",
+  mute_auto = "\\#ffff00\\%s\\#ffffff\\ è stato mutato automaticamente.",
+
+  -- team chat
+  tc_toggle = "La chat di squadra è %s!",
+  to_team = "\\#8a8a8a\\Squadra: ",
+  from_team = "\\#8a8a8a\\ (squadra): ",
+
+  -- vote skip
+  vote_skip = "%s\\#dcdcdc\\ Ha votato per saltare questa stella",
+  vote_info = "Scrivi /skip per votare",
+  vote_pass = "Il voto è stato approvato!",
+  already_voted = "Hai già votato.",
+
+  -- hard mode
+  hard_notice = "Psst, prova a scrivere /hard...",
+  extreme_notice = "Psst, prova a scrivere /hard ex...",
+  hard_toggle = "La \\#ff5a5a\\Modalità Difficile\\#ffffff\\ è %s!",
+  extreme_toggle = "La \\#b45aff\\Modalità Estrema\\#ffffff\\ è %s!",
+  hard_info = "Ti interessa la \\#ff5a5a\\Modalità Difficile\\#ffffff\\?"..
+  "\n- Metà energia"..
+  "\n- Niente cura dall'acqua"..
+  "\n- \\#ff5a5a\\Una vita"..
+  "\n\\#ffffff\\Scrivi /hard ON se sei pronto per la sfida.",
+  extreme_info = "Ti interessa la \\#b45aff\\Modalità Estrema\\#ffffff\\? Che sciocco."..
+  "\n- Una vita"..
+  "\n- Un'energia"..
+  "\n- \\#b45aff\\Cronometro della Morte\\#ffffff\\; Raccogli monete per aumentare"..
+  "\nSe non ti spaventa, scrivi /hard ex ON.",
+  no_hard_win = "Le tue vittorie in Difficile o Estrema non saranno contate per questa partita.",
+  hard_mode = "Modalità Difficile",
+  extreme_mode = "Modalità Estrema",
+  hard_info_short = "Metà energia, niente cura dall'acqua, e una vita.",
+  extreme_info_short = "Un'energia, una vita, ed un Cronometro della Morte.",
+
+  -- spectator
+  hunters_only = "Solo i cacciatori possono assistere!",
+  spectate_disabled = "Opzione assisti disattivata!",
+  timer_going = "Can't spectate during timer!", -- now unused
+  spectate_self = "Non puoi assistere a te stesso!",
+  spectator_controls = "Controlli:"..
+  "\nDPAD-UP: Nascondi la HUD"..
+  "\nDPAD-DOWN: Vista giocatore/Telecamera libera"..
+  "\nDPAD-LEFT / DPAD-RIGHT: Cambia giocatore"..
+  "\nJOYSTICK: Muoviti"..
+  "\nA: vai su"..
+  "\nZ: vai giu"..
+  "\nScrivi \"/spectate OFF\" per annullare",
+  spectate_off = "Non stai più assistendo.",
+  empty = "VUOTO (%d )",
+  free_camera = "TELECAMERA LIBERA",
+  spectate_mode = "- MODALITÀ SPETTATORE -",
+  is_spectator = '* IL GIOCATORE È UNO SPETTATORE  *',
+
+  -- stats
+  disp_wins_one = "%s\\#ffffff\\ Ha vinto 1 volta come \\#00ffff\\Corridore\\#ffffff\\!",
+  disp_wins = "%s\\#ffffff\\ ha vinto %d volte come \\#00ffff\\Corridore\\#ffffff\\!",
+  disp_kills_one = "%s\\#ffffff\\ has killed 1 player!", -- unused
+  disp_kills = "%s\\#ffffff\\ ha ucciso %d giocatori!",
+  disp_wins_hard_one = "%s\\#ffffff\\ Ha vinto 1 volta come \\#ffff5a\\Corridore\\#ffffff\\ in \\#ff5a5a\\Modalità Difficile!\\#ffffff\\",
+  disp_wins_hard = "%s\\#ffffff\\ ha vinto %d volte come \\#ffff5a\\Corridore\\#ffffff\\ in \\#ff5a5a\\Modalità Difficile!\\#ffffff\\",
+  disp_wins_ex_one = "%s\\#ffffff\\ Ha vinto 1 volta come \\#b45aff\\Corridore\\#ffffff\\ in \\#b45aff\\Modalità Estrema!\\#ffffff\\",
+  disp_wins_ex = "%s\\#ffffff\\ ha vinto %d volte come \\#b45aff\\Corridore\\#ffffff\\ in \\#b45aff\\Modalità Estrema!\\#ffffff\\",
+  -- for stats table
+  stat_wins_standard = "Vittorie",
+  stat_wins = "Vittorie (Minihunt/pre v2.3)",
+  stat_kills = "Uccisioni",
+  stat_combo = "Serie di uccisioni maggiore",
+  stat_wins_hard_standard = "Vittorie (Hard Mode)",
+  stat_wins_hard = "Vittorie (Modalità Difficile, MiniHunt/pre v2.3)",
+  stat_mini_stars = "Stelle massime in una pasrtita di MiniHunt",
+  stat_placement = "Piazzamento 64 Tour",
+  stat_wins_ex_standard = "Vittorie (Modalità Estrema)",
+  stat_wins_ex = "Vittorie (Modalità Estrema, MiniHunt/pre v2.3)",
+
+  -- placements
+  place_1 = "\\#e3bc2d\\[1° Posto]",
+  place_2 = "\\#c5d8de\\[2° Posto]",
+  place_3 = "\\#b38752\\[3° Posto]",
+  place = "\\#e7a1ff\\[%dth Posto]", -- thankfully we don't go up to 21
+  place_score_1 = "%d°",
+  place_score_2 = "%d°",
+  place_score_3 = "%d°",
+  place_score = "%d°",
+
+  -- chat roles
+  role_lead = "\\#9a96ff\\[Lead MH Dev]",
+  role_dev = "\\#96ecff\\[MH Dev]",
+  role_cont = "\\#ff9696\\[Contributore a MH]",
+  role_trans = "\\#ffd996\\[Traduttore di MH]",
+
+  -- command descriptions
+  page = "\\#ffff5a\\Pagina %d/%d", -- page for mariohunt command
+  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Inizia la partita; aggiungi \"continue\" per non partire dall'inizio; aggungi \"alt\" per un file di salvataggio alternativo; aggiungi \"main\" per il file di salvataggio principale; aggiungi \"reset\" per ripristinare il file",
+  add_desc = "[INT] - Aggiungi il numero di corridori casuali specificato",
+  random_desc = "[INT] - Sceglie casualmente il numero di corridori specificato",
+  lives_desc = "[INT] - Imposta il numero di vite dei Corridori, da 0 a 99 (n.b.: 0 vite equivale ad 1 vita)",
+  time_desc = "[NUM] - Imposta il tempo entro cui i Corridori devono scappare, in secondi, o per la durata della partita in MiniHunt.",
+  stars_desc = "[INT] - Imposta il numero di stelle che il Corridore deve aver per scappare, da 1 a 7 (solo per la modalità stelle)",
+  category_desc = "[INT] - Imposta il numero di stelle che i Corridori devono avere per affrontare Bowser.",
+  flip_desc = "[NAME|ID] - Cambia la squadra di un giocatore",
+  setlife_desc = "[NAME|ID|INT,INT] - Imposta il numero di vite per un corridore in particolare",
+  leave_desc = "[NAME|ID] - Permetti ad un giocatore specifico di abbandonare il livello in caso fosse un corridore",
+  mode_desc = "[NORMAL|SWAP|MINI] - Cambia modalità; Swap converte i corridori quando muoiono",
+  starmode_desc = "[ON|OFF] - Attiva o disattiva l'utilizzo delle stelle piuttosto che del tempo",
+  spectator_desc = "[ON|OFF] - Attiva o disattiva l'abilità dei cacciatori di assistere",
+  pause_desc = "[NAME|ID|ALL] - Attiva o disattiva lo stato di pasua per un giocatore specificato, o tutti se non specificato",
+  hunter_app_desc = "Cambia l'Aspetto dei Cacciatori.",
+  runner_app_desc = "Cambia l'Aspetto dei Corridori.",
+  hack_desc = "[STRING] - Imposta l'attuale rom hack",
+  weak_desc = "[ON|OFF] - Dimezza i fotogrammi di invincibilità per tutti",
+  auto_desc = "[ON|OFF|NUM] - Inizia automaticamente",
+  forcespectate_desc = "[NAME|ID|ALL] - Attiva o disattica la modalità spettatore forzata per uno o tutti i giocatori",
+  desync_desc = "- Prova a sistemare gli errori di desinc.",
+  stop_desc = "- Ferma il gioco",
+  default_desc = "- Ripristina le impostazioni",
+  blacklist_desc = "[ADD|REMOVE|LIST|RESET|SAVE|LOAD,COURSE,ACT] - Blocca stelle in MiniHunt",
+  stalking_desc = "[ON|OFF] - Permetti il teletrasporto al livello di un Corridore con /stalk",
+  mute_desc = "[NAME|ID] - Muta un giocatore, impedendogli di scrivere",
+  unmute_desc = "[NAME|ID] - Smuta un giocatore, permettendogli di scrivere",
+  out_desc = "- Butta tutti fuori da un'area",
+
+  -- Blocky's menu
+  main_menu = "Menu Principale",
+  menu_mh = "MarioHunt",
+  menu_mh_egg = "LuigiHunt",
+  menu_settings_player = "Impostazioni",
+  menu_rules = "Regole",
+  menu_list_settings = "Lista delle impostazioni",
+  menu_list_settings_desc = "Mostra la lista delle impostazioni per la stanza.",
+  menu_lang = "Lingua",
+  menu_misc = "Altro",
+  menu_stats = "Statistiche",
+  menu_back = "Indietro",
+  menu_exit = "Esci",
+
+  menu_run_random = "Corridori Casuali",
+  menu_run_add = "Aggiungi Corridori",
+  menu_run_lives = "Vite dei Corridori",
+  menu_settings = "Impostazioni della partita",
+
+  menu_start = "Inizia",
+  menu_stop = "Ferma",
+  menu_save_main = "Principale",
+  menu_save_alt = "File Alternativo",
+  menu_save_reset = "Ripristina File Alternativo",
+  menu_save_continue = "Continua (non teletraspora indietro)",
+  menu_random = "Casuale",
+  menu_campaign = "Storia",
+  menu_coop = "Cooperativa",
+
+  menu_gamemode = "Modalità",
+  menu_hunter_app = "Aspetto del Cacciatore",
+  menu_runner_app = "Aspetto del Corridore",
+  menu_weak = "Modalità Debole",
+  menu_allow_spectate = "Permetti Spettatori",
+  menu_star_mode = "Modalità Stella",
+  menu_category = "Categoria",
+  menu_time = "Tempo",
+  menu_stars = "Stelle",
+  menu_auto = "Auto Game",
+  menu_blacklist = "MiniHunt Bloccate",
+  menu_default = "Ripristina",
+  menu_anarchy = "Fuoco Amico",
+  menu_anarchy_desc = "Permette ai giocatori di attaccare i compagni di squadra.",
+  menu_dmgAdd = "Danno ai Corridori Aumentato", -- DMG is "damage"
+  menu_dmgAdd_desc = "Agguinge il quantitativo al danno inflitto ai Corridori",
+  menu_nerf_vanish = "Depotenzia Cappello Invisibile", -- Nerf, as in to reduce power for balancing
+  menu_nerf_vanish_desc = "Depotenzia il cappello invisibile rendendolo disattivabile e diminuendo la durata.",
+  menu_first_timer = "Cronometro della Morte per il 1°",
+  menu_first_timer_desc = "Da' al giocatore in prima posizione nella MiniHunt un cronometro della morte.",
+  menu_defeat_bowser = "Sconfiggi %s",
+  menu_allow_stalk = "Permetti lo 'Stalking'",
+  menu_countdown = "Conto alla rovescia",
+  menu_countdown_desc = "Tempo di attesa per i Cacciatori.",
+  menu_voidDmg = "danno del Vuoto",
+  menu_voidDmg_desc = "danno inflitto ai giocatori che cadono nel vuoto o nelle sabbie mobili.",
+  menu_double_health = "Energia dei Corridori Doppia",
+  menu_double_health_desc = "I Corridoi hanno 16 di energia piuttosto che 8.",
+
+  menu_flip = "Cambia Squadra",
+  menu_spectate = "Assisti",
+  menu_stalk = "Teletrasporto all'Area",
+  menu_stalk_desc = "Teletraspotati all'area di un giocatore.",
+  menu_pause = "Pausa",
+  menu_forcespectate = "Forza Modalità Spettatore",
+  menu_allowleave = "Permetti di Uscire",
+  menu_setlife = "Imposta Vite",
+  menu_players_all = "Tutti i Giocatori",
+  menu_target = "Imposta come Bersaglio",
+  menu_mute = "Muta",
+
+  menu_timer = "Cronometro Speedrun",
+  menu_timer_desc = "[ON|OFF] - Mostra un cronometro speedrun in basso nelle Modalità Standard.",
+  menu_tc = "Chat di Squadra",
+  menu_tc_desc = "Chat con solo la tua squadra.",
+  menu_demon = "Demone Verde", -- referring to the 1-Up
+  menu_demon_desc = "Una 1-Up inseguirà i Corridori.",
+  menu_unknown = "???",
+  menu_secret = "È un segreto. Come lo sblocchi?",
+  menu_hide_roles = "Nascondi il Mio Ruolo",
+  menu_hide_roles_desc = "Impedisci che il to ruolo vega mostrato in chat.",
+  menu_hide_hud = "Nascondi HUD",
+  hidehud_desc = "- Nascondi gli elementi della HUD.",
+  menu_fast = "Azioni Più Veloci",
+  menu_fast_desc = "Ti rialzerai, lancerai, ed aprirai le porte più velocemente.",
+  menu_popup_sound = "Suoni dei Popup",
+  menu_season = "Cambiamenti Stagionali",
+  menu_season_desc = "Piccoli dettagli che dipendono dalla data.",
+
+  menu_free_cam_desc = "Attiva la telecamera libera in modalità spettatore.",
+  menu_spectate_run = "Assisti ad un Corridore",
+  menu_spectate_run_desc = "Assisti automaticamente al corridore in prima posizione.",
+  menu_exit_spectate = "Esci dalla Modalità Spettatore",
+  menu_exit_spectate_desc = "Abbastanza esplicito.",
+  menu_stalk_run = "Teletrasporto al Livello del corridore",
+  menu_stalk_run_desc = "Teletrasportati al livello del corridore in prima posizione.",
+  menu_skip = "Salta",
+  menu_skip_desc = "- Vota per saltare una stella in MiniHunt.",
+
+  menu_spectate_desc = "Assisti a questo giocatore.",
+
+  menu_blacklist_list = "Lista Stelle Bloccate",
+  menu_blacklist_list_desc = "Lista delle stelle bloccate in MiniHunt per questo server.",
+  menu_blacklist_save = "Salva Lista",
+  menu_blacklist_save_desc = "Salva la tua lista delle stelle bloccate.",
+  menu_blacklist_load = "Carica Lista",
+  menu_blacklist_load_desc = "Carica la tua lista delle stelle bloccate.",
+  menu_blacklist_reset = "Ripristina Lista",
+  menu_blacklist_reset_desc = "Ripristina la lista delle stelle bloccate.",
+  menu_toggle_all = "Attiva tutte",
+
+  -- updater
+  up_to_date = "\\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\ è aggiornata!",
+  up_to_date_egg = "\\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\ è aggiornata!",
+  has_update = "Aggiornamento disponibile per \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\!",
+  has_update_egg = "Aggiornamento disponibile per \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\!",
+
+  -- v2.6 stuff I don't feel like sorting
+  leave_error = "%s\\#ffa0a0\\ è uscito a causa di un errore.",
+  hunter_color = "Tutti i cacciatori useranno la palette Borgogna", -- (check official lang for palette name)
+  runner_color = "Tutti i corridori useranno la palette Azzurra", -- (check official lang for palette name)
+  stat_playtime = "Tempo di gioco totale (ore)",
+  stat_parkour_time = "Record nel Parkour",
+  stat_parkour_time_omm = "Record nel Parkour (OMM)",
+  stat_parkour_time_other = "Record nel Parkour (Moveset)",
+  menu_free_roam = "Esplorazione Libera",
+  menu_free_roam_desc = "Rimuove la necessità di stelle o chiavi per la maggior parte delle porte.",
+  menu_radar = "Radar",
+  menu_radar_desc = "Mostra la posizione dei corridori e degli oggetti importanti.",
+  menu_minimap = "Minimappa",
+  menu_minimap_desc = "Mostra una mappa di tutto il livello.",
+  menu_romhack_cam = "Telecamera Romhack", -- (cam is short for camera)
+  menu_romhack_cam_desc = "Abilita permanentemente la telecamera della romhack.", -- (cam is short for camera)
+  menu_star_heal = "Stelle Curative",
+}
+
+-- Had to replace the characters that didn't exist
+langdata["ro"] = -- by N64 (not to be mistaken for N64-Mario)
+{
+  -- fullname for auto select (make sure this matches in-game under Misc -> Languages)
+  fullname = "Romanian",
+
+  -- name in the built-in menu
+  name_menu = "Româna",
+
+  -- global command info
+  to_switch = "Schrie \"/lang %s\" pentru a schimba limba",
+  switched = "Schimbare în Româna!", -- Replace "English" with the name of this language
+  rules_command = "Schimbare /rules pentru a arata din nou mesajul",
+  open_menu = "Apasa /mh sau apasa L + Porneste in meniu",
+  stalk = "Foloseste /stalk a deforma la alergatori!",
+  rules_desc = "- Arata MarioHunt reguli",
+  rules_desc_egg = "- Arata LuigiHunt reguli",
+  mh_desc = "[COMMAND,ARGS] - Executa comenzile; Scrie nimic sau \"menu\" pentru a dischide meniul",
+  lang_desc = "%s - Schimba limba",
+  hard_desc = "[EX|ON|OFF,ON|OFF] - Comutati modul greu pentru dvs",
+  tc_desc = "[ON|OFF|MSG] - Trimite mesaj numai echipei; activati pentru a se aplica tuturor mesajelor",
+  stats_desc = "- Afisati/ascundeti tabelul cu statistici",
+  stalk_desc = "[NAME|ID] - Se deformeaza la nivelul in care se afla jucatorul specificat sau primul alergator",
+  spectate_desc = "[NAME|ID|STOP] - Vizionati playerul specificat, camera libera daca nu este specificata sau OFF pentru a dezactiva", -- not to be confused 
+  target_desc = "[NAME|ID] - Setati acest Alergator ca tinta, care afiseaza locatia lui in orice moment.",
+
+  -- roluri
+  runner = "Alergator",
+  runners = "Alergatori",
+  short_runner = "Alergator scurt", -- unused
+  hunters = "Vânator",
+  hunter = "Vânatori",
+  spectator = "Spectator",
+  player = "Jucator",
+  players = "Jucatori",
+  all = "Toti",
+
+  -- rules
+  welcome = "Bine ai venit la \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\! CUM Sa JOCI:",
+  welcome_mini = "Bine ai venit la \\#ffff5a\\Mini\\#ff5a5a\\Hunt\\#ffffff\\! CUM Sa JOCI:",
+  welcome_egg = "Bine ai venit la \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\! CUM Sa JOCI:",
+  all_runners = "Morti toti \\#00ffff\\Alergatori\\#ffffff\\.",
+  any_runners = "Învinge orice \\#00ffff\\Alergatori\\#ffffff\\.",
+  shown_above = "(arata de mai sus)",
+  any_bowser = "Înfrângere %s prin \\#ffff5a\\orice\\#ffffff\\ inseamna necesar.",
+  collect_bowser = "Colectare \\#ffff5a\\%d stele(s)\\#ffffff\\ si înfrângere %s.",
+  mini_collect =  "Fi primul la \\#ffff5a\\aduna steaua\\#ffffff\\.",
+  collect_only = "Colectare \\#ffff5a\\%d stele(s)\\#ffffff\\.",
+  thats_you = "(asta esti tu!)",
+  banned_glitchless = "NU: Echipe încrucisate, BLJs, taierea de perete, blocare, campare.",
+  banned_general = "NU: Echipe încrucisate, blocare, campare.",
+  time_needed = "%d:%02d a parasi orice etapa principala; aduna stele pentru a reduce",
+  stars_needed = "%d stele(s) a parasi orice etapa principala",
+  become_hunter = "deveni \\#ff5a5a\\Vânatori\\#ffffff\\ când este învins",
+  become_runner = "învinge \\#00ffff\\Alergatori\\#ffffff\\ a devenit unul", -- is this correct?
+  infinite_lives = "Vieti infinite",
+  spectate = "Schrie \"/spectate\" pentru a te uita",
+  mini_goal = "\\#ffff5a\\Cine aduna cele mai multe stele in %d:%02d castiga!\\#ffffff\\",
+  fun = "Distractie placuta!",
+
+  -- hud, extra desc, and results text (%s is a placeholder for names, and %d is a placeholder for a number)
+  win = "%s\\#ffffff\\ câstigat!", -- team name is placed here
+  can_leave = "\\#5aff5a\\Poti iesi din curs",
+  cant_leave = "\\#ff5a5a\\Nu poti iesi din curs",
+  time_left = "Poti pleca în \\#ffff5a\\%d:%02d",
+  stars_left = "Nevoie \\#ffff5a\\%d star(s)\\#ffffff\\ to leave",
+  in_castle = "În castel",
+  until_hunters = "%d secunde(s) pâna \\#ff5a5a\\Vânatori\\#ffffff\\ încep",
+  until_runners = "%d secunde(s) pâna \\#00ffff\\Alergatori\\#ffffff\\ încep",
+  lives_one = "1 viata",
+  lives = "%d vieti",
+  stars_one = "1 stea",
+  stars = "%d stele",
+  no_runners = "Nu \\#00ffff\\Alergatori!",
+  camp_timer = "Continua sa the misti! \\#ff5a5a\\(%d)",
+  game_over = "Jocul s-a terminat!",
+  winners = "Câstigatori: ",
+  no_winners = "\\#ff5a5a\\Nici un câstigator!",
+  death_timer = "Mort",
+  mini_score = "Scor: %d",
+  new_record = "\\#ffff5a\\NOU RECORD!!!",
+  on = "\\#5aff5a\\PORNIT",
+  off = "\\#ff5a5a\\OPRIT",
+  frozen = "Înghetat pentru %d",
+
+  -- popups
+  lost_life = "%s\\#ffa0a0\\ pierdut o viata!",
+  lost_all = "%s\\#ffa0a0\\ pierdut toate vietile!",
+  now_role = "%s\\#ffa0a0\\ acum e %s\\#ffa0a0\\.",
+  got_star = "%s\\#ffa0a0\\ ai luat steaua!",
+  got_key = "%s\\#ffa0a0\\ ai luat cheia!",
+  rejoin_start = "%s\\#ffa0a0\\ are doua minute pentru a reveni.",
+  rejoin_success = "%s\\#ffa0a0\\ a intrat la timp!",
+  rejoin_fail = "%s\\#ffa0a0\\ nu sa conectat la timp.",
+  using_ee = "Aceasta foloseste numai Extreme Edition.",
+  not_using_ee = "Aceasta utilizeaza numai editia standard.",
+  killed = "%s\\#ffa0a0\\ omorât %s!",
+  sidelined = "%s\\#ffa0a0\\ terminat %s!",
+  paused = "Ai pus pauza.",
+  unpaused = "Nu mai ai pauza.",
+  kill_combo_2 = "%s\\#ffa0a0\\ a fost \\#ffff5a\\de doua ori\\#ffa0a0\\ mort!",
+  kill_combo_3 = "%s\\#ffa0a0\\ a fost \\#ffff5a\\de trei ori\\#ffa0a0\\ mort!",
+  kill_combo_4 = "%s\\#ffa0a0\\ a fost \\#ffff5a\\de patru ori\\#ffa0a0\\ mort!",
+  kill_combo_5 = "%s\\#ffa0a0\\ a fost \\#ffff5a\\de cinci ori\\#ffa0a0\\ mort!",
+  kill_combo_large = "\\#ffa0a0\\Wow! %s\\#ffa0a0\\ a facut \\#ffff5a\\%d\\#ffa0a0\\ a omorât la rând!",
+  set_hack = "Hack pus la %s",
+  incompatible_hack = "AVERTIZMANT: Hackul nu este compatibil!",
+  vanilla = "Folosind jocul vanila",
+  omm_detected = "OMM Rebirth detectat!",
+  omm_bad_version = "\\#ff5a5a\\OMM Rebirth este depasit!\\#ffffff\\\nMinimum version: %s\nYour version: %s",
+  warp_spam = "Iao mai încet cu urzeala!",
+  no_valid_star = "Nu s-a putut gasi o stea valida!",
+  custom_enter = "%s\\#ffffff\\ intrat\n%s", -- same as coop
+  vanish_custom = "tine \\#ffff5a\\B\\#ffffff\\ pentru a fi invisibil!",
+  got_all_stars = "Ai destule stele!",
+  unstuck = "Încercarea de a remedia starea",
+  use_out = "Foloseste /mh pentru a deforma pe toata lumea din acest nivel",
+  stars_in_area = "%d stele(s) valabile aici!",
+  demon_unlock = "Modul Green Demon deblocat!",
+  hit_switch_red = "%s\\#ffa0a0\\ a activat\n\\#df5050\\Comutatorul Rosu!", -- dark red (unique)
+  hit_switch_green = "%s\\#ffa0a0\\ a activat\n\\#50b05a\\Comutatorul Verde!", -- dark green (unique)
+  hit_switch_blue = "%s\\#ffa0a0\\ a activat\n\\#5050e3\\Comutatorul Albastru!", -- dark blue (unique)
+  hit_switch_yellow = "%s\\#ffa0a0\\ a activat\n\\#e3b050\\Comutatorul Galben...", -- orangeish (unique)
+
+  -- command feedback
+  not_mod = "Tu nu ai permisiune de a folosi comanda, prostule!",
+  no_such_player = "Nu exista un asemena de jucator",
+  bad_id = "ID jucatorului nu este!",
+  command_disabled = "Comanda aceasta este dezacrivata.",
+  change_setting = "Setari schimbate:",
+  you_are_muted = "Tu esti acum mut.",
+
+  -- more command feedback
+  bad_param = "Parametri invalidi!",
+  bad_command = "Comanda invalida!",
+  error_no_runners = "Nu poti începe jocul cu 0 alergatori!",
+  set_team = "%s's echipele au fost setate la '%s'", -- First %s is player name, second is team name (now unused)
+  not_started = "Jocul nu a început înca",
+  set_lives_one = "%s acum ai 1 viata",
+  set_lives = "%s acum are %d vieti",
+  not_runner = "%s nu este un Alergator",
+  may_leave = "%s poate pleca",
+  must_have_one = "Trebuie cel puti un Vânator",
+  added = "Alergatori adaugati: ", -- list comes afterward
+  no_runners_added = "Nici un Alergator nu a fost adaugat",
+  runners_are = "Alergatori sunt: ",
+  set_lives_total = "Viata alergatorilor setata la %d",
+  wrong_mode = "Nu este disponibil în acest mod",
+  need_time_feedback = "Alergatori pot iesi în %d secunde(s) acum",
+  game_time = "Jocul dureaza acum %d secunde(s)",
+  need_stars_feedback = "Alergatori au nevoie %d stele(s) acum",
+  new_category = "Acum este un %d stea alergatoare",
+  new_category_any = "Acum este any% alerga",
+  mode_normal = "În modul Normal",
+  mode_swap = "În modul Schimbator",
+  mode_mini = "În modul Minivânatoare",
+  using_stars = "Folosind stelele colectate",
+  using_timer = "Folosind und cronometru",
+  can_spectate = "Vînîtori pot acum privi",
+  no_spectate = "Vânatorii nu mai pot privi",
+  all_paused = "Toti jucatori au luat o pauza",
+  all_unpaused = "Toti jucatorii au reluat pauza",
+  player_paused = "%s a fost întrerupta",
+  player_unpaused = "%s a fost întrerupta",
+  hunter_metal = "Toti vânatorii sunt din metal",
+  hunter_normal = "Toti vânatorii par normali",
+  hunter_glow = "Toti vânatorii stralucesc rosu",
+  hunter_outline = "Toti vânatorii au un contur",
+  runner_sparkle = "Toti alergatorii stralucesc acum",
+  runner_normal = "Toti alergAll runners have an outlineatorii par normalil",
+  runner_glow = "Toti alergatorii stralucesc acum",
+  runner_outline = "Toti alergatorii au un contur",
+  now_weak = "Toti jucatorii au jumatate de cadre de invincibilitate",
+  not_weak = "Toti jucatorii au cadre de invincibilitate normale",
+  auto_on = "Jocurile vor începe automat",
+  auto_off = "Jocurile nu vor porni automat",
+  force_spectate = "Toata lumea trebuie sa priveasca",
+  force_spectate_off = "Spectacolul nu mai este fortat",
+  force_spectate_one = "%s trebuie sa priveasca",
+  force_spectate_one_off = "%s nu mai trebuie sa priveasca",
+  blacklist_add = "Pe lista neagra %s",
+  blacklist_remove = "Pe lista alba %s",
+  blacklist_add_already = "Acea stea sau nivel este deja pe lista neagra.",
+  blacklist_remove_already = "Acea stea sau nivel nu este pe lista neagra.",
+  blacklist_remove_invalid = "Nu pot fi listata în alb aceasta stea sau nivel.",
+  blacklist_list = "Pe lista neagra:",
+  blacklist_reset = "Resetati lista neagra!",
+  blacklist_save = "Lista neagra a fost salvata!",
+  blacklist_load = "Lista neagra a fost încarcata!",
+  anarchy_set_0 = "Alergatorul poate sa îsi atace echipa",
+  anarchy_set_1 = "Alergatorii îsi pot ataca colegii",
+  anarchy_set_2 = "Vânatorii îsi pot ataca colegii de echipa",
+  anarchy_set_3 = "Jucatorii îsi pot ataca colegii",
+  dmgAdd_set = "Alergatorii vor primi acum %d daune suplimentare din atacurile PVP.",
+  dmgAdd_set_ohko = "Alergatorii vor muri acum dintr-o lovitura",
+  voidDmg_set = "Jucatorii vor primi %d daune din caderea în gol sau nisipuri miscatoare.",
+  voidDmg_set_ohko = "Jucatorii vor muri instantaneu din cauza caderii în gol sau în nisipuri miscatoare.",
+  target_hunters_only = "Doar vânatorii pot stabili o tinta.",
+  muted = "\\#ffff00\\%s\\#ffffff\\ a fost dezactivat de \\#ffff00\\%s\\#ffffff\\.",
+  unmuted = "\\#ffff00\\%s\\#ffffff\\ a fost activat de \\#ffff00\\%s\\#ffffff\\.",
+  you_muted = "Tu ai dezactivat \\#ffff00\\%s\\#ffffff\\.",
+  you_unmuted = "Tu ai dezactivat\\#ffff00\\%s\\#ffffff\\.",
+  mute_auto = "\\#ffff00\\%s\\#ffffff\\ a fost dezactivat automat.",
+
+  -- team chat
+  tc_toggle = "Chatul în echipa este %s!",
+  to_team = "\\#8a8a8a\\La echipa: ",
+  from_team = "\\#8a8a8a\\ (echipa): ",
+
+  -- vote skip
+  vote_skip = "%s\\#dcdcdc\\ a votat pentru a omite aceasta stea",
+  vote_info = "Tastati /skip pentru a vota",
+  vote_pass = "Votul a trecut!",
+  already_voted = "Ai votat deja.",
+
+  -- hard mode
+  hard_notice = "Psst, încearca sa tastezi /hard...",
+  extreme_notice = "Psst, încearca sa tastezi /hard ex...",
+  hard_toggle = "\\#ff5a5a\\Modul Greu\\#ffffff\\ este %s!",
+  extreme_toggle = "\\#b45aff\\Modul Extrem\\#ffffff\\ este %s!",
+  hard_info = "Interesat în \\#ff5a5a\\Hard Mode\\#ffffff\\?"..
+  "\n- Jumate de viata"..
+  "\n- Fara regen de la apa"..
+  "\n- \\#ff5a5a\\O viata"..
+  "\n\\#ffffff\\Tastati /hard ON daca sunteti pregatit pentru provocare.",
+  extreme_info = "Esti atras de \\#b45aff\\Modul Extrem\\#ffffff\\? Ce prostie."..
+  "\n- O viata"..
+  "\n- O sanatate"..
+  "\n- \\#b45aff\\Cronometrul mortii\\#ffffff\\; aduna monede si stele pentru a creste"..
+  "\nIf asta nu te sperie, tastati /hard ex ON.",
+  no_hard_win = "Scorul dvs. de câstiguri dure sau extreme nu va fi actualizat pentru acest joc.",
+  hard_mode = "Modul Greu",
+  extreme_mode = "Modul Extrem",
+  hard_info_short = "Jumatate de sanatate, fara apa vindecare si o viata.",
+  extreme_info_short = "Un singur cronometru pentru sanatate, viata si moarte.",
+
+  -- spectator
+  hunters_only = "Numai vânatorii pot privi!",
+  spectate_disabled = "Spectatia este dezactivata!",
+  timer_going = "Nu pot privi în timpul cronometrului!", -- now unused
+  spectate_self = "Nu te poti privi!",
+  spectator_controls = "Controale:"..
+  "\nDPAD-UP: Opriti hud-ul"..
+  "\nDPAD-DOWN: Schimbati vizualizarea freecam/player"..
+  "\nDPAD-LEFT / DPAD-RIGHT: Schimbati jucatorul"..
+  "\nJOYSTICK: Misca"..
+  "\nA: Dute sus"..
+  "\nZ: Dute jos"..
+  "\nType \"/spectate OFF\" pentru a anula",
+  spectate_off = "Nu mai privesc.",
+  empty = "GOL (%d )",
+  free_camera = "CAMERA GRATUITA",
+  spectate_mode = "- MOD SPECTATOR -",
+  is_spectator = '* JUCATORUL ESTE UN SPECTATOR  *',
+
+  -- stats
+  disp_wins_one = "%s\\#ffffff\\ a câstigat 1 data ca \\#00ffff\\Alergator\\#ffffff\\!",
+  disp_wins = "%s\\#ffffff\\ a câstigat de %d ori ca \\#00ffff\\Alergator\\#ffffff\\!",
+  disp_kills_one = "%s\\#ffffff\\ a ucis 1 jucator!", -- unused
+  disp_kills = "%s\\#ffffff\\ a ucis %d jucatori!",
+  disp_wins_hard_one = "%s\\#ffffff\\ a câstigat 1 data ca \\#ffff5a\\Runner\\#ffffff\\ în \\#ff5a5a\\Modul Greu!\\#ffffff\\",
+  disp_wins_hard = "%s\\#ffffff\\ a câstigat de %d ori ca \\#ffff5a\\Runner\\#ffffff\\ în \\#ff5a5a\\Modul Greu!\\#ffffff\\",
+  disp_wins_ex_one = "%s\\#ffffff\\ a câstigat 1 data ca \\#b45aff\\Runner\\#ffffff\\ în \\#b45aff\\Modul Extrem!\\#ffffff\\",
+  disp_wins_ex = "%s\\#ffffff\\ a câstigat de %d ori ca \\#b45aff\\Runner\\#ffffff\\ în \\#b45aff\\Modul Extrem!\\#ffffff\\",
+  -- for stats table
+  stat_wins_standard = "Învingeri",
+  stat_wins = "Învingeri (Minihunt/pre v2.3)",
+  stat_kills = "Ucideri",
+  stat_combo = "Maximul de Ucideri Strike",
+  stat_wins_hard_standard = "Învingeri (Modul Greu)",
+  stat_wins_hard = "Învingeri (Modul Greu, MiniHunt/pre v2.3)",
+  stat_mini_stars = "Maximum de stele într-un singur joc de MiniHunt",
+  stat_placement = "64 Plasare în tur",
+  stat_wins_ex_standard = "Învingeri (Modul Extrem)",
+  stat_wins_ex = "Învingeri (Modul Extrem, MiniHunt/pre v2.3)",
+
+  -- placements
+  place_1 = "\\#e3bc2d\\[Primul Loc]",
+  place_2 = "\\#c5d8de\\[Doilea Loc]",
+  place_3 = "\\#b38752\\[Treilea Loc]",
+  place = "\\#e7a1ff\\[%dPatrulea Loc]", -- thankfully we don't go up to 21
+  place_score_1 = "%dprimul",
+  place_score_2 = "%ddoilea",
+  place_score_3 = "%dtrilea",
+  place_score = "%dpatrulea",
+
+  -- chat roles
+  role_lead = "\\#9a96ff\\[Conducator MH Dev]",
+  role_dev = "\\#96ecff\\[MH Dev]",
+  role_cont = "\\#ff9696\\[Colaborator MH]",
+  role_trans = "\\#ffd996\\[MH Traducator]",
+
+  -- command descriptions
+  page = "\\#ffff5a\\Pagina %d/%d", -- page for mariohunt command
+  start_desc = "[CONTINUE|MAIN|ALT|RESET] - Începe jocul; adauga \"continue\" a nu deforma pentru a începe; adauga \"alt\" pentru alt fisier de salvare; adauga \"main\" pentru fisierul de salvare principal; adauga \"reset\" prentru a reseta fisierele",
+  add_desc = "[INT] - Adauga aleatoriu cantitatea specificata de alergatorim",
+  random_desc = "[INT] - Alege aleatoriu numarul specificat de alergatori",
+  lives_desc = "[INT] - Seteaza numarul de vieti pe care le au alergatorii, de la 0 la 99 (nota: 0 vieti este înca 1 viata)",
+  time_desc = "[NUM] - Seteaza timpul pe care alergatorii trebuie sa astepte pentru a pleca, în secunde, sau durata jocului în MiniHunt.",
+  stars_desc = "[INT] - Seteaza cantitatea de stele pe care alergatorii trebuie sa le colecteze pentru a pleca, de la 0 la 7 (doar în modul stea)",
+  category_desc = "[INT] - Stabileste numarul de stele pe care alergatorii trebuie sa le aiba pentru a se confrunta cu Bowser.",
+  flip_desc = "[NAME|ID] - Întoarce echipa jucatorului specificat",
+  setlife_desc = "[NAME|ID|INT,INT] - Seteaza durata de viata specificata pentru alergatorul specificat",
+  leave_desc = "[NAME|ID] - Permite jucatorului specificat sa paraseasca nivelul daca este un alergator",
+  mode_desc = "[NORMAL|SWAP|MINI] - Changes game mode; Swap switches runners when one dies",
+  starmode_desc = "[ON|OFF] - Comuta utilizarea stelelor colectate în loc de timp",
+  spectator_desc = "[ON|OFF] - Comuta capacitatea vânatorilor de a privi",
+  pause_desc = "[NAME|ID|ALL] - Comuta starea de pauza pentru jucatorii specificati sau pentru toti daca nu este specificat",
+  hunter_app_desc = "Schimba aspectul vânatorilor.",
+  runner_app_desc = "Schimba aspectul alergatorilor.",
+  hack_desc = "[STRING] - Seteaza hack-ul actual al romului",
+  weak_desc = "[ON|OFF] - Reduce cadrele de invincibilitate la jumatate pentru toti jucatorii",
+  auto_desc = "[ON|OFF|NUM] - Porniti jocurile automat",
+  forcespectate_desc = "[NAME|ID|ALL] - Comutati fortarea spectatorului pentru acest jucator sau pentru toti jucatorii",
+  desync_desc = "- Încercari de a remedia erorile de desincronizare",
+  stop_desc = "- Opreste jocul",
+  default_desc = "- Setati setarile la început",
+  blacklist_desc = "[ADD|REMOVE|LIST|RESET|SAVE|LOAD,COURSE,ACT] -Lista neagra a vedetelor din MiniHunt",
+  stalking_desc = "[ON|OFF] - Permite deformarea la nivelul unui alergator cu /stalk",
+  mute_desc = "[NAME|ID] - Dezactiveaza un jucator, împiedicându-l sa converseze",
+  unmute_desc = "[NAME|ID] - Activeaza sunetul unui jucator, permitându-i sa discute din nou",
+  out_desc = "- Scoate pe toti din acest nivel",
+
+  -- Blocky's menu
+  main_menu = "Meniu principal",
+  menu_mh = "MarioHunt",
+  menu_mh_egg = "LuigiHunt",
+  menu_settings_player = "Setari",
+  menu_rules = "Reguli",
+  menu_list_settings = "Setari lista",
+  menu_list_settings_desc = "Listeaza toate setarile pentru acest lobby.",
+  menu_lang = "Limba",
+  menu_misc = "Muzica",
+  menu_stats = "Statistici",
+  menu_back = "Înapoi",
+  menu_exit = "Iesi",
+
+  menu_run_random = "Randomizati alergatorii",
+  menu_run_add = "Adaugati alergatori",
+  menu_run_lives = "Vietile alergatorului",
+  menu_settings = "Setarile jocului",
+
+  menu_start = "Porneste",
+  menu_stop = "Opreste",
+  menu_save_main = "Principal",
+  menu_save_alt = "Alt Salvare",
+  menu_save_reset = "Resetati Alt Salvare",
+  menu_save_continue = "Continua (fara deformare înapoi)",
+  menu_random = "Aleatoriu",
+  menu_campaign = "Campanie",
+  menu_coop = "Înpreuna",
+
+  menu_gamemode = "Mod de joc",
+  menu_hunter_app = "Aspectul vânatorului",
+  menu_runner_app = "Aspectul alergatorilor",
+  menu_weak = "Modul Slab",
+  menu_allow_spectate = "Permite Spectating",
+  menu_star_mode = "Modul Stea",
+  menu_category = "Categorie",
+  menu_time = "Timp",
+  menu_stars = "Stele",
+  menu_auto = "Joc Auto",
+  menu_blacklist = "Lista neagra MiniHunt",
+  menu_default = "Reseteaza la Început",
+  menu_anarchy = "Bataie prieteneasca",
+  menu_anarchy_desc = "Permite echipelor specificate sa-si atace colegii.",
+  menu_dmgAdd = "Alergatorul în PVP LOVITURA MARE", -- DMG is "damage"
+  menu_dmgAdd_desc = "Adaugati atât de mult daune la atacurile împotriva alergatorilor.",
+  menu_nerf_vanish = "sapca Nerf de Invisibilitate", -- Nerf, as in to reduce power for balancing
+  menu_nerf_vanish_desc = "Capacul Nerfs dispare facându-l comutabil si se scurge mai repede atunci când este utilizat.",
+  menu_first_timer = "Lider Mort Timp",
+  menu_first_timer_desc = "Ofera liderului din MiniHunt un cronometru al mortii.",
+  menu_defeat_bowser = "Înfrângere %s",
+  menu_allow_stalk = "Permite ,,Stalking\"",
+  menu_countdown = "Numaratoare inversa",
+  menu_countdown_desc = "Cât timp trebuie sa astepte vânatorii înainte de a începe.",
+  menu_voidDmg = "LOVITURA din Void",
+  menu_voidDmg_desc = "Daunele aduse jucatorilor care cad în gol sau nisipuri miscatoare.",
+  menu_double_health = "Sanatate dublu alergator",
+  menu_double_health_desc = "Alergatorii primesc 16 puncte de sanatate în loc de 8.",
+  menu_star_heal = "Viata stelelor",
+
+  menu_flip = "Schimba echipa",
+  menu_spectate = "Spectator",
+  menu_stalk = "Teleporteazate la un Nivel",
+  menu_stalk_desc = "Teleporteazate la nivelul acestui jucator.",
+  menu_pause = "Pauza",
+  menu_forcespectate = "Forzeaza pe Spectator",
+  menu_allowleave = "Permite pentru a Iesi",
+  menu_setlife = "Seteaza Vieatile",
+  menu_players_all = "Toti Jucatori",
+  menu_target = "Pune ca si o tinta",
+  menu_mute = "Mut",
+
+  menu_timer = "Cronometru de Rulare Rapida",
+  menu_timer_desc = "[ON|OFF] - Afisati un cronometru în partea de jos a ecranului în modurile Standard.",
+  menu_tc = "Chat în echipa",
+  menu_tc_desc = "Chat numai cu echipa ta.",
+  menu_demon = "Demonul Verde", -- referr
+  menu_demon_desc = "Ai un 1-Up sa te urmareasca ca alergator.",
+  menu_unknown = "???",
+  menu_secret = "Este un secret. Cum îl deblochezi?",
+  menu_hide_roles = "Ascundemi rolul meu",
+  menu_hide_roles_desc = "Ascundeti-va rolurile pentru a nu se afisa în chat.",
+  menu_hide_hud = "Ascunde HUD",
+  hidehud_desc = "- Ascunde toate elementele HUD.",
+  menu_fast = "Actiuni mai rapide",
+  menu_fast_desc = "Va veti recupera, aruncati obiecte si deschideti usi mai repede.",
+  menu_popup_sound = "Sunetul pop-up",
+  menu_season = "Schimbari sezoniere",
+  menu_season_desc = "Schimbari vizuale distractive în functie de data.",
+
+  menu_free_cam_desc = "Introduceti Camera gratuita în modul Spectator.",
+  menu_spectate_run = "Spectator pe Alergatori",
+  menu_spectate_run_desc = "Priveste automat primul alergator.",
+  menu_exit_spectate = "Iesi din Spectator",
+  menu_exit_spectate_desc = "Iesi din modul Spectator.",
+  menu_stalk_run = "Teleporteazate la Nivelul alergatorului",
+  menu_stalk_run_desc = "Deformati pâna la nivelul în care se afla primul alergator.",
+  menu_skip = "Omite",
+  menu_skip_desc = "- Votati pentru a omite aceasta stea în MiniHunt.",
+
+  menu_spectate_desc = "Priveste acest jucator.",
+
+  menu_blacklist_list = "Listati toate pe lista neagra",
+  menu_blacklist_list_desc = "Listeaza toate vedetele aflate pe lista neagra din MiniHunt pentru acest server.",
+  menu_blacklist_save = "Salveaza lista Neagra",
+  menu_blacklist_save_desc = "Salvati aceasta lista neagra de la capatul vostru.",
+  menu_blacklist_load = "Încarcati lista neagra",
+  menu_blacklist_load_desc = "Încarcati lista neagra salvata.",
+  menu_blacklist_reset = "Resetati lista neagra",
+  menu_blacklist_reset_desc = "Resetati lista neagra la valoarea implicita.",
+  menu_toggle_all = "Comutati toate",
+
+  -- updater
+  up_to_date = "\\#00ffff\\Mario\\#ff5a5a\\Vânatoare\\#ffffff\\ este la zi!",
+  up_to_date_egg = "\\#5aff5a\\Luigi\\#ff5a5a\\Vânatoare\\#ffffff\\ este la zi!",
+  has_update = "O actualizare este disponibila pentru \\#00ffff\\Mario\\#ff5a5a\\Vânatoare\\#ffffff\\!",
+  has_update_egg = "O actualizare este disponibila pentru \\#5aff5a\\Luigi\\#ff5a5a\\Vânatoare\\#ffffff\\!",
+
+  -- 2.6 stuff that I don't feel like sorting
+  leave_error = "%s\\#ffa0a0\\ lasat din cauza unei erori.",
+  hunter_color = "Toti vânatorii au paleta Burgundy",
+  runner_color = "Toti alergatorii au paleta Azure",
+  stat_playtime = "Timp de joaca (Ore)",
+  stat_parkour_time = "Cel mai rapid timp de parkour",
+  stat_parkour_time_omm = "Cel mai rapid timp de parkour (OMM)",
+  stat_parkour_time_other = "Cel mai rapid timp de parkour (Moveset)",
+  menu_free_roam = "Roam liber",
+  menu_free_roam_desc = "Dezactiveaza cerintele Star si Key pentru usi si majoritatea nivelurilor.",
+  menu_radar = "Radarul",
+  menu_radar_desc = "Arata unde sunt alergatorii si obiectele importante.",
+  menu_minimap = "Miniharta",
+  menu_minimap_desc = "Afiseaza o harta a întregului nivel.",
+  menu_romhack_cam = "Camera de la Romhack",
+  menu_romhack_cam_desc = "Activeaza camera rom hack in orice moment.",
 }
 
 -- language data ends here
@@ -2288,7 +3444,7 @@ langdata["fr"] = -- By Skeltan
 lang = "en"
 local lang_table = {}
 for lang,data in pairs(langdata) do
-  table.insert(lang_table,string.upper(lang))
+  table.insert(lang_table, string.upper(lang))
 end
 table.sort(lang_table)
 lang_list = "["
@@ -2363,7 +3519,7 @@ function lang_test(msg)
 
         if translated == translated_en then
           djui_chat_message_create(id.." lacks translation for "..langdata[lang].fullname.."!"..noline)
-          print(string.format("%s = %q,",id,translated))
+          print(string.format("%s = %q,",id, translated))
         end
       end
     end

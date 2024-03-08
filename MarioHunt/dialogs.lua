@@ -852,8 +852,16 @@ function auto_skip(id)
     reset_dialog_override_color()
   end
 
-  if id == gBehaviorValues.dialogs.Mips1Dialog or id == gBehaviorValues.dialogs.Mips2Dialog then return false end -- always skip mips dialog
-  if id == gBehaviorValues.dialogs.TuxieMotherDialog or id == gBehaviorValues.dialogs.TuxieMotherBabyFoundDialog then return false end -- always skip mother dialog
+  local skip_always = {
+    [gBehaviorValues.dialogs.BobombBuddyBob1Dialog] = 1,
+    [gBehaviorValues.dialogs.BobombBuddyOther1Dialog] = 1,
+    [gBehaviorValues.dialogs.Mips1Dialog] = 1,
+    [gBehaviorValues.dialogs.Mips2Dialog] = 1,
+    [gBehaviorValues.dialogs.TuxieMotherDialog] = 1,
+    [gBehaviorValues.dialogs.TuxieMotherBabyFoundDialog] = 1,
+  }
+
+  if skip_always[id] then return false end
 
   -- skip boss dialog if hunter
   if gPlayerSyncTable[0].team ~= 1 then

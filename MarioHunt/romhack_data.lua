@@ -16,6 +16,10 @@ local romhack_data = { -- supported rom hack data
     default_stars = 70, -- stars in a glitchless run
     max_stars = 120, -- maximum stars collectible
     requirements = {
+      [LEVEL_WF] = 1,
+      [LEVEL_PSS] = 1,
+      [LEVEL_CCM] = 3,
+      [LEVEL_JRB] = 3,
       [LEVEL_BITDW] = 8,
       [LEVEL_DDD] = 30,
       [LEVEL_BITFS] = 31,
@@ -82,6 +86,10 @@ local romhack_data = { -- supported rom hack data
       [221] = "Red Coin Acrobatics",
       [231] = "The Rainbow's Red Coins",
       [241] = "Swimming With The Coins",
+    },
+
+    minimap_data = {
+      [91] = {"bob-map"}, -- BOB area 1
     },
 
     runner_victory = function(m)
@@ -473,6 +481,45 @@ local romhack_data = { -- supported rom hack data
   end,
 },
 
+["SM64 Sapphire Green Comet"] = {
+  name = "SM64 Sapphire Green Comet",
+  inherit = "sapphire",
+  noLobby = true, -- hack tries to warp out of lobby, so don't use it
+  no_bowser = true, -- technically there is an endscreen but there's no reason to require it
+
+  starColor = {r = 0,g = 255,b = 0}, -- guess what color the stars are
+
+  -- 100c stars do not exist
+  star_data = {
+    [COURSE_PSS] = {8 | STAR_EXIT, 8, 8 | STAR_EXIT, 8 | STAR_EXIT},
+
+    [COURSE_BOB] = {8, 8, 8, 8, 8, 8},
+    [COURSE_CCM] = {8, 8, 8, 8, 8, 8},
+    [COURSE_WF] = {8 | STAR_EXIT, 8, 8 | STAR_EXIT, 8, 8, 8 | STAR_EXIT}, -- prevent getting stuck
+    [COURSE_JRB] = {8, 8, 8 | STAR_EXIT, 8, 8, 8}, -- prevent getting stuck
+    [COURSE_CCM] = {8, 8, 8, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT}, -- prevent getting stuck
+    [COURSE_BITS] = {8, 8 | STAR_EXIT},
+  },
+  -- same as in lug's
+  starNames = {
+    -- Gloomy Sea
+    [181] = "Green Star 1",
+    [182] = "Green Star 2",
+
+    -- Slide
+    [191] = "Green Star 1",
+    [192] = "Green Star 2",
+    [193] = "Green Star 3",
+    [194] = "Green Star 4",
+  },
+
+  -- exclude some stars in MiniHunt
+  mini_exclude = {
+    [41] = 1, -- It's literally just in the lava
+    [45] = 1, -- same
+  },
+},
+
 ["Ztar Attack 2"] = {
   name = "\\#0c33c2\\Ztar Attack \\#c20c0c\\2",
   default_stars = -1, -- no stars required!
@@ -482,11 +529,6 @@ local romhack_data = { -- supported rom hack data
   starColor = {r = 145,g = 207,b = 187}, -- stars are light green
   ommSupport = false, -- does not have default omm support
   final = -1,
-
-  -- cancel visible secrets (so they so show up as stars)
-  special_run = function(m,gotStar)
-    gLevelValues.visibleSecrets = 0
-  end,
 
   -- gotta define almost every level in the game, yay
   star_data = { -- in order
@@ -679,7 +721,10 @@ local romhack_data = { -- supported rom hack data
   badGuy = "The Shitilizer", -- this will display in the rules
   badGuy_es = "El Shitilizer",
   badGuy_de = "Den Shitilizer",
+  ["badGuy_pt-br"] = "O Shitilizer",
   badGuy_fr = "Le Shitilizer",
+  badGuy_it = "Il Shitilizer",
+  badGuy_ro = "Shitilizerul", -- I think this is right?
   isUnder = true, -- activates special star detection
   noLobby = true,
   starColor = {r = 0, g = 255, b = 255}, -- light blue
@@ -774,8 +819,6 @@ local romhack_data = { -- supported rom hack data
   runner_victory = function(m)
     return m.action == ACT_JUMBO_STAR_CUTSCENE
   end,
-
-  ["badGuy_pt-br"] = "O Shitilizer",
 },
 
 ["B3313"] = {
@@ -1279,6 +1322,51 @@ local romhack_data = { -- supported rom hack data
   },
 },
 
+["luigis-mansion-64"] = {
+  name = "Luigi's Mansion 64",
+  inherit = "vanilla", -- this actually causes the minimap to be inheritted too, which is... fine, I guess
+  max_stars = 118,
+  badGuy = "King Boo",
+
+  -- some levels have been moved around
+  requirements = {
+    [LEVEL_BOB] = 1,
+    [LEVEL_WF] = 0,
+    [LEVEL_SL] = 50,
+    [LEVEL_RR] = 50,
+    [LEVEL_BITFS] = 0,
+    [LEVEL_WMOTR] = 0,
+    [LEVEL_BOWSER_3] = 118,
+  },
+
+  starColor = {r = 180,g= 180,b= 180}, -- stars are gray
+
+  special_run = function(m, gotStar)
+    gBehaviorValues.GrateStarRequirement = gGlobalSyncTable.starRun
+  end,
+
+  star_data = {
+    [COURSE_SL] = {8, 8, 8, 8, 8, 8 | STAR_EXIT, 8},
+    [COURSE_THI] = {8 | STAR_ACT_SPECIFIC | STAR_EXIT, 8, 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8},
+    [COURSE_TTC] = {8, 8, 8, 8, 8 | STAR_EXIT, 8, 8},
+    [COURSE_NONE] = {0, 8, 8, 8, 8},
+    [COURSE_PSS] = {0, 8},
+  },
+
+  -- custom star names!
+  starNames = {
+    [161] = "Outta' This World Red Coins",
+    [171] = "Boiling Hot Coins",
+    [181] = "Coins From Another Dimension",
+    [192] = "Crush King Boo's Slide",
+    [201] = "Red Sparkles In The Ice",
+    [211] = "Red Coins Of The Night",
+    [221] = "Underground Red Treasures",
+    [231] = "The 7 Holy Coins",
+    [241] = "Coins In The Cube",
+  },
+},
+
 default = {
     name = "Default",
     default_stars = -1,
@@ -1332,6 +1420,8 @@ function setup_hack_data(settingRomHack,initial,usingOMM)
             if string.find(mod.basePath,"sm64ex/-coop") then
               djui_popup_create("WARNING: Mod installed in base directory; API may not function",2)
             end
+          elseif initial and not (usingOMM or movesetEnabled) and mod.incompatible and string.find(mod.incompatible,"moveset") then -- is moveset
+            movesetEnabled = true
           elseif (romhack_file == "vanilla") and (not found_121) and string.find(mod.name,"121rst star") then -- 121rst star support
             found_121 = true
           elseif not disable_chat_hook then -- disable hook for some mods
@@ -1636,13 +1726,13 @@ function warp_beginning()
 
     if correctAct == 7 then correctAct = 6 end
     if course == 0 then correctAct = 0 end
-    warp_to_level(gGlobalSyncTable.gameLevel, area, correctAct)
+    return warp_to_level(gGlobalSyncTable.gameLevel, area, correctAct)
   elseif gGlobalSyncTable.mhState == 0 and LEVEL_LOBBY and not ROMHACK.noLobby then
-    warp_to_level(LEVEL_LOBBY, 1, 0) -- go to custom lobby!
+    return warp_to_level(LEVEL_LOBBY, 1, 0) -- go to custom lobby!
   elseif gGlobalSyncTable.ee then
-    warp_to_level(gLevelValues.entryLevel, 2, 0)
+    return warp_to_level(gLevelValues.entryLevel, 2, 0)
   else
-    warp_to_start_level()
+    return warp_to_start_level()
   end
 end
 
@@ -1650,7 +1740,7 @@ end
 -- it probably also erases some other stuff but oh well
 function deleteStarRoadStuff(m)
     local starsNeeded = gGlobalSyncTable.starRun
-    if not starsNeeded or starsNeeded == -1 or starsNeeded > m.numStars then return end -- only if have enough for run
+    if gGlobalSyncTable.freeRoam or (not starsNeeded or starsNeeded == -1 or starsNeeded > m.numStars) then return end -- only if have enough for run
     local np = gNetworkPlayers[0]
     if m.playerIndex ~= 0 or np.currCourseNum ~= COURSE_NONE then return end -- only for local and in castle
 

@@ -10,23 +10,23 @@ hook_mario_action(ACT_SPECTATE, nothing)
 
 local Rmax = MAX_PLAYERS
 
-local i = 1
+spectateFocus = 1
 local number = 0
 
 local MSP = gMarioStates[0]
-local MSI = gMarioStates[i]
+local MSI = gMarioStates[spectateFocus]
 
 local NPP = gNetworkPlayers[0]
-local NPI = gNetworkPlayers[i]
+local NPI = gNetworkPlayers[spectateFocus]
 
 local STP = gPlayerSyncTable[0]
-local STI = gPlayerSyncTable[i]
+local STI = gPlayerSyncTable[spectateFocus]
 
 local GST = gGlobalSyncTable
 
 local LLS = gLakituState
 
-local free_camera = 0
+free_camera = 0
 local hide_hud = 0
 
 local Shealth
@@ -67,10 +67,10 @@ local cData = {
     goalDist = 1000,
 }
 
-hook_event(HOOK_USE_ACT_SELECT, function () if STP.spectator == 1 then return false end end) -- troopa moment
+hook_event(HOOK_USE_ACT_SELECT, function() if STP.spectator == 1 then return false end end) -- fix act select
 
 function mario_dfm(m)
-    if STP.spectator == 1 and free_camera == 1 and not (menu or showingStats) then
+    if STP.spectator == 1 and free_camera == 1 and not is_menu_open() then
         local speed = 0
 
         set_mario_animation(m, MARIO_ANIM_A_POSE)
@@ -118,16 +118,16 @@ end
 function mario_update_local(m)
 
     STP = gPlayerSyncTable[0]
-    STI = gPlayerSyncTable[i]
+    STI = gPlayerSyncTable[spectateFocus]
     GST = gGlobalSyncTable
 
     MSP = gMarioStates[0]
-    MSI = gMarioStates[i]
+    MSI = gMarioStates[spectateFocus]
 
     LLS = gLakituState
 
     NPP = gNetworkPlayers[0]
-    NPI = gNetworkPlayers[i]
+    NPI = gNetworkPlayers[spectateFocus]
 
     NPM = gNetworkPlayers[m.playerIndex]
 
@@ -172,14 +172,14 @@ function mario_update_local(m)
         if free_camera == 0 then
             if runnerFocus ~= 0 then
               if STI and STI.team == 1 then
-                runnerFocus = i
+                runnerFocus = spectateFocus
               else
                 local focusSMario = gPlayerSyncTable[runnerFocus]
                 if not focusSMario or focusSMario.team ~= 1 then
                   for a=1,(Rmax-1) do
                     local sMario = gPlayerSyncTable[a]
                     if sMario.team == 1 then
-                      i = a
+                      spectateFocus = a
                       runnerFocus = a
                       STI = sMario
                       break
@@ -190,26 +190,26 @@ function mario_update_local(m)
             end
 
             if (MSP.controller.buttonPressed & L_JPAD) ~= 0 then
-                i = (i + (Rmax - 1) - 2) % (Rmax - 1) + 1
-                if gNetworkPlayers[i].connected ~= true then
-                    local oldI = i
-                    i = (i + (Rmax - 1) - 2) % (Rmax - 1) + 1
-                    while oldI ~= i do
-                        if gNetworkPlayers[i].connected == true then break end
-                        i = (i + (Rmax - 1) - 2) % (Rmax - 1) + 1
+                spectateFocus = (spectateFocus + (Rmax - 1) - 2) % (Rmax - 1) + 1
+                if gNetworkPlayers[spectateFocus].connected ~= true then
+                    local oldI = spectateFocus
+                    spectateFocus = (spectateFocus + (Rmax - 1) - 2) % (Rmax - 1) + 1
+                    while oldI ~= spectateFocus do
+                        if gNetworkPlayers[spectateFocus].connected == true then break end
+                        spectateFocus = (spectateFocus + (Rmax - 1) - 2) % (Rmax - 1) + 1
                     end
                 end
                 number = 0
             end
 
             if (MSP.controller.buttonPressed & R_JPAD) ~= 0 then
-                i = (i + (Rmax - 1)) % (Rmax - 1) + 1
-                if gNetworkPlayers[i].connected ~= true then
-                    local oldI = i
-                    i = (i + (Rmax - 1)) % (Rmax - 1) + 1
-                    while oldI ~= i do
-                        if gNetworkPlayers[i].connected == true then break end
-                        i = (i + (Rmax - 1)) % (Rmax - 1) + 1
+                spectateFocus = (spectateFocus + (Rmax - 1)) % (Rmax - 1) + 1
+                if gNetworkPlayers[spectateFocus].connected ~= true then
+                    local oldI = spectateFocus
+                    spectateFocus = (spectateFocus + (Rmax - 1)) % (Rmax - 1) + 1
+                    while oldI ~= spectateFocus do
+                        if gNetworkPlayers[spectateFocus].connected == true then break end
+                        spectateFocus = (spectateFocus + (Rmax - 1)) % (Rmax - 1) + 1
                     end
                 end
                 number = 0
@@ -228,7 +228,7 @@ function mario_update_local(m)
 
         update_spectator_camera(MSP, MSI)
 
-        if free_camera == 0 and not obj_get_first_with_behavior_id(id_bhvActSelector) and (NPI.currLevelNum ~= NPP.currLevelNum or NPI.currAreaIndex ~= NPP.currAreaIndex or NPI.currActNum ~= NPP.currActNum) then
+        if free_camera == 0 and not (STP.inActSelect or STI.inActSelect) and (NPI.currLevelNum ~= NPP.currLevelNum or NPI.currAreaIndex ~= NPP.currAreaIndex or NPI.currActNum ~= NPP.currActNum) then
             number = number + 1
             if number >= 35 then
               number = 0
@@ -237,7 +237,7 @@ function mario_update_local(m)
                   warp_to_warpnode(NPI.currLevelNum, NPI.currAreaIndex, NPI.currActNum, 0xF0)
                 end
             end
-        elseif free_camera == 0 then
+        elseif free_camera == 0 and not (STP.inActSelect or STI.inActSelect) then
             number = 30
         end
 
@@ -338,7 +338,7 @@ end
 function spectated()
     if STP.spectator == 1 then
         if hide_hud == 0 then
-            local n = i
+            local n = spectateFocus
 
             djui_hud_set_font(FONT_MENU)
             djui_hud_set_resolution(RESOLUTION_DJUI)
@@ -357,14 +357,14 @@ function spectated()
                 local oldI = n
                 n = (n + (Rmax - 1)) % (Rmax - 1) + 1
                 while oldI ~= n do
-                    if gNetworkPlayers[i].connected == true then break end
+                    if gNetworkPlayers[spectateFocus].connected == true then break end
                     n = (n + (Rmax - 1)) % (Rmax - 1) + 1
                 end
                 if oldI ~= n then
-                    i = n
+                    spectateFocus = n
                     text = remove_color(gNetworkPlayers[n].name)
                 else
-                    text = trans("empty",i)
+                    text = trans("empty",spectateFocus)
                 end
             end
 
@@ -408,13 +408,13 @@ end
 
 function spectated_update()
 
-    if STP.spectator == 1 and not (menu or showingStats) then
+    if STP.spectator == 1 and not is_menu_open() then
         spectated()
     end
 
 end
 
--- screw it I'm writing my own camera code
+-- screw it spectateFocus'm writing my own camera code
 function update_spectator_camera(m, s)
     vec3f_copy(LLS.focus, cData.focus)
     vec3f_copy(LLS.curFocus, cData.focus)
@@ -534,15 +534,14 @@ function spectate_command(msg)
     free_camera = 1
     enable_spectator(m)
     djui_chat_message_create(trans("spectator_controls"))
+    return true
   elseif msg == "" then
     if runnerTarget == -1 then
       runnerFocus = 0
       free_camera = 1
-      enable_spectator(m)
-      djui_chat_message_create(trans("spectator_controls"))
     else
       runnerFocus = runnerTarget
-      i = runnerTarget
+      spectateFocus = runnerTarget
       free_camera = 0
     end
     enable_spectator(m)
@@ -561,11 +560,11 @@ function spectate_command(msg)
 
   if string.lower(msg) == "runner" then
     runnerFocus = 1
-    i = 1
+    spectateFocus = 1
     for a=1,(Rmax-1) do
       local sMario = gPlayerSyncTable[a]
       if sMario.team == 1 then
-        i = a
+        spectateFocus = a
         runnerFocus = a
         break
       end
@@ -588,7 +587,7 @@ function spectate_command(msg)
     return true
   end
   free_camera = 0
-  i = playerID
+  spectateFocus = playerID
   enable_spectator(m)
   djui_chat_message_create(trans("spectator_controls"))
   return true

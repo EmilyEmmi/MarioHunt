@@ -1,7 +1,7 @@
 
 local updateFile = nil
 
-_G.mhVersion = "v2.5" -- version string
+_G.mhVersion = "v2.6" -- version string
 
 function check_for_updates()
     if VERSION_NUMBER < 37 then return end -- only works in v37

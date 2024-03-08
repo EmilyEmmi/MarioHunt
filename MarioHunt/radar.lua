@@ -1,8 +1,8 @@
--- based on arena
+-- based on arena; this handles object radars and the minimap, also some texture stuff
 
 -- this reduces lag apparently
 local djui_hud_set_color, get_texture_info, djui_hud_render_texture_interpolated, djui_hud_set_resolution, clamp, network_get_player_text_color_string, obj_has_model_extended =
-djui_hud_set_color, get_texture_info, djui_hud_render_texture_interpolated, djui_hud_set_resolution, clamp,
+    djui_hud_set_color, get_texture_info, djui_hud_render_texture_interpolated, djui_hud_set_resolution, clamp,
     network_get_player_text_color_string, obj_has_model_extended
 
 TEX_RAD = get_texture_info('runner-mark')
@@ -13,10 +13,13 @@ TEX_SECRET = get_texture_info('secret-mark')
 TEX_DEMON = get_texture_info('demon-mark')
 TEX_MOON = get_texture_info('moon-mark')
 TEX_RAD_TARGET = get_texture_info('target-mark')
+TEX_MAP_ARROW = get_texture_info('map-arrow')
+
+-- radars
 icon_radar = {}
 star_radar = {}
 box_radar = {}
-for i = 0, (MAX_PLAYERS - 1) do
+for i = 1, (MAX_PLAYERS - 1) do
   icon_radar[i] = { tex = TEX_RAD, prevX = 0, prevY = 0, prevScale = 0.6 }
 end
 for i = 1, 7 do
@@ -29,29 +32,65 @@ ex_radar = {}
 ex_radar[1] = { tex = TEX_COIN, prevX = 0, prevY = 0, prevScale = 0.6 }
 ex_radar[2] = { tex = TEX_SECRET, prevX = 0, prevY = 0, prevScale = 0.6 }
 ex_radar[3] = { tex = TEX_DEMON, prevX = 0, prevY = 0, prevScale = 0.6 }
+
+-- minimap
+TEX_HUD_STAR_GREYSCALE = get_texture_info('hud_star_greyscale')
+TEX_HUD_BOX = get_texture_info('hud_box')
+TEX_HUD_DEMON = get_texture_info('hud_demon')
+TEX_HUD_TARGET = get_texture_info('hud_target')
+icon_minimap = {}
+star_minimap = {}
+box_minimap = {}
+for i = 0, (MAX_PLAYERS - 1) do
+  icon_minimap[i] = { tex = nil, prevX = 0, prevY = 0 } -- overriden with this character's head
+end
+for i = 1, 7 do
+  star_minimap[i] = { tex = gTextures.star, prevX = 0, prevY = 0 }
+end
+for i = 1, 7 do
+  box_minimap[i] = { tex = TEX_HUD_BOX, prevX = 0, prevY = 0 }
+end
+ex_minimap = {}
+ex_minimap[1] = { tex = gTextures.coin, prevX = 0, prevY = 0 }
+ex_minimap[2] = { tex = nil, prevX = 0, prevY = 0 } -- overriden with "S" in hud font
+ex_minimap[3] = { tex = TEX_HUD_DEMON, prevX = 0, prevY = 0 }
+
+levelSize = 8192
 defaultStarColor = { r = 255, g = 255, b = 92 } -- yellow
 
 -- also includes texture data for stats
 TEX_FLAG = get_texture_info('stat-flag')
+TEX_POLE = get_texture_info('stat-flag-pole')
 TEX_MULTI_STARS = get_texture_info('stat-stars')
 TEX_BOOT = get_texture_info('stat-kill')
 TEX_MULTI_BOOT = get_texture_info('stat-multikill')
 TEX_MEDAL = get_texture_info('stat-medal')
 TEX_ARROW = get_texture_info('stat-arrow')
+TEX_WATCH = get_texture_info('stat-watch')
+TEX_WATCH_OMM = get_texture_info('stat-watch-omm')
+TEX_WATCH_OTHER = get_texture_info('stat-watch-other')
 stat_icon_data = {}
+stat_icon_data_alt1 = {}
+stat_icon_data_alt2 = {}
 stat_icon_data[1] = { tex = TEX_FLAG, r = 255, g = 255, b = 92 }
 stat_icon_data[2] = { tex = TEX_STAR, r = 255, g = 255, b = 92 }
-stat_icon_data[3] = { tex = TEX_FLAG, r = 255, g = 92, b = 92 }
-stat_icon_data[4] = { tex = TEX_STAR, r = 255, g = 92, b = 92 }
-stat_icon_data[5] = { tex = TEX_FLAG, r = 180, g = 92, b = 255 }
-stat_icon_data[6] = { tex = TEX_STAR, r = 180, g = 92, b = 255 }
-stat_icon_data[7] = { tex = TEX_BOOT, r = 129, g = 90, b = 50 }
-stat_icon_data[8] = { tex = TEX_MULTI_BOOT, r = 129, g = 90, b = 50 }
-stat_icon_data[9] = { tex = TEX_MULTI_STARS, r = 255, g = 255, b = 92 }
-stat_icon_data[10] = { tex = TEX_MEDAL, r = 255, g = 255, b = 255 }
+stat_icon_data[3] = { tex = TEX_BOOT, r = 255, g = 255, b = 255 }
+stat_icon_data[4] = { tex = TEX_MULTI_BOOT, r = 255, g = 255, b = 255 }
+stat_icon_data[5] = { tex = TEX_MULTI_STARS, r = 255, g = 255, b = 92 }
+stat_icon_data[6] = { tex = TEX_MEDAL, r = 255, g = 255, b = 255 }
+stat_icon_data[7] = { tex = TEX_WATCH, r = 255, g = 255, b = 255 }
+stat_icon_data[8] = { tex = TEX_WATCH, r = 80, g = 255, b = 80 }
+
+-- hard and extreme
+stat_icon_data_alt1[1] = { tex = TEX_FLAG, r = 255, g = 92, b = 92 }
+stat_icon_data_alt1[2] = { tex = TEX_STAR, r = 255, g = 92, b = 92 }
+stat_icon_data_alt1[7] = { tex = TEX_WATCH_OMM, r = 255, g = 255, b = 255 }
+stat_icon_data_alt2[1] = { tex = TEX_FLAG, r = 180, g = 92, b = 255 }
+stat_icon_data_alt2[2] = { tex = TEX_STAR, r = 180, g = 92, b = 255 }
+stat_icon_data_alt2[7] = { tex = TEX_WATCH_OTHER, r = 255, g = 255, b = 255 }
 
 local rainbow_counter = 0
-function render_radar(m, hudIcon, isObj, objType)
+function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
   djui_hud_set_resolution(RESOLUTION_N64)
   local pos = {}
   local obj = m
@@ -69,19 +108,106 @@ function render_radar(m, hudIcon, isObj, objType)
       pos.y = pos.y + obj.hitboxHeight / 2
     end
   end
+
+  local screenWidth = djui_hud_get_screen_width()
+  local screenHeight = djui_hud_get_screen_height()
+
+  -- minimap render
+  if showMiniMap and not is_game_paused() then
+    local renderSize = 80
+    local x = screenWidth - 90
+    local y = screenHeight - 120
+
+    local tex = mapData.tex
+    if not isObj then
+      tex = m.character.hudHeadTexture
+    end
+
+    local level = gNetworkPlayers[0].currLevelNum
+    local area = gNetworkPlayers[0].currAreaIndex
+    if ROMHACK.minimap_data and ROMHACK.minimap_data[level * 10 + area] and ROMHACK.minimap_data[level * 10 + area][2] then
+      levelSize = ROMHACK.minimap_data[level * 10 + area][2]
+    end
+
+    if pos.x > levelSize + 5 or pos.x < -levelSize - 5 or pos.z > levelSize + 5 or pos.z < -levelSize - 5 then -- adjust size if oob
+      levelSize = levelSize * 2
+    end
+    local xScaled = (pos.x / (levelSize * 2) + 0.5)
+    local yScaled = (pos.z / (levelSize * 2) + 0.5)
+
+    local scale = 0.5
+    if (not isObj) and gPlayerSyncTable[0].spectator == 1 and spectateFocus == m.playerIndex and free_camera ~= 1 then
+      scale = 0.6
+    end
+
+    local renderX = x + xScaled * renderSize - 8 * scale
+    local renderY = y + yScaled * renderSize - 8 * scale
+
+    if objType == "coin" then
+      if ROMHACK.isMoonshine then
+        djui_hud_set_color(0, 255, 0, 255) -- green
+      else
+        djui_hud_set_color(255, 0, 0, 255) -- red
+      end
+    elseif objType == "secret" then
+      djui_hud_set_color(255, 255, 255, 255)
+      djui_hud_set_font(FONT_HUD)
+      djui_hud_print_text("S", renderX, renderY, 0.5)
+    elseif isObj and objType == nil then
+      local r, g, b = 255, 255, 255
+      if _G.OmmEnabled
+          and ROMHACK.ommSupport ~= false -- romhacks that use a custom model can't be checked; as such, the omm colored radar will never be displayed
+          and obj_has_model_extended(obj, E_MODEL_STAR) ~= 1
+          and obj_has_model_extended(obj, E_MODEL_TRANSPARENT_STAR) ~= 1
+          and _G.OmmApi.omm_get_setting(gMarioStates[0], "color") == 1 then
+        -- do colored radar
+        local np = gNetworkPlayers[0]
+        local starColor = omm_star_colors[np.currCourseNum]
+        tex = TEX_HUD_STAR_GREYSCALE
+        if starColor then
+          r, g, b = starColor.r, starColor.g, starColor.b
+        else
+          r, g, b = 252, 240, 65 -- yellow (try to match original hud color)
+        end
+      elseif gGlobalSyncTable.ee then
+        tex = TEX_HUD_STAR_GREYSCALE
+        r, g, b = 255, 0, 0 -- red
+      end
+      djui_hud_set_color(r, g, b, 255)
+    else
+      djui_hud_set_color(255, 255, 255, 255)
+    end
+
+    if tex then
+      djui_hud_render_texture_interpolated(tex, mapData.prevX, mapData.prevY, scale, scale, renderX, renderY, scale,
+        scale)
+      if not isObj then
+        local playercolor = network_get_player_text_color_string(m.playerIndex)
+        local r, g, b = convert_color(playercolor)
+        djui_hud_set_color(r, g, b, 155)
+        djui_hud_set_rotation(m.faceAngle.y, 0.5, 0.5)
+        djui_hud_render_texture(TEX_MAP_ARROW, renderX - 8 * scale, renderY - 8 * scale, scale, scale)
+        djui_hud_set_rotation(0, 0, 0)
+        if runnerTarget == m.playerIndex then
+          r, g, b = get_radar_color(runnerTarget)
+          djui_hud_set_color(r, g, b, 200)
+          djui_hud_render_texture_interpolated(TEX_HUD_TARGET, mapData.prevX, mapData.prevY, scale, scale, renderX,
+            renderY,
+            scale, scale)
+        end
+      end
+    end
+    mapData.prevX = renderX
+    mapData.prevY = renderY
+  end
+
+  if mapOnly or (not showRadar) then return end
+
   local out = { x = 0, y = 0, z = 0 }
   djui_hud_world_pos_to_screen_pos(pos, out)
 
   local dX = out.x
   local dY = out.y
-  local screenWidth = djui_hud_get_screen_width()
-  local screenHeight = djui_hud_get_screen_height()
-
-  if out.z > -260 then
-    hudIcon.prevX = dX
-    hudIcon.prevY = dY
-    return
-  end
 
   local dist = vec3f_dist(pos, gMarioStates[0].pos)
   local alpha = clamp(dist, 0, 1200) - 1000
@@ -89,57 +215,22 @@ function render_radar(m, hudIcon, isObj, objType)
     return
   end
 
+  if out.z > -260 then
+    local cdist = vec3f_dist(pos, gLakituState.pos)
+    if (dist < cdist) then
+      dY = 0
+    else
+      dY = screenHeight
+    end
+  end
+
   local r, g, b = 0, 0, 0
-  local tex = hudIcon.tex or TEX_STAR
+  local tex = radarData.tex or TEX_STAR
   if not isObj then
     if runnerTarget == m.playerIndex then
       tex = TEX_RAD_TARGET
     end
-    local sMario = gPlayerSyncTable[m.playerIndex]
-    if sMario.placement ~= 1 then
-      local np = gNetworkPlayers[m.playerIndex]
-      local playercolor = network_get_player_text_color_string(np.localIndex)
-      r, g, b = convert_color(playercolor)
-    else -- rainbow radar
-      rainbow_counter = rainbow_counter + 1
-      if rainbow_counter > 360 then rainbow_counter = 0 end
-
-      -- This is done by changing the hue over time
-      local h = rainbow_counter
-      local s = 0.8
-      local v = 1
-      -- Now it's time to convert this to RGB, which is very annoying
-      local M = 255 * v
-      local m = M * (1 - s)
-      local z = (M - m) * (1 - math.abs(h / 60 % 2 - 1))
-      -- there's SIX CASES
-      if h < 60 then
-        r = M
-        g = z + m
-        b = m
-      elseif h < 120 then
-        r = z + m
-        g = M
-        b = m
-      elseif h < 180 then
-        r = m
-        g = M
-        b = z + m
-      elseif h < 240 then
-        r = m
-        g = z + m
-        b = M
-      elseif h < 300 then
-        r = z + m
-        g = m
-        b = M
-      else
-        r = M
-        g = m
-        b = z + m
-      end
-      -- and we're doing this every frame. Thank god there's only one of these.
-    end
+    r, g, b = get_radar_color(m.playerIndex)
   elseif objType == "box" or objType == "demon" then
     r, g, b = 255, 255, 255 -- texture has color
     alpha = alpha - 100
@@ -204,108 +295,65 @@ function render_radar(m, hudIcon, isObj, objType)
     dY = 0
   end
   djui_hud_set_color(r, g, b, alpha)
-  djui_hud_render_texture_interpolated(tex, hudIcon.prevX, hudIcon.prevY, hudIcon.prevScale, hudIcon.prevScale, dX, dY,
+  djui_hud_render_texture_interpolated(tex, radarData.prevX, radarData.prevY, radarData.prevScale, radarData.prevScale,
+    dX, dY,
     scale, scale)
   --[[if not objType then
     djui_hud_set_font(FONT_HUD)
-    djui_hud_print_text_interpolated(tostring((obj.oBehParams >> 24) + 1), hudIcon.prevX, hudIcon.prevY, 0.6, dX, dY, 0.6)
+    djui_hud_print_text_interpolated(tostring((obj.oBehParams >> 24) + 1), radarData.prevX, radarData.prevY, 0.6, dX, dY, 0.6)
   end]]
 
-  hudIcon.prevScale = scale
-  hudIcon.prevX = dX
-  hudIcon.prevY = dY
+  radarData.prevScale = scale
+  radarData.prevX = dX
+  radarData.prevY = dY
 end
 
+local maxStar = -1
 function render_radar_act_select()
   djui_hud_set_resolution(RESOLUTION_N64)
   local screenWidth = djui_hud_get_screen_width()
   local screenHeight = djui_hud_get_screen_height()
 
   local alpha = 200
-  local np0 = gNetworkPlayers[0]
   local course = gNetworkPlayers[0].currCourseNum
   local stars = save_file_get_star_flags(get_current_save_file_num() - 1, course - 1)
-  local maxStar = -1
-
-  local allInRow = true
-  local missing = false
-  for i = 0, 5 do
-    if stars & 2 ^ i ~= 0 then
-      maxStar = i
-      if missing then
-        allInRow = false
-      end
-    else
-      missing = true
-    end
-  end
 
   if maxStar == -1 then
-    maxStar = 0
-  elseif allInRow and maxStar < 5 then
-    maxStar = maxStar + 1
+    local allInRow = true
+    local missing = false
+    for i = 0, 5 do
+      if stars & 2 ^ i ~= 0 then
+        maxStar = i
+        if missing then
+          allInRow = false
+        end
+      else
+        missing = true
+      end
+    end
+
+    if maxStar == -1 then
+      maxStar = 0
+    elseif allInRow and maxStar < 5 then
+      maxStar = maxStar + 1
+    end
   end
 
   for i = 1, (MAX_PLAYERS - 1) do
     local act = 0
     local np = gNetworkPlayers[i]
     local sMario = gPlayerSyncTable[i]
-    if np and np.connected and sMario.team == 1 and np.currCourseNum == np0.currCourseNum and np.currActNum ~= 0 then
+    if np and np.connected and sMario.team == 1 and np.currCourseNum == course and np.currActNum ~= 0 then
       act = np.currActNum
 
       if act <= maxStar + 1 then
         local dX = (139 - maxStar * 17 + act * 34) + djui_hud_get_screen_width() * 0.5 - 171
         local dY = 64
 
-        local r, g, b = 0, 0, 0
-        local hudIcon = icon_radar[i]
-        local tex = hudIcon.tex or TEX_STAR
+        local r, g, b = get_radar_color(i)
+        local tex = TEX_RAD
         if runnerTarget == i then
           tex = TEX_RAD_TARGET
-        end
-        local sMario = gPlayerSyncTable[i]
-        if sMario.placement ~= 1 then
-          local playercolor = network_get_player_text_color_string(np.localIndex)
-          r, g, b = convert_color(playercolor)
-        else -- rainbow radar
-          rainbow_counter = rainbow_counter + 1
-          if rainbow_counter > 360 then rainbow_counter = 0 end
-
-          -- This is done by changing the hue over time
-          local h = rainbow_counter
-          local s = 0.8
-          local v = 1
-          -- Now it's time to convert this to RGB, which is very annoying
-          local M = 255 * v
-          local m = M * (1 - s)
-          local z = (M - m) * (1 - math.abs(h / 60 % 2 - 1))
-          -- there's SIX CASES
-          if h < 60 then
-            r = M
-            g = z + m
-            b = m
-          elseif h < 120 then
-            r = z + m
-            g = M
-            b = m
-          elseif h < 180 then
-            r = m
-            g = M
-            b = z + m
-          elseif h < 240 then
-            r = m
-            g = z + m
-            b = M
-          elseif h < 300 then
-            r = z + m
-            g = m
-            b = M
-          else
-            r = M
-            g = m
-            b = z + m
-          end
-          -- and we're doing this every frame. Thank god there's only one of these.
         end
 
         local scale = 1
@@ -323,19 +371,146 @@ function render_radar_act_select()
           dY = 0
         end
         djui_hud_set_color(r, g, b, alpha)
-        djui_hud_render_texture_interpolated(tex, hudIcon.prevX, hudIcon.prevY, hudIcon.prevScale, hudIcon.prevScale, dX,
-          dY, scale, scale)
+        djui_hud_render_texture(tex, dX, dY, scale, scale)
         --[[if not objType then
         djui_hud_set_font(FONT_HUD)
-        djui_hud_print_text_interpolated(tostring((obj.oBehParams >> 24) + 1), hudIcon.prevX, hudIcon.prevY, 0.6, dX, dY, 0.6)
+        djui_hud_print_text_interpolated(tostring((obj.oBehParams >> 24) + 1), radarData.prevX, radarData.prevY, 0.6, dX, dY, 0.6)
         end]]
-
-        hudIcon.prevScale = scale
-        hudIcon.prevX = dX
-        hudIcon.prevY = dY
       end
     end
   end
+end
+
+function unset_max_star()
+  maxStar = -1
+end
+
+function render_minimap()
+  djui_hud_set_resolution(RESOLUTION_N64)
+  local screenWidth = djui_hud_get_screen_width()
+  local screenHeight = djui_hud_get_screen_height()
+
+  local renderSize = 80
+  local x = screenWidth - 90
+  local y = screenHeight - 120
+
+  local level = gNetworkPlayers[0].currLevelNum
+  local area = gNetworkPlayers[0].currAreaIndex
+  local tex
+  if (not LITE_MODE) and level == LEVEL_LOBBY then
+    tex = get_texture_info("lobby-map")
+  elseif (not LITE_MODE) and ROMHACK.minimap_data and ROMHACK.minimap_data[level * 10 + area] then
+    local data = ROMHACK.minimap_data[level * 10 + area][1]
+    if type(data) == "string" then
+      tex = get_texture_info(data)
+    else
+      tex = data
+    end
+  end
+
+  if tex then
+    -- border
+    djui_hud_set_color(50, 50, 50, 200)
+    djui_hud_render_rect(x - 1, y - 1, renderSize + 2, renderSize + 2)
+
+    local scale = renderSize / tex.width
+    djui_hud_set_color(255, 255, 255, 200)
+    djui_hud_render_texture(tex, x, y, scale, scale)
+  else
+    djui_hud_set_color(255, 255, 255, 100)
+    djui_hud_render_rect(x, y, renderSize, renderSize)
+  end
+end
+
+function render_player_minimap()
+  djui_hud_set_resolution(RESOLUTION_N64)
+  local screenWidth = djui_hud_get_screen_width()
+  local screenHeight = djui_hud_get_screen_height()
+
+  local renderSize = 80
+  local x = screenWidth - 90
+  local y = screenHeight - 120
+
+  local mapData = icon_minimap[0]
+  local pos = gMarioStates[0].pos
+
+  local level = gNetworkPlayers[0].currLevelNum
+  local area = gNetworkPlayers[0].currAreaIndex
+  if ROMHACK.minimap_data and ROMHACK.minimap_data[level * 10 + area] and ROMHACK.minimap_data[level * 10 + area][2] then
+    levelSize = ROMHACK.minimap_data[level * 10 + area][2]
+  end
+
+  if pos.x > levelSize + 5 or pos.x < -levelSize - 5 or pos.z > levelSize + 5 or pos.z < -levelSize - 5 then -- adjust size if oob
+    levelSize = levelSize * 2
+  end
+  local xScaled = (pos.x / (levelSize * 2) + 0.5)
+  local yScaled = (pos.z / (levelSize * 2) + 0.5)
+
+  local renderX = x + xScaled * renderSize - 4.8
+  local renderY = y + yScaled * renderSize - 4.8
+
+  djui_hud_set_color(255, 255, 255, 255)
+  djui_hud_render_texture_interpolated(gMarioStates[0].character.hudHeadTexture, mapData.prevX, mapData.prevY, 0.6, 0.6,
+    renderX, renderY, 0.6, 0.6)
+
+  local playercolor = network_get_player_text_color_string(0)
+  local r, g, b = convert_color(playercolor)
+  djui_hud_set_color(r, g, b, 155)
+  djui_hud_set_rotation(gMarioStates[0].faceAngle.y, 0.5, 0.5)
+  djui_hud_render_texture(TEX_MAP_ARROW, renderX - 8 * 0.6, renderY - 8 * 0.6, 0.6, 0.6)
+  djui_hud_set_rotation(0, 0, 0)
+
+  mapData.prevX = renderX
+  mapData.prevY = renderY
+end
+
+function get_radar_color(index)
+  local r, g, b = 0, 0, 0
+  local sMario = gPlayerSyncTable[index]
+  if sMario.placement ~= 1 then
+    local playercolor = network_get_player_text_color_string(index)
+    r, g, b = convert_color(playercolor)
+  else -- rainbow radar
+    rainbow_counter = rainbow_counter + 1
+    if rainbow_counter > 360 then rainbow_counter = 0 end
+
+    -- This is done by changing the hue over time
+    local h = rainbow_counter
+    local s = 0.8
+    local v = 1
+    -- Now it's time to convert this to RGB, which is very annoying
+    local M = 255 * v
+    local m = M * (1 - s)
+    local z = (M - m) * (1 - math.abs(h / 60 % 2 - 1))
+    -- there's SIX CASES
+    if h < 60 then
+      r = M
+      g = z + m
+      b = m
+    elseif h < 120 then
+      r = z + m
+      g = M
+      b = m
+    elseif h < 180 then
+      r = m
+      g = M
+      b = z + m
+    elseif h < 240 then
+      r = m
+      g = z + m
+      b = M
+    elseif h < 300 then
+      r = z + m
+      g = m
+      b = M
+    else
+      r = M
+      g = m
+      b = z + m
+    end
+    -- and we're doing this every frame. Thank god there's only one of these.
+  end
+  return r, g, b
 end
 
 -- star color table for OMM, based on course number

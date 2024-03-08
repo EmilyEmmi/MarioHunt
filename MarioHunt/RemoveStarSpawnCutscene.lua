@@ -18,7 +18,6 @@ function remove_timestop()
         if c.cutscene == CUTSCENE_ENTER_BOWSER_ARENA then
           local bowser = obj_get_first_with_behavior_id(id_bhvBowser)
           if bowser and bowser.oAction == 5 then
-            local np = gNetworkPlayers[0]
             if bowser.oBehParams2ndByte == 0x01 then
               bowser.oAction = 13
             else

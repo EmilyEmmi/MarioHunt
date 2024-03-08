@@ -1,4 +1,80 @@
 # Changelog
+## v2.6
+### Additions:
+  - Added Italian translation (Mr.L-ore)
+  - Added Romanian translation (N64, EpikCool)
+    - Unfortunately, some important characters ("ș", "ă", and "ț") are not available in the font; as such, they have been replaced with ("s" "a", and "t" respectively)
+  - Added Color option for Hunter and Runner Apperance, which forces players' palettes based on their team, a la Arena and Shine Thief
+  - Added playtime and parkour records to Stats menu
+    - Note that playtime only applies since this update
+  - Added seperate parkour records for moveset mods other than OMM Rebirth
+  - Added ability to see number of secrets in an area
+  - Added Minimap, which can be enabled in player settings
+    - Somewhat wip; it renders an image for BoB and the lobby (LeoHaha), renders a rectangle otherwise
+    - No images in Lite Mode
+  - Added option to disable the radar
+  - Added option to use Romhack Cam
+  - Added Free Roam game option, which disables all star and key requirements
+    - Does not disable Bowser 3 requirements, unless No Bowser mode is enabled
+    - Does not disable DDD painting blocking Fire Sea
+    - Does not change the star numbers at which Toad and Mips appear
+    - DOES disable boo cage requirements, "look up" warp requirements, the moat, and the cannon requirements in Star Road
+  - Added Star Heal game option
+    - Thanks to EpikCool for this suggestion!
+  - Added Stalk Cooldown setting, which allows for customization of the frozen timer that appears when using /stalk
+    - Thanks to CK64 and Nightf200 for this suggestion!
+        - Option and description are not translated for languages other than English and Spanish
+  - Added option to replace invulnerabilty frame "blink" effect with a custom particle (OFF by default)
+    - Particle drawn by Key's Artworks
+    - Uses vanilla particle in Lite Mode
+    - Option and description are not translated for languages other than English and Spanish
+  - **Added tips!** They appear in the lobby, act select, and pause menu.
+    - Only available in English and Spanish at this time
+  - Unsaved settings will now be highlighted in yellow
+  - Added support for the following rom hacks:
+    - SM64 Sapphire Green Comet
+    - Luigi's Mansion 64
+  - Parkour may be reset with L + R
+  - Major settings now appear in the center of the screen when starting a match or joining a lobby
+### Adjustments
+  - **Rules is now a menu instead of just a chat message**, complete with images
+  - Updated various textures for the stats menu and radars (AquariusAlexx, LeoHaha, myself)
+  - Radars now render even when the object is out of view
+  - Updated Spanish translation (EpikCool)
+  - Hard and Extreme wins are now viewed by pressing X in the Stats menu, or by clicking the star/flag
+  - Stats menu now shows 4 digits instead of 3
+  - The category option now displays "Any%" instead of "Any" in the menu
+  - **Red coins and secrets are no longer synced between players in MiniHunt mode** (EmeraldLockdown, Isaac)
+  - Hunters may no longer collect secrets
+  - Using /target with no parameters now picks the first Runner in the current level by default
+  - Increased the size of the bubble that appears when using the Void DMG option
+  - Removed cannon opening cutscene
+  - Adjusting the "Runner Lives" setting mid-game now automatically adjusts the lives for all Runners
+    - Lives will never go below 0 for Runners
+  - Far away surfaces (more than 1000 units below Mario) will no longer be set as the last valid position unless no other valid position exists
+    - This means that the skip in HMC is no longer trivial when Void DMG is on
+### Fixes/Backend changes
+  - ACTUALLY fixed star doors being unopenable in Star Road
+  - Fixed "Sparkle" option making sparkles appear even if the player is not in the level
+  - Removed all mentions of TroopaParaKoopa from the code
+  - Fixed entering WDW causing clips and other issues
+  - Fixed Glow option for Runners displaying the wrong palette when metal in CoopDX
+  - Fixed star popup sound playing twice in OMM... for real this time
+  - Changed the way the menu works, so that options that have been selected but not submitted (move option but not pressing "A") will return to their actual values when switching menus
+  - Fixed typing no response for commands that refer to a player referring to the host by default instead of yourself
+  - Fixed typing /spectate with no arguments displaying the controls message twice
+  - Fixed star radar not displaying stars outside of the current room
+  - Fixed being able to enter WF, PSS, CCM, and JRB early by performing LBLJ
+  - Fixed some menu descriptions getting cut off in some languages
+  - Fixed being able to spectate or stalk players in the Act Select
+  - Ending sequence may no longer play in No Bowser mode
+  - Fixed players getting stuck in Bowser levels in No Bowser mode
+  - "Can leave" timer now displays the last second as 0:01 instead of 0:00
+  - Fixed act select radar displaying incorrectly if a star is selected mid-level
+  - Fixed act select radar taking time to move into position
+  - Fixed blacklist not loading for new hacks (DX exclusive?)
+  - Fixed errors and inconsistencies in the Spanish translation (green)
+  - Mod description is no longer cut off
 ## v2.5
 ### Additions:
   - Added Runner Appearance, which works the same as Hunter Appearance

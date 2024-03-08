@@ -1,6 +1,6 @@
 <img src="wiki\img\logo.png" alt="MarioHunt" width="800"/>
 
-### v2.5 (wip) (view changelog [here](changelog.md))
+### v2.6 (view changelog [here](changelog.md))
 
 ## [Trailer](https://www.youtube.com/watch?v=hyuXu4Bzugs&ab_channel=N64Mario)
 
@@ -20,11 +20,11 @@ A mod for sm64ex-coop
 <br/>
 Main Programming by **EmilyEmmi**
 
-Some additional programming by **TroopaParaKoopa**, **EmeraldLockdown** and **Isaac**
+Some additional programming by **EmeraldLockdown** and **Isaac**
 
-Some assets made by **N64-Mario**
+Some assets made by **N64-Mario**, **LeoHaha**, and **AquariusAlexx**
 
-Outline model created by **Key's Artworks**
+Outline model and invincibility particles created by **Key's Artworks**
 
 Automatic Doors and Disable Star Spawn Cutscenes by **Blocky** and **Sunk**
 
@@ -40,7 +40,7 @@ Also special thanks to **ColbyRayz!** and **Key's Artworks** for testing and sup
 <br/>
 <br/>
 <br/>
-Spanish Translation made with help from **KanHeaven**, **SonicDark**, and **EpikCool**
+Spanish Translation made with help from **KanHeaven**, **SonicDark**, **EpikCool**, and **green**
 
 German Translation made by **N64 Mario**
 
@@ -48,7 +48,11 @@ Brazillian Portuguese Translation made by **PietroM**
 
 French translation made by **Skeltan** (some translations provided by **Blocky**)
 
-If you would like to make changes or submit your own translation, check [here](wiki/lang.md) or inside lang.lua for details
+Italian translation made by **Mr.L-ore**
+
+Romania translation by **N64** (some translations provided by **EpikCool**)
+
+If you would like to make changes or submit your own translation, check [here](wiki/lang.md) (does not exist yet) or inside lang.lua for details
 <br/>
 <br/>
 <br/>
@@ -57,7 +61,7 @@ Port of "Shooting Star Summit" by **pieordie1** [(here)](https://www.smwcentral.
 <br/>
 <br/>
 # HOW TO USE:
-Go to the [latest release](https://github.com/EmilyEmmi/MarioHunt/releases) and download **MarioHunt.zip**. Extract it's contents to your **save file mod folder** (not in the base directory!). Read [this](https://github.com/djoslin0/sm64ex-coop/blob/coop/docs/lua/lua.md) to find where it is located.
+Go to the [latest release](https://github.com/EmilyEmmi/MarioHunt/releases) and download **MarioHunt.zip** or (MarioHunt_Lite.zip for the Lite version). Extract it's contents to your **save file mod folder** (not in the base directory!). Read [this](https://github.com/djoslin0/sm64ex-coop/blob/coop/docs/lua/lua.md) to find where it is located.
 
 Open the menu with /mh or by holding L and pressing START. For information on how to play, check out the [wiki](wiki/home.md).
 <br/>

@@ -78,7 +78,7 @@ It also hits people in the air!
 
 But there's a faster way of beating people up, and that's the power of **gravity**.
 Use a swift kick to knock Runners off cliffs.
-They'll either take fall damage, or fall into the void and take some extra damage (unless Void DMG is set to OHKO, in which case they'll die instantly).
+They'll either take fall damage, or fall into the void and die instantly.
 
 You can also grab the Metal Cap to deal double damage. Combine this with a Ground Pound, for **six points of damage**. That's almost the entire health bar!
 

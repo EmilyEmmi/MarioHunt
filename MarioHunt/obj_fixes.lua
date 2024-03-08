@@ -138,6 +138,31 @@ end
 
 hook_behavior_custom(id_bhvCapSwitch, false, nil, custom_switch_loop)
 
+-- fix boo cage for free roam
+local function custom_cage_boo_init(o)
+    if gGlobalSyncTable.freeRoam and gMarioStates[0].numStars < 12 then
+        local cage = spawn_non_sync_object(id_bhvBooCage, E_MODEL_HAUNTED_CAGE, o.oPosX, o.oPosY, o.oPosZ, nil)
+        if cage then
+            cage.oBehParams = o.oBehParams
+            cage.oAction = BOO_CAGE_ACT_FALLING
+        end
+    end
+end
+hook_behavior_custom(id_bhvBooWithCage, false, custom_cage_boo_init)
+
+-- instantly open cannon
+local function custom_bobomb_buddy_cannon_loop(o)
+    if o.oBobombBuddyCannonStatus == BOBOMB_BUDDY_CANNON_OPENING then
+        cur_obj_play_sound_1(SOUND_OBJ_CANNON3)
+        local cannonClosed = cur_obj_nearest_object_with_behavior(get_behavior_from_id(id_bhvCannonClosed))
+        if cannonClosed then
+            obj_mark_for_deletion(cannonClosed)
+        end
+        o.oBobombBuddyCannonStatus = BOBOMB_BUDDY_CANNON_STOP_TALKING
+    end
+end
+hook_behavior_custom(id_bhvBobombBuddyOpensCannon, false, nil, custom_bobomb_buddy_cannon_loop)
+
 -- instant/faster cutscene, or radar
 function do_star_stuff(radar)
     local didRadar = {}
@@ -172,8 +197,8 @@ function do_star_stuff(radar)
                         o.oPosY = o.oHomeY - 1
                     end
                 end
-
-                if radar and o.header.gfx.node.flags & GRAPH_RENDER_ACTIVE ~= 0 then
+                
+                if radar and (o.header.gfx.node.flags & GRAPH_RENDER_ACTIVE ~= 0 or (o.oRoom ~= -1 and current_mario_room_check(o.oRoom) == 0)) then
                     local star = (o.oBehParams >> 24) + 1
                     if ((star > 0 and star < 8) or ROMHACK.isUnder) and not didRadar[star] then
                         if gGlobalSyncTable.mhMode ~= 2 then
@@ -183,15 +208,17 @@ function do_star_stuff(radar)
                             if course_star_flags & (1 << (star - 1)) == 0 then
                                 if not star_radar[star] then
                                     star_radar[star] = { tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6 }
+                                    star_minimap[star] = { tex = gTextures.star, prevX = 0, prevY = 0 }
                                 end
-                                render_radar(o, star_radar[star], true)
+                                render_radar(o, star_radar[star], star_minimap[star], true)
                                 didRadar[star] = 1
                             end
                         elseif star == gGlobalSyncTable.getStar then
                             if not star_radar[star] then
                                 star_radar[star] = { tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6 }
+                                star_minimap[star] = { tex = gTextures.star, prevX = 0, prevY = 0 }
                             end
-                            render_radar(o, star_radar[star], true)
+                            render_radar(o, star_radar[star], star_minimap[star], true)
                             didRadar[star] = 1
 
                             if o.unused1 ~= 5 then
@@ -280,27 +307,32 @@ if not LITE_MODE then
     }
 end
 
-local E_MODEL_CAKE = E_MODEL_MARIOS_WING_CAP -- cake model does not exist yet --((not LITE_MODE) and smlua_model_util_get_id("cake_geo"))
-if not LITE_MODE then
-    function on_obj_set_model(o, model)
-        if model == 0x7A and month == 14 then -- star model changes on anniversary
-            obj_set_model_extended(o, E_MODEL_CAKE)
-        elseif (runnerAppearance == 3 or hunterAppearance == 3) and OUTLINE_MODEL[model] then
-            local np = network_player_from_global_index(o.globalPlayerIndex)
-            if not np then return end
-            local sMario = gPlayerSyncTable[np.localIndex]
-            local modelIndex = 1
-            if sMario.team == 1 then
-                if runnerAppearance ~= 3 then return end
-                modelIndex = (sMario.hard or 0) + 2
-            elseif hunterAppearance ~= 3 then
-                return
-            end
-            if OUTLINE_MODEL[model][modelIndex] then
-                obj_set_model_extended(o, OUTLINE_MODEL[model][modelIndex])
-            end
+local E_MODEL_CAKE = E_MODEL_BUBBLE_PLAYER-- cake model does not exist yet --((not LITE_MODE) and smlua_model_util_get_id("cake_geo"))
+
+local sBehavior = get_behavior_from_id(id_bhvHiddenStarTrigger)
+function on_obj_set_model(o, model)
+    if obj_has_model_extended(o, E_MODEL_NONE) and o.behavior == sBehavior then
+        obj_set_model_extended(o, E_MODEL_PURPLE_MARBLE)
+    end
+    if LITE_MODE then return end
+
+    if model == 0x7A and month == 14 then -- star model changes on anniversary
+        obj_set_model_extended(o, E_MODEL_CAKE)
+    elseif (runnerAppearance == 3 or hunterAppearance == 3) and OUTLINE_MODEL[model] then
+        local np = network_player_from_global_index(o.globalPlayerIndex)
+        if not np then return end
+        local sMario = gPlayerSyncTable[np.localIndex]
+        local modelIndex = 1
+        if sMario.team == 1 then
+            if runnerAppearance ~= 3 then return end
+            modelIndex = (sMario.hard or 0) + 2
+        elseif hunterAppearance ~= 3 then
+            return
+        end
+        if OUTLINE_MODEL[model][modelIndex] then
+            obj_set_model_extended(o, OUTLINE_MODEL[model][modelIndex])
         end
     end
-
-    hook_event(HOOK_OBJECT_SET_MODEL, on_obj_set_model)
 end
+
+hook_event(HOOK_OBJECT_SET_MODEL, on_obj_set_model)
