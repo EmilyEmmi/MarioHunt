@@ -473,8 +473,8 @@
     - Ztar Attack 2
       - Added /stalk, exclusive to this rom hack as of now
     - SM64: The Green Stars
-  - Added a [wiki](wiki/home.md) (wip)
-  - **Added the MarioHunt API!** Now you can make your own rom hacks compatible, make add-on mods, or make your own mods compatible. Check the [wiki](wiki/home.md) for more info.
+  - Added a [wiki](../../wiki) (wip)
+  - **Added the MarioHunt API!** Now you can make your own rom hacks compatible, make add-on mods, or make your own mods compatible. Check the [wiki](../../wiki) for more info.
     - The files test_mh_api.lua and mhSetup.lua are meant to be examples.
     - mute.lua is Beard's mute mod made compatible with MarioHunt.
   - Added /mh desync to fix desync issues

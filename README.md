@@ -12,7 +12,7 @@ A gamemode based off of Beyond's concept.
 
 Runners have to complete the game, while Hunters must stop them.
 
-More information available at the [wiki](wiki/home.md) or in-game by reading signs.
+More information available at the [wiki](../../wiki) or in-game by reading signs.
 
 A mod for sm64ex-coop
 <br/>
@@ -63,7 +63,7 @@ Port of "Shooting Star Summit" by **pieordie1** [(here)](https://www.smwcentral.
 # HOW TO USE:
 Go to the [latest release](https://github.com/EmilyEmmi/MarioHunt/releases) and download **MarioHunt.zip** or (MarioHunt_Lite.zip for the Lite version). Extract it's contents to your **save file mod folder** (not in the base directory!). Read [this](https://github.com/djoslin0/sm64ex-coop/blob/coop/docs/lua/lua.md) to find where it is located.
 
-Open the menu with /mh or by holding L and pressing START. For information on how to play, check out the [wiki](wiki/home.md).
+Open the menu with /mh or by holding L and pressing START. For information on how to play, check out the [wiki](../../wiki).
 <br/>
 <br/>
 <br/>
