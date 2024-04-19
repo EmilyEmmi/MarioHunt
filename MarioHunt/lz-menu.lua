@@ -29,8 +29,10 @@ local sMenuInputsDown                                                           
 -- textures
 local TEX_MENU_ARROW                                                                                                                                                                                                                                                                                                       = get_texture_info(
   "menu-arrow")
-local TEX_MENU_ARROW_UP = gTextures.arrow_up
-local TEX_MENU_ARROW_DOWN = gTextures.arrow_down
+local TEX_MENU_ARROW_UP                                                                                                                                                                                                                                                                                                    = gTextures
+.arrow_up
+local TEX_MENU_ARROW_DOWN                                                                                                                                                                                                                                                                                                  = gTextures
+.arrow_down
 
 -- mouse stuff
 local TEX_HAND                                                                                                                                                                                                                                                                                                             = get_texture_info(
@@ -125,6 +127,19 @@ function menu_reload()
     back = 3,
   }
 
+  menuList["presetMenu"] = {
+    { name = ("menu_default"), desc = "default_desc", title = ("menu_presets") },
+    { name = ("preset_quick"), desc = "preset_quick_desc" },
+    { name = ("preset_infection"), desc= "preset_infection_desc" },
+    { name = ("preset_solo"), desc= "preset_solo_desc" },
+    { name = ("preset_tag"), desc= "preset_tag_desc" },
+    { name = ("preset_star_rush"), desc= "preset_star_rush_desc" },
+    { name = ("menu_back") },
+    { name = ("main_menu") },
+    name = "presetMenu",
+    back = 7,
+  }
+
   LanguageMenu[1].title = ("menu_lang")
 
   local maxStars = 255
@@ -135,27 +150,28 @@ function menu_reload()
     { name = ("menu_run_lives"),      currNum = GST.runnerLives,      maxNum = 99,                                                            desc = ("lives_desc"),               title = ("menu_settings") },
     { name = ("menu_time"),           currNum = GST.runTime // 30,    maxNum = 3600,                                                          desc = ("time_desc"),                time = true },
     { name = ("menu_star_mode"),      option = GST.starMode,          desc = ("starmode_desc"),                                               invalid = (GST.mhMode == 2) },
-    { name = ("menu_category"),       currNum = GST.starRun,          maxNum = maxStars,                                                      minNum = (GST.noBowser and 1) or -1, desc = ("category_desc"),     invalid = (GST.mhMode == 2) },
+    { name = ("menu_category"),       currNum = GST.starRun,          maxNum = maxStars,                                                      minNum = (GST.noBowser and 1) or -1, desc = ("category_desc"),             invalid = (GST.mhMode == 2) },
     { name = ("menu_defeat_bowser"),  option = not GST.noBowser,      invalid = (GST.mhMode == 2 or (ROMHACK and (ROMHACK.no_bowser ~= nil))) },
     { name = ("menu_free_roam"),      option = GST.freeRoam,          invalid = (GST.mhMode == 2),                                            desc = "menu_free_roam_desc" },
-    { name = ("menu_auto"),           currNum = auto,                 minNum = -1,                                                            maxNum = MAX_PLAYERS - 1,            desc = ("auto_desc"),         format = { "auto", "~" } },
+    { name = ("menu_auto"),           currNum = auto,                 minNum = -1,                                                            maxNum = MAX_PLAYERS - 1,            desc = ("auto_desc"),                 format = { "auto", "~" } },
     { name = ("menu_nerf_vanish"),    option = GST.nerfVanish,        desc = ("menu_nerf_vanish_desc") },
     { name = ("menu_allow_spectate"), option = GST.allowSpectate,     desc = ("spectator_desc") },
     { name = ("menu_allow_stalk"),    option = GST.allowStalk,        desc = ("stalking_desc"),                                               invalid = (GST.mhMode == 2) },
-    { name = ("menu_stalk_timer"),    currNum = GST.stalkTimer // 30, maxNum = 600,                                                           desc = ("menu_stalk_timer_desc"),    time = true,                  invalid = (GST.mhMode == 2 or not GST.allowStalk) },
+    { name = ("menu_stalk_timer"),    currNum = GST.stalkTimer // 30, maxNum = 600,                                                           desc = ("menu_stalk_timer_desc"),    time = true,                          invalid = (GST.mhMode == 2 or not GST.allowStalk) },
     { name = ("menu_weak"),           option = GST.weak,              desc = ("weak_desc") },
-    { name = ("menu_anarchy"),        currNum = GST.anarchy,          minNum = 0,                                                             maxNum = 3,                          desc = ("menu_anarchy_desc"), format = { "~", "lang_runners", "lang_hunters", "lang_all" } },
-    { name = ("menu_dmgAdd"),         currNum = GST.dmgAdd,           minNum = -1,                                                            maxNum = 15,                         desc = ("menu_dmgAdd_desc"),  format = { "OHKO" } },
-    { name = ("menu_countdown"),      currNum = GST.countdown // 30,  maxNum = 600,                                                           time = true,                         minNum = 0,                   desc = ("menu_countdown_desc"),                              invalid = (GST.mhMode == 2) },
+    { name = ("menu_anarchy"),        currNum = GST.anarchy,          minNum = 0,                                                             maxNum = 3,                          desc = ("menu_anarchy_desc"),         format = { "~", "lang_runners", "lang_hunters", "lang_all" } },
+    { name = ("menu_dmgAdd"),         currNum = GST.dmgAdd,           minNum = -1,                                                            maxNum = 15,                         desc = ("menu_dmgAdd_desc"),          format = { "OHKO" } },
+    { name = ("menu_countdown"),      currNum = GST.countdown // 30,  maxNum = 600,                                                           time = true,                         minNum = 0,                           desc = ("menu_countdown_desc"),                              invalid = (GST.mhMode == 2) },
     { name = ("menu_double_health"),  option = GST.doubleHealth,      desc = ("menu_double_health_desc") },
     { name = ("menu_star_heal"),      option = GST.starHeal },
-    { name = ("menu_voidDmg"),        currNum = GST.voidDmg,          minNum = -1,                                                            maxNum = 15,                         desc = ("menu_voidDmg_desc"), format = { "OHKO" } },
+    { name = ("menu_star_setting"),   currNum = GST.starSetting,      minNum = 0,                                                             maxNum = 2,                          format = { "lang_star_leave", "lang_star_stay", "lang_star_nonstop" }, invalid = (GST.mhMode == 2) },
+    { name = ("menu_voidDmg"),        currNum = GST.voidDmg,          minNum = -1,                                                            maxNum = 15,                         desc = ("menu_voidDmg_desc"),         format = { "OHKO" } },
     { name = ("menu_blacklist"),      desc = ("blacklist_desc") },
-    { name = ("menu_default"),        desc = ("default_desc") },
+    { name = ("menu_presets"), },
     { name = ("menu_back") },
     { name = ("main_menu") },
     name = "settingsMenu",
-    back = 21,
+    back = 22,
   }
   local settingsMenu = menuList["settingsMenu"]
   if GST.starMode and GST.mhMode ~= 2 then
@@ -508,6 +524,9 @@ function action_setup()
         gGlobalSyncTable.starHeal = option.option
       end,
       function(option)
+        gGlobalSyncTable.starSetting = option.currNum
+      end,
+      function(option)
         gGlobalSyncTable.voidDmg = option.currNum
         if option.currNum ~= -1 then
           djui_chat_message_create(trans("voidDmg_set", gGlobalSyncTable.voidDmg))
@@ -519,9 +538,7 @@ function action_setup()
         menu_enter("blacklistMenu")
       end,
       function()
-        default_settings()
-        menu_reload()
-        menu_enter("settingsMenu", currentOption)
+        menu_enter("presetMenu")
       end,
       function() menu_enter("marioHuntMenu", 5) end,
       function() menu_enter() end,
@@ -787,6 +804,65 @@ function action_setup()
       function() menu_enter("playerSettingsMenu", 16) end,
       function() menu_enter(nil, 2) end,
     },
+    presetMenu = {
+      function()
+        default_settings()
+      end,
+      function()
+        if gGlobalSyncTable.mhMode == 2 then
+          change_game_mode("normal", 0) -- normal mode if mini
+        end
+        runner_lives(tostring(0)) -- 0 lives
+        local stars = 30
+        if ROMHACK and ROMHACK.max_stars and ROMHACK.max_stars < 30 then
+          stars = ROMHACK.max_stars
+        end
+        star_count_command(stars) -- 30/max stars
+        if ROMHACK.no_bowser == nil then
+          gGlobalSyncTable.noBowser = true -- no bowser mode
+        end
+        gGlobalSyncTable.freeRoam = true -- free roam
+        runner_randomize() -- auto
+      end,
+      function()
+        local players = 0 -- get total active players
+        for i=0,MAX_PLAYERS-1 do
+          if gNetworkPlayers[i].connected and gPlayerSyncTable[i].spectator ~= 1 then
+            players = players + 1
+          end
+        end
+        change_game_mode("normal", 0) -- normal mode
+        runner_lives(tostring(0)) -- 0 lives
+        gGlobalSyncTable.dmgAdd = -1 -- OHKO
+        runner_randomize(players-1) -- one hunter only
+      end,
+      function()
+        for i=1,MAX_PLAYERS-1 do
+          become_hunter(gPlayerSyncTable[i])
+        end
+        change_team_command(network_global_index_from_local(i))
+        change_game_mode("normal", 0) -- normal mode
+        runner_lives(tostring(2)) -- 2 lives
+        gGlobalSyncTable.dmgAdd = 0 -- No dmg add
+        gGlobalSyncTable.doubleHealth = true -- double health
+      end,
+      function()
+        if gGlobalSyncTable.mhMode == 0 then
+          change_game_mode("swap", 1) -- swap mode if normal
+        end
+        runner_lives(tostring(0)) -- 0 lives
+        gGlobalSyncTable.dmgAdd = -1 -- OHKO
+        runner_randomize() -- auto
+      end,
+      function()
+        for i=0,MAX_PLAYERS-1 do
+          become_runner(gPlayerSyncTable[i])
+        end
+        change_game_mode("mini", 2) -- minihunt
+      end,
+      function() menu_enter("settingsMenu", 21) end,
+      function() menu_enter(nil, 2) end,
+    },
   }
 end
 
@@ -826,7 +902,7 @@ function selectOption(option)
       blacklist_command(currMenu[option].action)
       menu_enter("blacklistMenu", option)
     elseif currMenu.back == option then
-      menu_enter("settingsMenu", 19)
+      menu_enter("settingsMenu", 20)
     else
       menu_enter()
     end
@@ -2055,7 +2131,8 @@ function menu_controls(m)
           play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
         else
           play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource)
-          change_team_command(currentOption - 1)
+          local global = network_global_index_from_local(currentOption - 1) or -1
+          change_team_command(global)
         end
       elseif currMenu.name == "blacklistMenu" and option.course then -- toggle all
         play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource)

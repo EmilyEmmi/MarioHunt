@@ -464,6 +464,11 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_star_heal = "Star Heal",
   menu_stalk_timer = "Stalk Cooldown", -- needs translation
   menu_stalk_timer_desc = "Time the player is frozen for after using /stalk.", -- needs translation
+  menu_star_setting = "On star collection",
+  star_leave = "Leave",
+  star_stay = "Stay",
+  star_nonstop = "Non-Stop",
+  menu_presets = "Presets",
 
   menu_flip = "Flip Team",
   menu_spectate = "Spectate",
@@ -524,6 +529,18 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_blacklist_reset = "Reset Blacklist",
   menu_blacklist_reset_desc = "Reset the blacklist to the default.",
   menu_toggle_all = "Toggle All",
+  
+  -- presets (needs translation)
+  preset_quick = "Quick Game",
+  preset_quick_desc = "30 Star, Free Roam, No Bowser run.",
+  preset_infection = "Infection",
+  preset_infection_desc = "1 Hunter that can one-shot! Can the Runners survive?",
+  preset_solo = "Solo",
+  preset_solo_desc = "You're on your own! 3 lives and double health.",
+  preset_tag = "Tag",
+  preset_tag_desc = "Hit a Runner to instantly become one!",
+  preset_star_rush = "Star Rush",
+  preset_star_rush_desc = "Minihunt, but everyone's a Runner!",
 
   -- updater
   up_to_date = "\\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\ is up to date!",
@@ -1068,6 +1085,12 @@ langdata["es"] = -- By Kanheaven and SonicDark, with newer lines by EpikCool and
   menu_stalk_timer_desc = "Tiempo que el jugador es congelado luego de usar /stalk.",
   menu_star_heal = "Curación de Estrellas",
 
+  -- v2.6.1
+  menu_star_setting = "Al conseguir una estrella", -- from base coop
+  star_leave = "Salir",
+  star_stay = "Seguir",
+  star_nonstop = "Sin Parar",
+
   -- tips
   tip = "Consejo: ",
   tip_1 = "¡Presiona L + Start, o escribe /mh, para abrir el menú. Puedes configurar opciones aquí!",
@@ -1304,8 +1327,8 @@ langdata["de"] = -- by N64 Mario
   free_camera = "FREIE KAMERA",
 
   -- stats
-  disp_wins_one = "%s\\#ffffff\\ hat 1 mal als Läufer gewonnen!",
-  disp_wins = "%s\\#ffffff\\ hat %d mal als Läufer gewonnen!",
+  disp_wins_one = "%s\\#ffffff\\ hat 1 mal als \\#ffff5a\\Läufer\\#ffffff\\ gewonnen!",
+  disp_wins = "%s\\#ffffff\\ hat %d mal als \\#ffff5a\\Läufer\\#ffffff\\ gewonnen!",
   disp_kills_one = "%s\\#ffffff\\ hat einen Spieler getötet!", -- unused
   disp_kills = "%s\\#ffffff\\ hat %d Spieler getötet!",
   -- for stats table
@@ -1551,6 +1574,12 @@ langdata["de"] = -- by N64 Mario
   menu_romhack_cam = "Romhack-Kamera", -- (cam is short for camera)
   menu_romhack_cam_desc = "Aktiviert die Romhack-Kamera in allen Zeiten.", -- (cam is short for camera)
   menu_star_heal = "Sternenheilung",
+  
+  -- v2.6.1
+  menu_star_setting = "Beim Stern sammeln", -- from base
+  star_leave = "Verlassen", -- is this correct?
+  star_stay = "Bleiben", -- is this correct?
+  star_nonstop = "Durchgehend",
 }
 
 langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
@@ -2018,6 +2047,11 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   menu_romhack_cam = "Câmera de Rom Hack", -- (cam is short for camera)
   menu_romhack_cam_desc = "Habilita câmera de Rom Hack.", -- (cam is short for camera)
   menu_star_heal = "Recuperação por Estrela",
+
+  menu_star_setting = "Na Coleção de Estrelas", -- from base
+  star_leave = "Sair",
+  star_stay = "Ficar",
+  star_nonstop = "Sem-Parar",
 
   ["set-fov_desc"] = "[NUM] - Modifica o campo de visão; deixe em branco para resetar.", -- I accidently added a dev command to be translated, oops
 }
@@ -2503,6 +2537,12 @@ langdata["fr"] = -- By Skeltan
   menu_romhack_cam = "Romhack Cam",
   menu_romhack_cam_desc = "Active la Romhack Cam partout.",
   menu_star_heal = "Soin Étoile",
+
+  -- v2.6.1
+  menu_star_setting = "Obtention d'étoile", -- from base
+  star_leave = "Sortir",
+  star_stay = "Rester",
+  star_nonstop = "Non-Stop",
 }
 
 langdata["it"] = -- by Mr. L-ore
@@ -2978,6 +3018,12 @@ langdata["it"] = -- by Mr. L-ore
   menu_romhack_cam = "Telecamera Romhack", -- (cam is short for camera)
   menu_romhack_cam_desc = "Abilita permanentemente la telecamera della romhack.", -- (cam is short for camera)
   menu_star_heal = "Stelle Curative",
+
+  -- v2.6.1
+  menu_star_setting = "A stella collezzionata", -- from base
+  star_leave = "Lascia",
+  star_stay = "Rimani",
+  star_nonstop = "Non-Stop",
 }
 
 -- Had to replace the characters that didn't exist

@@ -307,7 +307,7 @@ if not LITE_MODE then
     }
 end
 
-local E_MODEL_CAKE = E_MODEL_BUBBLE_PLAYER-- cake model does not exist yet --((not LITE_MODE) and smlua_model_util_get_id("cake_geo"))
+local E_MODEL_CAKE = ((not LITE_MODE) and smlua_model_util_get_id("mh_star_geo")) -- no more waiting for cake, just do logo star
 
 local sBehavior = get_behavior_from_id(id_bhvHiddenStarTrigger)
 function on_obj_set_model(o, model)

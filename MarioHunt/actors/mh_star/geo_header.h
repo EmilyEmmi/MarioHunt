@@ -1,0 +1,16 @@
+extern const GeoLayout mh_star_geo[];
+extern u8 mh_star_star_surface_rgba16_ci8[];
+extern u8 mh_star_star_surface_rgba16_pal_rgba16[];
+extern u8 mh_star_mh_icon_tex_ci8[];
+extern u8 mh_star_mh_icon_tex_pal_rgba16[];
+extern Vtx mh_star_000_displaylist_mesh_layer_1_vtx_0[25];
+extern Gfx mh_star_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx mh_star_001_displaylist_mesh_layer_4_vtx_0[6];
+extern Gfx mh_star_001_displaylist_mesh_layer_4_tri_0[];
+extern Gfx mat_mh_star_star[];
+extern Gfx mat_revert_mh_star_star[];
+extern Gfx mat_mh_star_logo[];
+extern Gfx mat_revert_mh_star_logo[];
+extern Gfx mh_star_000_displaylist_mesh_layer_1[];
+extern Gfx mh_star_001_displaylist_mesh_layer_4[];
+extern Gfx mh_star_material_revert_render_settings[];

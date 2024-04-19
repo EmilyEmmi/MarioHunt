@@ -1,4 +1,53 @@
 # Changelog
+## v2.6.1 (WIP)
+### Additions:
+  - Minimap updates:
+    - Added remaining minimap images for vanilla (RoxasYTB)
+      - Not available in Lite mode
+    - Added Character Select support for minimap (Squishy)
+    - Implemented Dynamic Lives Icon into the minimap
+      - Not fully available in Lite mode
+  - "On star collection" setting may now be changed in-game
+  - Added a little something for this **April 19th**
+    - Not available in Lite Mode
+  - Added Void DMG and "On star collection" to the rules that appear at the start of a game
+  - **If the first level of the campaign is selected in single player, your best time is recorded after grabbing the 25th star**
+    - Press L + R to restart instantly
+    - Vanilla hack only
+    - Recorded for movesets, OMM, and vanilla seperately
+  - Added menu presets!
+    - Reset to Defaults is under here now
+    - Quick: Auto Runners, Normal/Swap, 0 lives, 30 (or max) stars, Free Roam, No Bowser
+    - Infection: 1 Hunter, Normal, 0 lives, OHKO
+    - Solo: 1 Runner (You), Normal, 2 lives, No DMG Add, Double Health
+    - Tag: Auto Runners, Swap/Mini, 0 lives, OHKO
+    - Star Rush: ALL Runners, Mini
+    - English only right now
+### Adjustments:
+  - Hunters within a Bowser stage with no Runners will now be kicked out after 30 seconds
+  - Entering a Bowser stage with no Runners inside as a Hunter now causes the player to freeze
+  - **Hunters may no longer grab Bowser**
+    - Can still grab Bowser in some rom hacks, such as Star Road
+  - Increased invulnerability frames when grabbing and releasing Bowser as a Runner
+  - Changed Racing Penguin dialog in vanilla, since the air time check doesn't exist in sm64ex-coop
+  - Changed dialog about Hunters being able to grab secrets, since this was changed
+  - Increased invulnerability frames for Runners after getting hit in water
+  - Runner PVP DMG Up now displays when non-zero instead of only when set to OHKO
+  - "You have enough stars!" message now appears 1 star earlier for all categories below 31 star (since DDD is required)
+  - Running /mh out in the castle lobby now sends players to Castle Grounds instead of BOB
+### Fixes/backend changes:
+  - Made key door unlocking action instant again
+  - Minor adjustments to warp spam detection (should be less strict now)
+  - Fixed getting no invulnerability frames when bouncing off of another player after a hit
+  - Fixed "Set as Target" option in menu not working
+  - Camera now properly follows player in the bubble action when using vanilla cam
+  - Fixed situations where the respawn bubble would cause the player to fall off again
+  - Fixed pausing in MiniHunt causing all players to heal
+  - Fixed the frame counter being off by 1
+  - Fixed star popup not appearing in OMM if the moveset is disabled
+  - Fixed pressing X in the players menu flipping the wrong player's team for non-hosts
+  - Fixed secrets being desynced even outside of MiniHunt
+  - Fixed auto muting not working
 ## v2.6
 ### Additions:
   - Added Italian translation (Mr.L-ore)

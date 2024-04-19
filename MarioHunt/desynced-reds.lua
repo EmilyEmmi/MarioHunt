@@ -186,6 +186,9 @@ function secret_init(o)
 
     -- billboard (looks at camera)
     obj_set_billboard(o)
+    if o.oSyncID ~= 0 then
+        network_init_object(o, false, {'activeFlags', 'oInteractStatus'})
+    end
 end
 
 ---@param o Object
@@ -214,6 +217,10 @@ function secret_loop(o)
             --end
 
             -- delete object
+            o.oInteractStatus = INT_STATUS_INTERACTED
+            if o.oSyncID ~= 0 then
+                network_send_object(o, true)
+            end
             o.activeFlags = ACTIVE_FLAG_DEACTIVATED
         else
             o.oInteractStatus = 0

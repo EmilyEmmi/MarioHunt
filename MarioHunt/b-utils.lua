@@ -31,8 +31,6 @@ end
 
 -- some debug stuff
 function do_warp(msg)
-  warpCount = 0
-  warpPrevArea = 0
   warpCooldown = 0
   if msg == "random" then
     local worked = false
@@ -93,6 +91,7 @@ function quick_debug(msg)
   if msg == "reset" then
     start_game("reset")
     gGlobalSyncTable.mhState = 2
+    gGlobalSyncTable.mhTimer = 0
   else
     start_game("continue")
   end

@@ -588,8 +588,8 @@ you can phase through\
 solid matter!"))
 
 smlua_text_utils_dialog_replace(DIALOG_132,1,4,30,200, ("Whoa, Mario, pal, you\
-can't be in the air that\
-long! You're disqualified!\
+can't take the shortcut!\
+You're disqualified!\
 Next time, play fair!"))
 
 changed_dialogs[133] = 1
@@ -790,8 +790,8 @@ smlua_text_utils_dialog_replace(DIALOG_053,1,4,30,200, ("Hunters are able to gra
 Red Coins when OMM Rebirth\
 is enabled to fix a bug.\
 \
-Hunters can also find\
-secrets, hit switches,\
+Hunters can also hurt\
+bosses, hit switches,\
 and other things that can\
 help the Runners.\
 If you're a Hunter, be sure\
@@ -815,8 +815,8 @@ be stunned for some time."))
 
 changed_dialogs[053] = 1
 smlua_text_utils_dialog_replace(DIALOG_053,1,5,30,200, ("While Hunters can't\
-grab Red Coins, they\
-can grab secrets, hit\
+grab Red Coins or secrets,\
+they can hurt bosses, hit\
 switches, and other things\
 that can help the Runners.\
 If you're a Hunter, be sure\

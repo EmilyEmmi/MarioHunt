@@ -1,6 +1,6 @@
--- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hun\\\\t\\#dcdcdc\\ (v2.6) !
+-- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hun\\\\t\\#dcdcdc\\ (v2.6.1) !
 -- incompatible: gamemode
--- description: A gamemode based off of Beyond's concept. Hunters stop Runners from clearing the game!\n\nProgramming: EmilyEmmi, Blocky, Sunk, EmeraldLockdown, Sprinter05\n\nSpanish Translation: KanHeaven, SonicDark, EpikCool, green\nGerman: N64 Mario\nBrazillian Portuguese: PietroM\nFrench: Skeltan and Blocky\n\nSome graphics: LeoHaha, Key's Artworks, AquarriusAlex\n\"Shooting Star Summit\" port: pieordie1\n\nAlso thanks to: ColbyRayz!, SilverOrigins
+-- description: A gamemode based off of Beyond's concept. Hunters stop Runners from clearing the game!\n\nProgramming: EmilyEmmi, Blocky, Sunk, EmeraldLockdown, Sprinter05, Squishy\n\nTranslations: KanHeaven, SonicDark, EpikCool, green, N64 Mario, PietroM, Skeltan, Blocky, N64, Mr. L-Ore\n\nSome graphics: LeoHaha, Key's Artworks, AquarriusAlex, RoxasYTB\n\"Shooting Star Summit\" port: pieordie1\n\nAlso thanks to: ColbyRayz!, SilverOrigins
 
 LITE_MODE = false -- disables some features
 
@@ -80,6 +80,7 @@ if network_is_server() then
   GST.freeRoam = false      -- disable star and key requirements (except for Bowser 3)
   GST.starHeal = false      -- star heal
   GST.stalkTimer = 150      -- frozen timer when using /stalk
+  GST.starSetting = gServerSettings.stayInLevelAfterStar
 
   -- now for other data
   GST.mhState = 0 -- game state
@@ -128,16 +129,15 @@ gLevelValues.hudCapTimer = 1
 gLevelValues.mushroom1UpHeal = 1
 gLevelValues.showStarNumber = 1
 
-local gotStar = nil             -- what star we just got
-local died = false              -- if we've died (because on_death runs every frame of death fsr)
-local didFirstJoinStuff = false -- if all of the initial code was run (rules message, etc.)
-frameCounter = 120              -- frame counter over 4 seconds
-local cooldownCaps = 0          -- stores m.flags, to see what caps are on cooldown
-local regainCapTimer = 0        -- timer for being able to recollect a cap
-local storeVanish = false       -- temporarily stores the vanish cap for pvp purposes
-local campTimer                 -- for camping actions (such as reading text or being in the star menu), nil means it is inactive
-warpCooldown = 0                -- to avoid warp spam
-warpCount = 0
+local gotStar = nil                                             -- what star we just got
+local died = false                                              -- if we've died (because on_death runs every frame of death fsr)
+local didFirstJoinStuff = false                                 -- if all of the initial code was run (rules message, etc.)
+frameCounter = 120                                              -- frame counter over 4 seconds
+local cooldownCaps = 0                                          -- stores m.flags, to see what caps are on cooldown
+local regainCapTimer = 0                                        -- timer for being able to recollect a cap
+local storeVanish = false                                       -- temporarily stores the vanish cap for pvp purposes
+local campTimer                                                 -- for camping actions (such as reading text or being in the star menu), nil means it is inactive
+warpCooldown = 0                                                -- to avoid warp spam
 local warpTree = {}
 local killTimer = 0                                             -- timer for kills in quick succession
 local killCombo = 0                                             -- kills in quick succession
@@ -166,6 +166,8 @@ local localPlayTime = 0                                         -- used for trac
 miniRedCoinCollect = 0                                          -- tracks red coins in minihunt
 miniSecretCollect = 0                                           -- tracks secrets in minihunt
 local centerRulesTimer = 0                                      -- important rules in center of screen
+local campaignRecordValid = false                               -- for solo minihunt campaign
+local hunterKickTimer = 0                                       -- prevent camping in bowser levels
 
 OmmEnabled = false                                              -- is true if using OMM Rebirth
 movesetEnabled = false                                          -- is true if using any other moveset
@@ -205,12 +207,16 @@ function do_game_start(data, self)
   menu = false
   showingStats = false
   showingRules = false
+  campaignRecordValid = false
   local cmd = data.cmd or ""
 
   if GST.mhMode == 2 then
     GST.mhState = 2
 
-    if string.lower(cmd) ~= "continue" then
+    if data.challenge then
+      campaignRecordValid = true
+      GST.mhTimer = 0
+    elseif string.lower(cmd) ~= "continue" then
       GST.mhTimer = GST.runTime or 0
     end
   elseif string.lower(cmd) ~= "continue" then
@@ -258,7 +264,6 @@ function do_game_start(data, self)
     killTimer = 0
     killCombo = 0
     campTimer = nil
-    warpCount = 0
     warpCooldown = 0
 
     warp_beginning()
@@ -663,7 +668,6 @@ function on_death(m, nonStandard)
     m.health = 0xFF  -- Mario's health is used to see if he has respawned
     m.numLives = 100 -- prevent star road 0 life
     died = true
-    warpCount = 0
     warpCooldown = 0
     killTimer = 0
     killCombo = 0
@@ -819,7 +823,7 @@ function update()
   -- handle timers
   if not (GST.pause and sMario0.pause) then
     if frameCounter < 1 then
-      frameCounter = 121
+      frameCounter = 120
       localPlayTime = localPlayTime + 4
     end
     frameCounter = frameCounter - 1
@@ -854,8 +858,8 @@ function update()
               else
                 start_game("")
               end
-              if GST.mhTimer == 0 then
-                GST.mhTimer = 20 * 30 -- 20 seconds (in elseif o.oAction == start doesnt work)
+              if GST.mhState ~= 1 and GST.mhState ~= 2 then
+                GST.mhTimer = 20 * 30 -- 20 seconds (when the game doesnt start)
               end
             else
               GST.mhState = 0
@@ -870,7 +874,7 @@ function update()
         end
       end
 
-      if GST.mhMode ~= 2 and (GST.mhState ~= 0 and (GST.mhState == 2 or (GST.mhState < 3 and GST.mhTimer < GST.countdown))) then
+      if (GST.mhMode ~= 2 or campaignRecordValid) and (GST.mhState ~= 0 and (GST.mhState == 2 or (GST.mhState < 3 and GST.mhTimer < GST.countdown))) then
         GST.speedrunTimer = GST.speedrunTimer + 1
       end
 
@@ -1077,6 +1081,7 @@ function on_course_sync()
         month = 14
       end
     end
+    --month = 14
     --djui_popup_create(string.format("%d/%d/%d, %d",month,days,year,hours), 1)
 
     print(time)
@@ -1435,11 +1440,11 @@ end
 function list_settings()
   local settings = { "mhMode", "campaignCourse", "starRun", "freeRoam", "runnerLives", "runTime", "nerfVanish", "weak",
     "dmgAdd",
-    "anarchy", "firstTimer", "allowSpectate", "allowStalk", "doubleHealth", "voidDmg", "starHeal" }
+    "anarchy", "firstTimer", "allowSpectate", "allowStalk", "doubleHealth", "voidDmg", "starHeal", "starSetting" }
   local settingName = { "menu_gamemode", "menu_campaign", "menu_category", "menu_free_roam", "menu_run_lives",
     "menu_time",
     "menu_nerf_vanish", "menu_weak", "menu_dmgAdd", "menu_anarchy", "menu_first_timer", "menu_allow_spectate",
-    "menu_allow_stalk", "menu_double_health", "menu_voidDmg", "menu_star_heal" }
+    "menu_allow_stalk", "menu_double_health", "menu_voidDmg", "menu_star_heal", "menu_star_setting" }
   for i, setting in ipairs(settings) do
     local name = settingName[i]
     local value = GST[setting]
@@ -1559,7 +1564,17 @@ function get_setting_as_string(name, value, listing)
     local minutes = (value // 1800)
     value = "\\#ffff5a\\" .. string.format("%d:%02d", minutes, seconds)
   elseif name == "menu_free_roam" then
-    if GST.mode == 2 then value = nil end
+    if GST.mhMode == 2 then value = nil end
+  elseif name == "menu_star_setting" then
+    if GST.mhMode == 2 then
+      value = nil
+    elseif value == 0 then
+      value = "\\#ff5a5a\\" .. trans("star_leave")
+    elseif value == 1 then
+      value = "\\#ffff5a\\" .. trans("star_stay")
+    elseif value == 2 then
+      value = "\\#5aff5a\\" .. trans("star_nonstop")
+    end
   end
 
   if value == true then
@@ -1701,8 +1716,9 @@ function on_hud_render()
     centerRulesTimer = 30
   end
   if centerRulesTimer > 0 then
-    local settings = { "mhMode", "starRun", "freeRoam", "dmgAdd", "allowStalk", "doubleHealth" }
-    local settingName = { "menu_gamemode", "menu_category", "menu_free_roam", "menu_dmgAdd", "menu_allow_stalk", "menu_double_health" }
+    local settings = { "mhMode", "starRun", "freeRoam", "starSetting", "voidDmg", "dmgAdd", "allowStalk", "doubleHealth" }
+    local settingName = { "menu_gamemode", "menu_category", "menu_free_roam", "menu_star_setting", "menu_voidDmg",
+      "menu_dmgAdd", "menu_allow_stalk", "menu_double_health" }
 
     djui_hud_set_font(FONT_NORMAL)
     local scale = 0.5
@@ -1710,11 +1726,13 @@ function on_hud_render()
 
     for i, setting in ipairs(settings) do
       local name, value = get_setting_as_string(settingName[i], GST[setting], true)
-      if GST[setting] == true then
+      if value and GST[setting] == true then
         value = trans(name)
+      elseif value and (setting == "voidDmg" or setting == "dmgAdd" or setting == "starSetting") then
+        value = trans(name) .. ": " .. value
       end
 
-      if value and (setting ~= "dmgAdd" or GST.dmgAdd == -1) then
+      if value and (setting ~= "dmgAdd" or GST.dmgAdd ~= 0) then
         local text = tostring(value)
         local screenWidth = djui_hud_get_screen_width()
         local width = djui_hud_measure_text(remove_color(text)) * scale
@@ -2042,7 +2060,22 @@ function on_hud_render()
 
   -- timer
   scale = 0.5
-  if GST.mhTimer and GST.mhTimer > 0 then
+  if (GST.mhMode == 2 and campaignRecordValid) then
+    local time = GST.speedrunTimer
+    local miliseconds = math.floor(time / 30 % 1 * 100)
+    local seconds = time // 30 % 60
+    local minutes = time // 30 // 60 % 60
+    text = string.format("%02d:%02d.%02d", minutes, seconds, miliseconds)
+    width = djui_hud_measure_text(text) * scale
+    x = 6
+    y = 0
+
+    djui_hud_set_color(0, 0, 0, 128);
+    djui_hud_render_rect(x - 6, y, width + 12, 16);
+
+    djui_hud_set_color(255, 255, 255, 255);
+    djui_hud_print_text(text, x, y, scale);
+  elseif (GST.mhTimer and GST.mhTimer > 0) then
     local seconds = GST.mhTimer // 30 % 60
     local minutes = GST.mhTimer // 1800
     text = string.format("%d:%02d", minutes, seconds)
@@ -2209,6 +2242,12 @@ function runner_hud(sMario)
 end
 
 function hunter_hud()
+  -- kick out timer in bowser levels
+  if hunterKickTimer ~= 0 then
+    text = string.format("%s \\#ff5a5a\\(%d)", trans("no_runners"), 31 - hunterKickTimer)
+    return text
+  end 
+
   -- set player text
   if runnerTarget and runnerTarget ~= -1 and GST.mhMode ~= 2 then
     local np = NetP[runnerTarget]
@@ -2507,10 +2546,28 @@ function on_warp()
 
   if sMario0.spectator ~= 1 then
     m0.invincTimer = 150 -- 5 seconds
-    if GST.mhMode == 2 and localPrevCourse ~= np0.currCourseNum or localPrevAct ~= np0.currActNum then
-      miniRedCoinCollect = 0
-      miniSecretCollect = 0
-      iVoted = false
+    if localPrevCourse ~= np0.currCourseNum or localPrevAct ~= np0.currActNum then
+      if GST.mhMode == 2 then
+        miniRedCoinCollect = 0
+        miniSecretCollect = 0
+        iVoted = false
+      elseif sMario0.team ~= 1 and (np0.currCourseNum == COURSE_BITDW or np0.currCourseNum == COURSE_BITFS or np0.currCourseNum == COURSE_BITS) then
+        local runnerHere = false
+        for i = 1, (MAX_PLAYERS - 1) do
+          if PST[i].team == 1 then
+            local np = NetP[i]
+            if np.connected and np.currCourseNum == np0.currCourseNum then
+              runnerHere = true
+              break
+            end
+          end
+        end
+
+        if (not runnerHere) and sMario0.pause ~= true and (sMario0.pause == false or sMario0.pause < 300) then
+          sMario0.pause = 300
+          hunterKickTimer = 20
+        end
+      end
     end
 
     if sMario0.team == 1 and GST.mhMode ~= 2 then
@@ -2526,15 +2583,10 @@ function on_warp()
     table.insert(warpTree, (np0.currLevelNum * 10 + np0.currAreaIndex))
     if #warpTree > 4 then table.remove(warpTree, 1) end
     if warpCooldown == 0 then
-      warpCount = 0
-    elseif warpTree[1] ~= warpTree[3] and warpTree[2] ~= warpTree[4] then
-      warpCount = 0
-    elseif warpCount >= 3 then
-      m0.hurtCounter = m0.hurtCounter + (warpCount * 4)
+      warpTree = {}
+    elseif #warpTree >= 4 and (warpTree[1] == warpTree[3] or warpTree[2] == warpTree[4]) then
+      m0.hurtCounter = m0.hurtCounter + (#warpTree * 4)
       djui_popup_create(trans("warp_spam"), 1)
-      warpCount = warpCount + 1
-    else
-      warpCount = warpCount + 1
     end
     warpCooldown = 300 -- 5 seconds
   end
@@ -2542,7 +2594,7 @@ function on_warp()
   local cname = ROMHACK.levelNames and ROMHACK.levelNames[np0.currLevelNum * 10 + np0.currAreaIndex]
   if cname and np0.currCourseNum ~= 0 then -- replace the name of the course
     local course = np0.currCourseNum
-    if course < 16 then                    -- replace act names with.. themselves (there's no replace course function)
+    if course < 16 then
       smlua_text_utils_course_name_replace(course, cname:upper())
     elseif course ~= 0 then
       smlua_text_utils_secret_star_replace(course, "   " .. cname:upper())
@@ -2750,6 +2802,7 @@ local faster_actions = {
   [ACT_BUTT_STUCK_IN_GROUND] = 0,
   [ACT_FEET_STUCK_IN_GROUND] = 0,
   [ACT_HEAD_STUCK_IN_GROUND] = 0,
+  [ACT_UNLOCKING_KEY_DOOR] = 1,
 }
 
 -- based off of example
@@ -2773,7 +2826,7 @@ function mario_update(m)
   if faster_actions[m.action] and sMario.fasterActions then
     if faster_actions[m.action] ~= 1 then
       m.marioObj.header.gfx.animInfo.animFrame = m.marioObj.header.gfx.animInfo.animFrame + 1
-    elseif m.marioObj.header.gfx.animInfo then
+    elseif m.marioObj.header.gfx.animInfo and m.marioObj.header.gfx.animInfo.curAnim then
       set_anim_to_frame(m, m.marioObj.header.gfx.animInfo.curAnim.loopEnd) -- instant
     end
   elseif m.action == ACT_WARP_DOOR_SPAWN then
@@ -2867,12 +2920,13 @@ function mario_update(m)
 
   -- update last floor position
   local floorClass = mario_get_floor_class(m)
-  if m.playerIndex == 0 and m.action ~= ACT_MH_BUBBLE_RETURN and m.floor and (m.pos.y - m.floorHeight < 1000 or (not prevSafePos.valid)) and (m.floor.normal.y > 0.99 or (floorClass ~= SURFACE_CLASS_SLIPPERY and floorClass ~= SURFACE_CLASS_VERY_SLIPPERY and m.floor.normal.y > 0.9))
+  if m.playerIndex == 0 and gGlobalSyncTable.voidDMG ~= -1 and m.action ~= ACT_MH_BUBBLE_RETURN and m.floor and (m.pos.y - m.floorHeight < 1000 or (not prevSafePos.valid)) and (m.floor.normal.y > 0.99 or (floorClass ~= SURFACE_CLASS_SLIPPERY and floorClass ~= SURFACE_CLASS_VERY_SLIPPERY and m.floor.normal.y > 0.9))
       and m.floor.type ~= SURFACE_DEATH_PLANE and m.floor.type ~= SURFACE_BURNING and m.floor.type ~= SURFACE_INSTANT_QUICKSAND and m.floor.type ~= SURFACE_VERTICAL_WIND and m.floor.type ~= SURFACE_INSTANT_MOVING_QUICKSAND
       and m.floor.type ~= SURFACE_MOVING_QUICKSAND and m.floor.type ~= SURFACE_DEEP_MOVING_QUICKSAND and m.floor.type ~= SURFACE_SHALLOW_MOVING_QUICKSAND then
     if m.floor.object then
       local o = m.floor.object
-      if (o.oVelX == 0 and o.oVelY == 0 and o.oVelZ == 0) and get_id_from_behavior(o.behavior) ~= id_bhvHiddenObject then
+      local id = get_id_from_behavior(o.behavior)
+      if (o.oVelX == 0 and o.oVelY == 0 and o.oVelZ == 0) and id ~= id_bhvHiddenObject and id ~= id_bhvAnimatesOnFloorSwitchPress then
         prevSafePos.obj = o
         prevSafePos.x = m.pos.x
         prevSafePos.y = o.oPosY + 200
@@ -2909,10 +2963,21 @@ function mario_update(m)
     m.health = math.max(m.health, 0x100)
   end
 
-  -- update star counter in MiniHunt mode
+  -- update star counter in MiniHunt mode / handle challenge
   if GST.mhMode == 2 then
     m.numStars = sMario.totalStars or 0
     m.prevNumStarsForDialog = m.numStars
+
+    -- invalid if there is another player
+    if campaignRecordValid then
+      if m.playerIndex == 0 and m.controller.buttonPressed & L_TRIG ~= 0 and m.controller.buttonDown & R_TRIG ~= 0 and GST.speedrunTimer > 30 then
+        start_game(1) -- restart
+        m.controller.buttonPressed = m.controller.buttonPressed & ~L_TRIG
+        m.controller.buttonDown = m.controller.buttonDown & ~L_TRIG
+      elseif m.playerIndex ~= 0 and np.connected and sMario.team == 1 then
+        campaignRecordValid = false
+      end
+    end
   end
 
   if m.invincTimer > 2 then
@@ -2920,7 +2985,7 @@ function mario_update(m)
     if GST.weak then
       m.invincTimer = m.invincTimer - 1
     end
-    -- flaming invulnerability frames
+    -- sparkle invulnerability frames
     if invincParticle and is_player_active(m) ~= 0 then
       m.marioObj.header.gfx.node.flags = m.marioObj.header.gfx.node.flags & ~GRAPH_RENDER_INVISIBLE
       local o = spawn_non_sync_object(
@@ -2936,7 +3001,7 @@ function mario_update(m)
   end
 
   -- handle rejoining
-  if m.playerIndex ~= 0 and np.connected then
+  if m.playerIndex ~= 0 and np.currAreaSyncValid and np.currLevelSyncValid then
     local discordID = sMario.discordID or 0
     local name = remove_color(np.name)
     if mute_storage and mute_storage[name] then
@@ -3261,8 +3326,8 @@ function runner_update(m, sMario)
 
   -- invincibility timers for certain actions
   local runner_invincible = {
-    [ACT_PICKING_UP_BOWSER] = 90, -- 3 seconds
-    [ACT_RELEASING_BOWSER] = 30,
+    [ACT_PICKING_UP_BOWSER] = 120, -- 4 seconds
+    [ACT_RELEASING_BOWSER] = 45,
     [ACT_READING_NPC_DIALOG] = 30,
     [ACT_READING_AUTOMATIC_DIALOG] = 30,
     [ACT_READING_SIGN] = 20,
@@ -3312,7 +3377,7 @@ function runner_update(m, sMario)
   end
 
   -- reduces water heal and boosts invincibility frames after getting hit in water
-  if (m.action & ACT_FLAG_SWIMMING) ~= 0 and m.healCounter <= 0 and m.hurtCounter <= 0 then
+  if (m.action & ACT_FLAG_SWIMMING) ~= 0 and m.healCounter == 0 and m.hurtCounter == 0 then
     if m.pos.y >= m.waterLevel - 140 and (m.area.terrainType & TERRAIN_MASK) ~= TERRAIN_SNOW then
       -- water heal is 26 (decimal) per frame
       if m.health ~= 0x880 then
@@ -3324,7 +3389,7 @@ function runner_update(m, sMario)
         end
       end
     elseif m.prevAction == ACT_FORWARD_WATER_KB or m.prevAction == ACT_BACKWARD_WATER_KB then
-      m.invincTimer = 60                                                                              -- 2 seconds
+      m.invincTimer = math.max(m.invincTimer, 75)                                                     -- 2 seconds
       m.prevAction = m.action
     elseif m.health ~= 0xFF and (sMario.hard ~= 0 or GST.doubleHealth) and frameCounter % 2 == 0 then -- half speed drowning
       m.health = m.health +
@@ -3338,12 +3403,12 @@ function runner_update(m, sMario)
     if m.playerIndex == 0 then deathTimer = 900 end
   elseif (sMario.hard == 2) or (leader and GST.firstTimer) then -- extreme mode
     if (sMario.hard == 2) then
-      if m.health > 0xFF and ((m.hurtCounter <= 0 and m.action ~= ACT_BURNING_FALL and m.action ~= ACT_BURNING_GROUND and m.action ~= ACT_BURNING_JUMP)) then
+      if m.health > 0xFF and ((m.hurtCounter == 0 and m.action ~= ACT_BURNING_FALL and m.action ~= ACT_BURNING_GROUND and m.action ~= ACT_BURNING_JUMP)) then
         m.health = 0x1FF
       end
     end
     if m.playerIndex == 0 and deathTimer > 0 then
-      if m.healCounter > 0 and m.health > 0xFF and deathTimer <= 1800 then
+      if m.healCounter ~= 0 and m.health > 0xFF and deathTimer <= 1800 then
         deathTimer = deathTimer + 8
         if not OmmEnabled then deathTimer = deathTimer + 8 end -- double gain without OMM
       elseif deathTimer > 1800 then
@@ -3392,12 +3457,12 @@ function runner_update(m, sMario)
     end
     prevCustomWedge = customWedge
 
-    if halvedHurtCounter > 0 then halvedHurtCounter = halvedHurtCounter - 1 end
+    if halvedHurtCounter ~= 0 then halvedHurtCounter = halvedHurtCounter - 1 end
     if m.hurtCounter > halvedHurtCounter then
       halvedHurtCounter = (m.hurtCounter - halvedHurtCounter) // 2 + halvedHurtCounter
       m.hurtCounter = halvedHurtCounter
     end
-    if halvedHealCounter > 0 then halvedHealCounter = halvedHealCounter - 1 end
+    if halvedHealCounter ~= 0 then halvedHealCounter = halvedHealCounter - 1 end
     if m.healCounter > halvedHealCounter then
       halvedHealCounter = (m.healCounter - halvedHealCounter) // 2 + halvedHealCounter
       m.healCounter = halvedHealCounter
@@ -3425,8 +3490,49 @@ function runner_update(m, sMario)
 
         -- new star for minihunt
         if GST.mhMode == 2 then
-          if GST.campaignCourse ~= 0 then
+          if GST.campaignCourse ~= 0 and GST.campaignCourse < 26 then
             GST.campaignCourse = GST.campaignCourse + 1
+            if GST.campaignCourse > 25 then
+              local singlePlayer = true
+              for i = 0, (MAX_PLAYERS - 1) do
+                local sMario = PST[i]
+                local np = NetP[i]
+
+                if np.connected and sMario.spectator ~= 1 then
+                  singlePlayer = false
+                  break
+                end
+              end
+
+              if singlePlayer then
+                local record = GST.speedrunTimer
+                local ref = "campaignRecord"
+                if OmmEnabled then
+                  ref = "cRecordOmm"
+                elseif movesetEnabled then
+                  ref = "cRecordOther"
+                end
+                local prevRecord = tonumber(mod_storage_load(ref)) or 0
+
+                local miliseconds = math.floor(record / 30 % 1 * 100)
+                local seconds = record // 30 % 60
+                local minutes = record // 30 // 60 % 60
+                local text = string.format("%02d:%02d.%02d", minutes, seconds, miliseconds)
+                djui_chat_message_create(text)
+
+                -- end game
+                if prevRecord == 0 or record < prevRecord then
+                  mod_storage_save(ref, tostring(record))
+                  play_star_fanfare()
+                  djui_chat_message_create(trans("new_record"))
+                else
+                  play_race_fanfare()
+                end
+                rejoin_timer = {}
+                GST.mhState = 4
+                GST.mhTimer = 20 * 30 -- 20 seconds
+              end
+            end
           end
           random_star(np.currCourseNum, GST.campaignCourse)
         end
@@ -3440,7 +3546,9 @@ function runner_update(m, sMario)
         end
 
         -- send message
-        local unlocked = (GST.starRun ~= -1 and m.numStars >= GST.starRun and m.prevNumStarsForDialog < GST.starRun)
+        local totalForMessage = GST.starRun
+        if ROMHACK.ddd and GST.starRun < 31 and (not GST.noBowser) then totalForMessage = totalForMessage - 1 end
+        local unlocked = (totalForMessage ~= -1 and m.numStars >= totalForMessage and m.prevNumStarsForDialog < totalForMessage)
         network_send_include_self(false, {
           id = PACKET_RUNNER_COLLECT,
           runnerID = np.globalIndex,
@@ -3479,6 +3587,37 @@ function hunter_update(m)
   if m.playerIndex ~= 0 then return end
 
   deathTimer = 900
+
+  -- kick out hunters in bowser level with no runners
+  if frameCounter % 30 == 0 then
+    if GST.mhMode ~= 2 and (np0.currCourseNum == COURSE_BITDW or np0.currCourseNum == COURSE_BITFS or np0.currCourseNum == COURSE_BITS) then
+      local runnerHere = false
+      for i = 1, (MAX_PLAYERS - 1) do
+        if PST[i].team == 1 then
+          local np = NetP[i]
+          if np.connected and np.currCourseNum == np0.currCourseNum then
+            runnerHere = true
+            break
+          end
+        end
+      end
+
+      if runnerHere then
+        hunterKickTimer = 0
+      else
+        hunterKickTimer = hunterKickTimer + 1
+        play_sound(SOUND_MENU_CAMERA_BUZZ, m.marioObj.header.gfx.cameraToObject)
+
+        if hunterKickTimer > 30 then -- 30 sec
+          SVcln = nil
+          warp_beginning()
+          hunterKickTimer = 0
+        end
+      end
+    else
+      hunterKickTimer = 0
+    end
+  end
 
   -- camp timer for hunters!?
   if not campTimer and m.action == ACT_IN_CANNON then
@@ -3576,10 +3715,11 @@ function on_allow_interact(m, o, type)
     [id_bhvCusRedCoin] = 1,
     [id_bhvSecrets] = 1,
     [id_bhvKingBobomb] = 1,
+    [id_bhvBowser] = 1,
   }
 
   local obj_id = get_id_from_behavior(o.behavior)
-  --print(get_behavior_name_from_id(obj_id))
+  --djui_chat_message_create(tostring(get_behavior_name_from_id(obj_id)))
   -- cap timer
   if type == INTERACT_CAP and regainCapTimer > 0 then
     if obj_id == id_bhvMetalCap and (cooldownCaps & MARIO_METAL_CAP) ~= 0 then return false end
@@ -3600,7 +3740,11 @@ function on_interact(m, o, type, value)
   end
   if m.healCounter < 0 then m.healCounter = 0 end]]
 
-  if type == INTERACT_STAR_OR_KEY then
+  if type == INTERACT_PLAYER then -- prevent janky comboing by bouncing off of another player
+    if m.knockbackTimer ~= 0 and m.action == ACT_JUMP then
+      m.invincTimer = 60
+    end
+  elseif type == INTERACT_STAR_OR_KEY then
     if m.playerIndex ~= 0 then return true end -- only local player
 
     local np = NetP[m.playerIndex]
@@ -3702,7 +3846,7 @@ function do_pause()
     end
 
     enable_time_stop_including_mario()
-    if GST.mhTimer > 0 then
+    if GST.mhState == 1 then
       m0.health = 0x880
     end
 
@@ -4013,7 +4157,7 @@ function target_command(msg)
       djui_chat_message_create(trans("no_runners"))
       return true
     end
-  elseif msg and msg:lower() == "off" then
+  elseif msg and tostring(msg):lower() == "off" then
     runnerTarget = -1
     return true
   else
@@ -4047,9 +4191,7 @@ function on_course_enter()
 
   -- justEntered = true
 
-  if GST.romhackFile == "vanilla" then
-    omm_replace(OmmEnabled)
-  elseif np0.currLevelNum == LEVEL_LOBBY then -- erase signs when not in vanilla
+  if GST.romhack_file ~= "vanilla" and np0.currLevelNum == LEVEL_LOBBY then -- erase signs when not in vanilla
     local sign = obj_get_first_with_behavior_id(id_bhvMessagePanel)
     while sign do
       obj_mark_for_deletion(sign)
@@ -4156,7 +4298,7 @@ function on_packet_runner_collect(data, self)
         popup_sound(SOUND_MENU_STAR_SOUND)
       end
 
-      if GST.mhMode == 2 or not (OmmEnabled and gServerSettings.stayInLevelAfterStar == 1) then -- OMM shows its own progress, so don't show this
+      if GST.mhMode == 2 or (not data.noSound) then -- OMM shows its own progress, so don't show this
         djui_popup_create(trans("got_star", (playerColor .. np.name)) .. "\\#ffffff\\\n" .. place .. "\n" .. name, 2)
       end
 
@@ -4458,6 +4600,7 @@ function on_packet_vote(data, self)
       maxVotes = math.ceil(count * 0.5) -- half the lobby
     elseif count == 1 then
       iVoted = false
+      campaignRecordValid = false
       if GST.campaignCourse ~= 0 then
         GST.campaignCourse = GST.campaignCourse + 1
       end
@@ -4490,6 +4633,7 @@ function on_packet_vote(data, self)
       djui_chat_message_create(trans("vote_pass"))
       iVoted = false
       if network_is_server() then
+        campaignRecordValid = false
         if GST.campaignCourse ~= 0 then
           GST.campaignCourse = GST.campaignCourse + 1
         end
@@ -4611,7 +4755,7 @@ function on_packet_mute_player(data, self)
 end
 
 function on_packet_get_outta_here(data, self)
-  if gNetworkPlayers[0].currCourseNum == 0 then
+  if gNetworkPlayers[0].currLevelNum == gLevelValues.entryLevel then
     warp_to_level(LEVEL_BOB, 1, 1)
   else
     warp_beginning()
@@ -4702,7 +4846,7 @@ end
 function on_setting_changed(tag, oldVal, newVal)
   if oldVal == newVal then return end
 
-  if (didFirstJoinStuff and not noSettingDisp) then
+  if (didFirstJoinStuff and not noSettingDisp) and (tag ~= "menu_star_setting" or not OmmEnabled) then
     local name, value, oldvalue
     name, value = get_setting_as_string(tag, newVal)
     name, oldvalue = get_setting_as_string(tag, oldVal)
@@ -4720,6 +4864,8 @@ function on_setting_changed(tag, oldVal, newVal)
 
   if tag == "menu_star_heal" then
     gLevelValues.starHeal = newVal
+  elseif tag == "menu_star_setting" then
+    gServerSettings.stayInLevelAfterStar = newVal
   elseif tag == "menu_star_mode" then
     noSettingDisp = true
     load_settings(false, true)
@@ -4764,11 +4910,12 @@ hook_on_sync_table_change(GST, "mhState", "change_state", on_state_changed)
 local settings = { "runnerLives", "starMode", "runTime", "allowSpectate", "weak",
   "gameAuto", "dmgAdd", "anarchy", "nerfVanish", "firstTimer", "allowStalk", "stalkTimer", "starRun", "noBowser",
   "countdown",
-  "doubleHealth", "voidDmg", "freeRoam", "starHeal" }
+  "doubleHealth", "voidDmg", "freeRoam", "starHeal", "starSetting" }
 local settingName = { "menu_run_lives", "menu_star_mode", "menu_time", "menu_allow_spectate", "menu_weak",
   "menu_auto", "menu_dmgAdd", "menu_anarchy", "menu_nerf_vanish", "menu_first_timer", "menu_allow_stalk",
   "menu_stalk_timer", "menu_category",
-  "menu_defeat_bowser", "menu_countdown", "menu_double_health", "menu_voidDmg", "menu_free_roam", "menu_star_heal" }
+  "menu_defeat_bowser", "menu_countdown", "menu_double_health", "menu_voidDmg", "menu_free_roam", "menu_star_heal",
+  "menu_star_setting" }
 for i, setting in ipairs(settings) do
   hook_on_sync_table_change(GST, setting, settingName[i], on_setting_changed)
 end

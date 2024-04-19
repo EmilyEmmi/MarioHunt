@@ -107,33 +107,39 @@ end
 function start_game(msg)
   -- count runners
   local runners = 0
+  local nonSoloRunner = false
   for i = 0, (MAX_PLAYERS - 1) do
     if gPlayerSyncTable[i].team == 1 and gNetworkPlayers[i].connected then
       runners = runners + 1
+      if i ~= 0 then
+        nonSoloRunner = true
+      end
     end
   end
 
-  if runners < 1 then
-    if gGlobalSyncTable.mhMode ~= 2 then
-      djui_chat_message_create(trans("error_no_runners"))
-      return true
-    else
-      local singlePlayer = true
-      for i = 1, MAX_PLAYERS - 1 do
-        local np = gNetworkPlayers[i]
-        local sMario = gPlayerSyncTable[i]
-        if np.connected and sMario.spectator ~= 1 then
-          singlePlayer = false
-          break
-        end
-      end
-      if singlePlayer then
-        become_runner(gPlayerSyncTable[0])
-      else
-        djui_chat_message_create(trans("error_no_runners"))
-        return true
+  local challenge = false
+  if (not nonSoloRunner) and gGlobalSyncTable.mhMode == 2 then
+    local singlePlayer = true
+    for i = 1, MAX_PLAYERS - 1 do
+      local np = gNetworkPlayers[i]
+      local sMario = gPlayerSyncTable[i]
+      if np.connected and sMario.spectator ~= 1 then
+        singlePlayer = false
+        break
       end
     end
+    if singlePlayer then
+      if (msg == 1 or msg == "1") and gGlobalSyncTable.romhackFile == "vanilla" then
+        challenge = true
+      end
+      become_runner(gPlayerSyncTable[0])
+    elseif runners < 1 then
+      djui_chat_message_create(trans("error_no_runners"))
+      return true
+    end
+  elseif runners < 1 then
+    djui_chat_message_create(trans("error_no_runners"))
+    return true
   end
 
   local cmd = msg
@@ -141,6 +147,7 @@ function start_game(msg)
   network_send_include_self(true, {
     id = PACKET_MH_START,
     cmd = cmd,
+    challenge = challenge,
   })
   return true
 end
@@ -276,7 +283,7 @@ end
 
 function runner_randomize(msg)
   local runners = tonumber(msg)
-  if not msg or msg == "" or msg == 99 or msg == 0 or msg == "auto" then
+  if (not msg) or msg == "" or msg == 99 or msg == 0 or msg == "auto" then
     runners = 0 -- TBD
   elseif not (runners or runners ~= math.floor(runners) or runners < 1) then
     return false
@@ -364,7 +371,7 @@ function runner_lives(msg)
     gGlobalSyncTable.runnerLives = num
     djui_chat_message_create(trans("set_lives_total", num))
     -- update lives for all runners
-    for i=0,MAX_PLAYERS-1 do
+    for i = 0, MAX_PLAYERS - 1 do
       local np = gNetworkPlayers[i]
       local sMario = gPlayerSyncTable[i]
       if np.connected and sMario.team == 1 and sMario.runnerLives then
@@ -447,7 +454,7 @@ end
 
 function star_count_command(msg)
   local num = tonumber(msg)
-  if msg and not num and msg:lower() == "any" then num = -1 end
+  if msg and (not num) and msg:lower() == "any" then num = -1 end
   if num and num >= -1 and num <= ROMHACK.max_stars and math.floor(num) == num then
     if gGlobalSyncTable.noBowser and num < 1 then
       return false
@@ -579,7 +586,7 @@ function get_role_name_and_color(sMario)
       colorString = "\\#00ffff\\"
     end
     roleName = trans("runner")
-  elseif not sMario.team then           -- joining
+  elseif not sMario.team then             -- joining
     color = { r = 169, g = 169, b = 169 } -- grey
     colorString = "\\#a9a9a9\\"
     roleName = trans("menu_unknown")
@@ -669,9 +676,13 @@ function act_bubble_return(m)
     m.pos.x = m.pos.x + m.vel.x
     m.pos.y = m.pos.y + m.vel.y
     m.pos.z = m.pos.z + m.vel.z
+    vec3f_copy(gLakituState.goalPos, m.pos)
   else
     m.faceAngle.x = 0
     vec3f_copy(m.pos, goToPos)
+    if m.actionTimer == 45 then
+      vec3f_copy(gLakituState.goalPos, goToPos)
+    end
   end
   vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
   vec3s_copy(m.marioObj.header.gfx.angle, m.faceAngle)
@@ -684,22 +695,26 @@ function act_bubble_return(m)
 
   if m.actionTimer > 60 then
     vec3f_copy(m.pos, goToPos)
-    m.vel.x, m.vel.y, m.vel.z = 0, -60, 0
+    m.forwardVel, m.vel.x, m.vel.y, m.vel.z = 0, 0, -60, 0
+    common_air_action_step(m, ACT_FREEFALL_LAND, MARIO_ANIM_GENERAL_FALL, 0) -- done to update floor
     if m.input & INPUT_NONZERO_ANALOG ~= 0 then
       m.forwardVel = 5
       m.faceAngle.y = m.intendedYaw
     else
       m.forwardVel = 0
     end
+
     obj_mark_for_deletion(m.bubbleObj)
     m.bubbleObj = nil
+
     m.particleFlags = m.particleFlags | PARTICLE_MIST_CIRCLE
     play_sound(SOUND_OBJ_DIVING_IN_WATER, m.pos)
     m.invincTimer = 70
     m.marioObj.oIntangibleTimer = 0
+
     if m.waterLevel > m.pos.y then
       set_mario_action(m, ACT_WATER_IDLE, 0)
-    elseif m.floor.type == SURFACE_DEATH_PLANE or m.floor.type == SURFACE_INSTANT_QUICKSAND then
+    elseif (m.floor.type == SURFACE_DEATH_PLANE or m.floor.type == SURFACE_BURNING or m.floor.type == SURFACE_INSTANT_QUICKSAND or m.floor.type == SURFACE_VERTICAL_WIND or m.floor.type == SURFACE_INSTANT_MOVING_QUICKSAND) then
       set_mario_action(m, ACT_TRIPLE_JUMP, 0)
     else
       set_mario_action(m, ACT_SOFT_BONK, 0)
