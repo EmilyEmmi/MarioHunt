@@ -1,5 +1,48 @@
 # Changelog
-## v2.6.1 (WIP)
+## v2.6.2 (WIP)
+### Additions:
+  - Added Classic preset, which changes settings to match old versions of MarioHunt
+  - Added game setting: "Stay If Already Collected"
+    - Stay in the level if the star you collected has already been collected
+    - Only applies when star collection is set to Leave
+  - Added an option to show at what time the last star was collected
+  - Added support for Star Revenge 7 - Park Of Time
+  - **API CHANGE:** Added coinColor, which works like starColor but for red coins
+  - **API CHANGE:** Added numRedCoins, for rom hacks that make the star appear with less coins
+  - Added a message when attempting to leave a menu without saving settings
+  - Added support for headless servers
+  - The menu now uses coopdx exclusive fonts, if available
+  - Some enemies can now be the subject of kill messages (ex: "Bowser finished off EmilyEmmi!")
+### Adjustments:
+  - Updated the minimap icons for players
+  - Metal doors now make the appropriate noise when being opened automatically
+  - **API CHANGE:** Added a third argument to getStarFlagsFunc, a bool called "recalc"
+    - TRUE if the function is ran in calculate_leave_requirements (used in Star Revenge 7 to unmark stars that are locked behind badges)'
+  - Anniversary date is now April 18th instead of April 19th
+  - Removed the update checker, since the function it uses was deprecated
+  - Changed the message that appears instructing on how to open the menu into a popup
+  - Hunters no longer get paused when entering a Bowser stage that has already been cleared while there are no Runners present
+  - Speedrun timer now pauses when global pause is active
+  - Placement roles for the 64 Tour now have "64T:" appended to the front
+  - Disabling your 64 Tour Placement role will now also disable the rainbow radar, if applicable
+  - Force spectate now overrides allow spectate
+  - Force spectate now only applies during the game
+  - Setting a Runner to force spectate will no longer turn them into Hunters
+    - Force spectate Runners will spectate upon death
+### Fixes:
+  - Fixed exclamation boxes causing errors in hacks such as Star Revenge 7
+  - Fixed incorrect numbers being displayed if there are not exactly 8 red coins/5 secrets
+  - Fixed menu being displayed under HUD in some scenarios
+  - Fixed the BBH back entrance causing the camera to get stuck in vanilla cam
+    - As a result, this door specifically will not open automatically
+  - Fixed the Runner Appearance and Runner Lives options not showing saved status properly
+  - Instances of "°" in Italian have been replaced with "o". This fixes the character displaying as "?", as well as a crash when entering the settings menu in MiniHunt.
+  - Corrected "[num]th Placo" in Italian to "[num]o Placo"
+  - Red coins are no longer desynced in MiniHunt when using OMM Rebirth to prevent softlocks
+  - Fixed spectator camera interacting with the "X Invert" and "Y Invert" options incorrectly
+  - Starting a new game now resets the special triple jump state
+  - Fixed solo preset causing a script error
+## v2.6.1
 ### Additions:
   - Minimap updates:
     - Added remaining minimap images for vanilla (RoxasYTB)
