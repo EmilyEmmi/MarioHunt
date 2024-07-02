@@ -118,7 +118,7 @@ function start_game(msg)
   end
 
   local challenge = false
-  if (not nonSoloRunner) and gGlobalSyncTable.mhMode == 2 then
+  if (not nonSoloRunner) and gGlobalSyncTable.mhMode == 2 and not (gServerSettings.headlessServer and gServerSettings.headlessServer ~= 0) then
     local singlePlayer = true
     for i = 1, MAX_PLAYERS - 1 do
       local np = gNetworkPlayers[i]
@@ -651,6 +651,7 @@ function act_bubble_return(m)
   if m.actionTimer < 15 or (m.playerIndex ~= 0 and m.actionTimer >= 45) then
     vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
     vec3s_copy(m.marioObj.header.gfx.angle, m.faceAngle)
+    m.vel.y = 0
     return
   elseif m.playerIndex ~= 0 then
     m.pos.x = m.pos.x + m.vel.x

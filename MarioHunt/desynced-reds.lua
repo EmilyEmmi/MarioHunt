@@ -81,12 +81,13 @@ function red_coin_loop(o)
     -- if mario interacted with the object...
     if o.oInteractStatus & INT_STATUS_INTERACTED ~= 0 then
         -- ..and the mario is us, and we are a runner (or OMM is enabled), if the gamemode is minihunt..
-        if gGlobalSyncTable.mhMode ~= 2 or (nearest_mario_state_to_object(o).playerIndex == 0 and (gPlayerSyncTable[0].team == 1 or OmmEnabled)) then
+        local m = nearest_mario_state_to_object(o)
+        if OmmEnabled or gGlobalSyncTable.mhMode ~= 2 or (m.playerIndex == 0 and gPlayerSyncTable[0].team == 1) then
             -- get red coin count
             local redCoins = count_objects_with_behavior(get_behavior_from_id(id_bhvRedCoin)) - 1
 
             -- spawn the orange number counter
-            spawn_orange_number(8 - redCoins, 0, 0, 0)
+            spawn_orange_number(m.area.numRedCoins - redCoins, 0, 0, 0)
 
             -- set this red coin as collected in minihunt
             if gGlobalSyncTable.mhMode == 2 then
@@ -130,7 +131,11 @@ end
 function hidden_red_coin_star_loop(o)
     if o.oAction == 0 then
         -- if there are no more red coins, set action to 1/spawn star
-        if count_objects_with_behavior(get_behavior_from_id(id_bhvRedCoin)) <= 0 then
+        local redMin = 0
+        if ROMHACK.numRedCoins then
+            redMin = 8 - ROMHACK.numRedCoins
+        end
+        if count_objects_with_behavior(get_behavior_from_id(id_bhvRedCoin)) <= redMin then
             o.oAction = 1
         end
     elseif o.oAction == 1 then
@@ -155,7 +160,11 @@ end
 function bowser_course_red_coin_star_loop(o)
     if o.oAction == 0 then
         -- if there are no more red coins, set action to 1/spawn star
-        if count_objects_with_behavior(get_behavior_from_id(id_bhvRedCoin)) <= 0 then
+        local redMin = 0
+        if ROMHACK.numRedCoins then
+            redMin = 8 - ROMHACK.numRedCoins
+        end
+        if count_objects_with_behavior(get_behavior_from_id(id_bhvRedCoin)) <= redMin then
             o.oAction = 1
         end
     elseif o.oAction == 1 then
@@ -196,14 +205,15 @@ function secret_loop(o)
     -- if we interacted with the object...
     if (o.oInteractStatus & INT_STATUS_INTERACTED ~= 0 or obj_check_if_collided_with_object(o, gMarioStates[0].marioObj) == 1) then
         -- ...and we're a runner, and our index is 0, if the gamemode is minihunt...
-        local index = nearest_mario_state_to_object(o).playerIndex
+        local m = nearest_mario_state_to_object(o)
+        local index = m.playerIndex
         if gPlayerSyncTable[index].team == 1 and (gGlobalSyncTable.mhMode ~= 2 or index == 0) then
             -- get hidden star object (ignore since the last one won't do the sound otherwise, for whatever reason)
             --local hiddenStar = cur_obj_nearest_object_with_behavior(get_behavior_from_id(id_bhvHiddenStarTrigger))
             --if hiddenStar ~= nil then
                 -- count amount of secrets and spawn orange number
                 local count = (count_objects_with_behavior(get_behavior_from_id(id_bhvHiddenStarTrigger)) - 1)
-                spawn_orange_number(5 - count, 0, 0, 0)
+                spawn_orange_number(m.area.numSecrets - count, 0, 0, 0)
                 if gGlobalSyncTable.mhMode == 2 then
                     miniSecretCollect = miniSecretCollect | (1 << o.unused1)
                 end

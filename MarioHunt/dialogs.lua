@@ -474,7 +474,7 @@ I could sure use a new\
 body!"))
 
 changed_dialogs[112] = 1
-smlua_text_utils_dialog_replace(DIALOG_112,1,4,30,200, ("Coins allow Runners\
+smlua_text_utils_dialog_replace(DIALOG_112,1,5,30,200, ("Coins allow Runners\
 to refill their Power\
 Meter.\
 Hunters can make use of\

@@ -22,7 +22,7 @@ end
 
 -- localize some functions
 local djui_chat_message_create, warp_to_level, warp_to_warpnode, tonumber, string_lower, mod_storage_save, mod_storage_load =
-djui_chat_message_create, warp_to_level, warp_to_warpnode, tonumber, string.lower, mod_storage_save, mod_storage_load
+    djui_chat_message_create, warp_to_level, warp_to_warpnode, tonumber, string.lower, mod_storage_save, mod_storage_load
 
 function if_then_else(cond, if_true, if_false)
   if cond then return if_true end
@@ -59,7 +59,7 @@ function do_warp(msg)
   end
   local area = tonumber(args[2]) or 1
   local act = tonumber(args[3]) or
-  (level_to_course[level] and level_to_course[level] < 16 and level_to_course[level] > 0 and 1) or 0
+      (level_to_course[level] and level_to_course[level] < 16 and level_to_course[level] > 0 and 1) or 0
   local node = tonumber(args[4])
   if not node then
     djui_chat_message_create("Warping to level " .. level .. " area " .. area .. " act " .. act)
@@ -95,7 +95,7 @@ function quick_debug(msg)
   else
     start_game("continue")
   end
-  
+
   if msg == "hunter" then
     gGlobalSyncTable.mhMode = 1
     become_hunter(sMario)
@@ -259,7 +259,6 @@ function force_spectate_command(msg)
       gGlobalSyncTable.forceSpectate = true
       for i = 0, (MAX_PLAYERS - 1) do
         gPlayerSyncTable[i].forceSpectate = true
-        become_hunter(gPlayerSyncTable[i])
       end
       djui_chat_message_create(trans("force_spectate"))
     end
@@ -276,7 +275,6 @@ function force_spectate_command(msg)
     djui_chat_message_create(trans("force_spectate_one_off", name))
   else
     sMario.forceSpectate = true
-    become_hunter(sMario)
     djui_chat_message_create(trans("force_spectate_one", name))
   end
   return true
@@ -554,8 +552,10 @@ end
 
 function render_power_meter_interpolated_mariohunt(health, prevX, prevY, prevWidth, prevHeight, x, y, width, height,
                                                    index)
-  if not apply_double_health(index or 0) then return hud_render_power_meter_interpolated(health, prevX, prevY, prevWidth,
-      prevHeight, x, y, width, height) end
+  if not apply_double_health(index or 0) then
+    return hud_render_power_meter_interpolated(health, prevX, prevY, prevWidth,
+      prevHeight, x, y, width, height)
+  end
   local doubleHealth = 2 * health - 0xFF
   if health >= 0x500 then
     hud_render_power_meter_interpolated(doubleHealth - 0x801, prevX, prevY, prevWidth, prevHeight, x, y, width, height)
@@ -570,7 +570,7 @@ end
 function apply_double_health(index)
   local sMario = gPlayerSyncTable[index]
   return sMario and gGlobalSyncTable.doubleHealth and sMario.team == 1 and sMario.hard ~= 2 and
-  (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2)
+      (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2)
 end
 
 -- tip data
@@ -610,7 +610,7 @@ tip_data = {
   [43] = { -1, true },
   [44] = { -1, false, -1, false, false, function() return gPlayerSyncTable[0].role ~= 0 end },
 }
-local new_tips = {1, 43, 46, 13, 42, 10, 11, 4, 5, 6, 7, 22}
+local new_tips = { 1, 43, 46, 13, 42, 10, 11, 4, 5, 6, 7, 22 }
 
 local newTipProg = 0
 local chosenTip = 0
@@ -643,7 +643,7 @@ function render_tip(pickNew)
             invalid = true
           elseif data[4] and not OmmEnabled then
             invalid = true
-          elseif data[5] and gGlobalSyncTable.romhack_file ~= "vanilla" then
+          elseif data[5] and gGlobalSyncTable.romhackFile ~= "vanilla" then
             invalid = true
           elseif data[6] and not data[6]() then
             invalid = true
@@ -670,6 +670,65 @@ function render_tip(pickNew)
   end
   x = (screenWidth - width) / 2
   djui_hud_print_text(text, x, y, scale)
+end
+
+function set_override_team_colors(np, team)
+  local m = gMarioStates[np.localIndex]
+  if team == 1 then
+    -- azure
+    local sMario = gPlayerSyncTable[m.playerIndex]
+    local darkBlue = { r = 0x4f, g = 0x31, b = 0x8b }
+    local lightBlue = { r = 0x5a, g = 0x94, b = 0xff }
+    if runnerAppearance ~= 4 and (runnerAppearance ~= 2 or m.marioBodyState.modelState & MODEL_STATE_METAL == 0) then
+      network_player_reset_override_palette(np)
+      return
+    end
+
+    network_player_reset_override_palette_part(np, GLOVES)
+    network_player_reset_override_palette_part(np, SKIN)
+    network_player_reset_override_palette_part(np, SHOES)
+    network_player_reset_override_palette_part(np, HAIR)
+    if m.marioBodyState.modelState & MODEL_STATE_METAL ~= 0 then
+      if runnerAppearance == 4 or sMario.hard == nil or sMario.hard == 0 then
+        network_player_set_override_palette_color(np, METAL, lightBlue)
+      elseif sMario.hard == 1 then
+        network_player_set_override_palette_color(np, METAL, { r = 255, g = 0xbd, b = 0 }) -- wario yellow
+      else
+        network_player_set_override_palette_color(np, METAL, { r = 0x61, g = 0x25, b = 0xb0 }) -- waluigi purple
+      end
+      return
+    end
+    network_player_set_override_palette_color(np, EMBLEM, darkBlue)
+    network_player_set_override_palette_color(np, CAP, lightBlue)
+    network_player_set_override_palette_color(np, PANTS, darkBlue)
+    network_player_set_override_palette_color(np, SHIRT, lightBlue)
+  else
+    -- burgundy
+    local darkRed = { r = 0x23, g = 0x11, b = 0x03 }
+    local lightRed = { r = 0x68, g = 0x0a, b = 0x17 }
+    if hunterAppearance ~= 4 and (hunterAppearance ~= 2 or m.marioBodyState.modelState & MODEL_STATE_METAL == 0) then
+      network_player_reset_override_palette(np)
+      return
+    end
+
+    
+    network_player_reset_override_palette_part(np, GLOVES)
+    network_player_reset_override_palette_part(np, SKIN)
+    network_player_reset_override_palette_part(np, SHOES)
+    network_player_reset_override_palette_part(np, HAIR)
+    if m.marioBodyState.modelState & MODEL_STATE_METAL ~= 0 then
+      network_player_set_override_palette_color(np, METAL, lightRed)
+      return
+    end
+    network_player_set_override_palette_color(np, EMBLEM, darkRed)
+    network_player_set_override_palette_color(np, CAP, lightRed)
+    network_player_set_override_palette_color(np, PANTS, darkRed)
+    network_player_set_override_palette_color(np, SHIRT, lightRed)
+  end
+end
+
+function network_player_reset_override_palette_part(np, part)
+  network_player_set_override_palette_color(np, part, network_player_get_palette_color(np, part))
 end
 
 -- main command

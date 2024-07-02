@@ -1,6 +1,6 @@
-<img src="img\logo.png" alt="MarioHunt" width="800"/>
+<img src="wiki\img\logo.png" alt="MarioHunt" width="800"/>
 
-### v2.6.1 (view changelog [here](changelog.md))
+### v2.6.2 (view changelog [here](changelog.md))
 
 ## [Trailer](https://www.youtube.com/watch?v=hyuXu4Bzugs&ab_channel=N64Mario)
 

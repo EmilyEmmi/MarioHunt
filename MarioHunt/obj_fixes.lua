@@ -6,11 +6,11 @@ local m0 = gMarioStates[0]
 local np0 = gNetworkPlayers[0]
 
 local function hook_behavior_custom(id, override, init, loop)
-    hook_behavior(id,
+    return hook_behavior(id,
         get_object_list_from_behavior(get_behavior_from_id(id)), -- Automatically get the correct object list
         override, init, loop,
         "bhvMhCustom" ..
-        get_behavior_name_from_id(id):sub(4)                     -- Give the behavior a consistent behavior name (for example, bhvTreasureChestsJrb will become bhvMhCustomTreasureChestsJrb)
+        get_behavior_name_from_id(id):sub(4) -- Give the behavior a consistent behavior name (for example, bhvTreasureChestsJrb will become bhvMhCustomTreasureChestsJrb)
     )
 end
 
@@ -138,18 +138,6 @@ end
 
 hook_behavior_custom(id_bhvCapSwitch, false, nil, custom_switch_loop)
 
--- fix boo cage for free roam
-local function custom_cage_boo_init(o)
-    if gGlobalSyncTable.freeRoam and gMarioStates[0].numStars < 12 then
-        local cage = spawn_non_sync_object(id_bhvBooCage, E_MODEL_HAUNTED_CAGE, o.oPosX, o.oPosY, o.oPosZ, nil)
-        if cage then
-            cage.oBehParams = o.oBehParams
-            cage.oAction = BOO_CAGE_ACT_FALLING
-        end
-    end
-end
-hook_behavior_custom(id_bhvBooWithCage, false, custom_cage_boo_init)
-
 -- instantly open cannon
 local function custom_bobomb_buddy_cannon_loop(o)
     if o.oBobombBuddyCannonStatus == BOBOMB_BUDDY_CANNON_OPENING then
@@ -163,15 +151,17 @@ local function custom_bobomb_buddy_cannon_loop(o)
 end
 hook_behavior_custom(id_bhvBobombBuddyOpensCannon, false, nil, custom_bobomb_buddy_cannon_loop)
 
--- instant/faster cutscene, or radar
-function do_star_stuff(radar)
+-- instant/faster cutscene, or radar (TODO: keys?)
+function star_update(radar)
+    if radar then
+        radar_store = {}
+    end
     local didRadar = {}
     if gGlobalSyncTable.mhMode ~= 2 or gNetworkPlayers[0].currLevelNum == gGlobalSyncTable.gameLevel then
-        for id, bhvName in pairs(star_ids) do
-            local o = obj_get_first_with_behavior_id(id)
-            while o do
-                if not o.unused1 then o.unused1 = 0 end
-
+        local o = obj_get_first(OBJ_LIST_LEVEL)
+        while o do
+            local id = get_id_from_behavior(o.behavior)
+            if o.oInteractType == INTERACT_STAR_OR_KEY or star_ids[id] then
                 if id == id_bhvSpawnedStar or id == id_bhvSpawnedStarNoLevelExit then
                     if o.oAction == 0 then
                         o.oPosX, o.oPosY, o.oPosZ = o.oHomeX, o.oHomeY, o.oHomeZ
@@ -197,8 +187,8 @@ function do_star_stuff(radar)
                         o.oPosY = o.oHomeY - 1
                     end
                 end
-                
-                if radar and (o.header.gfx.node.flags & GRAPH_RENDER_ACTIVE ~= 0 or (o.oRoom ~= -1 and current_mario_room_check(o.oRoom) == 0)) then
+
+                if radar and (o.activeFlags & ACTIVE_FLAG_DORMANT == 0) then
                     local star = (o.oBehParams >> 24) + 1
                     if ((star > 0 and star < 8) or ROMHACK.isUnder) and not didRadar[star] then
                         if gGlobalSyncTable.mhMode ~= 2 then
@@ -210,7 +200,7 @@ function do_star_stuff(radar)
                                     star_radar[star] = { tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6 }
                                     star_minimap[star] = { tex = gTextures.star, prevX = 0, prevY = 0 }
                                 end
-                                render_radar(o, star_radar[star], star_minimap[star], true)
+                                table.insert(radar_store, o)
                                 didRadar[star] = 1
                             end
                         elseif star == gGlobalSyncTable.getStar then
@@ -218,21 +208,13 @@ function do_star_stuff(radar)
                                 star_radar[star] = { tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6 }
                                 star_minimap[star] = { tex = gTextures.star, prevX = 0, prevY = 0 }
                             end
-                            render_radar(o, star_radar[star], star_minimap[star], true)
+                            table.insert(radar_store, o)
                             didRadar[star] = 1
-
-                            if o.unused1 ~= 5 then
-                                obj_set_model_extended(o, E_MODEL_STAR)
-                                o.unused1 = o.unused1 + 1 -- using this as a flag
-                            end
-                        elseif o.unused1 ~= 5 then
-                            obj_set_model_extended(o, E_MODEL_TRANSPARENT_STAR)
-                            o.unused1 = o.unused1 + 1 -- using this as a flag
                         end
                     end
                 end
-                o = obj_get_next_with_same_behavior_id(o)
             end
+            o = obj_get_next(o)
         end
     end
 end
@@ -282,21 +264,23 @@ local MODEL_TOAD_PLAYER = 0xE8               -- toad_player_geo
 local MODEL_TOADS_CAP = 0xE9                 -- toads_cap_geo
 local MODEL_TOADS_METAL_CAP = 0xEA           -- toads_metal_cap_geo
 local MODEL_TOADS_WING_CAP = 0xEB            -- toads_wing_cap_geo
+local MODEL_TOADS_WINGED_METAL_CAP = 0xEC    -- toads_winged_metal_cap_geo
 
-local MODEL_WALUIGI = 0xEC                   -- waluigi_geo
-local MODEL_WALUIGIS_CAP = 0xED              -- waluigis_cap_geo
-local MODEL_WALUIGIS_METAL_CAP = 0xEE        -- waluigis_metal_cap_geo
-local MODEL_WALUIGIS_WING_CAP = 0xEF         -- waluigis_wing_cap_geo
-local MODEL_WALUIGIS_WINGED_METAL_CAP = 0xF0 -- waluigis_winged_metal_cap_geo
+local MODEL_WALUIGI = 0xED                   -- waluigi_geo
+local MODEL_WALUIGIS_CAP = 0xEE1             -- waluigis_cap_geo
+local MODEL_WALUIGIS_METAL_CAP = 0xEF        -- waluigis_metal_cap_geo
+local MODEL_WALUIGIS_WING_CAP = 0xF0         -- waluigis_wing_cap_geo
+local MODEL_WALUIGIS_WINGED_METAL_CAP = 0xF1 -- waluigis_winged_metal_cap_geo
 
-local MODEL_WARIO = 0xF1                     -- wario_geo
-local MODEL_WARIOS_CAP = 0xF2                -- warios_cap_geo
-local MODEL_WARIOS_METAL_CAP = 0xF3          -- warios_metal_cap_geo
-local MODEL_WARIOS_WING_CAP = 0xF4           -- warios_wing_cap_geo
-local MODEL_WARIOS_WINGED_METAL_CAP = 0xF5   -- warios_winged_metal_cap_geo
+local MODEL_WARIO = 0xF2                     -- wario_geo
+local MODEL_WARIOS_CAP = 0xF3                -- warios_cap_geo
+local MODEL_WARIOS_METAL_CAP = 0xF4          -- warios_metal_cap_geo
+local MODEL_WARIOS_WING_CAP = 0xF5           -- warios_wing_cap_geo
+local MODEL_WARIOS_WINGED_METAL_CAP = 0xF6   -- warios_winged_metal_cap_geo
 
 -- outline models for each character and caps - order is Red, Blue, Yellow, Purple
 local OUTLINE_MODEL = {}
+local CAP_MODELS = {}
 if not LITE_MODE then
     OUTLINE_MODEL = {
         [MODEL_MARIO] = { smlua_model_util_get_id("h_mario_geo"), smlua_model_util_get_id("r_mario_geo"), smlua_model_util_get_id("rh_mario_geo"), smlua_model_util_get_id("re_mario_geo") },
@@ -310,15 +294,30 @@ end
 local E_MODEL_CAKE = ((not LITE_MODE) and smlua_model_util_get_id("mh_star_geo")) -- no more waiting for cake, just do logo star
 
 local sBehavior = get_behavior_from_id(id_bhvHiddenStarTrigger)
+local dontLoop = false
 function on_obj_set_model(o, model)
-    if obj_has_model_extended(o, E_MODEL_NONE) and o.behavior == sBehavior then
+    if dontLoop then return end
+    if model == 0 and o.behavior == sBehavior then
         obj_set_model_extended(o, E_MODEL_PURPLE_MARBLE)
     end
-    if LITE_MODE then return end
 
-    if model == 0x7A and month == 14 then -- star model changes on anniversary
-        obj_set_model_extended(o, E_MODEL_CAKE)
-    elseif (runnerAppearance == 3 or hunterAppearance == 3) and OUTLINE_MODEL[model] then
+    if model == 0x79 or model == 0x7A and star_ids[get_id_from_behavior(o.behavior)] then -- star model changes on anniversary
+        local star = (o.oBehParams >> 24) + 1
+        local starModel = (month == 14 and E_MODEL_CAKE) or E_MODEL_STAR
+        if gGlobalSyncTable.mhMode == 2 then
+            if (star == gGlobalSyncTable.getStar) ~= (model == 0x7A) then
+                if model == 0x7A then
+                    obj_set_model_extended(o, E_MODEL_TRANSPARENT_STAR)
+                else
+                    obj_set_model_extended(o, starModel)
+                end
+            end
+        elseif month == 14 and E_MODEL_CAKE and model == 0x7A then
+            dontLoop = true
+            obj_set_model_extended(o, starModel)
+            dontLoop = false
+        end
+    elseif (not LITE_MODE) and (runnerAppearance == 3 or hunterAppearance == 3) and OUTLINE_MODEL[model] then
         local np = network_player_from_global_index(o.globalPlayerIndex)
         if not np then return end
         local sMario = gPlayerSyncTable[np.localIndex]
@@ -335,4 +334,134 @@ function on_obj_set_model(o, model)
     end
 end
 
-hook_event(HOOK_OBJECT_SET_MODEL, on_obj_set_model)
+--hook_event(HOOK_OBJECT_SET_MODEL, on_obj_set_model) -- done in main.lua
+
+-- definitely a necessary feature
+obj_kill_names = {
+    [id_bhvBowser] = "\\#ff1f1f\\Bowser",
+    [id_bhvBowserBodyAnchor] = "\\#ff1f1f\\Bowser",
+    [id_bhvBlueBowserFlame] = "\\#ff1f1f\\Bowser",
+    [id_bhvFlameBowser] = "\\#ff1f1f\\Bowser",
+    [id_bhvFlameLargeBurningOut] = "\\#ff1f1f\\Bowser",
+    [id_bhvGoomba] = "\\#bf9c50\\Goomba",
+    [id_bhvBobomb] = "\\#707070\\Bob-Omb",
+    [id_bhvKingBobomb] = "\\#707070\\King Bob-Omb",
+    [id_bhvPiranhaPlant] = "\\#2eab2e\\Piranha Plant",
+    [id_bhvFirePiranhaPlant] = "\\#ff1f1f\\Fire Piranha Plant",
+    [id_bhvFlamethrowerFlame] = "\\#ff1f1f\\Flamethrower",
+    [id_bhvBoo] = "Boo",
+    [id_bhvMerryGoRoundBoo] = "Boo",
+    [id_bhvGhostHuntBoo] = "Boo",
+    [id_bhvBooWithCage] = "Big Boo",
+    [id_bhvBalconyBigBoo] = "Big Boo",
+    [id_bhvGhostHuntBigBoo] = "Big Boo",
+    [id_bhvMerryGoRoundBigBoo] = "Big Boo",
+    [id_bhvMrI] = "Mr. I",
+    [id_bhvMrIParticle] = "Mr. I",
+    [id_bhvMrBlizzard] = "Mr. Blizzard",
+    [id_bhvMrBlizzardSnowball] = "Mr. Blizzard",
+    [id_bhvMrBlizzardSnowball] = "Mr. Blizzard",
+    [id_bhvBulletBill] = "\\#707070\\Bullet Bill",
+    [id_bhvChainChomp] = "\\#707070\\Chain Chomp",
+    [id_bhvBigBully] = "\\#707070\\Big Bully",
+    [id_bhvBigBullyWithMinions] = "\\#707070\\Big Bully",
+    [id_bhvSmallBully] = "\\#707070\\Bully",
+    [id_bhvSmallChillBully] = "\\#91fff2\\Chill Bully",
+    [id_bhvBigChillBully] = "\\#91fff2\\Big Chill Bully",
+    [id_bhvUnagiSubobject] = "\\#ab2e56\\Unagi",
+    [id_bhvFlyingBookend] = "\\#2eab2e\\Flying Book",
+    [id_bhvHauntedChair] = "\\#bf9c50\\Flying Chair",
+    [id_bhvMadPiano] = "\\#707070\\Mad Piano",
+    [id_bhvFlyGuy] = "\\#ff5050\\Fly Guy",
+    [id_bhvFlyguyFlame] = "\\#ff5050\\Fly Guy",
+    [id_bhvScuttlebug] = "\\#f5d142\\Scuttlebug",
+    [id_bhvWigglerHead] = "\\#f5d142\\Wiggler",
+    [id_bhvWigglerBody] = "\\#f5d142\\Wiggler",
+    [id_bhvChuckya] = "\\#e642f5\\Chuckya",
+    [id_bhvSnufit] = "\\#ff5050\\Snufit",
+    [id_bhvSnufitBalls] = "\\#ff5050\\Snufit",
+    [id_bhvMontyMole] = "\\#bf9c50\\Monty Mole",
+    [id_bhvMontyMoleRock] = "\\#bf9c50\\Monty Mole",
+    [id_bhvBigBoulder] = "\\#bf9c50\\Rolling Rock",
+    [id_bhvBowlingBall] = "\\#707070\\Bowling Ball",
+    [id_bhvPitBowlingBall] = "\\#707070\\Bowling Ball",
+    [id_bhvFreeBowlingBall] = "\\#707070\\Bowling Ball",
+    [id_bhvHomingAmp] = "\\#707070\\Amp",
+    [id_bhvCirclingAmp] = "\\#707070\\Amp",
+    [id_bhvSushiShark] = "\\#5050ff\\Sushi",
+    [id_bhvHeaveHo] = "\\#ff5050\\Heave-Ho",
+    [id_bhvSkeeter] = "\\#5050ff\\Skeeter",
+    [id_bhvClamShell] = "\\#e642f5\\Clam",
+}
+
+-- all DDD stuff
+---@param o Object
+function custom_ddd_sub_init(o)
+    o.oFlags = o.oFlags | (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)
+    o.oCollisionDistance = 20000
+    o.collisionData = smlua_collision_util_get('ddd_seg7_collision_submarine')
+end
+
+---@param o Object
+function custom_ddd_door_init(o)
+    o.oFlags = o.oFlags | (OBJ_FLAG_ACTIVE_FROM_AFAR | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE)
+    o.oCollisionDistance = 20000
+    o.collisionData = smlua_collision_util_get('ddd_seg7_collision_bowser_sub_door')
+end
+
+---@param o Object
+function custom_ddd_loop(o)
+    if not gGlobalSyncTable.freeRoam then
+        bhv_bowsers_sub_loop()
+        load_object_collision_model()
+        return
+    end
+    local file = get_current_save_file_num() - 1
+    if save_file_get_star_flags(file, COURSE_DDD - 1) & 1 ~= 0 then
+        cur_obj_disable_rendering()
+    else
+        cur_obj_enable_rendering()
+        load_object_collision_model()
+    end
+end
+
+hook_behavior_custom(id_bhvBowsersSub, true, custom_ddd_sub_init, custom_ddd_loop)
+hook_behavior_custom(id_bhvBowserSubDoor, true, custom_ddd_door_init, custom_ddd_loop)
+
+---@param o Object
+function custom_ddd_warp_init(o)
+    o.oFlags = o.oFlags | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
+    o.oCollisionDistance = 30000
+end
+
+---@param o Object
+function custom_ddd_warp_loop(o)
+    if not gGlobalSyncTable.freeRoam then
+        bhv_ddd_warp_loop()
+        load_object_collision_model()
+        return
+    end
+    local paintingShift = 0
+    local file = get_current_save_file_num() - 1
+    if save_file_get_star_flags(file, COURSE_DDD - 1) & 1 == 0 then
+        local m = gMarioStates[0]
+        paintingShift = 600
+        if m.pos.z > 1587.1999511719 + paintingShift and m.pos.x <= 3556 then
+            o.collisionData = smlua_collision_util_get('inside_castle_seg7_collision_ddd_warp')
+        else
+            o.collisionData = smlua_collision_util_get('inside_castle_seg7_collision_ddd_warp_2')
+        end
+        if m.pos.x > 5000 then
+            o.oPosX = 5000
+        else
+            o.oPosX = 0
+        end
+    else
+        o.oPosX = 0
+        o.collisionData = smlua_collision_util_get('inside_castle_seg7_collision_ddd_warp_2')
+    end
+    gPaintingValues.ddd_painting.posZ = 1587.1999511719 + paintingShift
+    load_object_collision_model()
+end
+
+hook_behavior_custom(id_bhvDddWarp, true, custom_ddd_warp_init, custom_ddd_warp_loop)

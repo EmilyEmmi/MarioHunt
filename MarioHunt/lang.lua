@@ -79,6 +79,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   stalk_desc = "[NAME|ID] - Warps to the level the specified player is in, or the first Runner",
   spectate_desc = "[NAME|ID|OFF] - Spectate the specified player, free camera if not specified, or OFF to turn off", -- not to be confused with spectator_desc
   target_desc = "[NAME|ID] - Set this Runner as your target, which displays their location at all times.",
+  unsaved_changes = "\\#ff5a5a\\You have unsaved changes! Press again if you're sure.", -- needs translation
 
   -- roles
   runner = "Runner",
@@ -339,6 +340,10 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   disp_wins_hard = "%s\\#ffffff\\ has won %d times as \\#ffff5a\\Runner\\#ffffff\\ in \\#ff5a5a\\Hard Mode!\\#ffffff\\",
   disp_wins_ex_one = "%s\\#ffffff\\ has won 1 time as \\#b45aff\\Runner\\#ffffff\\ in \\#b45aff\\Extreme Mode!\\#ffffff\\",
   disp_wins_ex = "%s\\#ffffff\\ has won %d times as \\#b45aff\\Runner\\#ffffff\\ in \\#b45aff\\Extreme Mode!\\#ffffff\\",
+  disp_asn_quarter = "%s\\#ffffff\\ reached the \\#70ff94\\quarter-finals\\#ffffff\\ in the ASN Tourney!", -- needs translation
+  disp_asn_semi = "%s\\#ffffff\\ reached the \\#b38752\\semi-finals\\#ffffff\\ in the ASN Tourney!", -- needs translation
+  disp_asn_final = "%s\\#ffffff\\ reached the \\#c5d8de\\finals\\#ffffff\\ in the ASN Tourney!", -- needs translation
+  disp_asn_win = "%s \\#e3bc2d\\won\\#ffffff\\ the ASN Tourney!", -- needs translation
   -- for stats table
   stat_wins_standard = "Wins",
   stat_wins = "Wins (Minihunt/pre v2.3)",
@@ -354,12 +359,18 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   stat_parkour_time = "Fastest Parkour Time",
   stat_parkour_time_omm = "Fastest Parkour Time (OMM)",
   stat_parkour_time_other = "Fastest Parkour Time (Moveset)",
+  stat_placement_asn = "ASN Tourney Placement",
 
   -- placements
-  place_1 = "\\#e3bc2d\\[1st Place]",
-  place_2 = "\\#c5d8de\\[2nd Place]",
-  place_3 = "\\#b38752\\[3rd Place]",
-  place = "\\#e7a1ff\\[%dth Place]", -- thankfully we don't go up to 21
+  place_1 = "\\#e3bc2d\\[64T: 1st Place]",
+  place_2 = "\\#c5d8de\\[64T: 2nd Place]",
+  place_3 = "\\#b38752\\[64T: 3rd Place]",
+  place = "\\#e7a1ff\\[64T: %dth Place]", -- thankfully we don't go up to 21
+  place_asn_1 = "\\#e3bc2d\\[ASN Winner]", -- needs translation
+  place_asn_2 = "\\#c5d8de\\[ASN Finalist]", -- needs translation
+  place_asn_3 = "\\#b38752\\[ASN Semi-Finalist]", -- needs translation
+  place_asn_4 = "\\#70ff94\\[ASN Quarter-Finalist]", -- needs translation
+  place_asn = "\\#e7a1ff\\[ASN Participant]", -- needs translation
   place_score_1 = "%dst",
   place_score_2 = "%dnd",
   place_score_3 = "%drd",
@@ -465,6 +476,8 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_stalk_timer = "Stalk Cooldown", -- needs translation
   menu_stalk_timer_desc = "Time the player is frozen for after using /stalk.", -- needs translation
   menu_star_setting = "On star collection",
+  menu_star_stay_old = "Stay If Already Collected", -- needs translation
+  menu_star_stay_old_desc = "Collecting a star that has already been collected will not eject you from the level.", -- needs translation
   star_leave = "Leave",
   star_stay = "Stay",
   star_nonstop = "Non-Stop",
@@ -505,8 +518,10 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   menu_minimap_desc = "Shows a map of the whole level.",
   menu_romhack_cam = "Romhack Cam", -- (cam is short for camera)
   menu_romhack_cam_desc = "Enables romhack camera at all times.", -- (cam is short for camera)
-  menu_invinc_particle = "Sparkle I-Frames", -- needs translation (I-Frames is short for invincibility/invulnerability frames)
-  menu_invinc_particle_desc = "Replaces the \"blinking\" effect when Mario takes damage with sparkle particles.", -- needs translation
+  menu_invinc_particle = "Sparkle I-Frames", -- (I-Frames is short for invincibility/invulnerability frames)
+  menu_invinc_particle_desc = "Replaces the \"blinking\" effect when Mario takes damage with sparkle particles.",
+  menu_star_timer = "Last Star Time",
+  menu_star_timer_desc = "- Shows when the last star was collected on the bottom of the screen.",
 
   menu_free_cam_desc = "Enter Free Camera in Spectator Mode.",
   menu_spectate_run = "Spectate Runner",
@@ -541,12 +556,14 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   preset_tag_desc = "Hit a Runner to instantly become one!",
   preset_star_rush = "Star Rush",
   preset_star_rush_desc = "Minihunt, but everyone's a Runner!",
+  preset_classic = "Classic",
+  preset_classic_desc = "Changes settings to match old versions of MarioHunt.",
 
-  -- updater
+  -- updater (now obsolete)
   up_to_date = "\\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\ is up to date!",
   up_to_date_egg = "\\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\ is up to date!",
-  has_update = "An update is avalible for \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\!",
-  has_update_egg = "An update is avalible for \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\!",
+  has_update = "An update is availible for \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#ffffff\\!",
+  has_update_egg = "An update is availible for \\#5aff5a\\Luigi\\#ff5a5a\\Hunt\\#ffffff\\!",
 
   -- tips (needs translation)
   -- I totally understand if you don't want to translate all of these.
@@ -865,10 +882,10 @@ langdata["es"] = -- By Kanheaven and SonicDark, with newer lines by EpikCool and
   stat_parkour_time_other = "Tiempo Mas Rápido En Parkour (Moveset)",
 
   -- placements
-  place_1 = "\\#e3bc2d\\[1er Lugar]",
-  place_2 = "\\#c5d8de\\[2do Lugar]",
-  place_3 = "\\#b38752\\[3er Lugar]",
-  place = "\\#e7a1ff\\[%do Lugar]", -- thankfully we don't go up to 21
+  place_1 = "\\#e3bc2d\\[64T: 1er Lugar]",
+  place_2 = "\\#c5d8de\\[64T: 2do Lugar]",
+  place_3 = "\\#b38752\\[64T: 3er Lugar]",
+  place = "\\#e7a1ff\\[64T: %do Lugar]", -- thankfully we don't go up to 21
   place_score_1 = "%der",
   place_score_2 = "%ddo",
   place_score_3 = "%der",
@@ -1343,10 +1360,10 @@ langdata["de"] = -- by N64 Mario
   stat_wins_ex = "Siege (Extrem Modus, Minihunt/vor v2.3)",
 
   -- placements
-  place_1 = "\\#e3bc2d\\[Platz 1]",
-  place_2 = "\\#c5d8de\\[Platz 2]",
-  place_3 = "\\#b38752\\[Platz 3]",
-  place = "\\#e7a1ff\\[Platz %d]", -- thankfully we don't go up to 21
+  place_1 = "\\#e3bc2d\\[64T: Platz 1]",
+  place_2 = "\\#c5d8de\\[64T: Platz 2]",
+  place_3 = "\\#b38752\\[64T: Platz 3]",
+  place = "\\#e7a1ff\\[64T: Platz %d]", -- thankfully we don't go up to 21
   place_score_1 = "%d",
   place_score_2 = "%d",
   place_score_3 = "%d",
@@ -1809,10 +1826,10 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   stat_wins_ex = "Vitórias no Modo Extremo (Mini-Caça/pré v2.3)",
 
   -- placements
-  place_1 = "\\#e3bc2d\\[1ro Lugar]",
-  place_2 = "\\#c5d8de\\[2ndo Lugar]",
-  place_3 = "\\#b38752\\[3ro Lugar]",
-  place = "\\#e7a1ff\\[%do Lugar]", -- thankfully we don't go up to 21
+  place_1 = "\\#e3bc2d\\[64T: 1ro Lugar]",
+  place_2 = "\\#c5d8de\\[64T: 2ndo Lugar]",
+  place_3 = "\\#b38752\\[64T: 3ro Lugar]",
+  place = "\\#e7a1ff\\[64T: %do Lugar]", -- thankfully we don't go up to 21
   place_score_1 = "%dro",
   place_score_2 = "%dndo",
   place_score_3 = "%dro",
@@ -2311,10 +2328,10 @@ langdata["fr"] = -- By Skeltan
   stat_wins_ex = "Victoires (Mode Extrême, Minihunt/pré v2.3)",
 
   -- placements
-  place_1 = "\\#e3bc2d\\[1ère Place]",
-  place_2 = "\\#c5d8de\\[2ème Place]",
-  place_3 = "\\#b38752\\[3ème Place]",
-  place = "\\#e7a1ff\\[%dème Place]", -- thankfully we don't go up to 21
+  place_1 = "\\#e3bc2d\\[64T: 1ère Place]",
+  place_2 = "\\#c5d8de\\[64T: 2ème Place]",
+  place_3 = "\\#b38752\\[64T: 3ème Place]",
+  place = "\\#e7a1ff\\[64T: %dème Place]", -- thankfully we don't go up to 21
   place_score_1 = "%dère",
   place_score_2 = "%dème",
   place_score_3 = "%dème",
@@ -2839,14 +2856,14 @@ langdata["it"] = -- by Mr. L-ore
   stat_wins_ex = "Vittorie (Modalità Estrema, MiniHunt/pre v2.3)",
 
   -- placements
-  place_1 = "\\#e3bc2d\\[1° Posto]",
-  place_2 = "\\#c5d8de\\[2° Posto]",
-  place_3 = "\\#b38752\\[3° Posto]",
-  place = "\\#e7a1ff\\[%dth Posto]", -- thankfully we don't go up to 21
-  place_score_1 = "%d°",
-  place_score_2 = "%d°",
-  place_score_3 = "%d°",
-  place_score = "%d°",
+  place_1 = "\\#e3bc2d\\[64T: 1o Posto]",
+  place_2 = "\\#c5d8de\\[64T: 2o Posto]",
+  place_3 = "\\#b38752\\[64T: 3o Posto]",
+  place = "\\#e7a1ff\\[64T: %do Posto]", -- thankfully we don't go up to 21
+  place_score_1 = "%do",
+  place_score_2 = "%do",
+  place_score_3 = "%do",
+  place_score = "%do",
 
   -- chat roles
   role_lead = "\\#9a96ff\\[Lead MH Dev]",
@@ -2932,7 +2949,7 @@ langdata["it"] = -- by Mr. L-ore
   menu_dmgAdd_desc = "Agguinge il quantitativo al danno inflitto ai Corridori",
   menu_nerf_vanish = "Depotenzia Cappello Invisibile", -- Nerf, as in to reduce power for balancing
   menu_nerf_vanish_desc = "Depotenzia il cappello invisibile rendendolo disattivabile e diminuendo la durata.",
-  menu_first_timer = "Cronometro della Morte per il 1°",
+  menu_first_timer = "Cronometro della Morte per il 1o",
   menu_first_timer_desc = "Da' al giocatore in prima posizione nella MiniHunt un cronometro della morte.",
   menu_defeat_bowser = "Sconfiggi %s",
   menu_allow_stalk = "Permetti lo 'Stalking'",
@@ -3303,10 +3320,10 @@ langdata["ro"] = -- by N64 (not to be mistaken for N64-Mario)
   stat_wins_ex = "Învingeri (Modul Extrem, MiniHunt/pre v2.3)",
 
   -- placements
-  place_1 = "\\#e3bc2d\\[Primul Loc]",
-  place_2 = "\\#c5d8de\\[Doilea Loc]",
-  place_3 = "\\#b38752\\[Treilea Loc]",
-  place = "\\#e7a1ff\\[%dPatrulea Loc]", -- thankfully we don't go up to 21
+  place_1 = "\\#e3bc2d\\[64T: Primul Loc]",
+  place_2 = "\\#c5d8de\\[64T: Doilea Loc]",
+  place_3 = "\\#b38752\\[64T: Treilea Loc]",
+  place = "\\#e7a1ff\\[64T: %dPatrulea Loc]", -- thankfully we don't go up to 21
   place_score_1 = "%dprimul",
   place_score_2 = "%ddoilea",
   place_score_3 = "%dtrilea",

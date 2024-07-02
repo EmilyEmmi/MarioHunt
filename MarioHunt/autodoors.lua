@@ -6,11 +6,19 @@ doorsClosing = false
 
 ---@param o Object
 function door_loop(o)
-  -- fix for replica comet
+  -- fixes for: replica comet, bbh back entrance, and underworld
+  local m = gMarioStates[0]
   if gNetworkPlayers[0].currLevelNum == LEVEL_TTC and gGlobalSyncTable.romhackFile == "coop-romhacks-star-road" then return end
+  if gNetworkPlayers[0].currLevelNum == LEVEL_BBH and o.oDoorUnkF8 == 28 then
+    if m.usedObj == o and m.action == ACT_PUSHING_DOOR and m.actionTimer == 1 then
+      m.area.camera.cutscene = CUTSCENE_DOOR_PUSH
+      play_cutscene(m.area.camera)
+    end
+    return
+  end
+  if ROMHACK.isUnder then return end
 
   -- check if the door has enough stars to be opened
-  local m = gMarioStates[0]
   local starsNeeded = (o.oBehParams >> 24) or 0 -- this gets the star count
   if gGlobalSyncTable.freeRoam then
     starsNeeded = 0
@@ -22,7 +30,7 @@ function door_loop(o)
     end
   end
 
-  if m.numStars >= starsNeeded and not ROMHACK.isUnder then
+  if m.numStars >= starsNeeded then
     -- completely remove collision and hitbox
     o.collisionData = nil
     o.hitboxRadius = 0
@@ -38,9 +46,13 @@ function door_loop(o)
   if o.oAction == 5 then
     if o.oTimer == 0 then
       -- when the object timer is 0 (when we first set the action to 5) play a sound and init the animation
-      cur_obj_init_animation_with_sound(1)
+      cur_obj_init_animation_with_sound(2)
 
-      cur_obj_play_sound_2(SOUND_GENERAL_OPEN_WOOD_DOOR)
+      if cur_obj_has_model(0x1F) ~= 0 then -- metal door
+        cur_obj_play_sound_2(SOUND_GENERAL_OPEN_IRON_DOOR)
+      else
+        cur_obj_play_sound_2(SOUND_GENERAL_OPEN_WOOD_DOOR)
+      end
     end
 
     if o.header.gfx.animInfo.animFrame < 10 then
@@ -63,7 +75,11 @@ function door_loop(o)
     -- since the action is no longer 5, the animation continues, 78 is the end of the animation (take 2 frames)
     if o.header.gfx.animInfo.animFrame >= 78 then
       -- play object sound, and set action to 0
-      cur_obj_play_sound_2(SOUND_GENERAL_CLOSE_WOOD_DOOR)
+      if cur_obj_has_model(0x1F) ~= 0 then -- metal door
+        cur_obj_play_sound_2(SOUND_GENERAL_CLOSE_IRON_DOOR)
+      else
+        cur_obj_play_sound_2(SOUND_GENERAL_CLOSE_WOOD_DOOR)
+      end
       o.oAction = 0
     end
   end

@@ -33,6 +33,8 @@ ex_radar[1] = { tex = TEX_COIN, prevX = 0, prevY = 0, prevScale = 0.6 }
 ex_radar[2] = { tex = TEX_SECRET, prevX = 0, prevY = 0, prevScale = 0.6 }
 ex_radar[3] = { tex = TEX_DEMON, prevX = 0, prevY = 0, prevScale = 0.6 }
 
+radar_store = {} -- used with objects
+
 -- minimap
 TEX_HUD_STAR_GREYSCALE = get_texture_info('hud_star_greyscale')
 TEX_HUD_BOX = get_texture_info('hud_box')
@@ -141,8 +143,8 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
     local renderY = y + yScaled * renderSize - 8 * scale
 
     if objType == "coin" then
-      if ROMHACK.isMoonshine then
-        djui_hud_set_color(0, 255, 0, 255) -- green
+      if ROMHACK.coinColor then
+        djui_hud_set_color(ROMHACK.coinColor.r, ROMHACK.coinColor.g, ROMHACK.coinColor.b, 255)
       else
         djui_hud_set_color(255, 0, 0, 255) -- red
       end
@@ -152,11 +154,12 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
       djui_hud_print_text("S", renderX, renderY, 0.5)
     elseif isObj and objType == nil then
       local r, g, b = 255, 255, 255
-      if _G.OmmEnabled
+      if OmmEnabled
           and ROMHACK.ommSupport ~= false -- romhacks that use a custom model can't be checked; as such, the omm colored radar will never be displayed
+          and month ~= 14
           and obj_has_model_extended(obj, E_MODEL_STAR) ~= 1
           and obj_has_model_extended(obj, E_MODEL_TRANSPARENT_STAR) ~= 1
-          and _G.OmmApi.omm_get_setting(gMarioStates[0], "color") == 1 then
+          and OmmApi.omm_get_setting(gMarioStates[0], "color") == 1 then
         -- do colored radar
         local np = gNetworkPlayers[0]
         local starColor = omm_star_colors[np.currCourseNum]
@@ -176,7 +179,7 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
     end
 
     if not isObj then
-      render_player_head(m.playerIndex, renderX, renderY, scale, scale)
+      render_player_head(m.playerIndex, renderX, renderY, scale, scale, LITE_MODE)
 
       local playercolor = network_get_player_text_color_string(m.playerIndex)
       local r, g, b = convert_color(playercolor)
@@ -238,8 +241,8 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
     alpha = alpha - 100
     if alpha <= 0 then
       return
-    elseif ROMHACK.isMoonshine then -- change to green
-      r, g, b = 0, 255, 0
+    elseif ROMHACK.coinColor then
+      r, g, b = ROMHACK.coinColor.r, ROMHACK.coinColor.g, ROMHACK.coinColor.b
     end
   elseif objType == "secret" then
     r, g, b = 0, 255, 0 -- green
@@ -252,11 +255,11 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
       tex = TEX_MOON
     end
 
-    if _G.OmmEnabled
+    if OmmEnabled
         and ROMHACK.ommSupport ~= false -- romhacks that use a custom model can't be checked; as such, the omm colored radar will never be displayed
         and obj_has_model_extended(obj, E_MODEL_STAR) ~= 1
         and obj_has_model_extended(obj, E_MODEL_TRANSPARENT_STAR) ~= 1
-        and _G.OmmApi.omm_get_setting(gMarioStates[0], "color") == 1 then
+        and OmmApi.omm_get_setting(gMarioStates[0], "color") == 1 then
       -- do colored radar
       local np = gNetworkPlayers[0]
       local starColor = omm_star_colors[np.currCourseNum]
@@ -445,7 +448,7 @@ function render_player_minimap()
   local renderY = y + yScaled * renderSize - 4.8
 
   djui_hud_set_color(255, 255, 255, 255)
-  render_player_head(0, renderX, renderY, 0.6, 0.6)
+  render_player_head(0, renderX, renderY, 0.6, 0.6, LITE_MODE)
 
   local playercolor = network_get_player_text_color_string(0)
   local r, g, b = convert_color(playercolor)
@@ -458,7 +461,8 @@ end
 function get_radar_color(index)
   local r, g, b = 0, 0, 0
   local sMario = gPlayerSyncTable[index]
-  if sMario.placement ~= 1 then
+  local roles = sMario.role
+  if (sMario.placement ~= 1 or roles & 32 ~= 0) and (sMario.placementASN ~= 1 or roles & 64 ~= 0) then
     local playercolor = network_get_player_text_color_string(index)
     r, g, b = convert_color(playercolor)
   else -- rainbow radar
@@ -531,8 +535,7 @@ local PART_ORDER = {
 }
 
 HEAD_HUD = (not LITE_MODE) and get_texture_info("hud_head_recolor")
-WING_HUD = get_texture_info("hud_wing")
-CS_ACTIVE = _G.charSelectExists
+WING_HUD = (not LITE_MODE) and get_texture_info("hud_wing")
 
 local defaultIcons = {
   [gTextures.mario_head] = true,
@@ -542,98 +545,99 @@ local defaultIcons = {
   [gTextures.wario_head] = true,
 }
 
-function render_player_head(index, x, y, scaleX, scaleY, noSpecial)
+-- the actual head render function.
+--- @param index integer
+--- @param x integer
+--- @param y integer
+--- @param scaleX number
+--- @param scaleY number
+function render_player_head(index, x, y, scaleX, scaleY, noSpecial, alwaysCap, alpha_)
   local m = gMarioStates[index]
   local np = gNetworkPlayers[index]
 
-  local alpha = 255
+  local alpha = alpha_ or 255
   if (not noSpecial) and (m.marioBodyState.modelState & MODEL_STATE_NOISE_ALPHA) ~= 0 then
-    alpha = 100 -- vanish effect
+      alpha = math.max(alpha - 155, 0) -- vanish effect
   end
 
-  if CS_ACTIVE then
-    djui_hud_set_color(255, 255, 255, alpha)
-    local TEX_CS_ICON = _G.charSelect.character_get_life_icon(index)
-    if TEX_CS_ICON and not defaultIcons[TEX_CS_ICON] then
-      djui_hud_render_texture(TEX_CS_ICON, x, y, scaleX / (TEX_CS_ICON.width * 0.0625),
-        scaleY / (TEX_CS_ICON.width * 0.0625))
-      if (not noSpecial) and m.marioBodyState.capState == MARIO_HAS_WING_CAP_ON then
-        djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY)                                                -- wing
+  if charSelectExists then
+      djui_hud_set_color(255, 255, 255, alpha)
+      local TEX_CS_ICON = charSelect.character_get_life_icon(index)
+      if TEX_CS_ICON and not defaultIcons[TEX_CS_ICON] then
+          djui_hud_render_texture(TEX_CS_ICON, x, y, scaleX / (TEX_CS_ICON.width * 0.0625),
+              scaleY / (TEX_CS_ICON.width * 0.0625))
+          if (not noSpecial) and m.marioBodyState.capState == MARIO_HAS_WING_CAP_ON then
+              djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY) -- wing
+          end
+          return
+      elseif TEX_CS_ICON == nil then
+          djui_hud_set_font(FONT_HUD)
+          djui_hud_print_text("?", x, y, scaleX)
+          if (not noSpecial) and m.marioBodyState.capState == MARIO_HAS_WING_CAP_ON then
+              djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY) -- wing
+          end
+          return
       end
-      return
-    elseif TEX_CS_ICON == nil then
-      djui_hud_set_font(FONT_HUD)
-      djui_hud_print_text("?", x, y, scaleX)
-      if (not noSpecial) and m.marioBodyState.capState == MARIO_HAS_WING_CAP_ON then
-        djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY)                                                -- wing
-      end
-      return
-    end
   end
-
-  if LITE_MODE then
-    djui_hud_set_color(255, 255, 255, alpha)
-    djui_hud_render_texture(m.character.hudHeadTexture, x, y, scaleX, scaleY)
-    if (not noSpecial) and m.marioBodyState.capState == MARIO_HAS_WING_CAP_ON then
-      djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY)                                                -- wing
-    end
-    return
-  end
-  
   local isMetal = false
   local capless = false
 
   local tileY = m.character.type
   for i = 1, #PART_ORDER do
-    local color = { r = 255, g = 255, b = 255 }
-    if (not noSpecial) and (m.marioBodyState.modelState & MODEL_STATE_METAL) ~= 0 then -- metal
-      color = network_player_palette_to_color(np, METAL, color)
+      local color = { r = 255, g = 255, b = 255 }
+      if (not noSpecial) and (m.marioBodyState.modelState & MODEL_STATE_METAL) ~= 0 then -- metal
+          color = network_player_get_override_palette_color(np, METAL)
+          djui_hud_set_color(color.r, color.g, color.b, alpha)
+          isMetal = true
+
+          if (not (noSpecial or alwaysCap)) and m.marioBodyState.capState == MARIO_HAS_DEFAULT_CAP_OFF then
+              capless = true
+              djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, 7 * 16, tileY * 16, 16, 16) -- capless metal
+          else
+              djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, 5 * 16, tileY * 16, 16, 16)
+          end
+          break
+      end
+
+      local part = PART_ORDER[i]
+      if (not (noSpecial or alwaysCap)) and part == CAP and m.marioBodyState.capState == MARIO_HAS_DEFAULT_CAP_OFF then -- capless check
+          capless = true
+          part = HAIR
+      elseif tileY == 2 or tileY == 7 then
+          if part == CAP and capless then return end
+          tileY = 7 -- use alt toad
+          if part == HAIR then -- toad doesn't use hair except when cap is off
+              if (not (noSpecial or alwaysCap)) and m.marioBodyState.capState == MARIO_HAS_DEFAULT_CAP_OFF then
+                  capless = true
+                  part = HAIR
+              else
+                  part = GLOVES
+              end
+          end
+      end
+      color = network_player_get_override_palette_color(np, part)
+
       djui_hud_set_color(color.r, color.g, color.b, alpha)
-      isMetal = true
-
-      if (not noSpecial) and m.marioBodyState.capState == MARIO_HAS_DEFAULT_CAP_OFF then
-        capless = true
-        djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, 7 * 16, tileY * 16, 16, 16) -- capless metal
+      if capless then
+          djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, 6 * 16, tileY * 16, 16, 16) -- render hair instead of cap
       else
-        djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, 5 * 16, tileY * 16, 16, 16)
+          djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, (i - 1) * 16, tileY * 16, 16, 16)
       end
-      break
-    end
-
-    local part = PART_ORDER[i]
-    if (not noSpecial) and part == CAP and m.marioBodyState.capState == MARIO_HAS_DEFAULT_CAP_OFF then -- capless check
-      capless = true
-      part = HAIR
-    elseif tileY == 2 and part == HAIR then -- toad doesn't use hair
-      part = GLOVES
-      if (not noSpecial) and m.marioBodyState.capState == MARIO_HAS_DEFAULT_CAP_OFF then
-        capless = true
-        break -- toad only has 1 colored part in this scenario
-      end
-    end
-    network_player_palette_to_color(np, part, color)
-
-    djui_hud_set_color(color.r, color.g, color.b, alpha)
-    if capless then
-      djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, 6 * 16, tileY * 16, 16, 16) -- render hair instead of cap
-    else
-      djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, (i - 1) * 16, tileY * 16, 16, 16)
-    end
   end
 
   if not isMetal then
-    djui_hud_set_color(255, 255, 255, alpha)
-    --djui_hud_render_texture(HEAD_HUD, x, y, scaleX, scaleY)
-    djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, (#PART_ORDER) * 16, tileY * 16, 16, 16)
+      djui_hud_set_color(255, 255, 255, alpha)
+      --djui_hud_render_texture(HEAD_HUD, x, y, scaleX, scaleY)
+      djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, (#PART_ORDER) * 16, tileY * 16, 16, 16)
 
-    if not capless then
-      djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, (#PART_ORDER + 1) * 16, tileY * 16, 16, 16) -- hat emblem
-      if (not noSpecial) and m.marioBodyState.capState == MARIO_HAS_WING_CAP_ON then
-        djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY)                                                -- wing
+      if not capless then
+          djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, (#PART_ORDER + 1) * 16, tileY * 16, 16, 16) -- hat emblem
+          if (not noSpecial) and m.marioBodyState.capState == MARIO_HAS_WING_CAP_ON then
+              djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY)                                        -- wing
+          end
       end
-    end
   elseif m.marioBodyState.capState == MARIO_HAS_WING_CAP_ON then
-    djui_hud_set_color(109, 170, 173, alpha)                -- blueish green
-    djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY) -- wing
+      djui_hud_set_color(109, 170, 173, alpha)                -- blueish green
+      djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY) -- wing
   end
 end

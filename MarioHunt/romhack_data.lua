@@ -89,48 +89,48 @@ local romhack_data = {           -- supported rom hack data
     },
 
     minimap_data = {
-      [91] = { "bob-map" }, -- BOB area 1
-      [241] = { "wf-map" }, -- WF area 1
-      [161] = { "cg-map" }, -- CG area 1
-      [61] = { "ic-map" },  -- IC area 1
-      [62] = { "ica-map" }, -- IC area 2
-      [63] = { "icb-map" }, -- IC area 3
-      [171] = { "fb-map" }, -- B1 area 1
-      [301] = { "fbb-map" }, -- B1 area 2
-      [191] = { "bfs-map" }, -- B2 area 1
+      [91] = { "bob-map" },   -- BOB area 1
+      [241] = { "wf-map" },   -- WF area 1
+      [161] = { "cg-map" },   -- CG area 1
+      [61] = { "ic-map" },    -- IC area 1
+      [62] = { "ica-map" },   -- IC area 2
+      [63] = { "icb-map" },   -- IC area 3
+      [171] = { "fb-map" },   -- B1 area 1
+      [301] = { "fbb-map" },  -- B1 area 2
+      [191] = { "bfs-map" },  -- B2 area 1
       [331] = { "bfsb-map" }, -- B2 area 2
-      [51] = { "ccm-map" }, -- CCM area 1
-      [52] = { "ccms-map" }, -- CCM area 1
-      [121] = { "jrb-map" }, -- JRB area 1
+      [51] = { "ccm-map" },   -- CCM area 1
+      [52] = { "ccms-map" },  -- CCM area 1
+      [121] = { "jrb-map" },  -- JRB area 1
       [122] = { "jrbs-map" }, -- JRB area 2
-      [271] = { "pss-map" }, -- PSS area 1
-      [41] = { "bbh-map" }, -- BBH area 1
-      [261] = { "cc-map" }, -- BBH area 1
-      [71] = { "hmc-map" }, -- HMC area 1
-      [221] = { "lll-map" }, -- LLL area 1
+      [271] = { "pss-map" },  -- PSS area 1
+      [41] = { "bbh-map" },   -- BBH area 1
+      [261] = { "cc-map" },   -- BBH area 1
+      [71] = { "hmc-map" },   -- HMC area 1
+      [221] = { "lll-map" },  -- LLL area 1
       [222] = { "lllv-map" }, -- LLL area 2
-      [81] = { "ssl-map" }, -- SSL area 1
-      [82] = { "sslp-map" }, -- SSL area 2
+      [81] = { "ssl-map" },   -- SSL area 1
+      [82] = { "sslp-map" },  -- SSL area 2
       [83] = { "sslie-map" }, -- SSL area 2
-      [231] = { "ddd-map" }, -- SSL area 2
+      [231] = { "ddd-map" },  -- SSL area 2
       [232] = { "ddds-map" }, -- SSL area 2
-      [101] = { "sl-map" }, -- SL area 1
-      [102] = { "sli-map" }, -- SL area 2
-      [111] = { "wdw-map" }, -- WDW area 1
+      [101] = { "sl-map" },   -- SL area 1
+      [102] = { "sli-map" },  -- SL area 2
+      [111] = { "wdw-map" },  -- WDW area 1
       [112] = { "wdwu-map" }, -- WDW area 2
-      [361] = { "ttm-map" }, -- TTM area 1
+      [361] = { "ttm-map" },  -- TTM area 1
       -- [362] = { "ttms-map" },    -- TTM area 2 (removed due to inaccuracy)
       -- [363] = { "ttms-map" },    -- TTM area 3 (removed due to inaccuracy)
       -- [364] = { "ttms-map" },    -- TTM area 4 (removed due to inaccuracy)
-      [131] = { "thih-map" }, -- THI area 1
-      [132] = { "thit-map" }, -- THI area 2
-      [133] = { "thim-map" }, -- THI area 3
-      [141] = { "ttc-map" }, -- TTC area 1
-      [151] = { "rr-map" }, -- RR area 1
-      [201] = { "tsa-map" }, -- SA area 1
-      [281] = { "btw-map" }, -- MCL area 1
-      [311] = { "otr-map" }, -- RC area 1
-      [211] = { "bits-map" }, -- BITS area 1
+      [131] = { "thih-map" },  -- THI area 1
+      [132] = { "thit-map" },  -- THI area 2
+      [133] = { "thim-map" },  -- THI area 3
+      [141] = { "ttc-map" },   -- TTC area 1
+      [151] = { "rr-map" },    -- RR area 1
+      [201] = { "tsa-map" },   -- SA area 1
+      [281] = { "btw-map" },   -- MCL area 1
+      [311] = { "otr-map" },   -- RC area 1
+      [211] = { "bits-map" },  -- BITS area 1
       [341] = { "bitsb-map" }, -- bitsb area 1
       [181] = { "vcutm-map" }, -- vcutm area 1
       [291] = { "totwc-map" }, -- totwc area 1
@@ -154,7 +154,8 @@ local romhack_data = {           -- supported rom hack data
       [LEVEL_BITS] = 80,
       [LEVEL_WMOTR] = 120, -- Hidden Palace Finale
     },
-    heartReplace = true,   -- replaces all hearts with 1ups (doesn't affect the bubbles, thankfully)
+    heartReplace = true, -- replaces all hearts with 1ups (doesn't affect the bubbles in the coral level, thankfully)
+    lifeOverride = true, -- prevent star road 0 life
 
     -- mostly defining replicas
     star_data = {
@@ -162,7 +163,7 @@ local romhack_data = {           -- supported rom hack data
       [COURSE_BOB] = { 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8, 8 },
       [COURSE_WF] = { 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8, 8 },
       [COURSE_JRB] = { 8, 8, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8 },
-      [COURSE_CCM] = { 8, 8, 8, 8, 8, 8 | STAR_EXIT | STAR_APPLY_NO_ACTS, 8 },                                              -- don't get trapped in The Other Entrance
+      [COURSE_CCM] = { 8, 8, 8, 8, 8, 8 | STAR_IGNORE_STARMODE | STAR_EXIT | STAR_APPLY_NO_ACTS, 8 },                                                -- don't get trapped in The Other Entrance
       [COURSE_BBH] = { 8 | STAR_ACT_SPECIFIC, 8, 8, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 }, -- wow, Gloomy Garden has a lot of act specifics
       [COURSE_HMC] = { 8, 8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_ACT_SPECIFIC, 8, 8, 8 },
       [COURSE_LLL] = { 8, 8 | STAR_ACT_SPECIFIC, 8 | STAR_NOT_BEFORE_THIS_ACT, 8, 8, 8, 8 },
@@ -170,8 +171,8 @@ local romhack_data = {           -- supported rom hack data
       [COURSE_SSL] = { 8 | STAR_ACT_SPECIFIC | STAR_IGNORE_STARMODE, 8 | STAR_NOT_ACT_1, 8, 8 | STAR_NOT_ACT_1, 8 | STAR_NOT_ACT_1, 8, 8 | STAR_NOT_ACT_1 },
       [COURSE_SL] = { 8, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8, 8 },
       [COURSE_TTM] = { 8, 8 | STAR_NOT_ACT_1, 8 | STAR_NOT_ACT_1, 8 | STAR_NOT_ACT_1, 8, 8, 8 },
-      [COURSE_TTC] = { 8, 8, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8 },                                                       -- star 1 actually disappears in acts 5 and 6 (I could account for that but ehhh)
-      [COURSE_WDW] = { 8 | STAR_ACT_SPECIFIC | STAR_IGNORE_STARMODE, 8, 8, 8, 8, 8, 8 },                                -- ignored in star mode because it's glitchy
+      [COURSE_TTC] = { 8, 8, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8 },                                                         -- star 1 actually disappears in acts 5 and 6 (I could account for that but ehhh)
+      [COURSE_WDW] = { 8 | STAR_ACT_SPECIFIC | STAR_IGNORE_STARMODE, 8, 8, 8, 8, 8, 8 },                                  -- ignored in star mode because it's glitchy
       [COURSE_THI] = { 8, 8 | STAR_ACT_SPECIFIC, 8, 8, 8 | STAR_NOT_BEFORE_THIS_ACT, 8 | STAR_ACT_SPECIFIC | STAR_EXIT, 8 },
       [COURSE_RR] = { 8, 8, 8 | STAR_IGNORE_STARMODE | STAR_APPLY_NO_ACTS, 8, 8, 8 | STAR_EXIT | STAR_APPLY_NO_ACTS, 8 }, -- don't get trapped in In The Cage
       [COURSE_BITDW] = { 8, 0, 0, 8 | STAR_REPLICA },
@@ -315,15 +316,15 @@ local romhack_data = {           -- supported rom hack data
     noLobby = true,
 
     star_data = {
-      [COURSE_COTMC] = { 8, 8, 8, 8, 8 },  -- Toxic-Switch of Danger
-      [COURSE_BITDW] = { 8, 8, 8, 8 },     -- Bowser's Badlands-Battlefield
+      [COURSE_COTMC] = { 8, 8, 8, 8, 8 },    -- Toxic-Switch of Danger
+      [COURSE_BITDW] = { 8, 8, 8, 8 },       -- Bowser's Badlands-Battlefield
       [COURSE_WMOTR] = { 8, 8, 8, 8, 8, 8 }, -- Tower of the East
-      [COURSE_TOTWC] = { 8, 8, 8 },        -- Lava-Switch of Eruption
+      [COURSE_TOTWC] = { 8, 8, 8 },          -- Lava-Switch of Eruption
       [COURSE_VCUTM] = { 8, 8, 8, 8, 8, 8 }, -- Dust-Switch of Identity
-      [COURSE_PSS] = { 8, 8, 8, 8 },       -- Frozen Slide
-      [COURSE_BITFS] = { 8, 8, 8, 8, 8 },  -- Bowser's Aquatic Castle
-      [COURSE_SA] = { 8 },                 -- Champion's Challenge (there's another star but it is hard to get so we ignore in the time)
-      [COURSE_BITS] = { 8, 8, 8, 8, 8, 8 }, -- Bowser's Crystal Palace
+      [COURSE_PSS] = { 8, 8, 8, 8 },         -- Frozen Slide
+      [COURSE_BITFS] = { 8, 8, 8, 8, 8 },    -- Bowser's Aquatic Castle
+      [COURSE_SA] = { 8 },                   -- Champion's Challenge (there's another star but it is hard to get so we ignore in the time)
+      [COURSE_BITS] = { 8, 8, 8, 8, 8, 8 },  -- Bowser's Crystal Palace
     },
 
     -- EE has some different counts
@@ -472,7 +473,7 @@ local romhack_data = {           -- supported rom hack data
       [LEVEL_BITS] = 30,
       [LEVEL_BOWSER_3] = 30,
     },
-    ommSupport = false, -- does not have default omm support
+    ommSupport = false,  -- does not have default omm support
     heartReplace = true, -- replaces all hearts with 1ups
 
     -- since not all courses are modified here, exclude those
@@ -502,8 +503,8 @@ local romhack_data = {           -- supported rom hack data
       [COURSE_SA] = {},
 
       [COURSE_WF] = { 8, 8, 8 | STAR_EXIT, 8, 8, 8 | STAR_EXIT, 8 }, -- prevent getting stuck
-      [COURSE_JRB] = { 8, 8 | STAR_EXIT, 8, 8, 8, 8, 8 },        -- prevent getting stuck
-      [COURSE_CCM] = { 8, 8, 8, 8, 8, 8 | STAR_EXIT, 8 },        -- prevent getting stuck
+      [COURSE_JRB] = { 8, 8 | STAR_EXIT, 8, 8, 8, 8, 8 },            -- prevent getting stuck
+      [COURSE_CCM] = { 8, 8, 8, 8, 8, 8 | STAR_EXIT, 8 },            -- prevent getting stuck
     },
     -- custom star names!
     starNames = {
@@ -528,8 +529,8 @@ local romhack_data = {           -- supported rom hack data
   ["SM64 Sapphire Green Comet"] = {
     name = "SM64 Sapphire Green Comet",
     inherit = "sapphire",
-    noLobby = true,                  -- hack tries to warp out of lobby, so don't use it
-    no_bowser = true,                -- technically there is an endscreen but there's no reason to require it
+    noLobby = true,                        -- hack tries to warp out of lobby, so don't use it
+    no_bowser = true,                      -- technically there is an endscreen but there's no reason to require it
 
     starColor = { r = 0, g = 255, b = 0 }, -- guess what color the stars are
 
@@ -539,8 +540,8 @@ local romhack_data = {           -- supported rom hack data
 
       [COURSE_BOB] = { 8, 8, 8, 8, 8, 8 },
       [COURSE_CCM] = { 8, 8, 8, 8, 8, 8 },
-      [COURSE_WF] = { 8 | STAR_EXIT, 8, 8 | STAR_EXIT, 8, 8, 8 | STAR_EXIT }, -- prevent getting stuck
-      [COURSE_JRB] = { 8, 8, 8 | STAR_EXIT, 8, 8, 8 },                     -- prevent getting stuck
+      [COURSE_WF] = { 8 | STAR_EXIT, 8, 8 | STAR_EXIT, 8, 8, 8 | STAR_EXIT },  -- prevent getting stuck
+      [COURSE_JRB] = { 8, 8, 8 | STAR_EXIT, 8, 8, 8 },                         -- prevent getting stuck
       [COURSE_CCM] = { 8, 8, 8, 8 | STAR_EXIT, 8 | STAR_EXIT, 8 | STAR_EXIT }, -- prevent getting stuck
       [COURSE_BITS] = { 8, 8 | STAR_EXIT },
     },
@@ -569,9 +570,9 @@ local romhack_data = {           -- supported rom hack data
     default_stars = -1, -- no stars required!
     max_stars = 91,
     -- no requirements!
-    stalk = true,                        -- makes this hack less annoying
+    stalk = true,                              -- makes this hack less annoying
     starColor = { r = 145, g = 207, b = 187 }, -- stars are light green
-    ommSupport = false,                  -- does not have default omm support
+    ommSupport = false,                        -- does not have default omm support
     final = -1,
 
     -- gotta define almost every level in the game, yay
@@ -606,8 +607,8 @@ local romhack_data = {           -- supported rom hack data
       -- [COURSE_PSS] = {8}, -- The Super Quiz
       -- [COURSE_WMOTR] = {8}, -- Negative Realm
       [COURSE_SA] = { 8, 8, 0, 0, 8, 8 }, -- Gaell's Dream
-      [COURSE_CAKE_END] = { 0, 0, 8 }, -- The End
-      [COURSE_NONE] = { 0, 0, 0, 8 }, -- has mips
+      [COURSE_CAKE_END] = { 0, 0, 8 },    -- The End
+      [COURSE_NONE] = { 0, 0, 0, 8 },     -- has mips
     },
     -- custom star names!
     starNames = {
@@ -646,9 +647,9 @@ local romhack_data = {           -- supported rom hack data
       [211] = "Ztar Attack!",
       -- extra levels
       [231] = "A Hundred Coins Of Chaos", -- Negative Realm
-      [191] = "Quizmaster",             -- The Super Quiz
-      [251] = "Thanks For Playing!",    -- The End
-      [253] = "The Princess's Present", -- The End
+      [191] = "Quizmaster",               -- The Super Quiz
+      [251] = "Thanks For Playing!",      -- The End
+      [253] = "The Princess's Present",   -- The End
       -- Gaell's Dream
       [241] = "Stars Across Time And Space",
       [242] = "The End Of Time",
@@ -676,19 +677,19 @@ local romhack_data = {           -- supported rom hack data
     default_stars = 80,
     max_stars = 131,
     requirements = {
-      [LEVEL_BBH] = 4, -- Fiery Factory
+      [LEVEL_BBH] = 4,  -- Fiery Factory
       [LEVEL_BITDW] = 15,
       [LEVEL_LLL] = 20, -- Giant Overgrown Garden
       [LEVEL_DDD] = 20, -- Sandy Seaside Bay
-      [LEVEL_SL] = 30, -- Molten Magma Galaxy
+      [LEVEL_SL] = 30,  -- Molten Magma Galaxy
       [LEVEL_BITFS] = 40,
       [LEVEL_TTM] = 50, -- Perilous Cliffs
-      [LEVEL_RR] = 65, -- Rainbow Star Haven
+      [LEVEL_RR] = 65,  -- Rainbow Star Haven
       [LEVEL_BITS] = 80,
       [LEVEL_BOWSER_3] = 130,
     },
     starColor = { r = 92, g = 255, b = 92 }, -- stars are green (duh)
-    heartReplace = true,               -- replaces all hearts with 1ups
+    heartReplace = true,                     -- replaces all hearts with 1ups
 
     star_data = {
       [COURSE_NONE] = { 8, 8, 8 }, -- no mips
@@ -760,16 +761,16 @@ local romhack_data = {           -- supported rom hack data
     name = "SM64: The Underworld",
     default_stars = 30,
     max_stars = 30,
-    ommSupport = false,      -- does not have default omm support
-    no_bowser = false,       -- can't disable
+    ommSupport = false,        -- does not have default omm support
+    no_bowser = false,         -- can't disable
     badGuy = "The Shitilizer", -- this will display in the rules
     badGuy_es = "El Shitilizer",
     badGuy_de = "Den Shitilizer",
     ["badGuy_pt-br"] = "O Shitilizer",
     badGuy_fr = "Le Shitilizer",
     badGuy_it = "Il Shitilizer",
-    badGuy_ro = "Shitilizerul",          -- I think this is right?
-    isUnder = true,                      -- activates special star detection
+    badGuy_ro = "Shitilizerul",              -- I think this is right?
+    isUnder = true,                          -- activates special star detection
     noLobby = true,
     starColor = { r = 0, g = 255, b = 255 }, -- light blue
     final = -1,
@@ -868,11 +869,11 @@ local romhack_data = {           -- supported rom hack data
   ["B3313"] = {
     name = "B3313",
     default_stars = 30, -- just a number
-    max_stars = 120,  -- unknown how many stars there actually are (auto-generated)
-    vagueName = true, -- the names are all identical, just use course numbers
+    max_stars = 120,    -- unknown how many stars there actually are (auto-generated)
+    vagueName = true,   -- the names are all identical, just use course numbers
     -- no requirements
-    parseStars = true, -- automatically generate star list (this hack is too large I can't be bothered)
-    stalk = true,     -- the hack is confusing, so let people warp
+    parseStars = true,  -- automatically generate star list (this hack is too large I can't be bothered)
+    stalk = true,       -- the hack is confusing, so let people warp
     ommSupport = false,
     final = -1,
 
@@ -880,8 +881,8 @@ local romhack_data = {           -- supported rom hack data
 
     -- overrides the generated information
     game_exclude = {
-      [34] = 1, -- is area 3 meant to appear?
-      [73] = 1, -- prevent lava death
+      [34] = 1,  -- is area 3 meant to appear?
+      [73] = 1,  -- prevent lava death
 
       [122] = 0, -- unobtainable (can't enter act 2)... but you CAN get this star in OMM
 
@@ -913,7 +914,7 @@ local romhack_data = {           -- supported rom hack data
     },
 
     starNames = {
-      [151] = "Star (1)",           -- Manta Ray is not possible
+      [151] = "Star (1)",             -- Manta Ray is not possible
       [211] = "5 Hidden Secrets (1)", -- Same here
     },
 
@@ -966,7 +967,7 @@ local romhack_data = {           -- supported rom hack data
 
       [111] = "Snow Slide (B-Roll)?", -- duplicate (is accessible?)
       [112] = "Snowman's Darkness",
-      [113] = "Frosty Highlands?",  -- duplicate?
+      [113] = "Frosty Highlands?",    -- duplicate?
       [114] = "Cool, Cool Mountain (beta)",
       [115] = "Chief Chilly's Ring",
       [116] = "Cold, Cold Crevasse",
@@ -975,7 +976,7 @@ local romhack_data = {           -- supported rom hack data
       [121] = "Bob-Omb River",
       [122] = "Big Bob-Omb's Fortress?", -- duplicate with fog
       [123] = "Piranha Plant Garden",
-      [124] = "Minion Base?",          -- duplicate with different skybox
+      [124] = "Minion Base?",            -- duplicate with different skybox
       [125] = "Piranha's Igloo",
 
       [131] = "Castle Grounds",
@@ -1001,7 +1002,7 @@ local romhack_data = {           -- supported rom hack data
       [155] = "Balcony",
 
       [161] = "Castle Grounds?", -- not quite a duplicate
-      [162] = "Beta Lobby C/D", -- both rooms are connected
+      [162] = "Beta Lobby C/D",  -- both rooms are connected
       [163] = "Beta Lobby B",
       [164] = "Beta Lobby A",
       [165] = "Genesis Basement",
@@ -1018,7 +1019,7 @@ local romhack_data = {           -- supported rom hack data
       [181] = "Battle Fort",
       [182] = "Floor 2B",
       [183] = "Randomized Realm",
-      [184] = "Unknown Lobby",   -- unused lobby; doesn't lead anywhere good
+      [184] = "Unknown Lobby",     -- unused lobby; doesn't lead anywhere good
       [185] = "Bob-omb Test Site", -- also called "test field"?
       [186] = "Big Bob-Omb's Fortress",
 
@@ -1052,10 +1053,10 @@ local romhack_data = {           -- supported rom hack data
       [236] = "Snowman's Land (beta)",
       [237] = "Frosty Highlands",
 
-      [241] = "Cryptic Hideout?",   -- possibly an early version
-      [242] = "Dark Lobby?",        -- duplicate with different warps?
+      [241] = "Cryptic Hideout?",     -- possibly an early version
+      [242] = "Dark Lobby?",          -- duplicate with different warps?
       [243] = "Plexal Basement",
-      [244] = "Flooded Hallway",    -- unknown
+      [244] = "Flooded Hallway",      -- unknown
       [245] = "Empty Flooded Hallway",
       [246] = "Lavish Lava Mountain", -- grass side
       [247] = "Lavish Lava Mountain", -- lava side
@@ -1088,21 +1089,21 @@ local romhack_data = {           -- supported rom hack data
       [286] = "Rocky Trek",
 
       [291] = "Eel Graveyard",
-      [292] = "Empty Graveyard", -- unused?
+      [292] = "Empty Graveyard",  -- unused?
       [293] = "Checkboard (WC)",
       [294] = "Plexal Upstairs?", -- somewhat different
       [295] = "Silent Hall",
-      [296] = "Void?",          -- just like 34 area 2; idk
-      [297] = "Void?",          -- another one? instant death this time
+      [296] = "Void?",            -- just like 34 area 2; idk
+      [297] = "Void?",            -- another one? instant death this time
 
       [301] = "Bowser 1",
 
       [311] = "Water Land",
-      [312] = "Castle1",     -- layout 2?
+      [312] = "Castle1",       -- layout 2?
       [313] = "Castle1",
       [314] = "Forgotten Bay", -- couldn't find this one, so I made this name up
       [315] = "Castle Garden",
-      [316] = "Water Land",  -- Unused duplicate?
+      [316] = "Water Land",    -- Unused duplicate?
 
       [331] = "Bowser's Checkered Madness",
       [332] = "Bowser In The Bully Battlefield",
@@ -1125,7 +1126,6 @@ local romhack_data = {           -- supported rom hack data
       end
     end,
 
-    -- condition is "kill bowser" if any%, or simply "get X stars" otherwise
     runner_victory = function(m)
       return m.action == ACT_JUMBO_STAR_CUTSCENE
     end,
@@ -1137,16 +1137,17 @@ local romhack_data = {           -- supported rom hack data
     max_stars = 50,
     no_bowser = true,
     requirements = {
-      [LEVEL_LLL] = 8,                 -- Sweet Sweet Rush
-      [LEVEL_BITS] = 30,               -- Down Street
+      [LEVEL_LLL] = 8,                       -- Sweet Sweet Rush
+      [LEVEL_BITS] = 30,                     -- Down Street
     },
-    ommSupport = false,                -- not true, but this only affected the colored radar
+    ommSupport = false,                      -- not true, but this only affected the colored radar
     starColor = { r = 92, g = 255, b = 92 }, -- all moons are green
-    heartReplace = true,               -- replaces all hearts with 1ups
-    isMoonshine = true,                -- changes hud elements
+    heartReplace = true,                     -- replaces all hearts with 1ups
+    isMoonshine = true,                      -- changes hud elements
+    coinColor = { r = 0, g = 255, b = 0 },   -- green coins
 
     star_data = {
-      [COURSE_NONE] = { 0, 8 },           -- only toad star 2
+      [COURSE_NONE] = { 0, 8 },               -- only toad star 2
       [COURSE_JRB] = {},
       [COURSE_LLL] = { 8, 8, 0, 0, 0, 0, 8 }, -- Sweet Sweet Rush
       [COURSE_SSL] = {},
@@ -1159,7 +1160,7 @@ local romhack_data = {           -- supported rom hack data
       [COURSE_RR] = {},
       [COURSE_BITDW] = {},
       [COURSE_BITFS] = { 8, 8 }, -- Purple Swampy Swamp
-      [COURSE_BITS] = { 8, 8 }, -- Moonshine
+      [COURSE_BITS] = { 8, 8 },  -- Moonshine
       [COURSE_PSS] = {},
       [COURSE_COTMC] = {},
       [COURSE_TOTWC] = {},
@@ -1188,9 +1189,9 @@ local romhack_data = {           -- supported rom hack data
     max_stars = 74,
 
     starColor = { r = 255, g = 255, b = 255 }, -- stars are white
-    disableNonStop = true,               -- omm actually disables non stop for this hack
-    ommSupport = false,                  -- stars are always white, even in omm
-    no_bowser = true,                    -- no bowser.
+    disableNonStop = true,                     -- omm actually disables non stop for this hack
+    ommSupport = false,                        -- stars are always white, even in omm
+    no_bowser = true,                          -- no bowser.
     final = -1,
 
     -- warp to sweet delight after getting spectral spectacle star
@@ -1232,10 +1233,10 @@ local romhack_data = {           -- supported rom hack data
     },
 
     requirements = {
-      [LEVEL_HMC] = 30, -- Scorching Jaws
+      [LEVEL_HMC] = 30,   -- Scorching Jaws
       [LEVEL_CASTLE_COURTYARD] = 8,
       [LEVEL_BITFS] = 50, -- Spectral Spectacle
-      [LEVEL_BITS] = 51, -- A Sweet Delight
+      [LEVEL_BITS] = 51,  -- A Sweet Delight
     },
 
     starNames = {
@@ -1370,6 +1371,8 @@ local romhack_data = {           -- supported rom hack data
     name = "Luigi's Mansion 64",
     inherit = "vanilla", -- this actually causes the minimap to be inheritted too, which is... fine, I guess
     max_stars = 118,
+    default_stars = 65,
+    ommSupport = false,
     badGuy = "King Boo",
 
     -- some levels have been moved around
@@ -1395,10 +1398,12 @@ local romhack_data = {           -- supported rom hack data
       [COURSE_TTC] = { 8, 8, 8, 8, 8 | STAR_EXIT, 8, 8 },
       [COURSE_NONE] = { 0, 8, 8, 8, 8 },
       [COURSE_PSS] = { 0, 8 },
+      [COURSE_BOB] = { 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8 | STAR_NOT_ACT_1 },
     },
 
     -- custom star names!
     starNames = {
+      [107] = "Hearts Of The Igloo", -- this is NOT a 100 coin star
       [161] = "Outta' This World Red Coins",
       [171] = "Boiling Hot Coins",
       [181] = "Coins From Another Dimension",
@@ -1411,14 +1416,152 @@ local romhack_data = {           -- supported rom hack data
     },
   },
 
+  ["sr7-coop-port"] = {
+    name = "\\#FFC600\\Star \\#00BEFF\\Revenge \\#FF0034\\7\\#E7E7E7\\-Park of Time",
+    default_stars = 60,
+    heartReplace = true,
+    ommSupport = false,
+    max_stars = 121,
+    starColor = { r = 100, g = 255, b = 255 }, -- stars are light blue (same as runners! funny)
+    coinColor = { r = 155, g = 255, b = 155 }, -- I'm not making the gradient effect sorry
+    numRedCoins = 6,
+    requirements = {
+      [LEVEL_CCM] = 8,
+      [LEVEL_BBH] = 8,
+      [LEVEL_HMC] = 10,
+      [LEVEL_DDD] = 25,
+      [LEVEL_WDW] = 40,
+      [LEVEL_TTM] = 40,
+      [LEVEL_THI] = 40,
+      [LEVEL_RR] = 90,
+      [LEVEL_BITDW] = 15,
+      [LEVEL_PSS] = 8,
+      [LEVEL_BITFS] = 30,
+      [LEVEL_COTMC] = 30,
+      [LEVEL_WMOTR] = 50,
+      [LEVEL_TOTWC] = 100,
+      [LEVEL_BITS] = 60,
+    },
+    badGuy = "Timerock",
+    noLobby = true, -- lack of wall jumps makes the parkour impossible
+
+    star_data = {
+      [COURSE_NONE] = { 0, 8, 8, 8, 8 },
+      [COURSE_PSS] = { 8 | STAR_EXIT | STAR_APPLY_NO_ACTS, 8 },
+      [23] = { 0, 8 },
+      [COURSE_SA] = { 8, 8 | STAR_IGNORE_STARMODE | STAR_EXIT | STAR_APPLY_NO_ACTS, 8 },
+    },
+
+    starNames = {
+      [161] = "Coins O'er The Sea",
+      [171] = "Coins 'Round The Factory",
+      [181] = "Time To Raise The Roof",
+      [191] = "Coins On The Mountain",
+      [192] = "Fast Mountaineer",
+      [201] = "...Give Or Take 2", -- This is meant to go with the name of the level itself
+      [211] = "Coins Back In 1988",
+      [221] = "The Limbo's Secret",
+      [232] = "Besting Brodute",
+      [241] = "Coins Around The Tower",
+      [242] = "Hidden Pipe!",
+      [243] = "The Shattered Balcony",
+    },
+
+    mini_exclude = {
+      [181] = 1, -- eyerok moment
+      [221] = 1, -- impossible without dying
+      [242] = 1, -- pipe required
+
+      -- unfortunately we have to exclude every star that requires a badge
+      [15] = 1,
+      [16] = 1,
+      [55] = 1,
+      [56] = 1,
+      [62] = 1,
+      [63] = 1,
+      [65] = 1,
+      [66] = 1,
+      [74] = 1,
+      [75] = 1,
+      [76] = 1,
+      [84] = 1,
+      [86] = 1,
+      [91] = 1,
+      [94] = 1,
+      [95] = 1,
+      [102] = 1,
+      [103] = 1,
+      [104] = 1,
+      [105] = 1,
+      [106] = 1,
+      [111] = 1,
+      [112] = 1,
+      [113] = 1,
+      [114] = 1,
+      [115] = 1,
+      [116] = 1,
+      [121] = 1,
+      [122] = 1,
+      [123] = 1,
+      [124] = 1,
+      [125] = 1,
+      [126] = 1,
+      [151] = 1,
+      [211] = 1,
+    },
+
+    -- warps for end and ktq
+    special_run = function(m, gotStar)
+      if m.playerIndex ~= 0 then return end
+      if gotStar == 1 and gNetworkPlayers[0].currLevelNum == LEVEL_BITS then
+        warp_to_level(LEVEL_VCUTM, 1, 0)
+      elseif gotStar == 2 and gNetworkPlayers[0].currLevelNum == 31 then
+        warp_to_warpnode(31, 1, 0, 0xf0)
+      end
+    end,
+
+    -- marks stars that require certain badges as unobtainable
+    getStarFlagsFunc = function(file, course, recalc)
+      local course_star_flags = save_file_get_star_flags(file, course)
+      if not recalc then return course_star_flags end
+      local badgeNames = { -- lava defense is not required
+        "W",
+        "U",
+        "S",
+        "T",
+      }
+      for i = 0, 6 do
+        local name = get_custom_star_name(course + 1, i + 1)
+        for a, badgeName in ipairs(badgeNames) do
+          if name:find("-" .. badgeName .. "b-") and tonumber(romhackbadges.hasbadge(badgeName .. "B")) == 0 then
+            course_star_flags = course_star_flags | (1 << i)
+          end
+        end
+      end
+      return course_star_flags
+    end,
+
+    runner_victory = function(m)
+      if gGlobalSyncTable.bowserBeaten and m.numStars >= gGlobalSyncTable.starRun then
+        return true
+      elseif m.playerIndex == 0 then
+        local np = gNetworkPlayers[0]
+        if np.currLevelNum == 18 then
+          gGlobalSyncTable.bowserBeaten = true
+        end
+      end
+      return false
+    end,
+  },
+
   default = {
     name = "Default",
     default_stars = -1,
     max_stars = 255,
     requirements = { [LEVEL_BOWSER_3] = 255, [LEVEL_ENDING] = 255 }, -- block off Bowser 3 until needed stars are collected
-    parseStars = true,                                             -- automatically generate star list
+    parseStars = true,                                               -- automatically generate star list
 
-    star_data = {},                                                -- assume every secret stage has 1 star
+    star_data = {},                                                  -- assume every secret stage has 1 star
 
     runner_victory = function(m)
       local np = gNetworkPlayers[m.playerIndex]
@@ -1443,7 +1586,7 @@ function setup_hack_data(settingRomHack, initial, usingOMM)
   local romhack_file = gGlobalSyncTable.romhackFile
   ROMHACK = romhack_data[romhack_file]
   if initial and usingOMM then
-    local verstring = (_G.OmmVersion and _G.OmmVersion:sub(9)) or "Unknown"
+    local verstring = (OmmVersion and OmmVersion:sub(9)) or "Unknown"
     if tonumber(verstring) and tonumber(verstring) >= 1.2 then
       djui_popup_create(trans("omm_detected"), 1)
     else
@@ -1453,7 +1596,7 @@ function setup_hack_data(settingRomHack, initial, usingOMM)
 
   local found_121 = false
   if not ROMHACK and settingRomHack then
-    if not _G.mhApi or not _G.mhApi.romhackSetup then
+    if not mhApi or not mhApi.romhackSetup then
       romhack_file = "vanilla"
       for i, mod in pairs(gActiveMods) do
         if mod.enabled then
@@ -1466,9 +1609,9 @@ function setup_hack_data(settingRomHack, initial, usingOMM)
             end
           elseif initial and not (usingOMM or movesetEnabled) and mod.incompatible and string.find(mod.incompatible, "moveset") then -- is moveset
             movesetEnabled = true
-          elseif (romhack_file == "vanilla") and (not found_121) and string.find(mod.name, "121rst star") then                      -- 121rst star support
+          elseif (romhack_file == "vanilla") and (not found_121) and string.find(mod.name, "121rst star") then                       -- 121rst star support
             found_121 = true
-          elseif not disable_chat_hook then                                                                                         -- disable hook for some mods
+          elseif not disable_chat_hook then                                                                                          -- disable hook for some mods
             local name = mod.name:lower()
             if (name:find("mute") or name:find("swear filter") or name:find("nicknames")) and not name:find("(mh)") then
               disable_chat_hook = true
@@ -1482,8 +1625,8 @@ function setup_hack_data(settingRomHack, initial, usingOMM)
       romhack_file = "custom"
     end
   end
-  if romhack_file == "custom" and (_G.mhApi and _G.mhApi.romhackSetup) then
-    ROMHACK = _G.mhApi.romhackSetup()
+  if romhack_file == "custom" and (mhApi and mhApi.romhackSetup) then
+    ROMHACK = mhApi.romhackSetup()
     print("Romhack is", ROMHACK.name, "custom")
   end
 
@@ -1782,9 +1925,9 @@ end
 -- it probably also erases some other stuff but oh well
 function deleteStarRoadStuff(m)
   local starsNeeded = gGlobalSyncTable.starRun
-  if gGlobalSyncTable.freeRoam or (not starsNeeded or starsNeeded == -1 or starsNeeded > m.numStars) then return end   -- only if have enough for run
+  if gGlobalSyncTable.freeRoam or (not starsNeeded or starsNeeded == -1 or starsNeeded > m.numStars) then return end -- only if have enough for run
   local np = gNetworkPlayers[0]
-  if m.playerIndex ~= 0 or np.currCourseNum ~= COURSE_NONE then return end                                             -- only for local and in castle
+  if m.playerIndex ~= 0 or np.currCourseNum ~= COURSE_NONE then return end                                           -- only for local and in castle
 
   local obj = obj_get_first(OBJ_LIST_SURFACE)
 
@@ -1915,7 +2058,7 @@ star_sources = {
   [id_bhvMrI] = { 0xFF, "Eye To Eye" }, -- any set byte
   [id_bhvMantaRay] = { true, "The Manta Ray's Reward" },
   [id_bhvJetStreamRingSpawner] = { true, "Through The Jet Stream" },
-  [id_bhvKlepto] = { 0xFF, "In The Talons Of The Big Bird" },    -- any set byte
+  [id_bhvKlepto] = { 0xFF, "In The Talons Of The Big Bird" },      -- any set byte
   [id_bhvUkikiCage] = { true, "Mystery Of The Monkey Cage" },
   [id_bhvFirePiranhaPlant] = { 0xFF, "Pluck The Piranha Plants" }, -- any set byte
 }

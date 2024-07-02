@@ -161,7 +161,7 @@ function mario_update_local(m)
             end
         end
 
-        if (STP.team == 1 and (GST.mhState == 1 or GST.mhState == 2)) or GST.allowSpectate == false or (spectate == false and STP.forceSpectate == false) then
+        if (STP.team == 1 and (GST.mhState == 1 or GST.mhState == 2)) or ((spectate == false or GST.allowSpectate == false) and (STP.forceSpectate == false or (GST.mhState ~= 1 and GST.mhState ~= 2))) then
           STP.spectator = 0
           MSP.health = Shealth
           free_camera = 0
@@ -414,7 +414,7 @@ function spectated_update()
 
 end
 
--- screw it spectateFocus'm writing my own camera code
+-- screw it I'm writing my own camera code
 function update_spectator_camera(m, s)
     vec3f_copy(LLS.focus, cData.focus)
     vec3f_copy(LLS.curFocus, cData.focus)
@@ -438,12 +438,12 @@ function update_spectator_camera(m, s)
 
     if not is_game_paused() then
       local x_invert = 1
-      local y_invert = 1
-      if camera_config_is_x_inverted() then
+      local y_invert = -1
+      if camera_config_is_free_cam_enabled() == camera_config_is_x_inverted() then
         x_invert = -1
       end
-      if camera_config_is_y_inverted() then
-        y_invert = -1
+      if camera_config_is_free_cam_enabled() and camera_config_is_y_inverted() then
+        y_invert = 1
       end
 
       local mouseX = 0
@@ -483,8 +483,8 @@ function update_spectator_camera(m, s)
           --s.marioObj.header.gfx.node.flags = s.marioObj.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
         end
       else
-        cData.goalYaw = limit_angle(cData.goalYaw - (0.6 * stickX + mouseX) * (x_invert * camera_config_get_x_sensitivity()))
-        cData.goalPitch = clamp(cData.goalPitch + (0.6 * stickY + mouseY) * (y_invert * camera_config_get_y_sensitivity()), -0x3E00, 0x3E00)
+        cData.goalYaw = limit_angle(cData.goalYaw - (0.6 * stickX - mouseX) * (x_invert * camera_config_get_x_sensitivity()))
+        cData.goalPitch = clamp(cData.goalPitch - (0.6 * stickY + mouseY) * (y_invert * camera_config_get_y_sensitivity()), -0x3E00, 0x3E00)
 
         if (m.controller.buttonDown & L_TRIG) ~= 0 and free_camera == 0 and s.faceAngle.y then
           cData.goalYaw = limit_angle(s.faceAngle.y + 0x8000)
@@ -521,7 +521,7 @@ end
 function spectate_command(msg)
   local m = gMarioStates[0]
   local sMario = gPlayerSyncTable[0]
-  if not gGlobalSyncTable.allowSpectate then
+  if not (gGlobalSyncTable.allowSpectate or sMario.forceSpectate) then
     djui_chat_message_create(trans("spectate_disabled"))
     return true
   elseif sMario.team == 1 and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2) then
@@ -548,7 +548,7 @@ function spectate_command(msg)
     djui_chat_message_create(trans("spectator_controls"))
     return true
   elseif string.lower(msg) == "off" then
-    if sMario.forceSpectate then
+    if sMario.forceSpectate and (GST.mhState == 1 or GST.mhState == 2) then
       djui_chat_message_create(trans("not_mod"))
       return true
     end

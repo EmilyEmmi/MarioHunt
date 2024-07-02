@@ -1,10 +1,12 @@
 # Changelog
-## v2.6.2 (WIP)
+## v2.6.2
 ### Additions:
+  - Updated mod for coopDX v1.0 (although there is a version for 36.1, but this is the LAST one for this version)
   - Added Classic preset, which changes settings to match old versions of MarioHunt
   - Added game setting: "Stay If Already Collected"
     - Stay in the level if the star you collected has already been collected
     - Only applies when star collection is set to Leave
+    - ON by default
   - Added an option to show at what time the last star was collected
   - Added support for Star Revenge 7 - Park Of Time
   - **API CHANGE:** Added coinColor, which works like starColor but for red coins
@@ -15,13 +17,19 @@
   - Some enemies can now be the subject of kill messages (ex: "Bowser finished off EmilyEmmi!")
 ### Adjustments:
   - Updated the minimap icons for players
+  - Updated the lobby minimap to be more accurate
+  - Adjusted falling effect in lobby; it now has sound and stops playing when in a bubble
   - Metal doors now make the appropriate noise when being opened automatically
+  - Locked key doors no longer show any dialog while invulnerability frames are active
   - **API CHANGE:** Added a third argument to getStarFlagsFunc, a bool called "recalc"
     - TRUE if the function is ran in calculate_leave_requirements (used in Star Revenge 7 to unmark stars that are locked behind badges)'
   - Anniversary date is now April 18th instead of April 19th
   - Removed the update checker, since the function it uses was deprecated
   - Changed the message that appears instructing on how to open the menu into a popup
   - Hunters no longer get paused when entering a Bowser stage that has already been cleared while there are no Runners present
+  - Hunters are no longer effected by "Slow down with the warps!"
+  - Void DMG now applies to the last hub of Star Road
+  - The last safe position for void damage is now automatically set when warping: as such, it is no longer possible to die instantly in Tower Of The Wing Cap
   - Speedrun timer now pauses when global pause is active
   - Placement roles for the 64 Tour now have "64T:" appended to the front
   - Disabling your 64 Tour Placement role will now also disable the rainbow radar, if applicable
@@ -29,8 +37,20 @@
   - Force spectate now only applies during the game
   - Setting a Runner to force spectate will no longer turn them into Hunters
     - Force spectate Runners will spectate upon death
-### Fixes:
+  - Idling in the act select will no longer instantly kill Runners
+    - coopDX v1.0: Runners will enter act 1
+    - Old edition: Runners will lose one life
+    - The only reason for the difference is that the v1.0 version was made a bit more recently
+  - Entering Bowser In The Fire Sea in Free Roam is now possible before collecting Board Bowser's Sub
+  - In Free Roam, if Board Bowser's Sub is not collected, the Sub will still appear
+  - In Free Roam, courtyard boos now always appear (coopDX v1.0 only)
+  - Secrets counter no longer has background, and custom red coin counter was removed since the old one works now (coopDX v1.0 only)
+  - Color options now only change your Cap, Emblem, Shirt, and Overalls (coopDX v1.0 only)
+### Fixes/Backend changes:
+  - Fixed being able make inputs for 2 frames at the start of the game despite being frozen
+  - Fixed players at the start of the game appearing in the default pose
   - Fixed exclamation boxes causing errors in hacks such as Star Revenge 7
+  - Fixed lives temporarily appearing as 100 or 101 when dying
   - Fixed incorrect numbers being displayed if there are not exactly 8 red coins/5 secrets
   - Fixed menu being displayed under HUD in some scenarios
   - Fixed the BBH back entrance causing the camera to get stuck in vanilla cam
@@ -42,6 +62,12 @@
   - Fixed spectator camera interacting with the "X Invert" and "Y Invert" options incorrectly
   - Starting a new game now resets the special triple jump state
   - Fixed solo preset causing a script error
+  - Fixed signs not appearing in the lobby in vanilla
+  - Fixed vanilla tips never appearing
+  - Fixed Character Select support
+  - Fixed some inaccuracies with Luigi's Mansion 64
+  - Changed how star cutscenes are canceled (potential performance boost?)
+  - Added support for short color codes (ex: #a05) (coopDX v1.0 only)
 ## v2.6.1
 ### Additions:
   - Minimap updates:
