@@ -1,4 +1,4 @@
-<img src="wiki\img\logo.png" alt="MarioHunt" width="800"/>
+<img src="logo.png" alt="MarioHunt" width="800"/>
 
 ### v2.6.2 (view changelog [here](changelog.md))
 
