@@ -34,7 +34,7 @@ function do_warp(msg)
   warpCooldown = 0
   if msg == "random" then
     local worked = false
-    local level, area, act, node = nil
+    local level, area, act, node
     while not worked do
       level = math.random(4, 36)
       area = math.random(1, 4)
@@ -59,7 +59,8 @@ function do_warp(msg)
   end
   local area = tonumber(args[2]) or 1
   local act = tonumber(args[3]) or
-      (level_to_course[level] and level_to_course[level] < 16 and level_to_course[level] > 0 and 1) or 0
+      bool_to_int(gLevelValues.disableActs == 0 and level_to_course[level] and level_to_course[level] < 16 and
+        level_to_course[level] > 0)
   local node = tonumber(args[4])
   if not node then
     djui_chat_message_create("Warping to level " .. level .. " area " .. area .. " act " .. act)
@@ -97,7 +98,7 @@ function quick_debug(msg)
   end
 
   if msg == "hunter" then
-    gGlobalSyncTable.mhMode = 1
+    DEBUG_NO_VICTORY = true
     become_hunter(sMario)
     warp_to_level(LEVEL_BOB, 1, 1)
   elseif msg ~= "" and msg ~= "reset" then
@@ -253,12 +254,16 @@ function force_spectate_command(msg)
       gGlobalSyncTable.forceSpectate = false
       for i = 0, (MAX_PLAYERS - 1) do
         gPlayerSyncTable[i].forceSpectate = false
+        gPlayerSyncTable[i].dead = false
+        gPlayerSyncTable[i].knownDead = false
       end
       djui_chat_message_create(trans("force_spectate_off"))
     else
       gGlobalSyncTable.forceSpectate = true
       for i = 0, (MAX_PLAYERS - 1) do
         gPlayerSyncTable[i].forceSpectate = true
+        gPlayerSyncTable[i].dead = true
+        gPlayerSyncTable[i].knownDead = true
       end
       djui_chat_message_create(trans("force_spectate"))
     end
@@ -270,11 +275,15 @@ function force_spectate_command(msg)
 
   local sMario = gPlayerSyncTable[playerID]
   local name = remove_color(np.name)
-  if sMario.forceSpectate then
+  if sMario.forceSpectate or sMario.dead then
     sMario.forceSpectate = false
+    sMario.dead = false
+    sMario.knownDead = false
     djui_chat_message_create(trans("force_spectate_one_off", name))
   else
     sMario.forceSpectate = true
+    sMario.dead = true
+    sMario.knownDead = true
     djui_chat_message_create(trans("force_spectate_one", name))
   end
   return true
@@ -283,13 +292,21 @@ end
 function desync_fix_command(msg)
   local oldLevel = gGlobalSyncTable.gameLevel
   local oldStar = gGlobalSyncTable.getStar
+  local oldMode = gGlobalSyncTable.mhMode
+  local oldState = gGlobalSyncTable.mhState
   gGlobalSyncTable.gameLevel = -1
   gGlobalSyncTable.getStar = -1
+  gGlobalSyncTable.mhMode = -1
+  gGlobalSyncTable.mhState = -1
   gGlobalSyncTable.gameLevel = oldLevel
   gGlobalSyncTable.getStar = oldStar
+  gGlobalSyncTable.mhMode = oldMode
+  gGlobalSyncTable.mhState = oldState
   for i = 1, (MAX_PLAYERS - 1) do
     local sMario = gPlayerSyncTable[i]
     local oldTeam = sMario.team or 0
+    local oldSpectator = sMario.spectator or 0
+    local oldDead = sMario.dead or false
     local oldStars = sMario.totalStars or 0
     if oldTeam == 1 then
       local oldLives = sMario.runnerLives -- I wrote "runnerlives" instead before smh
@@ -300,6 +317,10 @@ function desync_fix_command(msg)
     sMario.team = oldTeam
     sMario.totalStars = -1
     sMario.totalStars = oldStars
+    sMario.spectator = 0
+    sMario.spectator = oldSpectator
+    sMario.dead = false
+    sMario.dead = oldDead
   end
   return true
 end
@@ -313,11 +334,7 @@ function out_command(msg)
       })
     end
   end
-  if gNetworkPlayers[0].currCourseNum == 0 then
-    warp_to_level(LEVEL_BOB, 1, 1)
-  else
-    warp_beginning()
-  end
+  on_packet_get_outta_here({id = PACKET_GET_OUTTA_HERE}, true)
   return true
 end
 
@@ -465,7 +482,6 @@ function blacklist_command(msg)
     gGlobalSyncTable.blacklistData = "none"
     djui_chat_message_create(trans("blacklist_reset"))
   elseif action == "save" then
-    -- (TODO: This breaks for some reason when resetting?)
     local fileName = string.gsub(gGlobalSyncTable.romhackFile, " ", "_")
     if gGlobalSyncTable.blacklistData ~= "none" then
       mod_storage_save(fileName .. "_black", gGlobalSyncTable.blacklistData)
@@ -569,14 +585,14 @@ end
 
 function apply_double_health(index)
   local sMario = gPlayerSyncTable[index]
-  return sMario and gGlobalSyncTable.doubleHealth and sMario.team == 1 and sMario.hard ~= 2 and
-      (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2)
+  return sMario and gGlobalSyncTable.doubleHealth and (sMario.team == 1 or gGlobalSyncTable.mhMode == 3) and
+      (sMario.hard == nil or sMario.hard == 0) and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2)
 end
 
 -- tip data
 -- arg 1: what team is needed for the tip to appear (-1 is either)
 -- arg 2: TRUE if mod powers are needed
--- arg 3: game mode needed for tip to appear (-1 refers to any, -2 is Normal or Swap, -3 is Swap or MiniHunt)
+-- arg 3: game mode needed for tip to appear (-1 refers to any, -2 is Not MiniHunt, -3 is Swap or MiniHunt)
 -- arg 4: TRUE if OMM is needed for the tip to appear
 -- arg 5: TRUE if the hack must be vanilla
 -- arg 6: a function for more complex requirements
@@ -604,6 +620,7 @@ tip_data = {
   [29] = { -1, false, -1, false, false, function() return (month == 13 or month == 12 or month == 10) end },
   [30] = { 0, false, -1, false, false, function() return gGlobalSyncTable.allowSpectate end },
   [31] = { -1, false, -1, false, false, function() return gGlobalSyncTable.allowStalk end },
+  [36] = { -1, false, -1, false, false, function() return gGlobalSyncTable.nerfVanishCap end },
   [38] = { 1, false, -2, false, false, function() return gLevelValues.disableActs and gLevelValues.disableActs ~= 0 end },
   [40] = { -1, false, -1, false, false, function() return gGlobalSyncTable.voidDmg ~= -1 end },
   [42] = { -1, true },
@@ -639,7 +656,7 @@ function render_tip(pickNew)
             invalid = true
           elseif data[2] and not has_mod_powers(0) then
             invalid = true
-          elseif data[3] ~= -1 and gGlobalSyncTable.mhMode ~= data[3] and not (data[3] == -2 and gGlobalSyncTable.mhMode ~= 2) then
+          elseif data[3] ~= -1 and gGlobalSyncTable.mhMode ~= data[3] and not ((data[3] == -2 and gGlobalSyncTable.mhMode ~= 2) or (data[3] == -3 and gGlobalSyncTable.mhMode ~= 0 and gGlobalSyncTable.mhMode ~= 3)) then
             invalid = true
           elseif data[4] and not OmmEnabled then
             invalid = true
@@ -653,7 +670,15 @@ function render_tip(pickNew)
     end
   end
 
-  local text = trans("tip") .. trans("tip_" .. chosenTip)
+  local extra
+  if chosenTip == 1 or chosenTip == 10 then -- show actual menu bind
+    local buttonString = { "L + Start", "R + Start", "U-DPAD", "D-DPAD", "L-DPAD", "R-DPAD" }
+    extra = buttonString[menuButton]
+  elseif chosenTip == 36 then -- show actual vanish bind
+    local buttonString = { "A", "B", "Z", "START", "U-DPAD", "D-DPAD", "L-DPAD", "R-DPAD", "Y", "X", "L", "R" }
+    extra = buttonString[nerfVanishButton]
+  end
+  local text = trans("tip") .. trans("tip_" .. chosenTip, extra)
   local screenWidth = djui_hud_get_screen_width()
   local width = djui_hud_measure_text(text) * scale
   local x = 0
@@ -673,26 +698,39 @@ function render_tip(pickNew)
 end
 
 function set_override_team_colors(np, team)
+  if not know_team(np.localIndex) then
+    network_player_reset_palette_custom(np)
+    return
+  end
+
+  local sMario = gPlayerSyncTable[np.localIndex]
+  if disguiseMod then
+    local gIndex = disguiseMod.getDisguisedIndex(np.globalIndex)
+    sMario = gPlayerSyncTable[network_local_index_from_global(gIndex)]
+  end
+
   local m = gMarioStates[np.localIndex]
   if team == 1 then
     -- azure
-    local sMario = gPlayerSyncTable[m.playerIndex]
     local darkBlue = { r = 0x4f, g = 0x31, b = 0x8b }
     local lightBlue = { r = 0x5a, g = 0x94, b = 0xff }
     if runnerAppearance ~= 4 and (runnerAppearance ~= 2 or m.marioBodyState.modelState & MODEL_STATE_METAL == 0) then
-      network_player_reset_override_palette(np)
+      network_player_reset_palette_custom(np)
       return
     end
+    if charSelectExists then
+      charSelect.restrict_palettes(not (charSelect.is_menu_open()))
+    end
 
-    network_player_reset_override_palette_part(np, GLOVES)
-    network_player_reset_override_palette_part(np, SKIN)
-    network_player_reset_override_palette_part(np, SHOES)
-    network_player_reset_override_palette_part(np, HAIR)
+    network_player_reset_palette_custom_part(np, GLOVES)
+    network_player_reset_palette_custom_part(np, SKIN)
+    network_player_reset_palette_custom_part(np, SHOES)
+    network_player_reset_palette_custom_part(np, HAIR)
     if m.marioBodyState.modelState & MODEL_STATE_METAL ~= 0 then
       if runnerAppearance == 4 or sMario.hard == nil or sMario.hard == 0 then
         network_player_set_override_palette_color(np, METAL, lightBlue)
       elseif sMario.hard == 1 then
-        network_player_set_override_palette_color(np, METAL, { r = 255, g = 0xbd, b = 0 }) -- wario yellow
+        network_player_set_override_palette_color(np, METAL, { r = 255, g = 0xbd, b = 0 })     -- wario yellow
       else
         network_player_set_override_palette_color(np, METAL, { r = 0x61, g = 0x25, b = 0xb0 }) -- waluigi purple
       end
@@ -707,15 +745,17 @@ function set_override_team_colors(np, team)
     local darkRed = { r = 0x23, g = 0x11, b = 0x03 }
     local lightRed = { r = 0x68, g = 0x0a, b = 0x17 }
     if hunterAppearance ~= 4 and (hunterAppearance ~= 2 or m.marioBodyState.modelState & MODEL_STATE_METAL == 0) then
-      network_player_reset_override_palette(np)
+      network_player_reset_palette_custom(np)
       return
     end
+    if charSelectExists then
+      charSelect.restrict_palettes(not (charSelect.is_menu_open()))
+    end
 
-    
-    network_player_reset_override_palette_part(np, GLOVES)
-    network_player_reset_override_palette_part(np, SKIN)
-    network_player_reset_override_palette_part(np, SHOES)
-    network_player_reset_override_palette_part(np, HAIR)
+    network_player_reset_palette_custom_part(np, GLOVES)
+    network_player_reset_palette_custom_part(np, SKIN)
+    network_player_reset_palette_custom_part(np, SHOES)
+    network_player_reset_palette_custom_part(np, HAIR)
     if m.marioBodyState.modelState & MODEL_STATE_METAL ~= 0 then
       network_player_set_override_palette_color(np, METAL, lightRed)
       return
@@ -727,8 +767,37 @@ function set_override_team_colors(np, team)
   end
 end
 
-function network_player_reset_override_palette_part(np, part)
-  network_player_set_override_palette_color(np, part, network_player_get_palette_color(np, part))
+function network_player_reset_palette_custom_part(np, part)
+  if disguiseMod then
+    local gIndex = disguiseMod.getDisguisedIndex(np.globalIndex)
+    if gIndex ~= np.globalIndex then
+      local np2 = network_player_from_global_index(gIndex)
+      local color = network_player_get_palette_color(np2, part, color)
+      network_player_set_override_palette_color(np, part, color)
+      return
+    end
+  end
+
+  return network_player_set_override_palette_color(np, part, network_player_get_palette_color(np, part))
+end
+
+function network_player_reset_palette_custom(np)
+  if charSelectExists then
+    charSelect.restrict_palettes(false)
+  end
+  if disguiseMod then
+    local gIndex = disguiseMod.getDisguisedIndex(np.globalIndex)
+    if gIndex ~= np.globalIndex then
+      local np2 = network_player_from_global_index(gIndex)
+      for i = 0, PLAYER_PART_MAX - 1 do
+        local color = network_player_get_palette_color(np2, i, color)
+        network_player_set_override_palette_color(np, i, color)
+      end
+      return
+    end
+  end
+
+  return network_player_reset_override_palette(np)
 end
 
 -- main command
@@ -756,7 +825,7 @@ function setup_commands()
   table.insert(marioHuntCommands, { "hack", "romhack", rom_hack_command })
   table.insert(marioHuntCommands, { "weak", nil, weak_command })
   table.insert(marioHuntCommands, { "auto", nil, auto_command })
-  table.insert(marioHuntCommands, { "forcespectate", nil, force_spectate_command })
+  table.insert(marioHuntCommands, { "forcespectate", "dead", force_spectate_command })
   table.insert(marioHuntCommands, { "desync", "fixdesync", desync_fix_command })
   table.insert(marioHuntCommands, { "out", "getout", out_command })
   table.insert(marioHuntCommands, { "stop", "halt", halt_command })
@@ -802,4 +871,19 @@ function setup_commands()
   table.insert(marioHuntCommands, { "swarp", nil, function(msg)
     return warp_special(tonumber(msg))
   end, true })
+  table.insert(marioHuntCommands,
+    { "safe", "safesurface", function()
+      DEBUG_SAFE_SURFACE = not DEBUG_SAFE_SURFACE
+      return true
+    end, true })
+  table.insert(marioHuntCommands,
+    { "nowin", "novictory", function()
+      DEBUG_NO_VICTORY = not DEBUG_NO_VICTORY
+      return true
+    end, true })
+  table.insert(marioHuntCommands,
+    { "ping", "showping", function()
+      DEBUG_SHOW_PING = not DEBUG_SHOW_PING
+      return true
+    end, true })
 end

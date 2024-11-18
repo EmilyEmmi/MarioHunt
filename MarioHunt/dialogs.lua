@@ -454,10 +454,15 @@ explorer does not need\
 such a ritual..."))
 
 changed_dialogs[104] = 1
-smlua_text_utils_dialog_replace(DIALOG_104,1,4,30,200, ("In this mode, you will\
-not pause while a Star\
-appears.\
-Isn't that lovely?"))
+smlua_text_utils_dialog_replace(DIALOG_104,1,3,30,200, ("The Red Coin Marker\
+may look like a\
+normal Star sometimes.\
+This indicates that the\
+Red Coin Star has not\
+been collected.\
+When the Star is\
+collected, it will\
+appear blue."))
 
 smlua_text_utils_dialog_replace(DIALOG_105,1,3,95,200, ("Ready for blastoff! Come\
 on, hop into the cannon!"))
@@ -484,9 +489,9 @@ will help Runners with\
 the 100 coin Star.\
 Is it worth it?\
 Quite the dilemma...\
-You can also fully\
-heal by collecting\
-1-up mushrooms.\
+You can also heal\
+4 HP by collecting\
+a 1-up mushroom.\
 They're useful in a\
 pinch!"))
 
@@ -721,6 +726,8 @@ mh set-fov\
 mh djui\
 mh hidehud\
 mh print\
+mh nowin\
+mh safe\
 \
 Enjoy this sweet\
 knowledge!"))
@@ -859,6 +866,7 @@ function auto_skip(id)
     [gBehaviorValues.dialogs.Mips2Dialog] = 1,
     [gBehaviorValues.dialogs.TuxieMotherDialog] = 1,
     [gBehaviorValues.dialogs.TuxieMotherBabyFoundDialog] = 1,
+    [gBehaviorValues.dialogs.SnowmanHeadBodyDialog] = 1,
   }
 
   if skip_always[id] then return false end

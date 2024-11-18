@@ -1,0 +1,12 @@
+extern const GeoLayout bcrown_geo[];
+extern Lights1 bcrown_f3dlite_material_lights;
+extern u8 bcrown_bronze_ci8[];
+extern u8 bcrown_bronze_pal_rgba16[];
+extern Vtx bcrown_000_displaylist_mesh_layer_1_vtx_0[111];
+extern Gfx bcrown_000_displaylist_mesh_layer_1_tri_0[];
+extern Vtx bcrown_000_displaylist_mesh_layer_1_vtx_1[121];
+extern Gfx bcrown_000_displaylist_mesh_layer_1_tri_1[];
+extern Gfx mat_bcrown_f3dlite_material_001[];
+extern Gfx mat_revert_bcrown_f3dlite_material_001[];
+extern Gfx mat_bcrown_f3dlite_material[];
+extern Gfx bcrown_000_displaylist_mesh_layer_1[];

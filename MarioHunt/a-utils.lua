@@ -37,6 +37,8 @@ function mario_hunt_command(msg)
           if cdata[4] == true then
             if not has_mod_powers(0, true) then
               hidden = true
+            else
+              desc = trans("debug_" .. cdata[1] .. "_desc")
             end
           end
 
@@ -66,12 +68,16 @@ function mario_hunt_command(msg)
     djui_chat_message_create(trans("page", page, maxPage))
     for i, cdata in ipairs(marioHuntCommands) do
       if i > (page - 1) * cmdPerPage and i <= page * cmdPerPage then
-        local desc = trans(cdata[1] .. "_desc")
+        local desc = ""
         local hidden = false
         if cdata[4] == true then
           if not has_mod_powers(0, true) then
             hidden = true
+          else
+            desc = trans("debug_" .. cdata[1] .. "_desc")
           end
+        else
+          desc = trans(cdata[1] .. "_desc")
         end
 
         if not hidden then
@@ -215,9 +221,9 @@ end
 
 function add_runner(msg)
   local runners = tonumber(msg)
-  if msg == "" or msg == 0 or msg == "auto" then
-    runners = 0 -- TBD
-  elseif not runners or runners ~= math.floor(runners) or runners < 1 then
+  if msg == "" or msg == -1 or msg == "auto" then
+    runners = -1 -- TBD
+  elseif not (runners and runners == math.floor(runners) and runners ~= 0) then
     return false
   end
 
@@ -232,7 +238,7 @@ function add_runner(msg)
     local sMario = gPlayerSyncTable[i]
     if np.connected and (sMario.spectator ~= 1 or sMario.team == 1) then
       if sMario.team ~= 1 then
-        if sMario.beenRunner == 0 then
+        if gGlobalSyncTable.mhMode == 3 or sMario.beenRunner == 0 then
           runners_available = runners_available + 1
           table.insert(goodHunterIDs, np.localIndex)
         end
@@ -244,15 +250,16 @@ function add_runner(msg)
     end
   end
 
-  if runners == 0 then
+  if runners == -1 then
     runners = ideal_runners(currPlayers) - currRunners
-    if runners <= 0 then
-      djui_chat_message_create(trans("no_runners_added"))
-      return true
-    end
+  elseif runners < 0 then
+    runners = currPlayers + runners + 2 - currRunners
   end
 
-  if #currHunterIDs < (runners + 1) then
+  if #currHunterIDs < runners or runners <= 0 then
+    djui_chat_message_create(trans("no_runners_added"))
+    return true
+  elseif gGlobalSyncTable.mhMode == 3 and #currHunterIDs <= runners then
     djui_chat_message_create(trans("must_have_one"))
     return true
   elseif runners_available < runners then -- if everyone has been a runner before, ignore recent status
@@ -270,22 +277,28 @@ function add_runner(msg)
     network_send_include_self(false, { id = PACKET_ROLE_CHANGE, index = np.globalIndex })
     table.insert(runnerNames, remove_color(np.name))
     table.remove(goodHunterIDs, selected)
+    if #goodHunterIDs == 0 then return end
   end
 
-  local text = trans("added")
-  for i = 1, #runnerNames do
-    text = text .. runnerNames[i] .. ", "
+  local text = ""
+  if gGlobalSyncTable.mhMode ~= 3 then
+    text = trans("added")
+    for i = 1, #runnerNames do
+      text = text .. runnerNames[i] .. ", "
+    end
+    text = text:sub(1, -3)
+  else
+    text = trans_plural("added_count", #runnerNames)
   end
-  text = text:sub(1, -3)
   djui_chat_message_create(text)
   return true
 end
 
 function runner_randomize(msg)
   local runners = tonumber(msg)
-  if (not msg) or msg == "" or msg == 99 or msg == 0 or msg == "auto" then
-    runners = 0 -- TBD
-  elseif not (runners or runners ~= math.floor(runners) or runners < 1) then
+  if (not msg) or msg == "" or msg == -1 or msg == "auto" then
+    runners = -1 -- TBD
+  elseif not (runners and runners == math.floor(runners)) then
     return false
   end
 
@@ -298,7 +311,7 @@ function runner_randomize(msg)
     local sMario = gPlayerSyncTable[i]
     become_hunter(sMario)
     if np.connected and sMario.spectator ~= 1 then
-      if sMario.beenRunner == 0 then
+      if gGlobalSyncTable.mhMode == 3 or sMario.beenRunner == 0 then
         runners_available = runners_available + 1
         table.insert(goodPlayerIDs, np.localIndex)
       end
@@ -306,15 +319,18 @@ function runner_randomize(msg)
     end
   end
 
-  if runners == 0 then
+  if runners == -1 then
     runners = ideal_runners(#currPlayerIDs)
-    if runners <= 0 then
-      djui_chat_message_create(trans("must_have_one"))
-      return true
-    end
+  elseif runners == 0 then
+    return true
+  elseif runners < 0 then
+    runners = #currPlayerIDs + runners + 2
   end
 
-  if #currPlayerIDs < (runners + 1) then
+  if runners <= 0 then
+    djui_chat_message_create(trans("must_have_one"))
+    return true
+  elseif gGlobalSyncTable.mhMode == 3 and #currPlayerIDs <= runners then
     djui_chat_message_create(trans("must_have_one"))
     return true
   elseif runners_available < runners then -- if everyone has been a runner before, ignore recent status
@@ -332,22 +348,36 @@ function runner_randomize(msg)
     network_send_include_self(false, { id = PACKET_ROLE_CHANGE, index = np.globalIndex })
     table.insert(runnerNames, remove_color(np.name))
     table.remove(goodPlayerIDs, selected)
+    if #goodPlayerIDs == 0 then break end
   end
 
-  local text = trans("runners_are")
-  for i = 1, #runnerNames do
-    text = text .. runnerNames[i] .. ", "
+  local text = ""
+  if gGlobalSyncTable.mhMode ~= 3 then
+    text = trans("runners_are")
+    for i = 1, #runnerNames do
+      text = text .. runnerNames[i] .. ", "
+    end
+    text = text:sub(1, -3)
+  else
+    text = trans_plural("hunters_set_count", runners_available - #runnerNames)
   end
-  text = text:sub(1, -3)
   djui_chat_message_create(text)
   return true
 end
 
 -- calculate good amount of runners (40% except when there's 5)
 function ideal_runners(num)
-  if num == 5 then return 1 end -- exception
-
-  return math.max(1, math.floor(num * 0.4))
+  local ideal = 0
+  if gGlobalSyncTable.mhMode ~= 3 then
+    if num ~= 5 then
+      ideal = math.max(1, math.floor(num * 0.4))
+    else
+      ideal = 1
+    end
+  else -- different logic for mysteryhunt (more runners)
+    ideal = math.min(num-1, math.ceil((num * 2 + 1) / 3))
+  end
+  return ideal
 end
 
 function become_runner(sMario)
@@ -418,18 +448,24 @@ end
 function auto_command(msg)
   local num = tonumber(msg)
   if string.lower(msg) == "on" then
-    num = 99
+    num = -1
   elseif string.lower(msg) == "off" then
     num = 0
   elseif not num or math.floor(num) ~= num then
     return false
-  elseif num > (MAX_PLAYERS - 1) then
+  elseif gGlobalSyncTable.mhMode == 3 and num > (MAX_PLAYERS - 1) then
     djui_chat_message_create(trans("must_have_one"))
     return true
   end
 
-  if num == 99 then
-    gGlobalSyncTable.gameAuto = 99
+  if num == 0 then
+    gGlobalSyncTable.gameAuto = 0
+    djui_chat_message_create(trans("auto_off"))
+    if gGlobalSyncTable.mhState == 0 then
+      gGlobalSyncTable.mhTimer = 0 -- don't set
+    end
+  elseif num == -1 then
+    gGlobalSyncTable.gameAuto = -1
     djui_chat_message_create(trans("auto_on"))
     if gGlobalSyncTable.mhState == 0 then
       gGlobalSyncTable.mhTimer = 20 * 30 -- 20 seconds
@@ -443,10 +479,15 @@ function auto_command(msg)
       gGlobalSyncTable.mhTimer = 20 * 30 -- 20 seconds
     end
   else
-    gGlobalSyncTable.gameAuto = 0
-    djui_chat_message_create(trans("auto_off"))
+    gGlobalSyncTable.gameAuto = num
+    local autoNum = -num - 2
+    local hunters = trans("hunters")
+    if gGlobalSyncTable.gameAuto == -3 then
+      hunters = trans("hunter")
+    end
+    djui_chat_message_create(string.format("%s (%d %s)", trans("auto_on"), autoNum, hunters))
     if gGlobalSyncTable.mhState == 0 then
-      gGlobalSyncTable.mhTimer = 0 -- don't set
+      gGlobalSyncTable.mhTimer = 20 * 30 -- 20 seconds
     end
   end
   return true
@@ -470,68 +511,33 @@ function star_count_command(msg)
   return false
 end
 
-function change_game_mode(msg, mode)
-  local prevMode = gGlobalSyncTable.mhMode
-  local miniSwitch = false
+function change_game_mode(msg, mode, prevMode_)
+  local prevMode = prevMode_ or gGlobalSyncTable.mhMode
   if prevMode == mode then return true end
 
   if mode == 0 or string.lower(msg) == "normal" then
     gGlobalSyncTable.mhMode = 0
-    miniSwitch = (gGlobalSyncTable.mhMode == 2) ~= (prevMode == 2)
-
-    -- defaults
-    gGlobalSyncTable.runnerLives = 1
-    if miniSwitch then
-      gGlobalSyncTable.runTime = 7200 -- 4 minutes
-      gGlobalSyncTable.anarchy = 0
-      gGlobalSyncTable.dmgAdd = 0
-      if gGlobalSyncTable.starMode then gGlobalSyncTable.runTime = 2 end
-      gGlobalSyncTable.gameAuto = 0
-    end
-
-    omm_disable_mode_for_minihunt(false)
   elseif mode == 1 or string.lower(msg) == "swap" or string.lower(msg) == "switch" then
     gGlobalSyncTable.mhMode = 1
-    miniSwitch = (gGlobalSyncTable.mhMode == 2) ~= (prevMode == 2)
-
-    -- defaults
-    gGlobalSyncTable.runnerLives = 0
-    if miniSwitch then
-      gGlobalSyncTable.runTime = 7200 -- 4 minutes
-      gGlobalSyncTable.anarchy = 0
-      gGlobalSyncTable.dmgAdd = 0
-      if gGlobalSyncTable.starMode then gGlobalSyncTable.runTime = 2 end
-      gGlobalSyncTable.gameAuto = 0
-    end
-
-    omm_disable_mode_for_minihunt(false)
   elseif mode == 2 or string.lower(msg) == "mini" then
     local np = gNetworkPlayers[0]
     gGlobalSyncTable.mhMode = 2
-    miniSwitch = (gGlobalSyncTable.mhMode == 2) ~= (prevMode == 2)
-
-    -- defaults
-    gGlobalSyncTable.runnerLives = 0
-    if miniSwitch then
-      gGlobalSyncTable.runTime = 9000 -- 5 minutes
-      gGlobalSyncTable.anarchy = 1
-      gGlobalSyncTable.dmgAdd = 2
-      gGlobalSyncTable.gameAuto = 0
-    end
-
     gGlobalSyncTable.gameLevel = np.currLevelNum
     gGlobalSyncTable.getStar = np.currActNum
-    omm_disable_mode_for_minihunt(true)
+  elseif mode == 3 or string.lower(msg) == "mystery" or string.lower(msg) == "mys" then
+    if disable_chat_hook then
+      djui_chat_message_create(trans("mysteryhunt_disabled"))
+      return true
+    end
+    gGlobalSyncTable.mhMode = 3
   else
     return false
   end
 
+  omm_disable_mode_for_minihunt(mode == 2)
+
   -- only reload settings if we changed from mini to standard or vice versa
-  if miniSwitch then
-    load_settings(true)
-  else -- load lives setting only
-    load_settings(false, false, true)
-  end
+  load_settings(prevMode)
   return true
 end
 
@@ -570,7 +576,18 @@ function pause_command(msg)
 end
 
 -- gets the name and color of the user's role (color is either a table or string)
-function get_role_name_and_color(sMario)
+function get_role_name_and_color(index)
+  local sMario = gPlayerSyncTable[index]
+  if not know_team(index) then
+    color = { r = 169, g = 169, b = 169 } -- grey
+    colorString = "\\#a9a9a9\\"
+    if sMario.knownDead then
+      roleName = trans("dead")
+    else
+      roleName = trans("menu_unknown")
+    end
+    return roleName, colorString, color
+  end
   local roleName = ""
   local color = { r = 255, g = 92, b = 92 } -- red
   local colorString = "\\#ff5a5a\\"
@@ -590,14 +607,30 @@ function get_role_name_and_color(sMario)
     color = { r = 169, g = 169, b = 169 } -- grey
     colorString = "\\#a9a9a9\\"
     roleName = trans("menu_unknown")
-  elseif sMario.spectator ~= 1 then
-    roleName = trans("hunter")
   else
-    color = { r = 169, g = 169, b = 169 } -- grey
-    colorString = "\\#a9a9a9\\"
-    roleName = trans("spectator")
+    roleName = trans("hunter")
   end
+
+  if sMario.spectator == 1 and (sMario.team ~= 1 or sMario.dead) then
+    if (not sMario.dead) or sMario.forceSpectate then
+      color = { r = 169, g = 169, b = 169 } -- grey
+      colorString = "\\#a9a9a9\\"
+      roleName = trans("spectator")
+    else
+      color.r = color.r//2
+      color.g = color.g//2
+      color.b = color.b//2
+      colorString = string.format("\\#%02x%02x%02x\\", color.r, color.g, color.b)
+      roleName = trans("dead")
+    end
+  end
+
   return roleName, colorString, color
+end
+
+-- gets if the player should know this role; applies only in mysteryhunt
+function know_team(index)
+  return gGlobalSyncTable.mhState == nil or gGlobalSyncTable.mhState >= 3 or gGlobalSyncTable.mhMode ~= 3 or index == 0 or (gPlayerSyncTable[0].team ~= 1 and gGlobalSyncTable.anarchy ~= 3) or gPlayerSyncTable[0].dead or (gGlobalSyncTable.confirmHunter and gPlayerSyncTable[index].knownDead)
 end
 
 function set_lobby_music(month)
@@ -624,8 +657,39 @@ function lerp(a, b, t)
   return a * (1 - t) + b * t
 end
 
+-- reset_camera and soft_reset_camera have a bug that makes itt impossible to disable freecam when they are run.
+-- This gets around that issue.
+function soft_reset_camera_fix_bug(c)
+  if camera_config_is_free_cam_enabled() then
+    camera_config_enable_free_cam(false) -- temporarily disable
+    local mode = gLakituState.mode
+    local defMode = gLakituState.defMode
+    soft_reset_camera(c)
+    gLakituState.mode = mode
+    gLakituState.defMode = defMode
+    set_camera_mode(c, mode, 0)
+    camera_reset_overrides()
+  else
+    soft_reset_camera(c)
+  end
+end
+function reset_camera_fix_bug(c)
+  if camera_config_is_free_cam_enabled() then
+    camera_config_enable_free_cam(false) -- temporarily disable
+    local mode = gLakituState.mode
+    local defMode = gLakituState.defMode
+    reset_camera(c)
+    gLakituState.mode = mode
+    gLakituState.defMode = defMode
+    set_camera_mode(c, mode, 0)
+    camera_reset_overrides()
+  else
+    reset_camera(c)
+  end
+end
+
 -- custom bubble action, with some code from the base game bubble action
-ACT_MH_BUBBLE_RETURN = allocate_mario_action(ACT_GROUP_CUTSCENE | ACT_FLAG_PAUSE_EXIT)
+ACT_MH_BUBBLE_RETURN = allocate_mario_action(ACT_GROUP_CUTSCENE | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE | ACT_FLAG_PAUSE_EXIT)
 ---@param m MarioState
 function act_bubble_return(m)
   -- create bubble
@@ -715,8 +779,17 @@ function act_bubble_return(m)
 
     if m.waterLevel > m.pos.y then
       set_mario_action(m, ACT_WATER_IDLE, 0)
-    elseif (m.floor.type == SURFACE_DEATH_PLANE or m.floor.type == SURFACE_BURNING or m.floor.type == SURFACE_INSTANT_QUICKSAND or m.floor.type == SURFACE_VERTICAL_WIND or m.floor.type == SURFACE_INSTANT_MOVING_QUICKSAND) then
-      set_mario_action(m, ACT_TRIPLE_JUMP, 0)
+    elseif is_hazard_floor(m.floor.type) then
+      local sMario = gPlayerSyncTable[m.playerIndex]
+      local np = gNetworkPlayers[m.playerIndex]
+      if m.playerIndex == 0 and gGlobalSyncTable.mhMode == 3 and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2) and sMario.dead then
+        spawn_my_corpse()
+        set_mario_action(m, ACT_SOFT_BONK, 0)
+      elseif m.flags & MARIO_WING_CAP ~= 0 and np.currLevelNum == LEVEL_TOTWC then
+        set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0)
+      else
+        set_mario_action(m, ACT_TRIPLE_JUMP, 0)
+      end
     else
       set_mario_action(m, ACT_SOFT_BONK, 0)
     end
@@ -762,4 +835,46 @@ function bubbled_offset_visual(m)
 
   -- offset global up direction
   m.marioObj.header.gfx.pos.y = m.marioObj.header.gfx.pos.y - upOffset;
+end
+
+function is_hazard_floor(type)
+  return (type == SURFACE_DEATH_PLANE or type == SURFACE_VERTICAL_WIND or type == SURFACE_INSTANT_QUICKSAND or type == SURFACE_BURNING or type == SURFACE_INSTANT_MOVING_QUICKSAND or type == SURFACE_DEEP_MOVING_QUICKSAND or type == SURFACE_SHALLOW_MOVING_QUICKSAND or type == SURFACE_MOVING_QUICKSAND)
+end
+
+function no_wall_between_points(pos1, pos2)
+  local dir = {x = pos2.x - pos1.x, y = pos2.y - pos1.y, z = pos2.z - pos1.z}
+  local intersect = collision_find_surface_on_ray(pos1.x, pos1.y, pos1.z, dir.x, dir.y, dir.z, 1)
+  while intersect.surface do
+    if intersect.surface.flags & SURFACE_FLAG_NO_CAM_COLLISION == 0 then
+      return false
+    end
+    pos1 = intersect.hitPos
+    local step = 0
+    if (math.abs(dir.x) >= math.abs(dir.z)) then
+      step = math.abs(dir.x) / 0x400
+    else
+      step = math.abs(dir.z) / 0x400
+    end
+    pos1.x = pos1.x + dir.x / step / 0x400
+    pos1.z = pos1.z + dir.z / step / 0x400
+
+    dir = {x = pos2.x - pos1.x, y = pos2.y - pos1.y, z = pos2.z - pos1.z}
+    intersect = collision_find_surface_on_ray(pos1.x, pos1.y, pos1.z, dir.x, dir.y, dir.z, 1)
+  end
+  return true
+end
+
+-- creates popup even in mysteryhunt
+function djui_popup_create_mystery(msg, lines)
+  if mystery_popup_off() then
+    djui_reset_popup_disabled_override()
+    if djui_is_popup_disabled() then
+      djui_chat_message_create(msg)
+    else
+      djui_popup_create(msg, lines)
+    end
+    djui_set_popup_disabled_override(true)
+  else
+    djui_popup_create(msg, lines)
+  end
 end

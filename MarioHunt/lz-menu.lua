@@ -1,67 +1,64 @@
 -- Thanks to blocky for making most of this
 
 -- localize some functions
-local djui_hud_set_font, djui_hud_set_color, djui_hud_print_text, djui_hud_render_rect, djui_hud_measure_text, djui_hud_render_texture, djui_hud_set_resolution, djui_chat_message_create, djui_hud_get_screen_width, djui_hud_get_screen_height, tonumber, play_sound, string_lower, network_get_player_text_color_string =
+local djui_hud_set_font, djui_hud_set_color, djui_hud_print_text, djui_hud_render_rect, djui_hud_measure_text,
+djui_hud_render_texture, djui_hud_set_resolution, djui_chat_message_create, djui_hud_get_screen_width, djui_hud_get_screen_height, tonumber, play_sound, string_lower, network_get_player_text_color_string =
     djui_hud_set_font, djui_hud_set_color, djui_hud_print_text, djui_hud_render_rect, djui_hud_measure_text,
     djui_hud_render_texture, djui_hud_set_resolution, djui_chat_message_create, djui_hud_get_screen_width,
     djui_hud_get_screen_height, tonumber, play_sound, string.lower,
     network_get_player_text_color_string
 
 -- localize other stuff
-local GST                                                                                                                                                                                                                                                                                                                  = gGlobalSyncTable
-local m0                                                                                                                                                                                                                                                                                                                   = gMarioStates
-    [0]
+local GST = gGlobalSyncTable
+local m0 = gMarioStates[0]
 
 -- Constants for joystick input
-local JOYSTICK_THRESHOLD                                                                                                                                                                                                                                                                                                   = 32
+local JOYSTICK_THRESHOLD = 32
 
 -- Variables to keep track of current menu state
-local currentOption                                                                                                                                                                                                                                                                                                        = 1
-local bottomOption                                                                                                                                                                                                                                                                                                         = 0
-local focusPlayerOrCourse                                                                                                                                                                                                                                                                                                  = 0
-local prevOption                                                                                                                                                                                                                                                                                                           = 0
-local hoveringOption                                                                                                                                                                                                                                                                                                       = true
+local currentOption = 1
+local bottomOption = 0
+local focusPlayerOrCourse = 0
+local prevOption = 0
+local hoveringOption = true
 
 -- Controller Inputs
-local sMenuInputsPressed                                                                                                                                                                                                                                                                                                   = 0
-local sMenuInputsDown                                                                                                                                                                                                                                                                                                      = 0
+local sMenuInputsPressed = 0
+local sMenuInputsDown = 0
+
+-- used for displaying binds
+buttonString = { "A", "B", "Z", "START", "U-DPAD", "D-DPAD", "L-DPAD", "R-DPAD", "Y", "X", "L", "R" }
+menuButtonString = { "L+START", "R+START", "U-DPAD", "D-DPAD", "L-DPAD", "R-DPAD" }
 
 -- textures
-local TEX_MENU_ARROW                                                                                                                                                                                                                                                                                                       = get_texture_info(
-  "menu-arrow")
-local TEX_MENU_ARROW_UP                                                                                                                                                                                                                                                                                                    = gTextures
-    .arrow_up
-local TEX_MENU_ARROW_DOWN                                                                                                                                                                                                                                                                                                  = gTextures
-    .arrow_down
+local TEX_MENU_ARROW = get_texture_info("menu-arrow")
+local TEX_MENU_ARROW_UP = gTextures.arrow_up
+local TEX_MENU_ARROW_DOWN = gTextures.arrow_down
 
 -- mouse stuff
-local TEX_HAND                                                                                                                                                                                                                                                                                                             = get_texture_info(
-  "gd_texture_hand_open")
-local TEX_HAND_SELECT                                                                                                                                                                                                                                                                                                      = get_texture_info(
-  "gd_texture_hand_closed")
-local mouseX                                                                                                                                                                                                                                                                                                               = djui_hud_get_mouse_x()
-local mouseY                                                                                                                                                                                                                                                                                                               = djui_hud_get_mouse_y()
-local mouseData                                                                                                                                                                                                                                                                                                            = {
-  prevX =
-      mouseX,
+local TEX_HAND = get_texture_info("gd_texture_hand_open")
+local TEX_HAND_SELECT = get_texture_info("gd_texture_hand_closed")
+local mouseX = djui_hud_get_mouse_x()
+local mouseY = djui_hud_get_mouse_y()
+local mouseData = {
+  prevX = mouseX,
   prevY = mouseY
 }
-local mouseIdleTimer                                                                                                                                                                                                                                                                                                       = 90
-local mouseGrabbedScrollBar                                                                                                                                                                                                                                                                                                = false
-local mouseScrollBarY                                                                                                                                                                                                                                                                                                      = 0
-local mouseArrowKey                                                                                                                                                                                                                                                                                                        = 0
-local validBack                                                                                                                                                                                                                                                                                                            = true
+local mouseIdleTimer = 90
+local mouseGrabbedScrollBar = false
+local mouseScrollBarY = 0
+local mouseArrowKey = 0
+local validBack = true
 
 -- limit for player names
-local PLAYER_NAME_CUTOFF                                                                                                                                                                                                                                                                                                   = 16
+local PLAYER_NAME_CUTOFF = 16
 
 -- build language menu
-local menuList                                                                                                                                                                                                                                                                                                             = {}
-menuList["LanguageMenu"]                                                                                                                                                                                                                                                                                                   = {}
-local LanguageMenu                                                                                                                                                                                                                                                                                                         = menuList
-    ["LanguageMenu"]
-local langnum                                                                                                                                                                                                                                                                                                              = 0
-local lang_table                                                                                                                                                                                                                                                                                                           = {}
+local menuList = {}
+menuList["LanguageMenu"] = {}
+local LanguageMenu = menuList["LanguageMenu"]
+local langnum = 0
+local lang_table = {}
 for id, data in pairs(langdata) do
   langnum = langnum + 1
   table.insert(lang_table, { (data.name_menu or data.fullname), id })
@@ -98,15 +95,19 @@ function menu_reload()
 
   menuList["marioHuntMenu"] = {
     { name = ("menu_start"),      title = ("menu_mh") },
-    { name = ("menu_run_random"), currNum = 0,          minNum = 0, maxNum = MAX_PLAYERS - 1, desc = ("random_desc"),               format = { "Auto" } },
-    { name = ("menu_run_add"),    currNum = 0,          minNum = 0, maxNum = MAX_PLAYERS - 1, desc = ("add_desc"),                  format = { "Auto" } },
-    { name = ("menu_gamemode"),   currNum = GST.mhMode, maxNum = 2, desc = ("mode_desc"),     format = { "Normal", "Swap", "Mini" } },
+    { name = ("menu_run_random"), currNum = -1,         minNum = -MAX_PLAYERS - 1, maxNum = MAX_PLAYERS - 1, desc = ("random_desc"),                          formatAuto = true },
+    { name = ("menu_run_add"),    currNum = -1,         minNum = -MAX_PLAYERS - 1, maxNum = MAX_PLAYERS - 1, desc = ("add_desc"),                             formatAuto = true },
+    { name = ("menu_gamemode"),   currNum = GST.mhMode, maxNum = 3,                desc = ("mode_desc"),     format = { "Normal", "Swap", "Mini", "Mystery" } },
     { name = ("menu_settings") },
     { name = ("menu_stop"),       desc = ("stop_desc") },
     { name = ("menu_back") },
     name = "marioHuntMenu",
     back = 7,
   }
+  if GST.mhMode == 3 then
+    menuList["marioHuntMenu"][2].name = "menu_hunt_random"
+    menuList["marioHuntMenu"][2].desc = "random_desc_hunt"
+  end
 
   menuList["startMenu"] = {
     { name = ("menu_save_main"),    title = ("menu_start") },
@@ -136,45 +137,92 @@ function menu_reload()
     { name = ("preset_tag"),       desc = "preset_tag_desc" },
     { name = ("preset_star_rush"), desc = "preset_star_rush_desc" },
     { name = ("preset_classic"),   desc = "preset_classic_desc" },
+    { name = ("preset_asn"),       desc = "preset_asn_desc" },
     { name = ("menu_back") },
     { name = ("main_menu") },
     name = "presetMenu",
-    back = 8,
+    back = 9,
   }
+
+  menuList["saboMenu"] = {
+    { name = ("sabo_bomb"), desc = "sabo_bomb_desc", color = true, title = ("menu_sabo") },
+    { name = ("sabo_gas"),  desc = "sabo_gas_desc",  color = true },
+    { name = ("sabo_dark"), desc = "sabo_dark_desc", color = true },
+    { name = ("menu_exit") },
+    name = "saboMenu",
+    back = 4,
+  }
+
+  local autoRun = 0
+  local autoHunt = 0
+  local playerCount = 0
+  for i = 0, MAX_PLAYERS - 1 do
+    if gNetworkPlayers[i].connected and gPlayerSyncTable[i].spectator ~= 1 then
+      playerCount = playerCount + 1
+    end
+  end
+  if GST.gameAuto == -1 then
+    autoRun = -1
+    autoHunt = -1
+  elseif GST.gameAuto == -2 then
+    autoRun = -2
+    autoHunt = 0
+  elseif GST.gameAuto > 0 then
+    autoRun = GST.gameAuto
+    autoHunt = math.max(playerCount - autoRun, 0)
+  elseif GST.gameAuto < 0 then
+    autoHunt = -GST.gameAuto - 2
+    autoRun = math.max(playerCount - autoHunt, 0)
+  end
+
+  menuList["autoMenu"] = {
+    { name = ("off"),      desc = "auto_desc", option = (GST.gameAuto ~= 0), title = ("menu_auto"), color = true },
+    { name = ("runners"),  currNum = autoRun,  maxNum = MAX_PLAYERS,         minNum = -2,           formatAuto = true, invalid = (GST.gameAuto == 0) },
+    { name = ("hunters"),  currNum = autoHunt, maxNum = MAX_PLAYERS,         minNum = -1,           formatAuto = true, invalid = (GST.gameAuto == 0) },
+    { name = ("menu_back") },
+    { name = ("main_menu") },
+    name = "autoMenu",
+    back = 4,
+  }
+  if menuList["autoMenu"][1].option then
+    menuList["autoMenu"][1].name = "on"
+  end
 
   LanguageMenu[1].title = ("menu_lang")
 
+  local auto = GST.gameAuto
   local maxStars = 255
-  local auto = gGlobalSyncTable.gameAuto
   if ROMHACK then maxStars = ROMHACK.max_stars end
-  if auto == 99 then auto = -1 end
   menuList["settingsMenu"] = {
-    { name = ("menu_run_lives"),      currNum = GST.runnerLives,      maxNum = 99,                                                            desc = ("lives_desc"),                              title = ("menu_settings") },
-    { name = ("menu_time"),           currNum = GST.runTime // 30,    maxNum = 3600,                                                          desc = ("time_desc"),                               time = true },
-    { name = ("menu_star_mode"),      option = GST.starMode,          desc = ("starmode_desc"),                                               invalid = (GST.mhMode == 2) },
-    { name = ("menu_category"),       currNum = GST.starRun,          maxNum = maxStars,                                                      minNum = (GST.noBowser and 1) or -1,                desc = ("category_desc"),                                              invalid = (GST.mhMode == 2) },
-    { name = ("menu_defeat_bowser"),  option = not GST.noBowser,      invalid = (GST.mhMode == 2 or (ROMHACK and (ROMHACK.no_bowser ~= nil))) },
-    { name = ("menu_free_roam"),      option = GST.freeRoam,          invalid = (GST.mhMode == 2),                                            desc = "menu_free_roam_desc" },
-    { name = ("menu_auto"),           currNum = auto,                 minNum = -1,                                                            maxNum = MAX_PLAYERS - 1,                           desc = ("auto_desc"),                                                  format = { "Auto", "~" } },
-    { name = ("menu_nerf_vanish"),    option = GST.nerfVanish,        desc = ("menu_nerf_vanish_desc") },
-    { name = ("menu_allow_spectate"), option = GST.allowSpectate,     desc = ("spectator_desc") },
-    { name = ("menu_allow_stalk"),    option = GST.allowStalk,        desc = ("stalking_desc"),                                               invalid = (GST.mhMode == 2) },
-    { name = ("menu_stalk_timer"),    currNum = GST.stalkTimer // 30, maxNum = 600,                                                           desc = ("menu_stalk_timer_desc"),                   time = true,                                                           invalid = (GST.mhMode == 2 or not GST.allowStalk) },
-    { name = ("menu_weak"),           option = GST.weak,              desc = ("weak_desc") },
-    { name = ("menu_anarchy"),        currNum = GST.anarchy,          minNum = 0,                                                             maxNum = 3,                                         desc = ("menu_anarchy_desc"),                                          format = { "~", "lang_runners", "lang_hunters", "lang_all" } },
-    { name = ("menu_dmgAdd"),         currNum = GST.dmgAdd,           minNum = -1,                                                            maxNum = 15,                                        desc = ("menu_dmgAdd_desc"),                                           format = { "OHKO" } },
-    { name = ("menu_countdown"),      currNum = GST.countdown // 30,  maxNum = 600,                                                           time = true,                                        minNum = 0,                                                            desc = ("menu_countdown_desc"),                              invalid = (GST.mhMode == 2) },
-    { name = ("menu_double_health"),  option = GST.doubleHealth,      desc = ("menu_double_health_desc") },
-    { name = ("menu_star_heal"),      option = GST.starHeal },
-    { name = ("menu_star_setting"),   currNum = GST.starSetting,      minNum = 0,                                                             maxNum = 2,                                         format = { "lang_star_leave", "lang_star_stay", "lang_star_nonstop" }, invalid = (GST.mhMode == 2) },
-    { name = ("menu_star_stay_old"),  option = GST.starStayOld,       desc = ("menu_star_stay_old_desc"),                                     invalid = (GST.mhMode == 2 or GST.starSetting ~= 0) },
-    { name = ("menu_voidDmg"),        currNum = GST.voidDmg,          minNum = -1,                                                            maxNum = 15,                                        desc = ("menu_voidDmg_desc"),                                          format = { "OHKO" } },
-    { name = ("menu_blacklist"),      desc = ("blacklist_desc") },
+    { name = ("menu_run_lives"),         currNum = GST.runnerLives,          maxNum = 99,                                                            desc = ("lives_desc"),                              title = ("menu_settings") },
+    { name = ("menu_time"),              currNum = GST.runTime // 30,        maxNum = 3600,                                                          desc = ("time_desc"),                               time = true },
+    { name = ("menu_star_mode"),         option = GST.starMode,              desc = ("starmode_desc"),                                               invalid = (GST.mhMode == 2) },
+    { name = ("menu_category"),          currNum = GST.starRun,              maxNum = maxStars,                                                      minNum = (GST.noBowser and 1) or -1,                desc = ("category_desc"),                                              invalid = (GST.mhMode == 2) },
+    { name = ("menu_defeat_bowser"),     option = not GST.noBowser,          invalid = (GST.mhMode == 2 or (ROMHACK and (ROMHACK.no_bowser ~= nil))) },
+    { name = ("menu_free_roam"),         option = GST.freeRoam,              invalid = (GST.mhMode == 2),                                            desc = "menu_free_roam_desc" },
+    { name = ("menu_auto"),              option = (auto ~= 0),               desc = "auto_desc",                                                     xOption = true },
+    { name = ("menu_shuffle"),           currNum = GST.maxShuffleTime // 30, minNum = 0,                                                             maxNum = 600,                                       time = true,                                                           desc = ("menu_shuffle_desc"),                                                  format = { "~" } },
+    { name = ("menu_nerf_vanish"),       option = GST.nerfVanish,            desc = ("menu_nerf_vanish_desc") },
+    { name = ("menu_allow_spectate"),    option = GST.allowSpectate,         desc = ("spectator_desc"), },
+    { name = ("menu_allow_stalk"),       option = GST.allowStalk,            desc = ("stalking_desc"),                                               invalid = (GST.mhMode == 2) },
+    { name = ("menu_stalk_timer"),       currNum = GST.stalkTimer // 30,     maxNum = 600,                                                           desc = ("menu_stalk_timer_desc"),                   time = true,                                                           invalid = (GST.mhMode == 2 or not GST.allowStalk) },
+    { name = ("menu_weak"),              option = GST.weak,                  desc = ("weak_desc") },
+    { name = ("menu_anarchy"),           currNum = GST.anarchy,              minNum = 0,                                                             maxNum = 3,                                         desc = ("menu_anarchy_desc"),                                          format = { "~", "lang_runners", "lang_hunters", "lang_all" } },
+    { name = ("menu_dmgAdd"),            currNum = GST.dmgAdd,               minNum = -1,                                                            maxNum = 15,                                        desc = ("menu_dmgAdd_desc"),                                           format = { "OHKO" } },
+    { name = ("menu_countdown"),         currNum = GST.countdown // 30,      maxNum = 600,                                                           time = true,                                        minNum = 0,                                                            desc = ("menu_countdown_desc"),                                                invalid = (GST.mhMode == 2) },
+    { name = ("menu_double_health"),     option = GST.doubleHealth,          desc = ("menu_double_health_desc"), },
+    { name = ("menu_star_heal"),         option = GST.starHeal },
+    { name = ("menu_star_setting"),      currNum = GST.starSetting,          minNum = 0,                                                             maxNum = 2,                                         format = { "lang_star_leave", "lang_star_stay", "lang_star_nonstop" }, invalid = (GST.mhMode == 2) },
+    { name = ("menu_star_stay_old"),     option = GST.starStayOld,           desc = ("menu_star_stay_old_desc"),                                     invalid = (GST.mhMode == 2 or GST.starSetting ~= 0) },
+    { name = ("menu_voidDmg"),           currNum = GST.voidDmg,              minNum = -1,                                                            maxNum = 15,                                        desc = ("menu_voidDmg_desc"),                                          format = { "OHKO" } },
+    { name = ("menu_spectate_on_death"), option = GST.spectateOnDeath },
+    { name = ("menu_show_on_map"),       currNum = GST.showOnMap,            maxNum = 4,                                                             desc = ("menu_show_on_map_desc"),                   invalid = (GST.mhMode == 3),                                           format = { "~", "lang_runners", "lang_hunters", "lang_opponents", "lang_all" } },
+    { name = ("menu_blacklist"),         desc = ("blacklist_desc") },
     { name = ("menu_presets"), },
     { name = ("menu_back") },
     { name = ("main_menu") },
     name = "settingsMenu",
-    back = 23,
+    back = 26,
   }
   local settingsMenu = menuList["settingsMenu"]
   if GST.starMode and GST.mhMode ~= 2 then
@@ -182,30 +230,27 @@ function menu_reload()
   end
   if GST.mhMode == 2 then
     settingsMenu[3] = { name = ("menu_first_timer"), option = GST.firstTimer, desc = ("menu_first_timer_desc"), }
+  elseif GST.mhMode == 3 then
+    settingsMenu[10] = { name = ("menu_confirm_hunter"), option = GST.confirmHunter, desc = ("menu_confirm_hunter_desc"), }
+    settingsMenu[11] = { name = ("menu_hunters_win_early"), option = GST.huntersWinEarly, desc = ("menu_hunters_win_early_desc"), }
+    settingsMenu[12] = { name = ("menu_global_chat"), currNum = GST.maxGlobalTalk // 30, maxNum = 600, minNum = -1, time = true, format = { "~", "Always" }, desc = ("menu_global_chat_desc"), }
+    settingsMenu[14] = { name = ("menu_know_team"), option = (GST.anarchy ~= 3), desc = ("menu_know_team_desc"), }
+    settingsMenu[16].name = "menu_grace_period"
+    settingsMenu[16].desc = "menu_grace_period_desc"
   end
 
   -- name gets overriden
   menuList["playerMenu"] = {}
   local playerMenu = menuList["playerMenu"]
   for i = 0, MAX_PLAYERS - 1 do
-    table.insert(playerMenu, { name = "PLAYER_" .. i, color = true })
+    table.insert(playerMenu, { name = "PLAYER_" .. i, color = true, xOption = has_mod_powers(0) })
   end
   playerMenu[1].title = "players"
   playerMenu.name = "playerMenu"
   playerMenu.back = MAX_PLAYERS + 2
-  table.insert(playerMenu, { name = ("menu_players_all"), invalid = not has_mod_powers(0) })
   table.insert(playerMenu, { name = ("menu_back") })
 
   one_player_reload()
-
-  menuList["allPlayerMenu"] = {
-    { name = ("menu_pause"),         option = GST.pause,         title = ("menu_players_all"), desc = ("pause_desc") },
-    { name = ("menu_forcespectate"), option = GST.forceSpectate, desc = ("forcespectate_desc") },
-    { name = ("menu_back") },
-    { name = ("main_menu") },
-    name = "allPlayerMenu",
-    back = 3,
-  }
 
   menuList["playerSettingsMenu"] = {
     { name = ("menu_runner_app"),      title = ("menu_settings_player"),                 currNum = runnerAppearance,        maxNum = 4,                                            format = { "~", "Sparkle", "Glow", "Outline", "Color" }, desc = ("runner_app_desc") },
@@ -213,6 +258,7 @@ function menu_reload()
     { name = ("menu_invinc_particle"), option = invincParticle,                          desc = "menu_invinc_particle_desc" },
     { name = ("menu_radar"),           option = showRadar,                               desc = ("menu_radar_desc") },
     { name = ("menu_minimap"),         option = showMiniMap,                             desc = ("menu_minimap_desc") },
+    { name = ("menu_overlay"),         option = showPaintingOverlays,                    desc = ("menu_overlay_desc") },
     { name = ("menu_timer"),           option = showSpeedrunTimer,                       desc = ("menu_timer_desc") },
     { name = ("menu_fast"),            option = gPlayerSyncTable[0].fasterActions,       desc = ("menu_fast_desc") },
     { name = ("menu_romhack_cam"),     option = romhackCam,                              desc = ("menu_romhack_cam_desc") },
@@ -224,28 +270,31 @@ function menu_reload()
     { name = ("hard_mode"),            option = (gPlayerSyncTable[0].hard == 1),         desc = ("hard_info_short") },
     { name = ("extreme_mode"),         option = (gPlayerSyncTable[0].hard == 2),         desc = ("extreme_info_short") },
     { name = ("menu_unknown"),         option = demonOn,                                 invalid = true,                    desc = ("menu_secret") },
+    { name = ("menu_binds"),           desc = ("menu_binds_desc") },
     { name = ("menu_hide_roles"),      invalid = (get_true_roles() == 0),                desc = ("menu_hide_roles_desc") },
     { name = ("menu_back") },
     name = "playerSettingsMenu",
-    back = 18,
+    back = 20,
   }
   local playerSettingsMenu = menuList["playerSettingsMenu"]
   if demonOn or demonUnlocked then
-    playerSettingsMenu[16].name = ("menu_demon")
-    playerSettingsMenu[16].desc = ("menu_demon_desc")
-    playerSettingsMenu[16].invalid = false
+    playerSettingsMenu[17].name = ("menu_demon")
+    playerSettingsMenu[17].desc = ("menu_demon_desc")
+    playerSettingsMenu[17].invalid = false
   end
 
   menuList["miscMenu"] = {
     { name = ("free_camera"),         title = ("menu_misc"),                                                                                            invalid = ((not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), desc = ("menu_free_cam_desc") },
     { name = ("menu_spectate_run"),   invalid = ((not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), desc = ("menu_spectate_run_desc") },
-    { name = ("menu_exit_spectate"),  invalid = (gPlayerSyncTable[0].forceSpectate or gPlayerSyncTable[0].spectator ~= 1),                              desc = ("menu_exit_spectate_desc") },
-    { name = ("menu_stalk_run"),      invalid = ((not gGlobalSyncTable.allowStalk) or GST.mhMode == 2 or GST.mhState ~= 2),                             desc = ("menu_stalk_run_desc") },
+    { name = ("menu_exit_spectate"),  invalid = (gPlayerSyncTable[0].forceSpectate or gPlayerSyncTable[0].dead or gPlayerSyncTable[0].spectator ~= 1),  desc = ("menu_exit_spectate_desc") },
+    { name = ("menu_stalk_run"),      invalid = ((not GST.allowStalk) or GST.mhMode == 2 or GST.mhState ~= 2),                                          desc = ("menu_stalk_run_desc") },
     { name = ("menu_skip"),           invalid = (GST.mhState ~= 2 or GST.mhMode ~= 2 or iVoted),                                                        desc = ("menu_skip_desc") },
     { name = ("menu_blacklist_list"), desc = ("menu_blacklist_list_desc") },
+    { name = ("menu_pause"),          option = GST.pause,                                                                                               desc = "pause_desc",                                                                                              invalid = not has_mod_powers(0) },
+    { name = ("menu_forcespectate"),  option = GST.forceSpectate,                                                                                       desc = "forcespectate_desc",                                                                                      invalid = not has_mod_powers(0) },
     { name = ("menu_back") },
     name = "miscMenu",
-    back = 7,
+    back = 9,
   }
 
   local trueRoles = get_true_roles()
@@ -257,11 +306,25 @@ function menu_reload()
     { name = ("role_cont"),          option = (roles & 16 ~= 0),  invalid = (trueRoles & 16 == 0), color = true },
     { name = ("stat_placement"),     option = (roles & 32 ~= 0),  invalid = (trueRoles & 32 == 0) },
     { name = ("stat_placement_asn"), option = (roles & 64 ~= 0),  invalid = (trueRoles & 64 == 0) },
+    { name = ("stat_crown"),         option = (roles & 128 ~= 0), invalid = (trueRoles & 128 == 0) },
     { name = ("menu_default") },
     { name = ("menu_back") },
     { name = ("main_menu") },
     name = "hideRolesMenu",
-    back = 8,
+    back = 9,
+  }
+
+  menuList["bindsMenu"] = {
+    { name = ("menu_vanish_button"), title = ("menu_binds"), currNum = nerfVanishButton, minNum = 1,  maxNum = 12,                      desc = "menu_vanish_button_desc", format = buttonString },
+    { name = ("menu_menu_button"),   currNum = menuButton,   minNum = 1,                 maxNum = 6,  desc = "menu_menu_button_desc",   format = menuButtonString },
+    { name = ("menu_report_button"), currNum = reportButton, minNum = 1,                 maxNum = 12, desc = "menu_report_button_desc", format = buttonString },
+    { name = ("menu_guard_button"),  currNum = guardButton,  minNum = 1,                 maxNum = 12, desc = "menu_guard_button_desc",  format = buttonString },
+    { name = ("menu_sabo_button"),   currNum = saboButton,   minNum = 1,                 maxNum = 6,  desc = "menu_sabo_button_desc",   format = menuButtonString },
+    { name = ("menu_default") },
+    { name = ("menu_back") },
+    { name = ("main_menu") },
+    name = "bindsMenu",
+    back = 7,
   }
 
   if currMenu then
@@ -272,15 +335,14 @@ end
 function one_player_reload()
   if focusPlayerOrCourse > (MAX_PLAYERS - 1) then focusPlayerOrCourse = 0 end
   local STP = gPlayerSyncTable[focusPlayerOrCourse]
-  local GST = gGlobalSyncTable
   menuList["onePlayerMenu"] = {
     { name = ("menu_flip"),          title = "PLAYER_S",                                                                                                                           invalid = not has_mod_powers(0),              desc = ("flip_desc") },
     { name = ("menu_spectate"),      invalid = (focusPlayerOrCourse == 0 or (not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), desc = ("menu_spectate_desc") },
-    { name = ("menu_target"),        invalid = (focusPlayerOrCourse == 0 or STP.team ~= 1 or GST.mhMode == 2 or GST.mhState ~= 2),                                                 desc = ("target_desc") },
-    { name = ("menu_stalk"),         invalid = (focusPlayerOrCourse == 0 or (not gGlobalSyncTable.allowStalk) or STP.team ~= 1 or GST.mhMode == 2 or GST.mhState ~= 2),            desc = ("menu_stalk_desc") },
+    { name = ("menu_target"),        invalid = (focusPlayerOrCourse == 0 or STP.team ~= 1 or GST.mhMode == 2 or GST.mhMode == 3 or GST.mhState ~= 2),                              desc = ("target_desc") },
+    { name = ("menu_stalk"),         invalid = (focusPlayerOrCourse == 0 or (not GST.allowStalk) or STP.team ~= 1 or GST.mhMode == 2 or GST.mhState ~= 2),                         desc = ("menu_stalk_desc") },
     { name = ("menu_pause"),         option = STP.pause,                                                                                                                           invalid = not has_mod_powers(0),              desc = ("pause_desc") },
     { name = ("menu_mute"),          option = STP.mute,                                                                                                                            invalid = not has_mod_powers(0),              desc = ("mute_desc") },
-    { name = ("menu_forcespectate"), option = STP.forceSpectate,                                                                                                                   invalid = not has_mod_powers(0),              desc = ("forcespectate_desc") },
+    { name = ("menu_forcespectate"), option = ((STP.forceSpectate or STP.dead) and has_mod_powers(0)),                                                                             invalid = not has_mod_powers(0),              desc = ("forcespectate_desc") },
     { name = ("menu_allowleave"),    invalid = (not has_mod_powers(0)) or (GST.mhMode == 2),                                                                                       desc = ("leave_desc") },
     { name = ("menu_setlife"),       invalid = (not has_mod_powers(0) or STP.team ~= 1 or GST.mhState == 0),                                                                       currNum = STP.runnerLives or GST.runnerLives, maxNum = 99,                  desc = ("setlife_desc") },
     { name = ("menu_back") },
@@ -295,7 +357,7 @@ function build_blacklist_menu()
   local blacklistMenu = menuList["blacklistMenu"]
   for i = COURSE_MIN, COURSE_MAX - 1 do
     if ROMHACK.star_data and (not ROMHACK.star_data[i] or #ROMHACK.star_data[i] > 0) and (not ROMHACK.hubStages or not ROMHACK.hubStages[i]) then
-      table.insert(blacklistMenu, { name = "COURSE", course = i })
+      table.insert(blacklistMenu, { name = "COURSE", course = i, xOption = true })
     end
   end
   table.insert(blacklistMenu, { name = ("menu_blacklist_list"), action = "list", desc = ("menu_blacklist_list_desc") })
@@ -331,6 +393,10 @@ function build_blacklist_course_menu()
 end
 
 function menu_enter(menu, option)
+  if currMenu and (currMenu.name == "settingsMenu" or currMenu.name == "presetMenu" or currMenu.name == "autoMenu" or currMenu.name == "blacklistMenu" or currMenu.name == "blacklistCourseMenu") and (menu == nil or menu == "mainMenu" or menu == "marioHuntMenu") then
+    save_settings()
+  end
+
   if menu == "onePlayerMenu" then
     one_player_reload()
   elseif menu == "blacklistMenu" then
@@ -346,7 +412,7 @@ function menu_enter(menu, option)
   if bottomOption > currentOption + 7 then
     bottomOption = currentOption + 7
   end
-  if bottomOption > #currMenu then
+  if currMenu and bottomOption > #currMenu then
     bottomOption = #currMenu
   end
 
@@ -358,8 +424,10 @@ end
 
 function close_menu()
   menu_enter()
-  play_sound(SOUND_GENERAL_PAINTING_EJECT, gGlobalSoundSource)
-  menu = false
+  if menu then
+    play_sound(SOUND_GENERAL_PAINTING_EJECT, gGlobalSoundSource)
+    menu = false
+  end
   showingStats = false
   showingRules = false
   focusPlayerOrCourse = 0
@@ -380,8 +448,14 @@ function action_setup()
       close_menu,
     },
     marioHuntMenu = {
-      function() if gGlobalSyncTable.mhMode ~= 2 then menu_enter("startMenu") else menu_enter("startMenuMini") end end,
-      function(option) runner_randomize(option.currNum) end,
+      function() if GST.mhMode ~= 2 then menu_enter("startMenu") else menu_enter("startMenuMini") end end,
+      function(option)
+        if GST.mhMode ~= 3 then
+          runner_randomize(option.currNum)
+        else
+          runner_randomize(-option.currNum - 2)
+        end
+      end,
       function(option) add_runner(option.currNum) end,
       function(option)
         change_game_mode("", option.currNum)
@@ -414,7 +488,7 @@ function action_setup()
     settingsMenu = {
       function(option) runner_lives(tostring(option.currNum)) end,
       function(option)
-        if gGlobalSyncTable.mhMode ~= 2 and gGlobalSyncTable.starMode then
+        if GST.mhMode ~= 2 and GST.starMode then
           stars_needed_command(option.currNum)
         else
           time_needed_command(option.currNum)
@@ -422,8 +496,8 @@ function action_setup()
       end,
       function(option)
         option.option = not option.option
-        if gGlobalSyncTable.mhMode == 2 then
-          gGlobalSyncTable.firstTimer = option.option
+        if GST.mhMode == 2 then
+          GST.firstTimer = option.option
         else
           star_mode_command("", option.option)
           menu_reload()
@@ -434,66 +508,59 @@ function action_setup()
       end,
       function(option)
         option.option = not option.option
-        gGlobalSyncTable.noBowser = not option.option
-        if gGlobalSyncTable.noBowser and gGlobalSyncTable.starRun < 1 then
-          gGlobalSyncTable.starRun = 1
+        GST.noBowser = not option.option
+        if GST.noBowser and GST.starRun < 1 then
+          GST.starRun = 1
         end
         menu_reload()
       end,
       function(option)
         option.option = not option.option
-        gGlobalSyncTable.freeRoam = option.option
+        GST.freeRoam = option.option
         menu_reload()
       end,
+      function()
+        menu_enter("autoMenu")
+      end,
       function(option)
-        if option.currNum < 0 then
-          gGlobalSyncTable.gameAuto = 99,
-              djui_chat_message_create(trans("auto_on"))
-          if gGlobalSyncTable.mhState == 0 then
-            gGlobalSyncTable.mhTimer = 20 * 30 -- 20 seconds
-          end
-        elseif option.currNum == 0 then
-          gGlobalSyncTable.gameAuto = 0,
-              djui_chat_message_create(trans("auto_off"))
-          if gGlobalSyncTable.mhState == 0 then
-            gGlobalSyncTable.mhTimer = 0 -- don't set
+        GST.maxShuffleTime = option.currNum * 30
+      end,
+      function(option)
+        option.option = not option.option
+        GST.nerfVanish = option.option
+      end,
+      function(option)
+        option.option = not option.option
+        if GST.mhMode ~= 3 then
+          GST.allowSpectate = option.option
+          if not option.option then
+            djui_chat_message_create(trans("no_spectate"))
+          else
+            djui_chat_message_create(trans("can_spectate"))
           end
         else
-          gGlobalSyncTable.gameAuto = option.currNum
-          local runners = trans("runners")
-          if gGlobalSyncTable.gameAuto == 1 then
-            runners = trans("runner")
-          end
-          djui_chat_message_create(string.format("%s (%d %s)", trans("auto_on"), gGlobalSyncTable.gameAuto, runners))
-          if gGlobalSyncTable.mhState == 0 then
-            gGlobalSyncTable.mhTimer = 20 * 30 -- 20 seconds
-          end
+          GST.confirmHunter = option.option
         end
       end,
       function(option)
         option.option = not option.option
-        gGlobalSyncTable.nerfVanish = option.option
+        if GST.mhMode ~= 3 then
+          GST.allowStalk = option.option
+          currMenu[currentOption + 1].invalid = not option.option
+        else
+          GST.huntersWinEarly = option.option
+        end
       end,
       function(option)
-        option.option = not option.option
-        gGlobalSyncTable.allowSpectate = option.option
-        if not option.option then
-          djui_chat_message_create(trans("no_spectate"))
+        if GST.mhMode ~= 3 then
+          GST.stalkTimer = option.currNum * 30
         else
-          djui_chat_message_create(trans("can_spectate"))
+          GST.maxGlobalTalk = option.currNum * 30
         end
       end,
       function(option)
         option.option = not option.option
-        gGlobalSyncTable.allowStalk = option.option
-        currMenu[currentOption + 1].invalid = not option.option
-      end,
-      function(option)
-        gGlobalSyncTable.stalkTimer = option.currNum * 30
-      end,
-      function(option)
-        option.option = not option.option
-        gGlobalSyncTable.weak = option.option
+        GST.weak = option.option
         if not option.option then
           djui_chat_message_create(trans("not_weak"))
         else
@@ -501,48 +568,60 @@ function action_setup()
         end
       end,
       function(option)
-        gGlobalSyncTable.anarchy = option.currNum
-        djui_chat_message_create(trans("anarchy_set_" .. gGlobalSyncTable.anarchy))
+        if GST.mhMode ~= 3 then
+          GST.anarchy = option.currNum
+          djui_chat_message_create(trans("anarchy_set_" .. GST.anarchy))
+        else
+          option.option = not option.option
+          GST.anarchy = (option.option and 1) or 3
+        end
       end,
       function(option)
-        gGlobalSyncTable.dmgAdd = option.currNum
+        GST.dmgAdd = option.currNum
         if option.currNum ~= -1 then
-          djui_chat_message_create(trans("dmgAdd_set", gGlobalSyncTable.dmgAdd))
+          djui_chat_message_create(trans("dmgAdd_set", GST.dmgAdd))
         else
           djui_chat_message_create(trans("dmgAdd_set_ohko"))
         end
       end,
       function(option)
-        local old = gGlobalSyncTable.countdown
-        gGlobalSyncTable.countdown = option.currNum * 30
-        if gGlobalSyncTable.mhState == 1 then
-          local diff = old - gGlobalSyncTable.countdown
-          gGlobalSyncTable.mhTimer = math.max(1, gGlobalSyncTable.mhTimer - diff)
+        local old = GST.countdown
+        GST.countdown = option.currNum * 30
+        if GST.mhState == 1 then
+          local diff = old - GST.countdown
+          GST.mhTimer = math.max(1, GST.mhTimer - diff)
         end
       end,
       function(option)
         option.option = not option.option
-        gGlobalSyncTable.doubleHealth = option.option
+        GST.doubleHealth = option.option
       end,
       function(option)
         option.option = not option.option
-        gGlobalSyncTable.starHeal = option.option
+        GST.starHeal = option.option
       end,
       function(option)
-        gGlobalSyncTable.starSetting = option.currNum
+        GST.starSetting = option.currNum
         currMenu[currentOption + 1].invalid = (option.currNum ~= 0)
       end,
       function(option)
         option.option = not option.option
-        gGlobalSyncTable.starStayOld = option.option
+        GST.starStayOld = option.option
       end,
       function(option)
-        gGlobalSyncTable.voidDmg = option.currNum
+        GST.voidDmg = option.currNum
         if option.currNum ~= -1 then
-          djui_chat_message_create(trans("voidDmg_set", gGlobalSyncTable.voidDmg))
+          djui_chat_message_create(trans("voidDmg_set", GST.voidDmg))
         else
           djui_chat_message_create(trans("voidDmg_set_ohko"))
         end
+      end,
+      function(option)
+        option.option = not option.option
+        GST.spectateOnDeath = option.option
+      end,
+      function(option)
+        GST.showOnMap = option.currNum
       end,
       function()
         menu_enter("blacklistMenu")
@@ -601,18 +680,6 @@ function action_setup()
       function() menu_enter("playerMenu", focusPlayerOrCourse + 1) end,
       function() menu_enter(nil, 7) end,
     },
-    allPlayerMenu = {
-      function(option)
-        option.option = not option.option
-        pause_command("all")
-      end,
-      function(option)
-        option.option = not option.option
-        force_spectate_command("all")
-      end,
-      function() menu_enter("playerMenu", MAX_PLAYERS + 1) end,
-      function() menu_enter(nil, 7) end,
-    },
     playerSettingsMenu = {
       function(option)
         runnerAppearance = option.currNum
@@ -661,6 +728,11 @@ function action_setup()
       end,
       function(option)
         option.option = not option.option
+        showPaintingOverlays = option.option
+        mod_storage_save("showPaintingOverlays", tostring(option.option))
+      end,
+      function(option)
+        option.option = not option.option
         showSpeedrunTimer = option.option
         mod_storage_save("showSpeedrunTimer", tostring(option.option))
       end,
@@ -691,7 +763,7 @@ function action_setup()
         noSeason = not option.option
         mod_storage_save("noSeason", tostring(not option.option))
         set_season_lighting(month, gNetworkPlayers[0].currLevelNum)
-        if gGlobalSyncTable.mhState == 0 then
+        if GST.mhState == 0 then
           set_lobby_music(month)
         end
       end,
@@ -735,6 +807,9 @@ function action_setup()
         option.option = not option.option
         demonOn = option.option
       end,
+      function()
+        menu_enter("bindsMenu", 1)
+      end,
       function() menu_enter("hideRolesMenu", 1) end,
       function() menu_enter(nil, 2) end,
     },
@@ -757,6 +832,14 @@ function action_setup()
         close_menu()
       end,
       function() blacklist_command("list") end,
+      function(option)
+        option.option = not option.option
+        pause_command("all")
+      end,
+      function(option)
+        option.option = not option.option
+        force_spectate_command("all")
+      end,
       function() menu_enter(nil, 6) end,
     },
     -- blacklistMenu is another special case
@@ -816,12 +899,21 @@ function action_setup()
         end
         mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
+      function(option)
+        option.option = not option.option
+        if option.option then
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 128
+        else
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~128
+        end
+        mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
+      end,
       function()
         gPlayerSyncTable[0].role = get_true_roles()
         menu_reload()
         mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
-      function() menu_enter("playerSettingsMenu", 17) end,
+      function() menu_enter("playerSettingsMenu", 19) end,
       function() menu_enter(nil, 2) end,
     },
     presetMenu = {
@@ -829,7 +921,7 @@ function action_setup()
         default_settings()
       end,
       function()
-        if gGlobalSyncTable.mhMode == 2 then
+        if GST.mhMode == 2 then
           change_game_mode("normal", 0) -- normal mode if mini
         end
         runner_lives(tostring(0))       -- 0 lives
@@ -837,24 +929,21 @@ function action_setup()
         if ROMHACK and ROMHACK.max_stars and ROMHACK.max_stars < 30 then
           stars = ROMHACK.max_stars
         end
-        star_count_command(stars)          -- 30/max stars
+        star_count_command(stars) -- 30/max stars
         if ROMHACK.no_bowser == nil then
-          gGlobalSyncTable.noBowser = true -- no bowser mode
+          GST.noBowser = true     -- no bowser mode
         end
-        gGlobalSyncTable.freeRoam = true   -- free roam
-        runner_randomize()                 -- auto
+        GST.freeRoam = true       -- free roam
+        runner_randomize()        -- auto
       end,
       function()
-        local players = 0 -- get total active players
-        for i = 0, MAX_PLAYERS - 1 do
-          if gNetworkPlayers[i].connected and gPlayerSyncTable[i].spectator ~= 1 then
-            players = players + 1
-          end
+        if GST.mhMode ~= 0 and GST.mhMode ~= 3 then
+          change_game_mode("normal", 0) -- normal mode
         end
-        change_game_mode("normal", 0) -- normal mode
-        runner_lives(tostring(0))     -- 0 lives
-        gGlobalSyncTable.dmgAdd = -1  -- OHKO
-        runner_randomize(players - 1) -- one hunter only
+        runner_lives(tostring(0))       -- 0 lives
+        GST.dmgAdd = -1                 -- OHKO
+        GST.spectateOnDeath = false
+        runner_randomize(-3)            -- one hunter only
       end,
       function()
         for i = 1, MAX_PLAYERS - 1 do
@@ -862,17 +951,17 @@ function action_setup()
         end
         gPlayerSyncTable[0].team = 0
         change_team_command(network_global_index_from_local(0))
-        change_game_mode("normal", 0)        -- normal mode
-        runner_lives(tostring(2))            -- 2 lives
-        gGlobalSyncTable.dmgAdd = 0          -- No dmg add
-        gGlobalSyncTable.doubleHealth = true -- double health
+        change_game_mode("normal", 0) -- normal mode
+        runner_lives(tostring(2))     -- 2 lives
+        GST.dmgAdd = 0                -- No dmg add
+        GST.doubleHealth = true       -- double health
       end,
       function()
-        if gGlobalSyncTable.mhMode == 0 then
-          change_game_mode("swap", 1) -- swap mode if normal
+        if GST.mhMode == 0 or GST.mhMode == 3 then
+          change_game_mode("swap", 1) -- swap mode if normal or mystery
         end
         runner_lives(tostring(0))     -- 0 lives
-        gGlobalSyncTable.dmgAdd = -1  -- OHKO
+        GST.dmgAdd = -1               -- OHKO
         runner_randomize()            -- auto
       end,
       function()
@@ -880,14 +969,21 @@ function action_setup()
           become_runner(gPlayerSyncTable[i])
         end
         change_game_mode("mini", 2) -- minihunt
+        GST.runnerLives = 99
       end,
       function()
         GST.noBowser = false
         GST.allowStalk = false
-        star_mode_command("on")
+        GST.starMode = true
+        GST.runTime = 2
         GST.weak = false
         GST.anarchy = 0
-        GST.dmgAdd = (GST.mhMode == 2 and 2) or 0
+        GST.dmgAdd = 0
+        if GST.mhMode == 2 then
+          GST.dmgAdd = 2
+        elseif GST.mhMode == 3 then
+          GST.dmgAdd = -1
+        end
         GST.nerfVanish = false
         GST.countdown = 300
         GST.doubleHealth = false
@@ -895,8 +991,105 @@ function action_setup()
         GST.freeRoam = false
         GST.starHeal = false
         GST.starStayOld = false
+        GST.spectateOnDeath = false
+        GST.maxShuffleTime = 0
+        GST.showOnMap = 1
       end,
-      function() menu_enter("settingsMenu", 22) end,
+      function()
+        change_game_mode("normal", 0) -- normal mode
+        GST.runnerLives = 1
+        GST.noBowser = true
+        GST.freeRoam = true
+        GST.starRun = 120
+        GST.allowStalk = false
+        GST.allowSpectate = false
+        GST.starMode = false
+        GST.runTime = 7200
+        GST.weak = false
+        GST.anarchy = 0
+        GST.dmgAdd = 0
+        GST.nerfVanish = true
+        GST.countdown = 600
+        GST.doubleHealth = false
+        GST.voidDmg = 3
+        GST.starHeal = false
+        GST.spectateOnDeath = true
+        GST.maxShuffleTime = 0
+        GST.starSetting = 2
+      end,
+      function() menu_enter("settingsMenu", 25) end,
+      function() menu_enter(nil, 2) end,
+    },
+    saboMenu = {
+      function()
+        start_sabotage(1)
+        close_menu()
+      end,
+      function()
+        start_sabotage(2)
+        close_menu()
+      end,
+      function()
+        start_sabotage(3)
+        close_menu()
+      end,
+      close_menu,
+    },
+    bindsMenu = {
+      function(option)
+        nerfVanishButton = option.currNum
+        mod_storage_save("vanButton", tostring(option.currNum))
+      end,
+      function(option)
+        menuButton = option.currNum
+        mod_storage_save("menuButton", tostring(option.currNum))
+      end,
+      function(option)
+        reportButton = option.currNum
+        mod_storage_save("reportButton", tostring(option.currNum))
+      end,
+      function(option)
+        guardButton = option.currNum
+        mod_storage_save("guardButton", tostring(option.currNum))
+      end,
+      function(option)
+        saboButton = option.currNum
+        mod_storage_save("saboButton", tostring(option.currNum))
+      end,
+      function()
+        nerfVanishButton = 2
+        reportButton = 11
+        guardButton = 11
+        menuButton = 1
+        saboButton = 4
+        mod_storage_save("nerfVanishButton", tostring(nerfVanishButton))
+        mod_storage_save("reportButton", tostring(reportButton))
+        mod_storage_save("guardButton", tostring(guardButton))
+        mod_storage_save("menuButton", tostring(menuButton))
+        mod_storage_save("saboButton", tostring(saboButton))
+        menu_reload()
+      end,
+      function() menu_enter("playerSettingsMenu", 18) end,
+      function() menu_enter(nil, 2) end,
+    },
+    autoMenu = {
+      function(option)
+        if option.option then
+          auto_command(0)
+        else
+          auto_command(-1)
+        end
+        menu_reload()
+      end,
+      function(option)
+        auto_command(option.currNum)
+        menu_reload()
+      end,
+      function(option)
+        auto_command(-option.currNum - 2)
+        menu_reload()
+      end,
+      function() menu_enter("settingsMenu", 7) end,
       function() menu_enter(nil, 2) end,
     },
   }
@@ -936,7 +1129,7 @@ function selectOption(option)
       blacklist_command(currMenu[option].action)
       menu_enter("blacklistMenu", option)
     elseif currMenu.back == option then
-      menu_enter("settingsMenu", 21)
+      menu_enter("settingsMenu", 24)
     else
       menu_enter()
     end
@@ -966,18 +1159,15 @@ function selectOption(option)
     if option <= MAX_PLAYERS then
       focusPlayerOrCourse = option - 1
       menu_enter("onePlayerMenu")
-    elseif option == currMenu.back then
-      menu_enter(nil, 7)
     else
-      focusPlayerOrCourse = option - 1
-      menu_enter("allPlayerMenu")
+      menu_enter(nil, 7)
     end
   elseif menuActions[currentMenuName] then
     local action = menuActions[currentMenuName][option]
     if action then
-      if validBack and currMenu[option].currNum == nil and (currentMenuName == "settingsMenu" or currentMenuName == "playerSettingsMenu") then
+      if validBack and currMenu[option].currNum == nil and (currentMenuName == "settingsMenu" or currentMenuName == "playerSettingsMenu" or currentMenuName == "onePlayerMenu" or currentMenuName == "bindsMenu") then
         for i, button in ipairs(currMenu) do
-          if button.savedNum and button.currNum and button.savedNum ~= button.currNum then
+          if (not button.invalid) and button.savedNum and button.currNum and button.savedNum ~= button.currNum then
             djui_chat_message_create(trans("unsaved_changes"))
             validBack = false
             return
@@ -1004,13 +1194,16 @@ function handleMenu()
   djui_hud_set_font(FONT_CUSTOM_HUD)
   local screenWidth = djui_hud_get_screen_width()
   local screenHeight = djui_hud_get_screen_height()
+  -- apparently I designed this whole menu for 720p. Detect if this is greater than that and if so, adjust scale
+  local adjustScale = screenHeight / 768
   djui_hud_set_color(255, 255, 255, 255)
 
   djui_hud_set_color(0, 0, 0, 200)
   djui_hud_render_rect(screenWidth * 0.1, 0, screenWidth * 0.8, screenHeight)
 
   local maxTextWidth = 0
-  local textScale = 1.5
+  local textScale = 1.5 * adjustScale
+  local optionScale = 2 * textScale
 
   for i, option in ipairs(currMenu) do
     local optionText = option.name
@@ -1040,31 +1233,53 @@ function handleMenu()
         measureString = string.format("%d:%02d", option.maxNum // 60, option.maxNum % 60)
       else
         choiceString = tostring(option.currNum)
-        if option.format then
-          local min = option.minNum or 0
+      end
 
-          choiceString = option.format[option.currNum - min + 1] or choiceString
-          if choiceString:sub(1, 5) == "lang_" then
-            choiceString = trans(choiceString:sub(6))
-          end
+      if option.format then
+        local min = option.minNum or 0
 
-          for a, text_ in ipairs(option.format) do
-            local text = text_
-            if text:sub(1, 5) == "lang_" then
-              text = trans(text:sub(6))
-            end
-            if measureString:len() < text:len() then
-              measureString = text
-            end
+        choiceString = option.format[option.currNum - min + 1] or choiceString
+        if choiceString:sub(1, 5) == "lang_" then
+          choiceString = trans(choiceString:sub(6))
+        end
+
+        for a, text_ in ipairs(option.format) do
+          local text = text_
+          if text:sub(1, 5) == "lang_" then
+            text = trans(text:sub(6))
           end
-        else
-          if option.currNum == -1 then choiceString = "Any%" end
+          if measureString:len() < text:len() then
+            measureString = text
+          end
+        end
+      elseif option.formatAuto then
+        local allString = trans("all")
+        if option.currNum == -1 then
+          choiceString = "Auto"
+        elseif option.currNum == -2 then
+          choiceString = allString
+        elseif option.currNum < 0 then
+          choiceString = allString .. tostring(option.currNum + 2)
+        end
+
+        measureString = allString .. tostring(-MAX_PLAYERS)
+      else
+        if option.currNum == -1 then choiceString = "Any%" end
+        if option.minNum and option.minNum < 0 then
           measureString = tostring("Any%")
+        else
+          measureString = tostring(option.maxNum)
         end
       end
-      option.choiceWidth = djui_hud_measure_text(measureString) * 3
+      option.choiceWidth = djui_hud_measure_text(measureString)
       option.choiceString = choiceString
-      textWidth = textWidth + option.choiceWidth + 80
+      textWidth = textWidth + (option.choiceWidth + 47) * optionScale
+      if textWidth > screenWidth * 0.6 then
+        local prevScale = textScale
+        textScale = textScale * (screenWidth * 0.6) / textWidth
+        optionScale = 2 * textScale
+        textWidth = textWidth * textScale / prevScale
+      end
     end
     maxTextWidth = math.max(maxTextWidth, textWidth)
   end
@@ -1084,7 +1299,7 @@ function handleMenu()
 
   local optionX = screenWidth / 2 - maxTextWidth / 2
   local optionY = (screenHeight / 2 - (screenHeight * 0.1 * (optionCount - 1)) / 2)
-  local titleScale = 4
+  local titleScale = 4 * adjustScale
 
   local titleText = tostring(currMenu[1].title)
   local titleCenter = 0
@@ -1104,7 +1319,7 @@ function handleMenu()
     local titleWidth = djui_hud_measure_text(remove_color(titleText))
     local y = screenHeight * 0.03 - 10 * titleScale
     if titleWidth * titleScale > screenWidth * 0.8 then
-      titleScale = 3
+      titleScale = screenWidth * 0.8 / (titleWidth + 20)
     end
 
     titleCenter = (screenWidth - titleWidth * titleScale) / 2
@@ -1118,24 +1333,28 @@ function handleMenu()
       titleText = trans(titleText)
     end
 
-    if djui_hud_measure_text(titleText) * titleScale > screenWidth * 0.8 then -- shrink the title if it's too big
-      titleScale = 3
+    local titleWidth = djui_hud_measure_text(titleText)
+    if titleWidth * titleScale > screenWidth * 0.8 then -- shrink the title if it's too big
+      titleScale = screenWidth * 0.8 / (titleWidth + 20)
     end
 
-    titleCenter = (screenWidth - djui_hud_measure_text(titleText) * titleScale) / 2
+    titleCenter = (screenWidth - titleWidth * titleScale) / 2
     print_text_ex_hud_font(titleText, titleCenter, screenHeight * 0.03, titleScale)
   end
   djui_hud_set_font(FONT_CUSTOM_HUD)
 
   for i, option in ipairs(currMenu) do
     local render = true
+    local menuArrowScale = (4 * adjustScale)
     if i > bottomOption then
       djui_hud_set_color(255, 255, 255, 255)
-      djui_hud_render_texture(TEX_MENU_ARROW_DOWN, screenWidth / 2 - 23, screenHeight - 82, 4, 4)
+      djui_hud_render_texture(TEX_MENU_ARROW_DOWN, screenWidth / 2 - 23, screenHeight - 20 * menuArrowScale,
+        menuArrowScale, menuArrowScale)
       break
     elseif i <= (bottomOption - optionCount) then
       djui_hud_set_color(255, 255, 255, 255)
-      djui_hud_render_texture(TEX_MENU_ARROW_UP, screenWidth / 2 - 23, screenHeight * 0.15, 4, 4)
+      djui_hud_render_texture(TEX_MENU_ARROW_UP, screenWidth / 2 - 23, screenHeight * 0.15, menuArrowScale,
+        menuArrowScale)
       render = false
     end
 
@@ -1164,8 +1383,7 @@ function handleMenu()
         local np = gNetworkPlayers[index]
         if np and np.connected then
           local playerColor = network_get_player_text_color_string(index)
-          local sMario = gPlayerSyncTable[index]
-          local roleName, colorString = get_role_name_and_color(sMario)
+          local roleName, colorString = get_role_name_and_color(index)
           roleText = colorString .. roleName
           optionText = playerColor .. np.name
           optionText = cap_color_text(optionText, PLAYER_NAME_CUTOFF)
@@ -1189,7 +1407,7 @@ function handleMenu()
 
       if roleText then textX = screenWidth * 0.2 end
 
-      if option.currNum then textX = (screenWidth - textWidth - option.choiceWidth - 80) / 2 end
+      if option.currNum then textX = (screenWidth - textWidth - option.choiceWidth * optionScale - 80) / 2 end
 
       if roleText == "" then
         option.invalid = true
@@ -1230,7 +1448,7 @@ function handleMenu()
       djui_hud_set_color(table.unpack(textColor))
 
       if option.color then
-        if option.option or roleText then
+        if option.option ~= false or roleText then
           djui_hud_print_text_with_color(optionText, textX, optionY, textScale, textColor[4])
         else
           djui_hud_print_text(remove_color(optionText), textX, optionY, textScale)
@@ -1244,6 +1462,16 @@ function handleMenu()
       end
 
       djui_hud_set_font(FONT_CUSTOM_HUD)
+      -- print "x"
+      if option.xOption and currentOption == i and (not option.invalid) and mouseIdleTimer >= 90 then
+        local x = textX + textWidth
+        if option.name:sub(1, 7) == "PLAYER_" then
+          x = textX + 30 * optionScale
+        end
+        local y = optionY - 5 * optionScale
+        djui_hud_set_color(255, 255, 255, 255)
+        djui_hud_print_text("X", x, y, optionScale / 2)
+      end
 
       -- allows selecting an option with the mouse
       if mouseIdleTimer < 2 then
@@ -1264,19 +1492,22 @@ function handleMenu()
       end
 
       if option.currNum then
-        local choiceWidth = (option.choiceWidth - djui_hud_measure_text(option.choiceString) * 3) / 2
-        print_text_ex_hud_font(option.choiceString, textX + textWidth + choiceWidth + 45, optionY, 3)
-        djui_hud_render_texture(TEX_MENU_ARROW, textX + textWidth + 40,
-          optionY + 2 + 40, -5, -5)
-        djui_hud_render_texture(TEX_MENU_ARROW, textX + textWidth + option.choiceWidth + 60,
-          optionY + 2, 5, 5)
+        local arrowScale = (5 * optionScale) / 3
+        local choiceWidth = (option.choiceWidth * optionScale - djui_hud_measure_text(option.choiceString) * optionScale) /
+            2
+        print_text_ex_hud_font(option.choiceString, textX + textWidth + choiceWidth + 15 * optionScale, optionY,
+          optionScale)
+        djui_hud_render_texture(TEX_MENU_ARROW, textX + textWidth + 8 * arrowScale,
+          optionY + 2 + 8 * arrowScale, -arrowScale, -arrowScale)
+        djui_hud_render_texture(TEX_MENU_ARROW, textX + textWidth + (option.choiceWidth + 20) * optionScale,
+          optionY + 2, arrowScale, arrowScale)
 
         -- mouse control
         if mouseIdleTimer < 90 and i == currentOption and hoveringOption then
           local relativeX = mouseX - textX - textWidth
-          if relativeX <= 50 then
+          if relativeX <= 16 * optionScale then
             mouseArrowKey = 3 -- left
-          elseif relativeX >= option.choiceWidth + 50 then
+          elseif relativeX >= (option.choiceWidth + 16) * optionScale then
             mouseArrowKey = 1 -- right
           else
             mouseArrowKey = 0 -- none
@@ -1291,7 +1522,11 @@ function handleMenu()
         local rectY = optionY
         local rectWidth = maxTextWidth -- * 1.4
         local rectHeight = screenHeight * 0.07
-        djui_hud_set_color(92, 255, 92, math.abs((frameCounter % 60) - 30) * 2)
+        if option.currNum and option.maxNum >= 10 and sMenuInputsDown & X_BUTTON ~= 0 then
+          djui_hud_set_color(92, 92, 255, math.abs((frameCounter % 60) - 30) * 2) -- blue
+        else
+          djui_hud_set_color(92, 255, 92, math.abs((frameCounter % 60) - 30) * 2) -- green
+        end
         djui_hud_render_rect(rectX, rectY, rectWidth, rectHeight)
         djui_hud_set_color(255, 255, 255, 255)
 
@@ -1300,6 +1535,7 @@ function handleMenu()
         end
 
         if currMenu[currentOption].desc then
+          local descScale = adjustScale
           local desc = (trans(currMenu[currentOption].desc))
           local s, e = desc:find("- ")
           if s then
@@ -1307,20 +1543,22 @@ function handleMenu()
           end
           djui_hud_set_font(FONT_NORMAL)
           djui_hud_set_color(255, 255, 255, 255)
-          local descWidth = djui_hud_measure_text(desc)
-          local y = screenHeight - 50
+          local descWidth = djui_hud_measure_text(desc) * descScale
+          local y = screenHeight - 50 * descScale
           local descX = (screenWidth - descWidth) / 2
-          if descWidth > screenWidth * 0.8 then
+          if descWidth > screenWidth * 0.7 then
             local spaceLoc = desc:find(" ", desc:len() // 2) or desc:len() // 2
             local desc1 = desc:sub(1, spaceLoc)
             desc = desc:sub(spaceLoc)
-            descWidth = djui_hud_measure_text(desc)
+            descWidth = djui_hud_measure_text(desc1) * descScale
             descX = (screenWidth - descWidth) / 2
-            y = y - 10
-            djui_hud_print_text(desc1, descX, y, 1)
-            y = y + 30
+            y = y - 10 * descScale
+            djui_hud_print_text(desc1, descX, y, descScale)
+            descWidth = djui_hud_measure_text(desc) * descScale
+            descX = (screenWidth - descWidth) / 2
+            y = y + 30 * descScale
           end
-          djui_hud_print_text(desc, descX, y, 1)
+          djui_hud_print_text(desc, descX, y, descScale)
         end
       elseif option.currNum and option.savedNum ~= option.currNum then
         if not option.savedNum then
@@ -1342,10 +1580,10 @@ function handleMenu()
 
   -- render scroll bar
   if #currMenu > optionCount then
-    local x = screenWidth * 0.9 - 40
+    local x = screenWidth * 0.9 - 40 * adjustScale
     local y = 150
     djui_hud_set_color(0, 0, 0, 155)
-    djui_hud_render_rect(x, y, 20, screenHeight - 210)
+    djui_hud_render_rect(x, y, 20 * adjustScale, screenHeight - 210)
     local farDown = 0
     local fullportion = screenHeight - 214
     local partportion = fullportion * 7 / #currMenu
@@ -1379,7 +1617,7 @@ function handleMenu()
     end
 
     djui_hud_set_color(255, 255, 255, 155)
-    djui_hud_render_rect(x + 2, y + 2 + farDown, 16, partportion)
+    djui_hud_render_rect(x + 2, y + 2 + farDown, 16 * adjustScale, partportion)
   end
 
   handle_mouse()
@@ -1395,55 +1633,58 @@ local altNum = 0     -- used with alt1 and alt2
 -- rules menu stuff; also my code
 showingRules = false          -- showing the rules menu
 ruleSlide = 0                 -- which part of this menu is being shown
-local MAX_RULES_SLIDE = 5     -- the maximum rule slide (constant)
 local mouseRulesDirection = 0 -- used for mouse buttons
 ruleEgg = false               -- if the easter egg has appeared
 
-local statOrder = { "wins_standard", "wins", "kills",
+local statOrder = { "wins_standard", "wins", "wins_mys", "kills",
   "maxStreak", "maxStar", "placement", "parkourRecord", "playtime" }
-local statOrder_alt1 = { "hardWins_standard", "hardWins", nil, nil, nil, "placementASN", "pRecordOmm" }
-local statOrder_alt2 = { "exWins_standard", "exWins", nil, nil, nil, "placement", "pRecordOther" }
+local statOrder_alt1 = { "hardWins_standard", "hardWins", "hardWins_mys", nil, nil, nil, "placementASN", "pRecordOmm" }
+local statOrder_alt2 = { "exWins_standard", "exWins", "exWins_mys", nil, nil, nil, "placement", "pRecordOther" }
 
-local descOrder = { "stat_wins_standard", "stat_wins", "stat_kills", "stat_combo", "stat_mini_stars",
+local descOrder = { "stat_wins_standard", "stat_wins", "stat_wins_mys", "stat_kills", "stat_combo", "stat_mini_stars",
   "stat_placement", "stat_parkour_time", "stat_playtime" }
-local descOrder_alt1 = { "stat_wins_hard_standard", "stat_wins_hard", nil, nil, nil, "stat_placement_asn",
+local descOrder_alt1 = { "stat_wins_hard_standard", "stat_wins_hard", "stat_wins_hard_mys", nil, nil, nil,
+  "stat_placement_asn",
   "stat_parkour_time_omm" }
-local descOrder_alt2 = { "stat_wins_ex_standard", "stat_wins_ex", nil, nil, nil, nil, "stat_parkour_time_other" }
+local descOrder_alt2 = { "stat_wins_ex_standard", "stat_wins_ex", "stat_wins_ex_mys", nil, nil, nil, nil,
+  "stat_parkour_time_other" }
 
 function stats_table_hud()
   djui_hud_set_resolution(RESOLUTION_DJUI)
 
   local text = ""
 
-  local scale = 1
   local screenWidth = djui_hud_get_screen_width()
   local screenHeight = djui_hud_get_screen_height()
+  -- apparently I designed this whole menu for 720p. Detect if this is greater than that and if so, adjust scale
+  local scale = screenHeight / 768
   local width = 0
   local x = 0
-  local y = 180
+  local y = 180 * scale
   djui_hud_set_color(0, 0, 0, 200);
   djui_hud_render_rect(screenWidth * 0.1, 0, screenWidth * 0.8, screenHeight);
 
   -- title
   djui_hud_set_font(FONT_CUSTOM_HUD)
   text = trans("menu_stats")
-  width = djui_hud_measure_text(text) * 4
+  width = djui_hud_measure_text(text) * 4 * scale
   x = (screenWidth - width) / 2
   djui_hud_set_color(255, 255, 255, 255);
-  print_text_ex_hud_font(text, x, 10, 4);
+  print_text_ex_hud_font(text, x, 10, 4 * scale);
   djui_hud_set_font(FONT_NORMAL)
 
   -- "player"
   text = trans("player")
   width = djui_hud_measure_text(text) * scale
-  x = screenWidth * 0.1 + 150 - width / 2
+  x = screenWidth * 0.1 + 150 * scale - width / 2
   djui_hud_print_text(text, x, y - 64 * scale, scale);
 
   -- scores, icons, etc.
-  x = screenWidth * 0.1 + 300
-  space = (screenWidth * 0.8 - 420) / (#statOrder - 1)
+  x = screenWidth * 0.1 + 300 * scale
+  space = (screenWidth * 0.8 - 420 * scale) / (#statOrder - 1)
   for i = 1, #stat_icon_data do
     local data = stat_icon_data[i]
+    local iconScale = scale * 1.5
     if altNum == 1 and stat_icon_data_alt1[i] then
       data = stat_icon_data_alt1[i]
     elseif altNum == 2 and stat_icon_data_alt2[i] then
@@ -1452,27 +1693,28 @@ function stats_table_hud()
 
     if data.tex == TEX_FLAG then
       djui_hud_set_color(255, 255, 255, 255)
-      djui_hud_render_texture(TEX_POLE, x - 1.5, y - 64 * scale, 1.5, 1.5)
+      djui_hud_render_texture(TEX_POLE, x - iconScale, y - 64 * scale, iconScale, iconScale)
     end
     djui_hud_set_color(data.r, data.g, data.b, 255)
-    djui_hud_render_texture(data.tex, x - 1.5, y - 64 * scale, 1.5, 1.5)
+    djui_hud_render_texture(data.tex, x - iconScale, y - 64 * scale, iconScale, iconScale)
     if math.abs(sortBy) == i then
       local sign = i / sortBy
+      local arrowScale = scale * 1.2
       if sign == 1 then
         djui_hud_set_color(92, 255, 92, 255)
-        djui_hud_render_texture(TEX_ARROW, x + 25, y - 35, 1.2, 1.2)
+        djui_hud_render_texture(TEX_ARROW, x + 20 * arrowScale, y - 30 * arrowScale, arrowScale, arrowScale)
       else
         djui_hud_set_color(255, 92, 92, 255)
-        djui_hud_render_texture(TEX_ARROW, x + 45, y - 15, -1.2, -1.2)
+        djui_hud_render_texture(TEX_ARROW, x + 37.5 * arrowScale, y - 12.5 * arrowScale, -arrowScale, -arrowScale)
       end
     end
 
     -- selected option
     if mouseIdleTimer < 2 or (statDesc == i and hoveringOption) then
       local rectX = x + 20 * scale - space / 2
-      local rectY = y - 64 * scale - 5
+      local rectY = y - 69 * scale
       local rectWidth = space
-      local rectHeight = (16 * 32 + 64) * scale + 25
+      local rectHeight = screenHeight - 56 * scale - rectY
       --djui_hud_set_resolution(RESOLUTION_DJUI)
       --djui_hud_render_rect(rectX, rectY, rectWidth, rectHeight)
       if mouseX >= rectX and mouseX <= rectX + rectWidth
@@ -1522,21 +1764,24 @@ function stats_table_hud()
   end
 
   -- render scroll bar
-  if (MAX_PLAYERS > 16) and (network_player_connected_count() > 16) then
+  local maxStatsNames = (screenHeight / scale - 240) // 32
+  if (MAX_PLAYERS > maxStatsNames) and (network_player_connected_count() > maxStatsNames) then
     local pcount = network_player_connected_count()
-    local x = screenWidth * 0.9 - 40
+    local x = screenWidth * 0.9 - 40 * scale
     local y = 150
     local fullportion = screenHeight - 214
-    local partportion = fullportion * 16 / pcount
+    local partportion = fullportion * maxStatsNames / pcount
     local farDown = 0
     djui_hud_set_color(0, 0, 0, 155)
-    djui_hud_render_rect(x, y, 20, screenHeight - 210)
+    djui_hud_render_rect(x, y, 20 * scale, screenHeight - 210)
 
     -- handle scroll bar with mouse
     local scrolling = true
     if mouseGrabbedScrollBar then
       farDown = mouseScrollBarY + mouseY
-      while scrolling do
+      local LIMIT = pcount - maxStatsNames
+      while scrolling and LIMIT > 0 do
+        LIMIT = LIMIT - 1
         scrolling = false
         local shiftUp = (menuY - 0.5) * fullportion / pcount
         local shiftDown = (menuY + 0.5) * fullportion / pcount
@@ -1555,21 +1800,20 @@ function stats_table_hud()
         end
       end
     else
-      if menuY > pcount - 16 then
-        menuY = pcount - 16
+      if menuY > pcount - maxStatsNames then
+        menuY = pcount - maxStatsNames
       end
       farDown = menuY * fullportion / pcount
     end
 
     djui_hud_set_color(255, 255, 255, 155)
-    djui_hud_render_rect(x + 2, y + 2 + farDown, 16, partportion)
+    djui_hud_render_rect(x + 2, y + 2 + farDown, 16 * scale, partportion)
   end
 
   -- player names
   y = y - (menuY * 32 * scale)
   for a, i in ipairs(statTable) do
-    if y > 170 and y < (screenHeight - 96 * scale) then
-      x = 0
+    if y >= 180 * scale and y < (screenHeight - 80 * scale) then
       local sMario = gPlayerSyncTable[i]
       local np = gNetworkPlayers[i]
       local playerColor = network_get_player_text_color_string(i)
@@ -1577,11 +1821,11 @@ function stats_table_hud()
       text = playerColor .. np.name .. "\\#ffffff\\"
       text = cap_color_text(text, PLAYER_NAME_CUTOFF)
       width = djui_hud_measure_text(remove_color(text)) * scale
-      x = screenWidth * 0.1 + 150 - width / 2
+      x = screenWidth * 0.1 + 150 * scale - width / 2
       djui_hud_print_text_with_color(text, x, y, scale)
 
-      x = screenWidth * 0.1 + 295
-      space = (screenWidth * 0.8 - 420) / (#statOrder - 1)
+      x = screenWidth * 0.1 + 295 * scale
+      space = (screenWidth * 0.8 - 420 * scale) / (#statOrder - 1)
       for i = 1, #statOrder do
         local stat = statOrder[i]
         if altNum == 1 and statOrder_alt1[i] then
@@ -1616,10 +1860,9 @@ function stats_table_hud()
   end
 
   -- desc
+  local newScale = scale * 1.5
   djui_hud_set_color(255, 255, 255, 255);
   if statDesc ~= 0 and hoveringOption then
-    scale = 1.5
-
     local desc = descOrder[statDesc]
     if altNum == 1 and descOrder_alt1[statDesc] then
       desc = descOrder_alt1[statDesc]
@@ -1627,23 +1870,22 @@ function stats_table_hud()
       desc = descOrder_alt2[statDesc]
     end
     text = trans(desc)
-    width = djui_hud_measure_text(text) * scale
+    width = djui_hud_measure_text(text) * newScale
     x = (screenWidth - width) / 2
-    y = screenHeight - 32 * scale
+    y = screenHeight - 32 * newScale
 
-    djui_hud_print_text(text, x, y, scale);
+    djui_hud_print_text(text, x, y, newScale);
   end
 
   -- back button
-  scale = 1.5
-  x = screenWidth * 0.1 + 32
+  x = screenWidth * 0.1 + 21 * newScale
   y = screenHeight * 0.05
-  djui_hud_render_texture(TEX_MENU_ARROW, x, y, -3, -3)
+  djui_hud_render_texture(TEX_MENU_ARROW, x, y, -newScale * 2, -newScale * 2)
   if mouseIdleTimer < 2 or (statDesc == 0 and hoveringOption) then
-    local rectX = x - 25
-    local rectY = 10
-    local rectWidth = 32
-    local rectHeight = 32
+    local rectX = x - 16 * newScale
+    local rectY = y - 18 * newScale
+    local rectWidth = 21 * newScale
+    local rectHeight = 21 * newScale
     --djui_hud_set_resolution(RESOLUTION_DJUI)
     --djui_hud_render_rect(rectX, rectY, rectWidth, rectHeight)
     if mouseX >= rectX and mouseX <= rectX + rectWidth
@@ -1664,27 +1906,28 @@ function stats_table_hud()
   handle_mouse()
 end
 
-function rules_menu_hud()
+function rules_menu_hud(forceSlide)
   djui_hud_set_resolution(RESOLUTION_DJUI)
 
   local text = ""
 
-  local scale = 2
   local screenWidth = djui_hud_get_screen_width()
   local screenHeight = djui_hud_get_screen_height()
+  -- apparently I designed this whole menu for 720p. Detect if this is greater than that and if so, adjust scale
+  local scale = screenHeight / 384
   local width = 0
   local x = 0
-  local y = 100
+  local y = 50 * scale
   djui_hud_set_color(0, 0, 0, 200);
   djui_hud_render_rect(screenWidth * 0.1, 0, screenWidth * 0.8, screenHeight);
 
   -- title
   djui_hud_set_font(FONT_CUSTOM_HUD)
   text = trans("menu_rules")
-  width = djui_hud_measure_text(text) * 4
+  width = djui_hud_measure_text(text) * 2 * scale
   x = (screenWidth - width) / 2
   djui_hud_set_color(255, 255, 255, 255);
-  print_text_ex_hud_font(text, x, 10, 4);
+  print_text_ex_hud_font(text, x, 5 * scale, 2 * scale);
   djui_hud_set_font(FONT_NORMAL)
 
   -- all text
@@ -1692,8 +1935,21 @@ function rules_menu_hud()
   local runners = trans("runners")
   local hunters = trans("hunters")
   local tex = nil
-  if ruleSlide == 0 then
-    if GST.mhMode ~= 2 then
+  local imgScale = 2 * scale
+  local finalSlide = 5
+  local currSlide = forceSlide or ruleSlide
+  if GST.mhMode == 3 then
+    finalSlide = 8
+  end
+
+  if currSlide == 0 then
+    if GST.mhMode == 2 then
+      text = (trans("welcome_mini"))
+      tex = "mh_rules_00"
+    elseif GST.mhMode == 3 then
+      text = (trans("welcome_mys"))
+      tex = "mh_rules_00"
+    else
       if month == 13 or ruleEgg then
         text = (trans("welcome_egg"))
         tex = "mh_rules_01"
@@ -1701,11 +1957,8 @@ function rules_menu_hud()
         text = (trans("welcome"))
         tex = "mh_rules_00"
       end
-    else
-      text = (trans("welcome_mini"))
-      tex = "mh_rules_00"
     end
-  elseif ruleSlide == 1 then
+  elseif currSlide == 1 then
     local extraRun = ""
     if GST.mhState ~= 0 and GST.mhState < 3 then
       if sMario0.team ~= 1 then
@@ -1730,11 +1983,14 @@ function rules_menu_hud()
       runGoal = trans("collect_only", GST.starRun)
       tex = "mh_rules_03"
     end
+    if GST.mhMode == 3 then
+      runGoal = runGoal .. "\n" .. trans("mystery_altgoal")
+    end
     text = string.format("\\#00ffff\\%s\\#ffffff\\%s:\n%s",
       runners,
       extraRun,
       runGoal)
-  elseif ruleSlide == 2 then
+  elseif currSlide == 2 then
     tex = "mh_rules_04"
     local extraHunt = ""
     if GST.mhState ~= 0 and GST.mhState < 3 and sMario0.team ~= 1 then
@@ -1743,6 +1999,8 @@ function rules_menu_hud()
     local huntGoal = ""
     if GST.mhMode == 0 then
       huntGoal = trans("all_runners")
+    elseif GST.mhMode == 3 then
+      huntGoal = trans("all_runners") .. "\n" .. trans("keep_secret")
     else
       huntGoal = trans("any_runners")
     end
@@ -1750,7 +2008,7 @@ function rules_menu_hud()
       hunters,
       extraHunt,
       huntGoal)
-  elseif ruleSlide == 3 then
+  elseif currSlide == 3 then
     local runLives = trans_plural("lives", (GST.runnerLives + 1))
     local needed = ""
     if GST.mhMode == 2 then
@@ -1765,24 +2023,28 @@ function rules_menu_hud()
       tex = "mh_rules_05"
     end
     local becomeHunter = ""
-    if GST.mhMode == 0 then
+    if not GST.spectateOnDeath then
       becomeHunter = "; " .. trans("become_hunter")
+    else
+      becomeHunter = "; " .. trans("become_spectator")
     end
     text = string.format("\\#00ffff\\%s\\#ffffff\\:\n%s%s%s.",
       runners,
       runLives,
       needed,
       becomeHunter)
-  elseif ruleSlide == 4 then
+  elseif currSlide == 4 then
     local becomeRunner = ""
-    if GST.mhMode ~= 0 then
+    if GST.mhMode ~= 0 and GST.mhMode ~= 3 then
       becomeRunner = "; " .. trans("become_runner")
       tex = "mh_rules_09"
     else
       tex = "mh_rules_08"
     end
     local spectate = ""
-    if GST.allowSpectate == true then
+    if GST.mhMode == 3 then
+      spectate = "... " .. trans("unless_defeated")
+    elseif GST.allowSpectate == true then
       spectate = "; " .. trans("spectate")
     end
     text = string.format("\\#ff5a5a\\%s\\#ffffff\\:\n%s%s%s.",
@@ -1790,13 +2052,9 @@ function rules_menu_hud()
       trans("infinite_lives"),
       becomeRunner,
       spectate)
-  elseif ruleSlide == 5 then
-    local banned = ""
-    if (GST.starRun) ~= -1 then
-      banned = trans("banned_glitchless")
-    else
-      banned = trans("banned_general")
-    end
+  elseif currSlide == finalSlide then -- for mysteryhunt, there's three slides before this
+    tex = "mh_rules_10"
+    local banned = trans("banned_general")
 
     local goal = ""
     local fun = trans("fun")
@@ -1808,6 +2066,32 @@ function rules_menu_hud()
       banned,
       goal,
       fun)
+  elseif currSlide == 5 then -- mysteryhunt exclusive slide
+    tex = "mh_rules_13"
+
+    text = trans("runners_can_kill")
+  elseif currSlide == 6 then -- mysteryhunt exclusive slide
+    tex = "mh_rules_14"
+
+    local deadBecome = ""
+    if not GST.confirmHunter then
+      deadBecome = trans("dead_become_noconfirm")
+    elseif GST.spectateOnDeath then
+      deadBecome = trans("dead_become")
+    else
+      deadBecome = trans("dead_become_infection")
+    end
+    local reportInfo = trans("report_info_rules", buttonString[reportButton])
+    local guardInfo = trans("guard_info_rules", buttonString[guardButton])
+
+    text = string.format("%s\n%s\n%s",
+      deadBecome,
+      reportInfo,
+      guardInfo)
+  elseif currSlide == 7 then -- mysteryhunt exclusive slide
+    tex = "mh_rules_12"
+
+    text = trans("sabo_info_rules", buttonString[reportButton])
   end
 
   local newline = text:find("\n") or (text:len() + 1)
@@ -1837,25 +2121,34 @@ function rules_menu_hud()
   end
 
   if tex then
-    y = y + 60 * scale
+    if currSlide == 0 or currSlide == 7 then
+      y = y - 120 * scale
+    elseif currSlide == 4 and GST.mhMode ~= 0 and GST.mhMode ~= 3 then
+      y = y + 30 * scale
+    end
     local actualTex = get_texture_info(tex)
-    x = (screenWidth - actualTex.width * 6) / 2
-    djui_hud_render_texture(actualTex, x, y, 6, 6)
+    x = (screenWidth - actualTex.width * imgScale) / 2
+    djui_hud_render_texture(actualTex, x, y, imgScale, imgScale)
   end
 
+  if forceSlide then return end
+
+  local dirTextScale = 2 * scale
   local olddir = mouseRulesDirection
   mouseRulesDirection = 0
   djui_hud_set_font(FONT_HUD)
-  djui_hud_print_text("A", screenWidth * 0.8 - 30, screenHeight - 80, 4)
-  if ruleSlide == MAX_RULES_SLIDE then
-    djui_hud_render_texture(gTextures.no_camera, screenWidth * 0.8 + 30, screenHeight - 67, 3, 3)
+  djui_hud_print_text("A", screenWidth * 0.8 - 8 * dirTextScale, screenHeight - 20 * dirTextScale, dirTextScale)
+  if currSlide == finalSlide then
+    djui_hud_render_texture(gTextures.no_camera, screenWidth * 0.8 + 6 * dirTextScale, screenHeight - 17 * dirTextScale,
+      0.75 * dirTextScale, 0.75 * dirTextScale)
   else
-    djui_hud_render_texture(TEX_MENU_ARROW, screenWidth * 0.8 + 30, screenHeight - 67, 6, 6)
+    djui_hud_render_texture(TEX_MENU_ARROW, screenWidth * 0.8 + 8 * dirTextScale, screenHeight - 17 * dirTextScale,
+      1.5 * dirTextScale, 1.5 * dirTextScale)
   end
-  local rectX = screenWidth * 0.8 - 40
-  local rectY = screenHeight - 85
-  local rectWidth = 120
-  local rectHeight = 80
+  local rectX = screenWidth * 0.8 - 10 * dirTextScale
+  local rectY = screenHeight - 21 * dirTextScale
+  local rectWidth = 30 * dirTextScale
+  local rectHeight = 20 * dirTextScale
   if mouseX >= rectX and mouseX <= rectX + rectWidth
       and mouseY >= rectY and mouseY <= rectY + rectHeight then
     mouseRulesDirection = 1
@@ -1868,13 +2161,15 @@ function rules_menu_hud()
   end
 
   djui_hud_set_color(255, 255, 255, 255)
-  djui_hud_print_text("B", screenWidth * 0.2, screenHeight - 80, 4)
-  if ruleSlide == 0 then
-    djui_hud_render_texture(gTextures.no_camera, screenWidth * 0.2 - 50, screenHeight - 67, 3, 3)
+  djui_hud_print_text("B", screenWidth * 0.2, screenHeight - 20 * dirTextScale, dirTextScale)
+  if currSlide == 0 then
+    djui_hud_render_texture(gTextures.no_camera, screenWidth * 0.2 - 14 * dirTextScale, screenHeight - 17 * dirTextScale,
+      0.75 * dirTextScale, 0.75 * dirTextScale)
   else
-    djui_hud_render_texture(TEX_MENU_ARROW, screenWidth * 0.2 - 10, screenHeight - 20, -6, -6)
+    djui_hud_render_texture(TEX_MENU_ARROW, screenWidth * 0.2 - 2 * dirTextScale, screenHeight - 5 * dirTextScale,
+      -1.5 * dirTextScale, -1.5 * dirTextScale)
   end
-  rectX = screenWidth * 0.2 - 60
+  rectX = screenWidth * 0.2 - 15 * dirTextScale
   if mouseX >= rectX and mouseX <= rectX + rectWidth
       and mouseY >= rectY and mouseY <= rectY + rectHeight then
     mouseRulesDirection = -1
@@ -1894,7 +2189,7 @@ function handle_mouse()
   mouseX = djui_hud_get_mouse_x()
   mouseY = djui_hud_get_mouse_y()
   local tex = TEX_HAND
-  if sMenuInputsDown & A_BUTTON ~= 0 and mouseIdleTimer < 90 then
+  if sMenuInputsDown & (A_BUTTON | B_BUTTON) ~= 0 and mouseIdleTimer < 90 then
     tex = TEX_HAND_SELECT
     mouseIdleTimer = 0
   end
@@ -1920,10 +2215,38 @@ function menu_controls(m)
   if not is_menu_open() then
     sMenuInputsPressed = 0
     sMenuInputsDown = 0
-    if (m.controller.buttonDown & L_TRIG) ~= 0 and (m.controller.buttonPressed & START_BUTTON) ~= 0 and not is_game_paused() then
+
+    local menuEntered = false
+    local saboEntered = false
+    if menuButton <= 2 then
+      local key = (menuButton ~= 2 and L_TRIG) or R_TRIG
+      if (m.controller.buttonDown & key) ~= 0 and (m.controller.buttonPressed & START_BUTTON) ~= 0 then
+        menuEntered = true
+      end
+    elseif (m.controller.buttonPressed & (U_JPAD >> (menuButton - 3))) ~= 0 then
+      menuEntered = true
+      frameDelay = 15
+    end
+    if sabo_valid() then
+      if saboButton <= 2 then
+        local key = (saboButton ~= 2 and L_TRIG) or R_TRIG
+        if (m.controller.buttonDown & key) ~= 0 and (m.controller.buttonPressed & START_BUTTON) ~= 0 then
+          saboEntered = true
+        end
+      elseif (m.controller.buttonPressed & (U_JPAD >> (saboButton - 3))) ~= 0 then
+        saboEntered = true
+        frameDelay = 15
+      end
+    end
+
+    if (menuEntered or saboEntered) and not is_game_paused() then
       menu_reload()
       menu = true
-      menu_enter()
+      if (not saboEntered) then
+        menu_enter()
+      else
+        menu_enter("saboMenu")
+      end
 
       -- Disable controls for everything but the menu
       sMenuInputsPressed = m.controller.buttonDown & (m.controller.buttonDown ~ sMenuInputsDown)
@@ -1945,8 +2268,11 @@ function menu_controls(m)
 
   djui_hud_set_resolution(RESOLUTION_DJUI)
   local screenWidth = djui_hud_get_screen_width()
+  local screenHeight = djui_hud_get_screen_height()
+  -- apparently I designed this whole menu for 720p. Detect if this is greater than that and if so, adjust scale
+  local adjustScale = screenHeight / 768
 
-  if (sMenuInputsPressed & A_BUTTON) ~= 0 then
+  if (sMenuInputsPressed & A_BUTTON) ~= 0 or (mouseIdleTimer < 90 and (sMenuInputsPressed & B_BUTTON) ~= 0) then
     if mouseIdleTimer < 90 and currMenu.name == "playerMenu" and currentOption < 17 and mouseX > screenWidth * 0.7 then
       pressed[7] = true
     elseif mouseIdleTimer < 90 and showingStats and statDesc ~= 0 and mouseY < 180 then
@@ -1977,7 +2303,7 @@ function menu_controls(m)
 
   -- arrow key controls for mouse
   local joystickMoved = true
-  if mouseIdleTimer < 90 and (sMenuInputsDown & A_BUTTON) ~= 0 and mouseArrowKey ~= 0 then
+  if mouseIdleTimer < 90 and (sMenuInputsDown & (A_BUTTON | B_BUTTON)) ~= 0 and mouseArrowKey ~= 0 then
     pressed[5] = false
     pressed[mouseArrowKey] = true
     mouseIdleTimer = 0
@@ -2011,9 +2337,9 @@ function menu_controls(m)
   end
 
   -- scroll bar controls for mouse
-  if mouseIdleTimer < 90 and (#currMenu > 7 or (showingStats and MAX_PLAYERS > 16 and network_player_connected_count() > 16)) and (sMenuInputsDown & A_BUTTON) ~= 0 and (mouseGrabbedScrollBar or (mouseX >= screenWidth * 0.9 - 40 and mouseX <= screenWidth * 0.9 - 20)) then
+  local maxStatsNames = (screenHeight / adjustScale - 240) // 32
+  if mouseIdleTimer < 90 and (((not showingStats) and #currMenu > 7) or (showingStats and MAX_PLAYERS > maxStatsNames and network_player_connected_count() > maxStatsNames)) and (sMenuInputsDown & (A_BUTTON | B_BUTTON)) ~= 0 and (mouseGrabbedScrollBar or (mouseX >= screenWidth * 0.9 - 40 * adjustScale and mouseX <= screenWidth * 0.9 - 20 * adjustScale)) then
     if (not mouseGrabbedScrollBar) then
-      local screenHeight = djui_hud_get_screen_height()
       mouseGrabbedScrollBar = true
       local fullportion = screenHeight - 214
       local farDown = 0
@@ -2046,7 +2372,8 @@ function menu_controls(m)
     end
 
     if change ~= 0 then
-      if ruleSlide + change > MAX_RULES_SLIDE or ruleSlide + change < 0 then
+      local finalSlide = (GST.mhMode == 3 and 8) or 5
+      if ruleSlide + change > finalSlide or ruleSlide + change < 0 then
         showingRules = false
         if menu then
           menu_enter(nil, 3)
@@ -2143,12 +2470,14 @@ function menu_controls(m)
       if countBy == 1 then
         option.currNum = (option.currNum - countBy - min) % (option.maxNum + 1 - min) + min
       else
-        if option.currNum == min then option.currNum = 0 end
+        local prevNum = option.currNum
         option.currNum = (option.currNum - countBy)
         if option.currNum == -countBy then
           option.currNum = option.maxNum
-        elseif option.currNum < 0 or option.currNum < min then
-          option.currNum = option.maxNum + option.currNum
+        elseif (option.currNum < 0 and prevNum >= 0) then
+          option.currNum = option.maxNum
+        elseif option.currNum < min then
+          option.currNum = min
         end
       end
       play_sound(SOUND_MENU_CHANGE_SELECT, gGlobalSoundSource)
@@ -2156,13 +2485,15 @@ function menu_controls(m)
       if countBy == 1 then
         option.currNum = (option.currNum + countBy - min) % (option.maxNum + 1 - min) + min
       else
-        if option.currNum == min then option.currNum = 0 end
+        local prevNum = option.currNum
         option.currNum = (option.currNum + countBy)
         if option.currNum == option.maxNum + countBy then
           option.currNum = 0
           if min > 0 then
-            option.currNum = 10
+            option.currNum = countBy
           end
+        elseif (option.currNum >= 0 and prevNum < 0) then
+          option.currNum = 0
         elseif option.currNum > option.maxNum then
           option.currNum = option.maxNum
         end
@@ -2182,7 +2513,7 @@ function menu_controls(m)
       play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource)
       selectOption(currMenu.back)
     elseif hoveringOption and pressed[7] then
-      if currMenu.name == "playerMenu" and currentOption < 17 then
+      if currMenu.name == "playerMenu" and currentOption < #currMenu then
         if (not has_mod_powers(0)) or option.invalid then
           play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
         else
@@ -2207,6 +2538,14 @@ function menu_controls(m)
         else
           blacklist_command("remove " .. currentOption)
         end
+      elseif currMenu.name == "settingsMenu" and option.name == "menu_auto" then -- flip auto
+        play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource)
+        option.option = not option.option
+        if option.option then
+          auto_command(-1)
+        else
+          auto_command(0)
+        end
       end
     end
   end
@@ -2217,130 +2556,15 @@ function is_menu_open()
   return (menu or showingStats or showingRules)
 end
 
--- custom text function that allows the HUD font to support more characters
-local extra_chars = {
-  ["ü"] = 00,
-  ["Ü"] = 00, -- string_lower doesn't work for these, so we need both
-  --["q"] = 01,
-  --["v"] = 02,
-  --["x"] = 03,
-  --["z"] = 04,
-  ["ä"] = 05,
-  ["Ä"] = 05,
-  ["ö"] = 06,
-  ["Ö"] = 06,
-  --["?"] = 07,
-  --["."] = 08,
-  ["á"] = 09,
-  ["Á"] = 09,
-  ["é"] = 10,
-  ["É"] = 10,
-  ["í"] = 11,
-  ["Í"] = 11,
-  ["ó"] = 12,
-  ["Ó"] = 12,
-  ["ú"] = 13,
-  ["Ú"] = 13,
-  ["à"] = 14,
-  ["À"] = 14,
-  ["è"] = 15,
-  ["È"] = 15,
-  ["ì"] = 16,
-  ["Ì"] = 16,
-  ["ò"] = 17,
-  ["Ò"] = 17,
-  ["ù"] = 18,
-  ["Ù"] = 18,
-  ["ë"] = 19,
-  ["Ë"] = 19,
-  ["ï"] = 20,
-  ["Ï"] = 20,
-  ["â"] = 21,
-  ["Â"] = 21,
-  ["ê"] = 22,
-  ["Ê"] = 22,
-  ["î"] = 23,
-  ["Î"] = 23,
-  ["ô"] = 24,
-  ["Ô"] = 24,
-  ["û"] = 25,
-  ["Û"] = 25,
-  ["å"] = 26,
-  ["Å"] = 26,
-  ["e̊"] = 27,
-  ["̊E̊"] = 27,
-  ["i̊"] = 28,
-  ["I̊"] = 28,
-  ["o̊"] = 29,
-  ["O̊"] = 29,
-  ["ů"] = 30,
-  ["Ů"] = 30,
-  ["ã"] = 31,
-  ["Ã"] = 31,
-  ["ẽ"] = 32,
-  ["Ẽ"] = 32,
-  ["ĩ"] = 33,
-  ["Ĩ"] = 33,
-  ["õ"] = 34,
-  ["Õ"] = 34,
-  ["ũ"] = 35,
-  ["Ũ"] = 35,
-  ["ñ"] = 36,
-  ["Ñ"] = 36,
-  ["ě"] = 37,
-  ["Ě"] = 37,
-  ["ç"] = 38,
-  ["Ç"] = 38,
-  --["!"] = 39,
-  ["_"] = 40,
-  --["-"] = 41,
-  --[","] = 42,
-  [":"] = 43,
-  ["~"] = 44, -- use as "fixed camera"
-}
-
-local EX_HUD_FONT = get_texture_info("ex_hud_font")
 function print_text_ex_hud_font(text, x, y, scale)
   if text == "~" then
     djui_hud_render_texture(gTextures.no_camera, x, y, scale, scale)
     return
-  elseif FONT_CUSTOM_HUD then
+  else
     djui_hud_set_font(FONT_CUSTOM_HUD)
     djui_hud_print_text(text, x, y - scale * 10, scale)
     return
   end
-  djui_hud_set_font(FONT_CUSTOM_HUD)
-  local space = 0
-  local render = ""
-  local charSkip = 0
-  for i = 1, string.len(text) do
-    if charSkip > 0 then
-      charSkip = charSkip - 1
-    else
-      local char = text:sub(i, i)
-
-      if string.byte(text, i) > 122 then -- accent characters are actually two characters
-        char = text:sub(i, i + 1)
-        charSkip = 1
-      end
-
-      --djui_chat_message_create(char)
-      local tex = extra_chars[string_lower(char)]
-      if tex then
-        djui_hud_print_text(render, x + space, y, scale);
-        space = space + djui_hud_measure_text(render) * scale
-        djui_hud_render_texture_tile(EX_HUD_FONT, x + space, y - (3 * scale), scale, scale, (tex % 8) * 32, (tex // 8) *
-          32, 32, 32)
-        space = space + djui_hud_measure_text(char) * scale
-        render = ""
-      elseif charSkip > 0 then -- prevent game crash
-        render = render .. "x"
-      else
-        render = render .. char
-      end
-    end
-  end
-  djui_hud_print_text(render, x + space, y, scale);
 end
 
 --hook_event(HOOK_ON_HUD_RENDER, handleMenu)

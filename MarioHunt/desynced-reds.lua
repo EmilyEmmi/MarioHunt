@@ -119,8 +119,21 @@ end
 ---@param o Object
 function hidden_red_coin_star_init(o)
     if (gNetworkPlayers[0].currLevelNum ~= LEVEL_JRB) then
+        local star = (o.oBehParams >> 24) + 1
+        local starModel = (month == 14 and E_MODEL_CAKE) or E_MODEL_STAR
+        if gGlobalSyncTable.mhMode == 2 then
+            if (star ~= gGlobalSyncTable.getStar) then
+                starModel = E_MODEL_TRANSPARENT_STAR
+            end
+        else
+            local course_star_flags = save_file_get_star_flags(get_current_save_file_num() - 1, gNetworkPlayers[0].currCourseNum - 1)
+            if course_star_flags & (1 << (star - 1)) ~= 0 then
+                starModel = E_MODEL_TRANSPARENT_STAR
+            end
+        end
+
         -- spawn in the red coin marker if we aren't in jrb
-        spawn_non_sync_object(id_bhvRedCoinStarMarker, E_MODEL_TRANSPARENT_STAR, o.oPosX, o.oPosY, o.oPosZ, nil)
+        o.parentObj = spawn_non_sync_object(id_bhvRedCoinStarMarker, starModel, o.oPosX, o.oPosY, o.oPosZ, nil)
     end
 
     -- set object flags
@@ -145,6 +158,9 @@ function hidden_red_coin_star_loop(o)
             if obj ~= nil then
                 -- spawn mist particles (obviously)
                 spawn_mist_particles()
+                if o.parentObj and o.parentObj ~= o then
+                    obj_set_model_extended(o.parentObj, E_MODEL_TRANSPARENT_STAR)
+                end
             end
         end
     end
@@ -207,7 +223,7 @@ function secret_loop(o)
         -- ...and we're a runner, and our index is 0, if the gamemode is minihunt...
         local m = nearest_mario_state_to_object(o)
         local index = m.playerIndex
-        if gPlayerSyncTable[index].team == 1 and (gGlobalSyncTable.mhMode ~= 2 or index == 0) then
+        if (gPlayerSyncTable[index].team == 1 or gGlobalSyncTable.mhMode == 3) and (gGlobalSyncTable.mhMode ~= 2 or index == 0) then
             -- get hidden star object (ignore since the last one won't do the sound otherwise, for whatever reason)
             --local hiddenStar = cur_obj_nearest_object_with_behavior(get_behavior_from_id(id_bhvHiddenStarTrigger))
             --if hiddenStar ~= nil then
@@ -265,6 +281,5 @@ function hidden_star_loop(o)
     end
 end
 
--- hidden star is secrets
-id_bhvSecrets = hook_behavior(id_bhvHiddenStar, OBJ_LIST_LEVEL, true, hidden_star_init, hidden_star_loop, "secret star")
-hook_behavior(id_bhvHiddenStarTrigger, OBJ_LIST_LEVEL, true, secret_init, secret_loop, "secret")
+hook_behavior(id_bhvHiddenStar, OBJ_LIST_LEVEL, true, hidden_star_init, hidden_star_loop, "secret star")
+id_bhvSecrets = hook_behavior(id_bhvHiddenStarTrigger, OBJ_LIST_LEVEL, true, secret_init, secret_loop, "secret")

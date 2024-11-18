@@ -15,6 +15,7 @@ local romhack_data = {           -- supported rom hack data
     name = "Super Mario 64",
     default_stars = 70, -- stars in a glitchless run
     max_stars = 120,    -- maximum stars collectible
+    ommColorStar = true,
     requirements = {
       [LEVEL_WF] = 1,
       [LEVEL_PSS] = 1,
@@ -35,9 +36,9 @@ local romhack_data = {           -- supported rom hack data
     -- all one table now!
     star_data = {
       [COURSE_BOB] = { 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8 },
-      [COURSE_WF] = { 8 | STAR_ACT_SPECIFIC, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8 },
+      [COURSE_WF] = { 8 | STAR_ACT_SPECIFIC, 8 | STAR_NOT_ACT_1, 8, 8, 8 | STAR_NOT_ACT_1, 8 | STAR_ACT_SPECIFIC, 8 },
       [COURSE_JRB] = { 8 | STAR_ACT_SPECIFIC, 1 | STAR_ACT_SPECIFIC, 1, 1, 1, 1 | STAR_NOT_ACT_1, 1 },
-      [COURSE_CCM] = { 8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8 },
+      [COURSE_CCM] = { 8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_NOT_ACT_1, 8, 8 | STAR_ACT_SPECIFIC, 8, 8 },
       [COURSE_BBH] = { 8 | STAR_ACT_SPECIFIC, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8, 8 },
       [COURSE_LLL] = { 1, 1, 1, 1, 8, 8, 1 },
       [COURSE_SSL] = { 1 | STAR_ACT_SPECIFIC, 1, 8, 8 | STAR_EXIT, 1, 8, 1 },
@@ -57,6 +58,9 @@ local romhack_data = {           -- supported rom hack data
       [124] = 1, -- Mysterious Mountainside (too easy)
       [84] = 1,  -- Stand Tall On Four Pillars (too annoying)
       [45] = 1,  -- Snowman's Lost His Head (inconsistant)
+      [12] = 1, -- Footrace With Koopa The Quick (takes FOREVER)
+      [133] = 1, -- Rematch With Koopa The Quick (takes FOREVER)
+      [56] = 1, -- Eye-To-Eye In The Secret Room (one-sided)
     },
 
     -- this is a function run every frame for all players. This one in particular handles 0 star runs and minihunts in ttc
@@ -145,6 +149,7 @@ local romhack_data = {           -- supported rom hack data
     name = "Star Road",
     default_stars = 80,
     max_stars = 130,
+    ommColorStar = true,
     requirements = {
       [LEVEL_CCM] = 8,  -- Chuckya Harbor
       [LEVEL_BBH] = 8,  -- Gloomy Garden
@@ -154,8 +159,8 @@ local romhack_data = {           -- supported rom hack data
       [LEVEL_BITS] = 80,
       [LEVEL_WMOTR] = 120, -- Hidden Palace Finale
     },
-    heartReplace = true, -- replaces all hearts with 1ups (doesn't affect the bubbles in the coral level, thankfully)
-    lifeOverride = true, -- prevent star road 0 life
+    heartReplace = true,   -- replaces all hearts with 1ups (doesn't affect the bubbles in the coral level, thankfully)
+    lifeOverride = true,   -- prevent star road 0 life
 
     -- mostly defining replicas
     star_data = {
@@ -163,7 +168,7 @@ local romhack_data = {           -- supported rom hack data
       [COURSE_BOB] = { 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8, 8 },
       [COURSE_WF] = { 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8, 8 },
       [COURSE_JRB] = { 8, 8, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8 },
-      [COURSE_CCM] = { 8, 8, 8, 8, 8, 8 | STAR_IGNORE_STARMODE | STAR_EXIT | STAR_APPLY_NO_ACTS, 8 },                                                -- don't get trapped in The Other Entrance
+      [COURSE_CCM] = { 8, 8, 8, 8, 8, 8 | STAR_IGNORE_STARMODE | STAR_EXIT | STAR_APPLY_NO_ACTS, 8 },                         -- don't get trapped in The Other Entrance
       [COURSE_BBH] = { 8 | STAR_ACT_SPECIFIC, 8, 8, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 | STAR_ACT_SPECIFIC, 8 }, -- wow, Gloomy Garden has a lot of act specifics
       [COURSE_HMC] = { 8, 8 | STAR_ACT_SPECIFIC, 8, 8 | STAR_ACT_SPECIFIC, 8, 8, 8 },
       [COURSE_LLL] = { 8, 8 | STAR_ACT_SPECIFIC, 8 | STAR_NOT_BEFORE_THIS_ACT, 8, 8, 8, 8 },
@@ -305,7 +310,8 @@ local romhack_data = {           -- supported rom hack data
   ["sm74"] = {
     name = "Super Mario 74 (+EE)",
     default_stars = 110,
-    max_stars = 157, -- only one version, sorry
+    max_stars = 157, -- impossible in normal, but not in ee
+    ommColorStar = true,
     requirements = {
       [LEVEL_BITDW] = 10,
       [LEVEL_BITFS] = 50,
@@ -473,8 +479,8 @@ local romhack_data = {           -- supported rom hack data
       [LEVEL_BITS] = 30,
       [LEVEL_BOWSER_3] = 30,
     },
-    ommSupport = false,  -- does not have default omm support
     heartReplace = true, -- replaces all hearts with 1ups
+    noCapDefault = true,
 
     -- since not all courses are modified here, exclude those
     star_data = {
@@ -529,8 +535,13 @@ local romhack_data = {           -- supported rom hack data
   ["SM64 Sapphire Green Comet"] = {
     name = "SM64 Sapphire Green Comet",
     inherit = "sapphire",
-    noLobby = true,                        -- hack tries to warp out of lobby, so don't use it
-    no_bowser = true,                      -- technically there is an endscreen but there's no reason to require it
+    noLobby = true,   -- hack tries to warp out of lobby, so don't use it
+    no_bowser = true, -- technically there is an endscreen but there's no reason to require it
+    noCapDefault = true,
+    requirements = {
+      [LEVEL_BITS] = 0,
+      [LEVEL_BOWSER_3] = 0,
+    },
 
     starColor = { r = 0, g = 255, b = 0 }, -- guess what color the stars are
 
@@ -572,8 +583,8 @@ local romhack_data = {           -- supported rom hack data
     -- no requirements!
     stalk = true,                              -- makes this hack less annoying
     starColor = { r = 145, g = 207, b = 187 }, -- stars are light green
-    ommSupport = false,                        -- does not have default omm support
     final = -1,
+    noCapDefault = true,
 
     -- gotta define almost every level in the game, yay
     star_data = { -- in order
@@ -676,6 +687,7 @@ local romhack_data = {           -- supported rom hack data
     name = "SM64: The Green Stars",
     default_stars = 80,
     max_stars = 131,
+    ommColorStar = true,
     requirements = {
       [LEVEL_BBH] = 4,  -- Fiery Factory
       [LEVEL_BITDW] = 15,
@@ -761,7 +773,6 @@ local romhack_data = {           -- supported rom hack data
     name = "SM64: The Underworld",
     default_stars = 30,
     max_stars = 30,
-    ommSupport = false,        -- does not have default omm support
     no_bowser = false,         -- can't disable
     badGuy = "The Shitilizer", -- this will display in the rules
     badGuy_es = "El Shitilizer",
@@ -874,8 +885,8 @@ local romhack_data = {           -- supported rom hack data
     -- no requirements
     parseStars = true,  -- automatically generate star list (this hack is too large I can't be bothered)
     stalk = true,       -- the hack is confusing, so let people warp
-    ommSupport = false,
     final = -1,
+    noCapDefault = true,
 
     star_data = {}, -- filled when parsed
 
@@ -1140,7 +1151,6 @@ local romhack_data = {           -- supported rom hack data
       [LEVEL_LLL] = 8,                       -- Sweet Sweet Rush
       [LEVEL_BITS] = 30,                     -- Down Street
     },
-    ommSupport = false,                      -- not true, but this only affected the colored radar
     starColor = { r = 92, g = 255, b = 92 }, -- all moons are green
     heartReplace = true,                     -- replaces all hearts with 1ups
     isMoonshine = true,                      -- changes hud elements
@@ -1190,7 +1200,6 @@ local romhack_data = {           -- supported rom hack data
 
     starColor = { r = 255, g = 255, b = 255 }, -- stars are white
     disableNonStop = true,                     -- omm actually disables non stop for this hack
-    ommSupport = false,                        -- stars are always white, even in omm
     no_bowser = true,                          -- no bowser.
     final = -1,
 
@@ -1284,6 +1293,12 @@ local romhack_data = {           -- supported rom hack data
     inherit = "ldd",
     default_stars = 42,
     max_stars = 80,
+    requirements = {
+      [LEVEL_HMC] = 0,   -- Scorching Jaws
+      [LEVEL_CASTLE_COURTYARD] = 0,
+      [LEVEL_BITFS] = 0, -- Spectral Spectacle
+      [LEVEL_BITS] = 0,  -- A Sweet Delight
+    },
 
     starColor = { r = 0, g = 255, b = 0 }, -- guess what color the stars are
 
@@ -1367,12 +1382,11 @@ local romhack_data = {           -- supported rom hack data
     },
   },
 
-  ["luigis-mansion-64"] = {
+  ["luigis-mansion-64"] = { -- TODO: Make WMOTR accessible
     name = "Luigi's Mansion 64",
-    inherit = "vanilla", -- this actually causes the minimap to be inheritted too, which is... fine, I guess
+    inherit = "vanilla",    -- this actually causes the minimap to be inheritted too, which is... fine, I guess
     max_stars = 118,
     default_stars = 65,
-    ommSupport = false,
     badGuy = "King Boo",
 
     -- some levels have been moved around
@@ -1389,7 +1403,11 @@ local romhack_data = {           -- supported rom hack data
     starColor = { r = 180, g = 180, b = 180 }, -- stars are gray
 
     special_run = function(m, gotStar)
-      gBehaviorValues.GrateStarRequirement = gGlobalSyncTable.starRun
+      if gGlobalSyncTable.freeRoam and gGlobalSyncTable.noBowser then
+        gBehaviorValues.GrateStarRequirement = 0
+      else
+        gBehaviorValues.GrateStarRequirement = gGlobalSyncTable.starRun
+      end
     end,
 
     star_data = {
@@ -1420,7 +1438,6 @@ local romhack_data = {           -- supported rom hack data
     name = "\\#FFC600\\Star \\#00BEFF\\Revenge \\#FF0034\\7\\#E7E7E7\\-Park of Time",
     default_stars = 60,
     heartReplace = true,
-    ommSupport = false,
     max_stars = 121,
     starColor = { r = 100, g = 255, b = 255 }, -- stars are light blue (same as runners! funny)
     coinColor = { r = 155, g = 255, b = 155 }, -- I'm not making the gradient effect sorry
@@ -1444,6 +1461,7 @@ local romhack_data = {           -- supported rom hack data
     },
     badGuy = "Timerock",
     noLobby = true, -- lack of wall jumps makes the parkour impossible
+    noCapDefault = true,
 
     star_data = {
       [COURSE_NONE] = { 0, 8, 8, 8, 8 },
@@ -1571,16 +1589,17 @@ local romhack_data = {           -- supported rom hack data
 
 }
 
-ROMHACK = {}              -- table containing the romhack data we're using
-PARSE_COURSE = 0          -- what course we're parsing in level_script_parse
-PARSE_AREA = 0            -- what area we're parsing in level_script_parse
-PARSE_LEVEL = 0           -- what level we're parsing in level_script_parse
-PARSE_PRINT = false       -- used in debug command; displays information about found stars
-PARSE_FOUND_STARS = {}    -- stars we've found in the level we're parsing
-PARSE_MINI_EXCLUDE = {}   -- stars we've found to exclude in minihunt
-PARSE_STAR_NAMES = {}     -- the name of the stars we've found
+ROMHACK = {}               -- table containing the romhack data we're using
+PARSE_COURSE = 0           -- what course we're parsing in level_script_parse
+PARSE_AREA = 0             -- what area we're parsing in level_script_parse
+PARSE_LEVEL = 0            -- what level we're parsing in level_script_parse
+PARSE_PRINT = false        -- used in debug command; displays information about found stars
+PARSE_FOUND_STARS = {}     -- stars we've found in the level we're parsing
+PARSE_MINI_EXCLUDE = {}    -- stars we've found to exclude in minihunt
+PARSE_STAR_NAMES = {}      -- the name of the stars we've found
 
-disable_chat_hook = false -- disabled if a mod uses it (swear filter, for example)
+disable_chat_hook = false  -- disabled if a mod uses it (swear filter, for example)
+voice_chat_enabled = false -- limbokong's proximity voicechat; changes how spectator mode works
 
 function setup_hack_data(settingRomHack, initial, usingOMM)
   local romhack_file = gGlobalSyncTable.romhackFile
@@ -1596,34 +1615,32 @@ function setup_hack_data(settingRomHack, initial, usingOMM)
 
   local found_121 = false
   if not ROMHACK and settingRomHack then
-    if not mhApi or not mhApi.romhackSetup then
+    if not (mhApi and mhApi.romhackSetup) then
       romhack_file = "vanilla"
-      for i, mod in pairs(gActiveMods) do
-        if mod.enabled then
-          if mod.incompatible and string.find(mod.incompatible, "romhack") then -- is a romhack
-            romhack_file = mod.relativePath:gsub("ROMHACK - ", "")
-            found_121 = false
-          elseif mod.incompatible and string.find(mod.incompatible, "gamemode") then -- is mariohunt
-            if string.find(mod.basePath, "sm64ex/-coop") then
-              djui_popup_create("WARNING: Mod installed in base directory; API may not function", 2)
-            end
-          elseif initial and not (usingOMM or movesetEnabled) and mod.incompatible and string.find(mod.incompatible, "moveset") then -- is moveset
-            movesetEnabled = true
-          elseif (romhack_file == "vanilla") and (not found_121) and string.find(mod.name, "121rst star") then                       -- 121rst star support
-            found_121 = true
-          elseif not disable_chat_hook then                                                                                          -- disable hook for some mods
-            local name = mod.name:lower()
-            if (name:find("mute") or name:find("swear filter") or name:find("nicknames")) and not name:find("(mh)") then
-              disable_chat_hook = true
-            end
-          end
-        end
-      end
-      print("Romhack is", romhack_file)
-      ROMHACK = romhack_data[romhack_file]
     else
       romhack_file = "custom"
     end
+    for i, mod in pairs(gActiveMods) do
+      if mod.enabled then
+        if not (mhApi and mhApi.romhackSetup) and mod.incompatible and string.find(mod.incompatible, "romhack") then   -- is a romhack
+          romhack_file = mod.relativePath:gsub("ROMHACK - ", "")
+          found_121 = false
+        elseif initial and not (usingOMM or movesetEnabled) and mod.incompatible and string.find(mod.incompatible, "moveset") then   -- is moveset
+          movesetEnabled = true
+        elseif (not found_121) and (romhack_file == "vanilla") and string.find(mod.name, "121rst star") then                         -- 121rst star support
+          found_121 = true
+        elseif not voice_chat_enabled and mod.name and (remove_color(mod.name) == ("Limbokong's Voicechat") or mod.name:find("Roblox Chat Bubbles")) and not mod.name:find("(MH)") then
+          voice_chat_enabled = true
+        elseif not disable_chat_hook then                                                                                            -- disable hook for some mods
+          local name = mod.name:lower()
+          if (name:find("mute") or name:find("swear filter") or name:find("nicknames")) and not name:find("(mh)") then
+            disable_chat_hook = true
+          end
+        end
+      end
+    end
+    print("Romhack is", romhack_file)
+    ROMHACK = romhack_data[romhack_file]
   end
   if romhack_file == "custom" and (mhApi and mhApi.romhackSetup) then
     ROMHACK = mhApi.romhackSetup()
@@ -1913,10 +1930,13 @@ function warp_beginning()
     if course == 0 then correctAct = 0 end
     return warp_to_level(gGlobalSyncTable.gameLevel, area, correctAct)
   elseif gGlobalSyncTable.mhState == 0 and LEVEL_LOBBY and not ROMHACK.noLobby then
+    gMarioStates[0].health = 0x880
     return warp_to_level(LEVEL_LOBBY, 1, 0) -- go to custom lobby!
   elseif gGlobalSyncTable.ee then
+    gMarioStates[0].health = 0x880
     return warp_to_level(gLevelValues.entryLevel, 2, 0)
   else
+    gMarioStates[0].health = 0x880
     return warp_to_start_level()
   end
 end
@@ -1925,7 +1945,7 @@ end
 -- it probably also erases some other stuff but oh well
 function deleteStarRoadStuff(m)
   local starsNeeded = gGlobalSyncTable.starRun
-  if gGlobalSyncTable.freeRoam or (not starsNeeded or starsNeeded == -1 or starsNeeded > m.numStars) then return end -- only if have enough for run
+  if (not gGlobalSyncTable.freeRoam) and (not starsNeeded or starsNeeded == -1 or starsNeeded > m.numStars) then return end -- only if have enough for run
   local np = gNetworkPlayers[0]
   if m.playerIndex ~= 0 or np.currCourseNum ~= COURSE_NONE then return end                                           -- only for local and in castle
 

@@ -26,6 +26,10 @@ local function on_object_unload(o)
                 nil
             )
         end
+    elseif obj_is_mushroom_1up(o) then
+        if obj_check_if_collided_with_object(o, m0.marioObj) ~= 0 then
+            m0.healCounter = m0.healCounter + 16 -- 4 hp
+        end
     end
 end
 
@@ -45,15 +49,15 @@ local function bhv_custom_chest_bottom_loop(o)
     -- Prevent opening the wrong chest in omm
     if OmmEnabled and o.parentObj.oTreasureChestIsLastInteractionIncorrect ~= 0 then
         o.parentObj.oTreasureChestCurrentAnswer = o.unused1
-        o.oAction = (o.unused1 > o.oBehParams2ndByte and 1) or 0
+        o.oAction = bool_to_int(o.unused1 > o.oBehParams2ndByte)
         o.parentObj.oTreasureChestIsLastInteractionIncorrect = 0
     end
 
-    if o.oAction == 1 or (o.oAction == 0 and player and gPlayerSyncTable[player.playerIndex].team == 1 and is_point_within_radius_of_mario(o.oPosX, o.oPosY, o.oPosZ, 150) and obj_check_if_facing_toward_angle(o.oMoveAngleYaw, player.marioObj.header.gfx.angle.y + 0x8000, 0x3000)) then
+    if o.oAction == 1 or (o.oAction == 0 and player and (gPlayerSyncTable[player.playerIndex].team == 1 or gGlobalSyncTable.mhMode == 3) and is_point_within_radius_of_mario(o.oPosX, o.oPosY, o.oPosZ, 150) and obj_check_if_facing_toward_angle(o.oMoveAngleYaw, player.marioObj.header.gfx.angle.y + 0x8000, 0x3000)) then
         bhv_treasure_chest_bottom_loop()
     elseif o.oAction == 2 then
         bhv_treasure_chest_bottom_loop()
-        if player and gPlayerSyncTable[player.playerIndex].team ~= 1 then
+        if player and gPlayerSyncTable[player.playerIndex].team ~= 1 and gGlobalSyncTable.mhMode ~= 3 then
             o.oAction = 0
         end
     else
@@ -151,7 +155,7 @@ local function custom_bobomb_buddy_cannon_loop(o)
 end
 hook_behavior_custom(id_bhvBobombBuddyOpensCannon, false, nil, custom_bobomb_buddy_cannon_loop)
 
--- instant/faster cutscene, or radar (TODO: keys?)
+-- instant/faster cutscene, or radar
 function star_update(radar)
     if radar then
         radar_store = {}
@@ -191,16 +195,40 @@ function star_update(radar)
                 if radar and (o.activeFlags & ACTIVE_FLAG_DORMANT == 0) then
                     local star = (o.oBehParams >> 24) + 1
                     if ((star > 0 and star < 8) or ROMHACK.isUnder) and not didRadar[star] then
-                        if gGlobalSyncTable.mhMode ~= 2 then
+                        local np = gNetworkPlayers[0]
+                        if o.oInteractionSubtype & INT_SUBTYPE_GRAND_STAR ~= 0 then
+                            if not star_radar[star] then
+                                star_radar[star] = { tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6 }
+                                star_minimap[star] = { tex = gTextures.star, prevX = 0, prevY = 0 }
+                            end
+                            table.insert(radar_store, { o })
+                            didRadar[star] = 1
+                        elseif np.currLevelNum == LEVEL_BOWSER_1 or np.currLevelNum == LEVEL_BOWSER_2 then
+                            local valid = true
+                            local save_flags = save_file_get_flags()
+                            if np.currLevelNum == LEVEL_BOWSER_1 and save_flags & (SAVE_FLAG_HAVE_KEY_1 | SAVE_FLAG_UNLOCKED_BASEMENT_DOOR) ~= 0 then
+                                valid = false
+                            elseif np.currLevelNum == LEVEL_BOWSER_2 and save_flags & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR) ~= 0 then
+                                valid = false
+                            end
+                            if valid then
+                                if not star_radar[star] then
+                                    star_radar[star] = { tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6 }
+                                    star_minimap[star] = { tex = gTextures.star, prevX = 0, prevY = 0 }
+                                end
+                                table.insert(radar_store, { o, "key" })
+                                didRadar[star] = 1
+                            end
+                        elseif gGlobalSyncTable.mhMode ~= 2 then
                             local file = get_current_save_file_num() - 1
-                            local course_star_flags = save_file_get_star_flags(file, gNetworkPlayers[0].currCourseNum - 1)
+                            local course_star_flags = save_file_get_star_flags(file, np.currCourseNum - 1)
 
                             if course_star_flags & (1 << (star - 1)) == 0 then
                                 if not star_radar[star] then
                                     star_radar[star] = { tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6 }
                                     star_minimap[star] = { tex = gTextures.star, prevX = 0, prevY = 0 }
                                 end
-                                table.insert(radar_store, o)
+                                table.insert(radar_store, { o })
                                 didRadar[star] = 1
                             end
                         elseif star == gGlobalSyncTable.getStar then
@@ -208,7 +236,7 @@ function star_update(radar)
                                 star_radar[star] = { tex = TEX_STAR, prevX = 0, prevY = 0, prevScale = 0.6 }
                                 star_minimap[star] = { tex = gTextures.star, prevX = 0, prevY = 0 }
                             end
-                            table.insert(radar_store, o)
+                            table.insert(radar_store, { o })
                             didRadar[star] = 1
                         end
                     end
@@ -236,15 +264,20 @@ hook_behavior_custom(id_bhvMantaRayWaterRing, false, function(o)
     o.oWaterRingNormalZ = dest.z
 end, nil)
 
--- Skip snowman dialog (Isaac)
-hook_behavior_custom(id_bhvSnowmansBottom, false, nil, function(o)
-    if o.oAction == 0 and m0.action == ACT_READING_NPC_DIALOG and is_point_within_radius_of_mario(o.oPosX, o.oPosY, o.oPosZ, 400) then
+-- Skip snowman dialog (Isaac) (Removed because it doesn't work anymore)
+--[[hook_behavior_custom(id_bhvSnowmansBottom, false, nil, function(o)
+    if o.oAction == 0 and m0.action == ACT_READING_NPC_DIALOG and is_point_within_radius_of_mario(o.oPosX, o.oPosY, o.oPosZ, 400) ~= 0 then
         o.oForwardVel = 10
-        o.oAction = 1
+        cur_obj_change_action(1)
         set_mario_action(m0, not m0.heldObj and ACT_IDLE or ACT_HOLD_IDLE, 0)
+        print("disabled cutscene")
+        disable_time_stop_including_mario()
+        m0.freeze = 0
+        m0.area.camera.cutscene = 0
+        play_cutscene(m0.area.camera)
         if (o.coopFlags & COOP_OBJ_FLAG_NON_SYNC) == 0 then network_send_object(o, true) end
     end
-end)
+end)]]
 
 -- outline stuff
 
@@ -280,7 +313,6 @@ local MODEL_WARIOS_WINGED_METAL_CAP = 0xF6   -- warios_winged_metal_cap_geo
 
 -- outline models for each character and caps - order is Red, Blue, Yellow, Purple
 local OUTLINE_MODEL = {}
-local CAP_MODELS = {}
 if not LITE_MODE then
     OUTLINE_MODEL = {
         [MODEL_MARIO] = { smlua_model_util_get_id("h_mario_geo"), smlua_model_util_get_id("r_mario_geo"), smlua_model_util_get_id("rh_mario_geo"), smlua_model_util_get_id("re_mario_geo") },
@@ -291,7 +323,7 @@ if not LITE_MODE then
     }
 end
 
-local E_MODEL_CAKE = ((not LITE_MODE) and smlua_model_util_get_id("mh_star_geo")) -- no more waiting for cake, just do logo star
+E_MODEL_CAKE = ((not LITE_MODE) and smlua_model_util_get_id("mh_star_geo")) -- no more waiting for cake, just do logo star
 
 local sBehavior = get_behavior_from_id(id_bhvHiddenStarTrigger)
 local dontLoop = false
@@ -301,7 +333,7 @@ function on_obj_set_model(o, model)
         obj_set_model_extended(o, E_MODEL_PURPLE_MARBLE)
     end
 
-    if model == 0x79 or model == 0x7A and star_ids[get_id_from_behavior(o.behavior)] then -- star model changes on anniversary
+    if (model == 0x79 or model == 0x7A) and star_ids[get_id_from_behavior(o.behavior)] then -- star model changes on anniversary
         local star = (o.oBehParams >> 24) + 1
         local starModel = (month == 14 and E_MODEL_CAKE) or E_MODEL_STAR
         if gGlobalSyncTable.mhMode == 2 then
@@ -322,6 +354,13 @@ function on_obj_set_model(o, model)
         if not np then return end
         local sMario = gPlayerSyncTable[np.localIndex]
         local modelIndex = 1
+        if not know_team(np.localIndex) then return end
+
+        if disguiseMod then
+            local gIndex = disguiseMod.getDisguisedIndex(np.globalIndex)
+            sMario = gPlayerSyncTable[network_local_index_from_global(gIndex)]
+        end
+        
         if sMario.team == 1 then
             if runnerAppearance ~= 3 then return end
             modelIndex = (sMario.hard or 0) + 2
@@ -437,6 +476,7 @@ end
 ---@param o Object
 function custom_ddd_warp_loop(o)
     if not gGlobalSyncTable.freeRoam then
+        gPaintingValues.ddd_painting.posZ = 1587.1999511719
         bhv_ddd_warp_loop()
         load_object_collision_model()
         return

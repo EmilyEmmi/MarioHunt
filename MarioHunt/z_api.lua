@@ -63,16 +63,27 @@ _G.mhApi.become_hunter = function(index)
 end
 
 -- returns a string, a color string, and a table, in that order
-_G.mhApi.get_role_name_and_color = function(index)
-  local sMario = gPlayerSyncTable[index]
-  return get_role_name_and_color(sMario)
-end
+_G.mhApi.get_role_name_and_color = get_role_name_and_color
 
 -- checks if a menu is open
 _G.mhApi.isMenuOpen = is_menu_open
 
+-- used for the Limbokong's Proximity Vociechat version
+-- returns true if global talking is active (in lobby, or in mysteryhunt when global talk is on)
+_G.mhApi.isGlobalTalkActive = function()
+  return (gGlobalSyncTable.mhMode == 3 and (gGlobalSyncTable.maxGlobalTalk == 0 or gGlobalSyncTable.globalTalkTimer ~= 0 or gGlobalSyncTable.mhState ~= 2)) or (gGlobalSyncTable.mhState ~= 1 and gGlobalSyncTable.mhState ~= 2)
+end
+
+-- returns if the player is deaqd
+_G.mhApi.isDead = function(index)
+  return gPlayerSyncTable[index].dead
+end
+
+-- returns the focus pos for the local player's spectator cam
+_G.mhApi.getFocusPos = get_focus_pos
+
 -- making some things global
-_G.mhApi.interactionIsValid = on_interact
+_G.mhApi.interactionIsValid = on_allow_interact
 _G.mhApi.exitIsValid = on_pause_exit
 _G.mhApi.pvpIsValid = allow_pvp_attack
 _G.mhApi.getStarName = get_custom_star_name
@@ -85,6 +96,7 @@ _G.mhApi.get_tag = get_tag -- takes index, returns string for tag shown in chat 
 _G.mhApi.render_power_meter = render_power_meter_mariohunt
 _G.mhApi.render_power_meter_interpolated = render_power_meter_interpolated_mariohunt
 _G.mhApi.apply_double_health = apply_double_health
+_G.mhApi.getActiveSabo = get_active_sabo
 
 -- this gets the local player's current kill combo
 _G.mhApi.getKillCombo = get_kill_combo

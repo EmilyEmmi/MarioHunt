@@ -1,11 +1,14 @@
 -- does the crown, which is rewarded for ASN semi-finalists and onwards
 local alreadySpawnedCrown = {}
-local crownYPos = {}
-local crownYOffset = {}
+
+E_MODEL_GOLD_CROWN = (not LITE_MODE) and smlua_model_util_get_id("gcrown_geo")
+E_MODEL_SILVER_CROWN = (not LITE_MODE) and smlua_model_util_get_id("scrown_geo")
+E_MODEL_BRONZE_CROWN = (not LITE_MODE) and smlua_model_util_get_id("bcrown_geo")
 
 ---@param o Object
 function crown_init(o)
     o.oFlags = o.oFlags | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
+    o.oTimer = gMarioStates[0].marioBodyState.updateTorsoTime + 1
     cur_obj_disable_rendering()
 end
 
@@ -14,7 +17,7 @@ function crown_loop(o)
     if o.oBehParams == 0 then return end
     ---@type MarioState
     local m = gMarioStates[o.oBehParams - 1]
-    if is_player_active(m) == 0 or not (gPlayerSyncTable[m.playerIndex].role and gPlayerSyncTable[m.playerIndex].role & 64 ~= 0) then
+    if is_player_active(m) == 0 or not (gPlayerSyncTable[m.playerIndex].role and gPlayerSyncTable[m.playerIndex].role & 128 ~= 0) then
         obj_mark_for_deletion(o)
         alreadySpawnedCrown[o.oBehParams] = nil
         return
@@ -23,26 +26,32 @@ function crown_loop(o)
     local oGFX = o.header.gfx
     local mGFX = m.marioObj.header.gfx
     o.oOpacity = 255
-    o.oAnimState = 0
+    o.oAnimState = 1
     if (m.marioBodyState.modelState & MODEL_STATE_NOISE_ALPHA) ~= 0 then
         o.oOpacity = 128
         o.oAnimState = 1
     end
     oGFX.node.flags = mGFX.node.flags
+
+    if m.playerIndex ~= 0 then
+        -- check if on screen
+        local pos = { x = m.pos.x, y = m.pos.y, z = m.pos.z }
+        local out = { x = 0, y = 0, z = 0 }
+        local screenWidth = djui_hud_get_screen_width()
+        local screenHeight = djui_hud_get_screen_height()
+        djui_hud_world_pos_to_screen_pos(pos, out)
+
+        if (o.oTimer > m.marioBodyState.updateTorsoTime + 1) or out.z > -400 or out.x > screenWidth + 100 or out.x < -100 or out.y > screenHeight + 100 or out.y < -100 then
+            o.oTimer = m.marioBodyState.updateTorsoTime + 1
+            cur_obj_disable_rendering()
+        end
+    end
     o.hookRender = 1
 end
 
 -- This functions calculates where the crown should be placed
--- TODO: breaks with mirror mario
--- Try the "get angle from torso to head" method
 function on_obj_render(o)
     if LITE_MODE then return end
-    if get_behavior_from_id(id_bhvMario) == o.behavior then -- TODO: this line used to cause inconsistent crashes for some players, notably not me. Does it still? If it does, I can always remove this code for the tourney b/c its not actually doing anything right now
-        local m = gMarioStates[o.oBehParams - 1]
-        if not crownYPos[m.playerIndex] then return end
-        crownYOffset[m.playerIndex] = math.floor(crownYPos[m.playerIndex] - m.marioBodyState.headPos.y)
-        return
-    end
     if get_behavior_from_id(id_bhvMHCrown) ~= o.behavior then return end
     if o.oBehParams == 0 then return end
     ---@type MarioState
@@ -63,14 +72,16 @@ function on_obj_render(o)
         upBy = upBy - 10
     end
     if (m.action & (ACT_FLAG_SWIMMING_OR_FLYING | ACT_FLAG_DIVING) ~= 0) and m.action & ACT_FLAG_INVULNERABLE == 0 then
-        local mHeadAngle = {x = m.faceAngle.x, y = m.faceAngle.y, z = m.faceAngle.z}
+        local mHeadAngle = { x = m.faceAngle.x, y = m.faceAngle.y, z = m.faceAngle.z }
         if m.action & ACT_FLAG_WATER_OR_TEXT ~= 0 and mHeadAngle.x > 0 then
             mHeadAngle.x = mHeadAngle.x * 0.4
         end
         mHeadPos.y = mHeadPos.y + upBy * coss(mHeadAngle.x) * coss(mHeadAngle.z)
 
-        mHeadPos.x = mHeadPos.x - upBy * sins(mHeadAngle.y) * sins(mHeadAngle.x) - upBy * coss(-mHeadAngle.y) * sins(mHeadAngle.z)    
-        mHeadPos.z = mHeadPos.z - upBy * coss(mHeadAngle.y) * sins(mHeadAngle.x) - upBy * sins(-mHeadAngle.y) * sins(mHeadAngle.z)
+        mHeadPos.x = mHeadPos.x - upBy * sins(mHeadAngle.y) * sins(mHeadAngle.x) -
+        upBy * coss(-mHeadAngle.y) * sins(mHeadAngle.z)
+        mHeadPos.z = mHeadPos.z - upBy * coss(mHeadAngle.y) * sins(mHeadAngle.x) -
+        upBy * sins(-mHeadAngle.y) * sins(mHeadAngle.z)
         upBy = 0
     elseif (m.action & (ACT_FLAG_AIR | ACT_FLAG_SWIMMING_OR_FLYING) == 0) then
         upBy = upBy - 20
@@ -86,7 +97,7 @@ function on_obj_render(o)
         oGFX.angle.x = pitch
         oGFX.angle.y = m.marioObj.header.gfx.angle.y
         oGFX.angle.z = m.marioBodyState.torsoAngle.z
-        local angleDiff = abs_angle_diff(yaw,  m.marioObj.header.gfx.angle.y)
+        local angleDiff = abs_angle_diff(yaw, m.marioObj.header.gfx.angle.y)
         if angleDiff >= 0x4000 then
             oGFX.angle.x = -oGFX.angle.x
         end
@@ -94,9 +105,11 @@ function on_obj_render(o)
             oGFX.angle.z = -pitch * sins(m.marioObj.header.gfx.angle.y - yaw)
         end
 
-        oGFX.pos.x = oGFX.pos.x + upBy * sins(oGFX.angle.y) * sins(oGFX.angle.x) - upBy * coss(-oGFX.angle.y) * sins(oGFX.angle.z)
+        oGFX.pos.x = oGFX.pos.x + upBy * sins(oGFX.angle.y) * sins(oGFX.angle.x) -
+        upBy * coss(-oGFX.angle.y) * sins(oGFX.angle.z)
         oGFX.pos.y = oGFX.pos.y + upBy * coss(oGFX.angle.x) * coss(oGFX.angle.z)
-        oGFX.pos.z = oGFX.pos.z + upBy * coss(oGFX.angle.y) * sins(oGFX.angle.x) - upBy* sins(-oGFX.angle.y) * sins(oGFX.angle.z)
+        oGFX.pos.z = oGFX.pos.z + upBy * coss(oGFX.angle.y) * sins(oGFX.angle.x) -
+        upBy * sins(-oGFX.angle.y) * sins(oGFX.angle.z)
         oGFX.angle.x = oGFX.angle.x - 0x1000
     else
         oGFX.angle.x = -m.faceAngle.x
@@ -134,14 +147,36 @@ end
 id_bhvMHCrown = hook_behavior(nil, OBJ_LIST_DEFAULT, true, crown_init, crown_loop)
 
 function get_crown(i)
-    if gPlayerSyncTable[i].role and gPlayerSyncTable[i].role & 64 ~= 0 and gPlayerSyncTable[i].placementASN and gPlayerSyncTable[i].placementASN <= 3 then
-        return E_MODEL_TOADS_METAL_CAP
+    if LITE_MODE then return end
+    local vIndex = i
+    if disguiseMod then
+        vIndex = network_local_index_from_global(disguiseMod.getDisguisedIndex(network_global_index_from_local(i)))
+    end
+    if gPlayerSyncTable[vIndex].role and gPlayerSyncTable[vIndex].role & 128 ~= 0 and gPlayerSyncTable[vIndex].placementASN and gPlayerSyncTable[vIndex].placementASN <= 3 then
+        if gPlayerSyncTable[vIndex].placementASN == 1 then
+            return E_MODEL_GOLD_CROWN
+        elseif gPlayerSyncTable[vIndex].placementASN == 2 then
+            return E_MODEL_SILVER_CROWN
+        else
+            return E_MODEL_BRONZE_CROWN
+        end
+    end
+end
+
+function get_crown_tex(i)
+    if gPlayerSyncTable[i].role and gPlayerSyncTable[i].role & 128 ~= 0 and gPlayerSyncTable[i].placementASN and gPlayerSyncTable[i].placementASN <= 3 then
+        if gPlayerSyncTable[i].placementASN == 1 then
+            return GOLD_CROWN_HUD
+        elseif gPlayerSyncTable[i].placementASN == 2 then
+            return SILVER_CROWN_HUD
+        end
+        return BRONZE_CROWN_HUD
     end
 end
 
 function spawn_new_crowns()
     --gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 64
-    --gPlayerSyncTable[0].placementASN = 2
+    --gPlayerSyncTable[0].placementASN = 1
     if LITE_MODE then return end
     for i = 0, MAX_PLAYERS - 1 do
         local m = gMarioStates[i]

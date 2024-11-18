@@ -73,12 +73,12 @@ Gfx mh_star_000_displaylist_mesh_layer_1_tri_0[] = {
 };
 
 Vtx mh_star_001_displaylist_mesh_layer_4_vtx_0[6] = {
-	{{ {0, 114, 95}, 0, {-1042, 990}, {255, 255, 255, 255} }},
-	{{ {-120, 113, 71}, 0, {-2022, 995}, {255, 255, 255, 255} }},
-	{{ {-120, -98, 68}, 0, {-2022, 2034}, {255, 255, 255, 255} }},
-	{{ {0, -99, 92}, 0, {-1042, 2038}, {255, 255, 255, 255} }},
-	{{ {121, 113, 71}, 0, {-48, 995}, {255, 255, 255, 255} }},
-	{{ {121, -98, 68}, 0, {-48, 2034}, {255, 255, 255, 255} }},
+	{{ {0, 114, 95}, 0, {-1039, -29}, {255, 255, 255, 255} }},
+	{{ {-120, 113, 71}, 0, {-10, -22}, {255, 255, 255, 255} }},
+	{{ {-120, -98, 68}, 0, {-10, 997}, {255, 255, 255, 255} }},
+	{{ {0, -99, 92}, 0, {-1039, 999}, {255, 255, 255, 255} }},
+	{{ {121, 113, 71}, 0, {-2083, -22}, {255, 255, 255, 255} }},
+	{{ {121, -98, 68}, 0, {-2083, 997}, {255, 255, 255, 255} }},
 };
 
 Gfx mh_star_001_displaylist_mesh_layer_4_tri_0[] = {
@@ -121,11 +121,11 @@ Gfx mat_mh_star_logo[] = {
 	gsSPTexture(65535, 65535, 0, 0, 1),
 	gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, mh_star_mh_icon_tex_pal_rgba16),
 	gsDPSetTile(0, 0, 0, 256, 5, 0, G_TX_WRAP | G_TX_NOMIRROR, 0, 0, G_TX_WRAP | G_TX_NOMIRROR, 0, 0),
-	gsDPLoadTLUTCmd(5, 98),
+	gsDPLoadTLUTCmd(5, 108),
 	gsDPSetTextureImage(G_IM_FMT_CI, G_IM_SIZ_8b_LOAD_BLOCK, 1, mh_star_mh_icon_tex_ci8),
 	gsDPSetTile(G_IM_FMT_CI, G_IM_SIZ_8b_LOAD_BLOCK, 0, 0, 7, 0, G_TX_WRAP | G_TX_NOMIRROR, 0, 0, G_TX_WRAP | G_TX_NOMIRROR, 0, 0),
 	gsDPLoadBlock(7, 0, 0, 1023, 256),
-	gsDPSetTile(G_IM_FMT_CI, G_IM_SIZ_8b, 8, 0, 0, 0, G_TX_WRAP | G_TX_NOMIRROR, 5, 0, G_TX_WRAP | G_TX_NOMIRROR, 6, 0),
+	gsDPSetTile(G_IM_FMT_CI, G_IM_SIZ_8b, 8, 0, 0, 0, G_TX_WRAP | G_TX_MIRROR, 5, 0, G_TX_WRAP | G_TX_MIRROR, 6, 0),
 	gsDPSetTileSize(0, 0, 0, 252, 124),
 	gsSPEndDisplayList(),
 };
