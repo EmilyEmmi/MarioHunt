@@ -1,4 +1,133 @@
 # Changelog
+## v2.7
+### Additions:
+  - Added painting overlay that shows how many stars have been collected in that stage
+    - Also shows keys and caps
+    - Can be disabled in personal settings menu
+  - You can now change the button used to activate the vanish cap in Nerf Vanish Cap in the personal settings menu
+    - Default is B
+  - Added rewards for ASN Tournament!
+    - The chat role and crown can be disabled seperately in the Hide My Roles menu, via "ASN Placement" and "ASN Crown" respectively
+      - For 1st place, the rainbow radar is tied to the "ASN Crown" role
+      - Your placement being annouced is tied to "ASN Placement"
+    - All rewards are based on your Discord ID unless requested otherwise. Let me know if you do not have access to your reward.
+  - Added radar for keys
+  - If the host types "pause" in chat, all players will be paused
+    - Must be first word
+    - "Unpause" unpauses all players
+    - If anyone else does so, the host will be prompted the pause command
+  - Added Nametags (MH) to the base mod
+    - Is disabled if the server setting is not active
+    - You can also now do /nametags color to toggle the role color
+  - Added Runners Spectate On Death option
+    - Does what it says on the tin
+  - Added Team Shuffle option
+    - Shuffles the teams of every alive player in the selected amount of time
+  - Force spectate state is now stored when disconnecting
+  - Added the ability to set the amount of Hunters instead with Randomize and Add (Max, Max-1, etc.)
+    - Auto game can also do this
+  - Added ASN Tourney preset
+    - Sets settings to the same as used in the ASN Tourney (1 extra life)
+  - **And now, for the star of the show: The new game mode, MYSTERYHUNT!**
+    - Combination of Murder Mystery and MarioHunt
+    - Hunters have to defeat all Runners without getting caught
+    - Comes with 5 exclusive options:
+      - Confirm Hunter Deaths: Displays a message whenever a Hunter dies. Disabling this also makes Hunters produce corpses. Default is ON.
+      - Hunters Win Early: Hunters win when they match/exceed the amount of Runners, like in Among Us. Default is ON.
+      - Global Chat Time: Time that players can speak whenever a body is found. "Always" allows players to speak to eachother at any time, and "X" gives no time. Default is 1:30.
+      - Grace Period: Time before players can kill each other. Default is 20s.
+      - Hunters Know Teammates: If disabled, Hunters can kill each other. Default is ON.
+    - Mysteryhunt has a different Auto chart, shown here (formula is floor(X * 2 + 1) / 3, in which X is the amount of players, OR X-1, whichever is lower):
+      | Players | Hunters |
+      |---------|---------|
+      | 2-6     | 1       |
+      | 7-9     | 2       |
+      | 10-12   | 3       |
+      | 13-15   | 4       |
+      | 16      | 5       |
+  - Added support for Limbokong's Voicechat
+    - Note that global chat won't work in MysteryHunt (you won't be able to hear everyone)
+  - Added lives counter when using OMM Rebirth's hud
+### Adjustments:
+  - Updated all languages! (EpikCool, N64-Mario, PietroM, Skeltan, N64yt, Mr. L-Ore)
+    - Tips are also now translated for Spanish, Portuguese, French, Romanian, and Italian
+  - **1Ups now only heal 4 HP instead of 8**
+    - Does not apply to Star Revenge 7.5
+  - **Moved the star counter to the left side of the screen**
+    - Does not apply if Character Select or Personal Star Counter are enabled
+  - Lives no longer appear when playing as Hunter
+    - Does not apply if Character Select is enabled
+  - The rules screen now has new, higher quality images courtesy of MaybeNotJohny
+  - Changed the last page of the rules screen to say "Happy Hunting!" instead of "Have fun!"
+    - English only for now
+    - Thanks to MaybeNotJohny for this suggestion!
+  - All players menu was removed; you can now pause/force spectate all players in the Misc. menu
+  - Players menu now notifies of unsaved changes
+  - Improved "error leave" detection; no longer activates when closing the game purposefully
+  - All players now have their state stored when disconnecting; in addition, rejoining while your old player state is still active now sets your role immediately rather than waiting for the old player state to leave
+  - Both left and right click now act as "accept" with the mouse (assuming they are set to default binds)
+  - Runners can now exit a stage with 0 health, even if they don't have the needed requirements
+  - You can now choose your direction after the star grab animation
+  - The Red Coin Marker now appears yellow if the red coin star has not been collected
+  - Fall Onto The Cage Island is no longer listed as obtainable in Act 1
+  - Force Spectate now applies in the lobby again
+  - Updated MarioHunt lobby logo to match the color of the mod name (LeoHaha)
+  - MarioHunt lobby now has thicker walls in some areas
+  - Menu now better matches resolution
+  - When using OMM Rebirth, the stars on the minimap now use their OMM textures
+  - The following actions are now even faster with Faster Actions enabled (multiplier is compared to vanilla):
+    - Dive Picking Up (x4)
+    - Releasing Bowser (x3)
+    - All "water knockback" actions (x3)
+    - All "stuck in ground" actions (x3)
+  - Added Stomach Slide Stop to Faster Actions
+  - Unlocking a key door is now instant regardless of if Faster Actions is enabled or not
+  - Moved the location of the health meter when in spectator mode
+  - ALL doors no longer show any dialog when invulnerability is active
+  - Stating "the doors are *broken*" now also prompts */mh out*
+  - Simply stating "how do" or "como se" no longer prompts the rules message; You now must say "how do I/you play" or "como se juego/juega/juegas"
+    - Also now matches "cómo juego/juegas"
+  - More phrases along the lines of "I can't grab/collect stars" prompt the rules message, and don't do so when the player is Runner
+  - The players menu will shrink of less players are configured
+    - Additionally, loops involving players will take less time
+  - The Randomize and Add Runners options no longer require at least one hunter, except in MysteryHunt
+  - Game settings are now saved when exiting the Game Settings menu instead of when the game starts
+  - Made Glow the default option for Runner and Hunter Appearance
+  - Being in Hard Mode while double health is enabled now just uses the vanilla health
+  - Changed how some settings are displayed at the start of a game
+  - Runner PVP DMG Up no longer applies in the lobby
+  - /mh out now always uses the death warp (except in Castle Grounds, where it insteads warps to inside castle)
+  - Staying in a Bowser stage as a Hunter now follows the same rules as /mh out
+### Fixes/backend changes:
+  - Fixed Faster Actions not working
+  - Fixed not being able to mash A out of "stuck in ground" actions when using Faster Actions
+  - Fixed exiting to castle no longer healing
+  - Fixed being able to keep vanish cap between levels in rare cases when Nerf Vanish Cap is enabled
+  - Fixed Whomp's Fortress incorrectly assuming that Act 1 is completed when calculating obtainable stars
+  - Fixed Snowman's Lost His Head not being act specific
+  - Fixed spectate controls appearing every time /spectate is used
+  - Fixed scrolling through players immediately warping in spectate
+  - Fixed incorrect direction being inputted after exiting a door
+  - Fixed not being able to exit Free Camera after taking void damage
+  - Fixed wins counting multiple times in some scenarios
+  - Fixed the cannon in castle grounds being inaccessible regardless of star count
+  - Fixed stars not getting recolored in OMM Rebirth on the radar and minimap
+  - Fixed unsaved changes message appearing for invalid options
+  - Fixed */mh out* warping the one who runs it to Bob-Omb Battlefield instead of Castle Grounds
+  - Fixed Swap/Minihunt exclusive tips never appearing
+  - Fixed getting sent to zero life in Star Road
+  - Fixed Sapphire and LDD Green Comet having star requirements
+  - RNG now also depends on global index; this will hopefully reduce repetitive stars in MiniHunt
+  - Fixed Leader Death Timer not applying for Hard Mode players
+  - Added message when there are more than 10 settings when pressing "List Settings"
+  - Fixed "Got All Stars!" message not appearing when it should in vanilla
+  - Hopefully fixed games ending immediately on start
+  - **API CHANGE:** ommSupport was replaced with ommColorStar
+    - Used to know if color stars are supported with the hack
+    - Defaults to FALSE
+  - */mh langtest all* no longer lists the debug commands or lines that are identical to English
+  - */mh langtest all* print statementes are now sorted based on language and in alphabetical order
+  - Added several new API functions related to MysteryHunt
 ## v2.6.2
 ### Additions:
   - Updated mod for coopDX v1.0 (although there is a version for 36.1, but this is the LAST one for this version)
@@ -27,7 +156,7 @@
   - Removed the update checker, since the function it uses was deprecated
   - Changed the message that appears instructing on how to open the menu into a popup
   - Hunters no longer get paused when entering a Bowser stage that has already been cleared while there are no Runners present
-  - Hunters are no longer effected by "Slow down with the warps!"
+  - Hunters are no longer affected by "Slow down with the warps!"
   - Void DMG now applies to the last hub of Star Road
   - The last safe position for void damage is now automatically set when warping: as such, it is no longer possible to die instantly in Tower Of The Wing Cap
   - Speedrun timer now pauses when global pause is active
