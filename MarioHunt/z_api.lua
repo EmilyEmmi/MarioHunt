@@ -74,6 +74,13 @@ _G.mhApi.isGlobalTalkActive = function()
   return (gGlobalSyncTable.mhMode == 3 and (gGlobalSyncTable.maxGlobalTalk == 0 or gGlobalSyncTable.globalTalkTimer ~= 0 or gGlobalSyncTable.mhState ~= 2)) or (gGlobalSyncTable.mhState ~= 1 and gGlobalSyncTable.mhState ~= 2)
 end
 
+-- used for the Limbokong's Proximity Vociechat version
+-- return true if team chat is currently enabled for the specified player (via /tc on)
+_G.mhApi.isTeamChatOn = function(index)
+  local sMario = gPlayerSyncTable[index]
+  return sMario.teamChat and (gGlobalSyncTable.mhMode ~= 3 or (sMario.team ~= 1 and not sMario.dead))
+end
+
 -- returns if the player is deaqd
 _G.mhApi.isDead = function(index)
   return gPlayerSyncTable[index].dead

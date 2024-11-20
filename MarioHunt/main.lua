@@ -151,6 +151,7 @@ gLevelValues.respawnBlueCoinsSwitch = 1
 gLevelValues.extendedPauseDisplay = 1
 gLevelValues.hudCapTimer = 1
 gLevelValues.mushroom1UpHeal = 0 -- edited to heal 4 instead of 8
+gLevelValues.numCoinsToLife = 255 -- do NOT put this at 0.
 gLevelValues.showStarNumber = 1
 
 local gotStar = nil                                     -- what star we just got
@@ -1619,6 +1620,9 @@ function on_course_sync()
           sMario.totalStars = 0
           sMario.team = bool_to_int(GST.mhMode == 3)
           sMario.discordID = 0
+          sMario.choseToLeave = true
+          local name = playerColor .. np0.name
+          global_popup_lang("rejoin_success", name, nil, 1)
           break
         end
       end
@@ -4613,7 +4617,7 @@ function on_chat_message(m, msg)
     if msg_ then msg = msg_ end
   end
 
-  if sMario.teamChat == true and (GST.mhMode ~= 3 or (sMario.team ~= 1 and sMario.spectator ~= 1)) then
+  if sMario.teamChat and (GST.mhMode ~= 3 or (sMario.team ~= 1 and not sMario.dead)) then
     if m.playerIndex == 0 then
       djui_chat_message_create(trans("to_team") .. msg)
       play_sound(SOUND_MENU_MESSAGE_DISAPPEAR, gGlobalSoundSource)

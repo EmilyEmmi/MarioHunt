@@ -386,7 +386,7 @@ function on_packet_report_body(data, self)
     djui_chat_message_create(text)
 
     gPlayerSyncTable[np2.localIndex].knownDead = true
-    if gGlobalSyncTable.maxGlobalTalk ~= 0 and gGlobalSyncTable.maxGlobalTalk ~= -1 then
+    if gGlobalSyncTable.maxGlobalTalk ~= 0 and gGlobalSyncTable.maxGlobalTalk ~= -30 then
         djui_chat_message_create(trans("global_talk_start", gGlobalSyncTable.maxGlobalTalk//30))
         if network_is_server() then
             gGlobalSyncTable.globalTalkTimer = gGlobalSyncTable.maxGlobalTalk
@@ -419,7 +419,7 @@ end
 -- reset sabotage timer
 function on_sabo_changed(tag, oldVal, newVal)
     if (not (oldVal and newVal)) or oldVal == newVal then return end
-    if not (network_is_server() and gGlobalSyncTable.mhMode == 3) then return end
+    if not (network_is_server() and gGlobalSyncTable.mhMode == 3 and newVal == 0) then return end
     local hunterCount = 0
     for i=0,MAX_PLAYERS-1 do
         local sMario = gPlayerSyncTable[i]

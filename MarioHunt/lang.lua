@@ -2055,7 +2055,7 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   ]]
   welcome = "Bem vindo à \\#ff5a5a\\Caça-\\#00ffff\\Mario\\#ffffff\\! INSTRUÇÕES:",
   welcome_mini = "Bem vindo à \\#ffff5a\\Mini-\\#ff5a5a\\Caça\\#ffffff\\! INSTRUÇÕES:",
-  welcome_mys = "Bem vindo à \\#b45aff\\Mystery-\\#ff5a5a\\Caça\\#ffffff\\! INSTRUÇÕES:",
+  welcome_mys = "Bem vindo à \\#ff5a5a\\Caça-\\#b45aff\\Mistério\\#ffffff\\! INSTRUÇÕES:",
   welcome_egg = "Bem vindo à \\#ff5a5a\\Caça-\\#5aff5a\\Luigi\\#ffffff\\! INSTRUÇÕES:",
   all_runners = "Derrote todos os \\#00ffff\\Corredores\\#ffffff\\.",
   any_runners = "Derrote quaisquer \\#00ffff\\Corredores\\#ffffff\\.",
@@ -2164,7 +2164,7 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   mode_swap = "Está no Modo Swap",
   --mode_swap = "Mudando o Modo de jogo", -- I think there was a miscommunication here
   mode_mini = "Está no modo Mini-Caça",
-  mode_mys = "Está no modo Mystery-Caça",
+  mode_mys = "Está no modo Caça-Mistério",
   using_stars = "Usando estrelas coletadas",
   using_timer = "Usando Cronômetro",
   can_spectate = "Caçadores podem agora observar a partida",
@@ -2239,16 +2239,16 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   -- for stats table
   stat_wins_standard = "Vitórias",
   stat_wins = "Vitórias (Mini-Caça/pré v2.3)", -- probably wrong
-  stat_wins_mys = "Vitórias (Mystery-Caça)",   -- probably wrong
+  stat_wins_mys = "Vitórias (Caça-Mistério)",   -- probably wrong
   stat_kills = "Já Matou",
   stat_combo = "Combo Máx. de Assassinatos",
   stat_wins_hard_standard = "Vitórias no Modo Difícil",
   stat_wins_hard = "Vitórias no Modo Difícil (Mini-Caça/pré v2.3)",
-  stat_wins_hard_mys = "Vitórias no Modo Difícil (Mystery-Caça)",
+  stat_wins_hard_mys = "Vitórias no Modo Difícil (Caça-Mistério)",
   stat_mini_stars = "Máximo de Estrelas em uma rodada de Mini-Caça",
   stat_wins_ex_standard = "Vitórias no Modo Extremo",
   stat_wins_ex = "Vitórias no Modo Extremo (Mini-Caça/pré v2.3)",
-  stat_wins_ex_mys = "Vitórias no Modo Extremo (Mystery-Caça)",
+  stat_wins_ex_mys = "Vitórias no Modo Extremo (Caça-Mistério)",
 
   -- placements
   place_1 = "\\#e3bc2d\\[64T: 1ro Lugar]",

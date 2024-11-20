@@ -423,7 +423,7 @@ function get_setting_as_string(index, value, listing)
     elseif name == "menu_star_stay_old" then
         if gServerSettings.stayInLevelAfterStar ~= 0 then value = nil end
     elseif name == "menu_global_chat" then
-        if value == -1 then
+        if value == -30 then
             value = false
         elseif value == 0 then
             value = "\\#5aff5a\\Always"

@@ -37,13 +37,20 @@ function save_command(msg)
                 
                 if(mhExists and mhApi.getMode() == 3 and mhApi.isDead(i) and not mhApi.isDead(0)) then -- (Emily) MH support; In MysteryHunt, don't hear dead unlesss also dead
                     currentPlayersDistance = "99"
+                elseif(mhExists and mhApi.isTeamChatOn and mhApi.isTeamChatOn(i)) then
+                    if mhApi.isTeamChatOn(0) and mhApi.getTeam(0) == mhApi.getTeam(i) then
+                        currentPlayersDistance = "0"
+                    else
+                        currentPlayersDistance = "99"
+                    end
                 elseif(mhExists and ((mhApi.isGlobalTalkActive and mhApi.isGlobalTalkActive()) or (mhApi.getMode() ~= 3 and (mhApi.isSpectator(i) or mhApi.isSpectator(0))))) -- (Emily) MH support; always hear spectators, spectators always hear (non-mysteryhunt), hear all with global chat
                 then
                     currentPlayersDistance = "0"
                 elseif(is_player_active(gMarioStates[i]) == 0) -- (Emily) Replaced level check with is_player_active
                 then
                     currentPlayersDistance = "99"
-                elseif mhExists and mhApi.isSpectator(0) and mhApi.getFocusPos then -- (Emily) For mysteryhunt, spectators can only hear those they are nearby (unless global chat is active)
+                elseif(mhExists and mhApi.isSpectator(0) and mhApi.getFocusPos) -- (Emily) For mysteryhunt, spectators can only hear those they are nearby (unless global chat is active)
+                then
                     local focusPos = mhApi.getFocusPos()
                     currentPlayersDistance = tostring(clamp(math.floor(dist_between_object_and_point(gMarioStates[i].marioObj, focusPos.x, focusPos.y, focusPos.z) / (40 * gGlobalSyncTable.distanceMultiplier))))
                 else
