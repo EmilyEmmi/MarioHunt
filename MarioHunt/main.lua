@@ -1,4 +1,4 @@
--- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#dcdcdc\\ (v2.7) !
+-- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#dcdcdc\\ (v2.7.1) !
 -- incompatible: gamemode nametags
 -- description: A gamemode based off of Beyond's concept. Hunters stop Runners from clearing the game!\n\nProgramming: EmilyEmmi, Blocky, Sunk, EmeraldLockdown, Sprinter05, Squishy, Agent X\n\nTranslations: KanHeaven, SonicDark, EpikCool, green, N64 Mario, PietroM, Skeltan, Blocky, N64, Mr. L-Ore\n\nSome graphics: LeoHaha, Key's Artworks, AquarriusAlex, RoxasYTB\n\"Shooting Star Summit\" port: pieordie1\n\nAlso thanks to: ColbyRayz!, SilverOrigins
 -- deluxe: true
@@ -763,6 +763,8 @@ function on_pause_exit(exitToCastle)
     prevHealth = 0x880
     actualHealthBeforeRender = 0x880
     m0.hurtCounter = 0x0
+  else
+    enable_time_stop_including_mario()
   end
 end
 
@@ -803,7 +805,7 @@ function on_death(m, nonStandard)
 
   if not died then
     -- ghost guard
-    if GST.mhMode == 3 and sMario0.guardTime and sMario0.guardTime ~= 0 then
+    if GST.mhMode == 3 and sMario0.guardTime and sMario0.guardTime ~= 0 and not sMario0.dead then
       sMario0.guardTime = 0
       m.health = 0x180
       prevHealth = 0x180
@@ -977,7 +979,7 @@ function update()
       for i=1,MAX_PLAYERS - 1 do
         network_player_set_override_location(NetP[i], trans("menu_unknown"))
       end
-    else
+    elseif not network_player_set_override_location then
       gServerSettings.enablePlayerList = 0
     end
     gServerSettings.enablePlayersInLevelDisplay = 0
@@ -987,7 +989,7 @@ function update()
   else
     if network_player_set_override_location and gServerSettings.enablePlayersInLevelDisplay == 0 then
       for i=1,MAX_PLAYERS - 1 do
-        network_player_set_override_location(NetP[i])
+        network_player_set_override_location(NetP[i], "")
       end
     else
       gServerSettings.enablePlayerList = 1
@@ -1532,7 +1534,14 @@ function on_course_sync()
     sMario0.placement = assign_place(discordID)
     sMario0.placementASN = assign_place_asn(discordID)
 
+    -- use coopnet id instead
+    if discordID == 0 and get_coopnet_id then
+      discordID = get_coopnet_id(0)
+      if discordID == -1 then discordID = 0 end
+    end
+
     -- only use our saved ID if we've not passed 8 hours since our last join
+    -- (only used when direct connection is enabled as of v1.0.4 of coopdx)
     local lastJoined = tonumber(mod_storage_load("lastJoined")) or 0
     if discordID == 0 and time - lastJoined <= (8 * 60 * 60) then
       discordID = tonumber(mod_storage_load("mhID")) or 0
@@ -2407,9 +2416,9 @@ function behind_hud_render()
     local out = {x = 0, y = 0, z = 0}
     djui_hud_world_pos_to_screen_pos(pos, out)
     --djui_chat_message_create(tostring(out.z))
-    local rectSize = 300
+    local rectSize = 400
     if m0.particleFlags & ACTIVE_PARTICLE_FIRE ~= 0 then -- increased size when burning
-      rectSize = 600
+      rectSize = rectSize * 2
     end
     if out.z ~= 0 then
       rectSize = rectSize / out.z * -200
@@ -4293,6 +4302,10 @@ function before_set_mario_action(m, action)
   -- don't do the ending cutscene for hunters (or runners in no bowser mode)
   if action == ACT_JUMBO_STAR_CUTSCENE and (sMario.team ~= 1 or GST.noBowser) then
     m.flags = m.flags | MARIO_WING_CAP
+    return 1
+  end
+
+  if (action == ACT_STANDING_DEATH or action == ACT_SUFFOCATION) and not on_death(m, true) then
     return 1
   end
 end

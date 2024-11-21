@@ -438,16 +438,16 @@ function painting_overlays_and_mystery_misc(paintingValid)
   local doneCourses = { [np.currCourseNum] = 1 }
   local warpList = {}
 
-  if (gPlayerSyncTable[0].spectator ~= 1) and gGlobalSyncTable.mhMode == 3 and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2) then
+  if (not gPlayerSyncTable[0].dead) and gGlobalSyncTable.mhMode == 3 and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2) then
     djui_hud_set_resolution(RESOLUTION_N64)
-    djui_hud_set_font(FONT_HUD)
+    djui_hud_set_font(FONT_CUSTOM_HUD)
     djui_hud_set_color(255, 255, 255, 255)
     local o = obj_get_first_with_behavior_id(id_bhvMHCorpse)
     while o do
       local pos = { x = o.oPosX, y = o.oPosY + 210, z = o.oPosZ }
       local out = { x = 0, y = 0, z = 0 }
       if dist_between_objects(m.marioObj, o) < 200 and djui_hud_world_pos_to_screen_pos(pos, out) then
-        local text = string.format("Press %s!", buttonString[reportButton])
+        local text = trans("press_report", buttonString[reportButton])
         local width = djui_hud_measure_text(text)
         djui_hud_print_text(text, out.x - width / 2, out.y, 1)
       end
@@ -459,7 +459,7 @@ function painting_overlays_and_mystery_misc(paintingValid)
         local pos = { x = o.oPosX, y = o.oPosY + 210, z = o.oPosZ }
         local out = { x = 0, y = 0, z = 0 }
         if dist_between_objects(m.marioObj, o) < 200 and djui_hud_world_pos_to_screen_pos(pos, out) then
-          local text = string.format("Press %s!", buttonString[reportButton])
+          local text = trans("press_report", buttonString[reportButton])
           local width = djui_hud_measure_text(text)
           djui_hud_print_text(text, out.x - width / 2, out.y, 1)
         end

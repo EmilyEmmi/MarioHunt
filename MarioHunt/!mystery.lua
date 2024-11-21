@@ -220,7 +220,7 @@ function mh_corpse_loop(o)
     end
 
     local m0 = gMarioStates[0]
-    if gPlayerSyncTable[0].spectator ~= 1 and (m0.controller.buttonPressed & (A_BUTTON >> (reportButton - 1))) ~= 0 and dist_between_objects(m0.marioObj, o) < 200 then
+    if (not gPlayerSyncTable[0].dead) and (m0.controller.buttonPressed & (A_BUTTON >> (reportButton - 1))) ~= 0 and dist_between_objects(m0.marioObj, o) < 200 then
         network_send_include_self(true, {
             id = PACKET_REPORT_BODY,
             reported = network_global_index_from_local(0),

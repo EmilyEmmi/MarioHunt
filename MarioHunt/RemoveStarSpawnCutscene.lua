@@ -15,6 +15,10 @@ function remove_timestop()
         print("disabled cutscene")
         disable_time_stop_including_mario()
         m.freeze = 0
+        if m.action == ACT_READING_NPC_DIALOG then
+          force_idle_state(m)
+        end
+        
         if c.cutscene == CUTSCENE_ENTER_BOWSER_ARENA then
           local bowser = obj_get_first_with_behavior_id(id_bhvBowser)
           if bowser and bowser.oAction == 5 then
@@ -22,9 +26,6 @@ function remove_timestop()
               bowser.oAction = 13
             else
               bowser.oAction = 0
-            end
-            if m.action == ACT_READING_NPC_DIALOG then
-              set_mario_action(m, ACT_IDLE, 0)
             end
           end
         elseif c.cutscene == CUTSCENE_STAR_SPAWN then -- done here because a lot of hacks hook to this object

@@ -1,4 +1,22 @@
 # Changelog
+## v2.7.1
+### Adjustments:
+  - Increased size of darkness spotlight in MysteryHunt
+  - Player list is now visible in MysteryHunt, but the locations of other players are censored
+    - This was technically implemented in the last version, but it didn't work correctly
+    - Note the the act number will still display
+    - Exclusive to v1.0.4 of sm64coopdx
+  - You can now move again after releasing Chain Chomp
+  - Time in now frozen during the "Exit Course" option, which should make it easier to exit in certain death scenarios
+  - Translated the "Press L!" prompt into all languages
+    - I did this myself based on what was used for other lines, so let me know if I screwed up.
+### Fixes/backend changes
+  - Fixed some ? symbols displaying in French
+  - Fixed script errors with the implementation of location censorship in MysteryHunt
+  - Fixed being able to report bodies while in a dying action
+  - Fixed guarding not working properly with some death actions
+  - When hosting with CoopNet, the coop id is now used for rejoin handling if discord is not available
+    - This doesn't really affect much, as there was already a system for players not using discord anyway...
 ## v2.7
 ### Additions:
   - Added painting overlay that shows how many stars have been collected in that stage
