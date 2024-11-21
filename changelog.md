@@ -1,4 +1,15 @@
 # Changelog
+## v2.7.2
+### Adjustments:
+  - Nametags were changed to match in-game nametag changes
+  - One of the tips was changed to reflect changes to ground pound damage (4 instead of 3)
+    - As such, this tip will be inaccurate if you are playing on an earlier version
+  - Crowns will no longer appear while the darkness sabotage is active
+### Fixes/backend changes
+  - Fixed being able to see the locations of players that join mid-game in MysteryHunt
+  - Players that are dead are now listed as dead immediately to hunters rather than waiting for their death animation
+  - Fixed discord id being set to the string "-1" for all non-discord players when coopnet is not enabled
+    - In addition, fixed discord id being a string instead of a number for non-discord players, although this didn't result in any issues in practice
 ## v2.7.1
 ### Adjustments:
   - Increased size of darkness spotlight in MysteryHunt

@@ -681,7 +681,7 @@ langdata["en"] = -- the letters here will be what you type for the command (ex: 
   -- I totally understand if you don't want to translate all of these.
   tip = "Tip: ",
   tip_1 = "Press %s, or type /mh, to open the menu. You can configure settings here!",
-  tip_2 = "Ground pounds deal 3 damage to other players.",
+  tip_2 = "Ground pounds deal 4 damage to other players.",
   tip_3 = "A kick will deal 2 damage and send players flying!",
   tip_4 =
   "For commands such as /spectate and /target, you can enter partial names and they'll still work (ex: entering \"Emily\" will refer to EmilyEmmi)",
@@ -1370,7 +1370,7 @@ langdata["es"] = -- By Kanheaven and SonicDark, with newer lines by EpikCool and
   -- tips
   tip = "Consejo: ",
   tip_1 = "¡Presiona %s, o escribe /mh, para abrir el menú. Puedes configurar opciones aquí!",
-  tip_2 = "Los Ground pounds hacen 3 de daño a los otros jugadores.",
+  tip_2 = "Los Ground pounds hacen 4 de daño a los otros jugadores.",
   tip_3 = "¡Una patada puede hacer 2 de daño y sacar a jugadores volando!",
   tip_4 =
   "Para ciertos comandos como /spectate y /target, puedes escribir los nombres parcialmente y seguiran funcionando. (ej: colocando \"Emily\" se referirá a EmilyEmmi)",
@@ -2634,7 +2634,7 @@ langdata["pt-br"] = -- Made by PietroM (PietroM#4782)
   -- These are not a priority. You can translate these if you want.
   tip = "Tip: ",
   tip_1 = "Pressione %s, ou digite no chat /mh, para abrir o menu. Você pode acessar as configurações lá!",
-  tip_2 = "Bundadas causam um dano equivalente a 3 barras à outros jogadores.",
+  tip_2 = "Bundadas causam um dano equivalente a 4 barras à outros jogadores.",
   tip_3 = "Um chute causa um dano equivalente à 2 barras e lançam jogadores longe!",
   tip_4 = "Para comandos como /spectate e /target, você pode abreviá-los, e eles ainda funcionarão (ex: digitar \"Emily\" se refere a EmilyEmmi)",
   tip_5 = "É possível alterar configurações no meio de uma partida.",
@@ -3318,7 +3318,7 @@ langdata["fr"] = -- By Skeltan
 
   tip = "Astuce : ",
   tip_1 = "Appuyez sur %s, ou tapez /mh, pour ouvrir le menu. Vous pouvez configurer les paramètres ici !",
-  tip_2 = "Les attaques rodéos infligent 3 dégâts aux autres joueurs.",
+  tip_2 = "Les attaques rodéos infligent 4 dégâts aux autres joueurs.",
   tip_3 = "Un coup de pied inflige 2 dégâts et projette les joueurs en arrière !",
   tip_4 = "Pour des commandes comme /spectate et /target, vous pouvez entrer des noms partiels et elles fonctionneront (ex : entrer \"Emily\" se référera à EmilyEmmi).",
   tip_5 = "Vous pouvez modifier les paramètres en cours de partie dans le menu.",
@@ -3988,7 +3988,7 @@ langdata["it"] = -- by Mr. L-ore
   -- Tips (TODO: check if these render correctly)
   tip = "Suggerimento: ",
   tip_1 = "Premi %s, o scrivi /mh, per aprire il menù. Lì potrai configurare le impostazioni!",
-  tip_2 = "Gli schianti a terra infliggono 3 danni agli altri giocatori.",
+  tip_2 = "Gli schianti a terra infliggono 4 danni agli altri giocatori.",
   tip_3 = "Un calcio infligge 2 danni e spazza via gli altri giocatori!",
   tip_4 = "Per comandi come /spectate e /target, puoi scrivere parzialmente i nomi e funzioneranno comunque (es: scrivere \"Emily\" frà riferimento ad EmilyEmmi)",
   tip_5 = "Puoi cambiare le impostazioni durante la partita dal menù.",
@@ -4643,7 +4643,7 @@ langdata["ro"] = -- by N64 (not to be mistaken for N64-Mario)
   -- Tips:
   tip = "Tip: ",
   tip_1 = "Apasati %s sau tastati /mh pentru a deschide meniul. Puteti configura setarile aici!",
-  tip_2 = "Lirele de pamant fac 3 din viata altor jucatori.",
+  tip_2 = "Lirele de pamant fac 4 din viata altor jucatori.",
   tip_3 = "O lovitura va provoca 2 daune si va trimite jucatorii in zbor!", -- si is și
   tip_4 = "Pentru comenzi precum /spectate si /target, puteti introduce nume partiale si vor functiona in continuare (ex: entering \"Emily\" will refer to EmilyEmmi)",
   tip_5 = "Poti schimba setarile in joc in meniu.",

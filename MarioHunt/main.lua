@@ -1,4 +1,4 @@
--- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#dcdcdc\\ (v2.7.1) !
+-- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#dcdcdc\\ (v2.7.2) !
 -- incompatible: gamemode nametags
 -- description: A gamemode based off of Beyond's concept. Hunters stop Runners from clearing the game!\n\nProgramming: EmilyEmmi, Blocky, Sunk, EmeraldLockdown, Sprinter05, Squishy, Agent X\n\nTranslations: KanHeaven, SonicDark, EpikCool, green, N64 Mario, PietroM, Skeltan, Blocky, N64, Mr. L-Ore\n\nSome graphics: LeoHaha, Key's Artworks, AquarriusAlex, RoxasYTB\n\"Shooting Star Summit\" port: pieordie1\n\nAlso thanks to: ColbyRayz!, SilverOrigins
 -- deluxe: true
@@ -975,11 +975,11 @@ function update()
     end
   elseif mystery_popup_off() then
     djui_set_popup_disabled_override(true)
-    if network_player_set_override_location and gServerSettings.enablePlayersInLevelDisplay ~= 0 then
+    if network_player_set_override_location then
       for i=1,MAX_PLAYERS - 1 do
         network_player_set_override_location(NetP[i], trans("menu_unknown"))
       end
-    elseif not network_player_set_override_location then
+    else
       gServerSettings.enablePlayerList = 0
     end
     gServerSettings.enablePlayersInLevelDisplay = 0
@@ -1536,7 +1536,7 @@ function on_course_sync()
 
     -- use coopnet id instead
     if discordID == 0 and get_coopnet_id then
-      discordID = get_coopnet_id(0)
+      discordID = tonumber(get_coopnet_id(0)) or 0
       if discordID == -1 then discordID = 0 end
     end
 

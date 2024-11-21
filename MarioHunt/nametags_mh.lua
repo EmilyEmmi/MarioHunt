@@ -1,7 +1,7 @@
 -- name: Nametags (MH)
 -- description: Nametags\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds nametags to sm64ex-coop, this helps to easily identify other players without the player list, nametags can toggled on and off with \\#ffff00\\/nametag-distance 7000\\#dcdcdc\\ and \\#ffff00\\/nametag-distance 0\\#dcdcdc\\ respectively.\n\nThis version uses the MarioHunt API.
 
-local MAX_SCALE = 0.32
+local FADE_SCALE = 4
 
 if gServerSettings.nametags ~= 0 then
     gGlobalSyncTable.tagDist = 7000
@@ -24,6 +24,7 @@ for i = 0, (MAX_PLAYERS - 1) do
     e.prevPos.y = 0
     e.prevPos.z = 0
     e.prevScale = 1
+    e.inited = false
 end
 
 -- localize functions to improve performance
@@ -41,6 +42,9 @@ local is_player_active = is_player_active
 local clampf = clampf
 local is_game_paused = is_game_paused
 local obj_get_first_with_behavior_id = obj_get_first_with_behavior_id
+local djui_hud_get_fov_coeff = djui_hud_get_fov_coeff or function()
+    return 1 -- backwards compatibility
+end
 
 local mh_is_spectator = function(index)
     return gPlayerSyncTable[index].spectator == 1
@@ -197,23 +201,23 @@ local function render_nametags()
         local m = gMarioStates[i]
         local np = gNetworkPlayers[i]
         local out = { x = 0, y = 0, z = 0 }
-        local pos = { x = m.marioObj.header.gfx.pos.x, y = m.pos.y + 210, z = m.marioObj.header.gfx.pos.z }
+        local pos = { x = m.marioBodyState.headPos.x, y = m.pos.y + 210, z = m.marioBodyState.headPos.z }
         if np.currAreaSyncValid and active_player(m) ~= 0 and (not invalid_nametag_action[m.action]) and (m.playerIndex ~= 0 or m.action ~= ACT_FIRST_PERSON) and djui_hud_world_pos_to_screen_pos(pos, out) then
-            local scale = MAX_SCALE
-            local dist = vec3f_dist(gLakituState.pos, m.pos)
-            if m.playerIndex ~= 0 and dist > 1000 then
-                scale = 0.5
-                scale = scale + dist / gGlobalSyncTable.tagDist
-                scale = clampf(1 - scale, 0, MAX_SCALE)
-            end
+            local scale = -400 / out.z * djui_hud_get_fov_coeff()
 
             -- collision nametags
-            if scale ~= 0 and gGlobalSyncTable.mhMode == 3 and m.playerIndex ~= 0 and gPlayerSyncTable[0].spectator ~= 1 and not no_wall_between_points(gLakituState.pos, pos) then
+            if scale >= 0 and gGlobalSyncTable.mhMode == 3 and m.playerIndex ~= 0 and gPlayerSyncTable[0].spectator ~= 1 and not no_wall_between_points(gLakituState.pos, pos) then
                 scale = 0
             end
 
             local e = gStateExtras[i]
-            if scale ~= 0 then
+            if scale >= 0 then
+                if not e.inited then
+                    vec3f_copy(e.prevPos, out)
+                    e.prevScale = scale
+                    e.inited = true
+                end
+
                 local name = np.name
                 local vIndex = i
                 if disguiseMod then
@@ -228,13 +232,14 @@ local function render_nametags()
                     local dum, dum2, roleColor = mhApi.get_role_name_and_color(vIndex)
                     color = roleColor
                 else
-                    color = network_player_get_override_palette_color(np, CAP)
+                    local colorString = network_get_player_text_color_string(i)
+                    color.r, color.g, color.b = convert_color(colorString)
                 end
                 tag = get_tag(vIndex)
 
                 local measure = djui_hud_measure_text(name) * scale * 0.5
-
-                local alpha = (i == 0 and 255) or math.min(np.fadeOpacity << 3, 255)
+                
+                local alpha = (i == 0 and 255 or math.min(np.fadeOpacity << 3, 255)) * clampf(FADE_SCALE - scale, 0, 1)
 
                 local exHealthScale = 1
                 djui_hud_print_outlined_text_interpolated(name, e.prevPos.x - measure, e.prevPos.y, e.prevScale,
@@ -256,6 +261,8 @@ local function render_nametags()
                         prevHealthScale, prevHealthScale,
                         out.x - (healthScale * 0.5), out.y - healthScale * exHealthScale, healthScale, healthScale, m.playerIndex)
                 end
+            else
+                e.inited = false
             end
 
             e.prevPos.x = out.x

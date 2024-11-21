@@ -33,7 +33,9 @@ function crown_loop(o)
     end
     oGFX.node.flags = mGFX.node.flags
 
-    if m.playerIndex ~= 0 then
+    if get_active_sabo() == 3 then -- hide during darkness
+        cur_obj_disable_rendering()
+    elseif m.playerIndex ~= 0 then
         -- check if on screen
         local pos = { x = m.pos.x, y = m.pos.y, z = m.pos.z }
         local out = { x = 0, y = 0, z = 0 }

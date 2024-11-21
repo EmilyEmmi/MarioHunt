@@ -611,7 +611,7 @@ function get_role_name_and_color(index)
     roleName = trans("hunter")
   end
 
-  if sMario.spectator == 1 and (sMario.team ~= 1 or sMario.dead) then
+  if sMario.dead or (sMario.spectator == 1 and sMario.team ~= 1) then
     if (not sMario.dead) or sMario.forceSpectate then
       color = { r = 169, g = 169, b = 169 } -- grey
       colorString = "\\#a9a9a9\\"
