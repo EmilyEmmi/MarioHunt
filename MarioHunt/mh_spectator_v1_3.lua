@@ -49,11 +49,11 @@ ACT_SPECTATE = ACT_BUBBLED--allocate_mario_action(ACT_GROUP_CUTSCENE)
 function act_spectate(m)                            -- doesn't do much other than set visibility
   m.marioObj.header.gfx.node.flags = m.marioObj.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
   local np = gNetworkPlayers[m.playerIndex]
-  if np.currPositionValid and (np.currLevelNum == LEVEL_BOWSER_1 or np.currLevelNum == LEVEL_BOWSER_2 or np.currLevelNum == LEVEL_BOWSER_3 or (np.currLevelNum == LEVEL_SSL and np.currAreaIndex == 3)) then
-    m.pos.x, m.pos.y, m.pos.z = 0, 100000, 0 -- as far away as possible
+  if np.currAreaSyncValid and (np.currLevelNum == LEVEL_BOWSER_1 or np.currLevelNum == LEVEL_BOWSER_2 or np.currLevelNum == LEVEL_BOWSER_3 or (np.currLevelNum == LEVEL_SSL and np.currAreaIndex == 3)) then
+    m.pos.x, m.pos.y, m.pos.z = 0, 10000, 0 -- as far away as possible
   elseif m.playerIndex ~= 0 and voice_chat_enabled then -- don't hear spectators, or always hear spectators, depending on which
     if gPlayerSyncTable[0].spectator ~= 1 then
-      m.pos.x, m.pos.y, m.pos.z = 0, 100000, 0      -- as far away as possible
+      m.pos.x, m.pos.y, m.pos.z = 0, 10000, 0      -- as far away as possible
     else
       vec3f_copy(m.pos, gMarioStates[0].pos)
     end
@@ -351,8 +351,8 @@ function enable_spectator(m)
   djui_chat_message_create(trans("spectator_controls"))
 end
 
-function spectated()
-  if free_camera == 0 and MSI then
+function render_spectated_power_meter()
+  if STP.spectator == 1 and (not is_menu_open()) and free_camera == 0 and MSI and (gGlobalSyncTable.tagDist == 0 or not gNametagsSettings.showHealth) then
     djui_hud_set_resolution(RESOLUTION_N64)
     local screenWidth = djui_hud_get_screen_width()
     local xposh = screenWidth * 0.5 - 51
@@ -361,7 +361,9 @@ function spectated()
     render_power_meter_mariohunt(MSI.health, xposh, yposh, 64, 64, spectateFocus)
     djui_hud_set_resolution(RESOLUTION_DJUI)
   end
+end
 
+function spectated()
   if hide_hud == 0 then
     local n = spectateFocus
 
@@ -653,4 +655,5 @@ end
 hook_chat_command("spectate", trans("spectate_desc"), spectate_command)
 
 hook_event(HOOK_ON_HUD_RENDER, spectated_update)
+hook_event(HOOK_ON_HUD_RENDER_BEHIND, render_spectated_power_meter)
 hook_event(HOOK_MARIO_UPDATE, mario_update)

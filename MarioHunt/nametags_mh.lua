@@ -43,7 +43,7 @@ local clampf = clampf
 local is_game_paused = is_game_paused
 local obj_get_first_with_behavior_id = obj_get_first_with_behavior_id
 local djui_hud_get_fov_coeff = djui_hud_get_fov_coeff or function()
-    return 1 -- backwards compatibility
+    return 1.13 -- backwards compatibility
 end
 
 local mh_is_spectator = function(index)
@@ -195,15 +195,21 @@ local function render_nametags()
     if gGlobalSyncTable.tagDist == 0 or (get_active_sabo() == 3 and gPlayerSyncTable[0].team == 1 and gPlayerSyncTable[0].spectator ~= 1) or (not gNametagsSettings.showSelfTag and network_player_connected_count() == 1) or not gNetworkPlayers[0].currAreaSyncValid or obj_get_first_with_behavior_id(id_bhvActSelector) then return end
 
     djui_hud_set_resolution(RESOLUTION_N64)
+    local fovCoeff = djui_hud_get_fov_coeff() -- this is a very expensive calculation, so only run it once
+    if DEBUG_SAFE_SURFACE then
+        for i=0,100 do
+            local scale = -400 / 400 * djui_hud_get_fov_coeff()
+        end
+    end
 
     for i = if_then_else(gNametagsSettings.showSelfTag, 0, 1), (MAX_PLAYERS - 1) do
         djui_hud_set_font(FONT_NORMAL)
         local m = gMarioStates[i]
         local np = gNetworkPlayers[i]
         local out = { x = 0, y = 0, z = 0 }
-        local pos = { x = m.marioBodyState.headPos.x, y = m.pos.y + 210, z = m.marioBodyState.headPos.z }
+        local pos = { x = m.marioObj.header.gfx.pos.x, y = m.pos.y + 230, z = m.marioObj.header.gfx.pos.z }
         if np.currAreaSyncValid and active_player(m) ~= 0 and (not invalid_nametag_action[m.action]) and (m.playerIndex ~= 0 or m.action ~= ACT_FIRST_PERSON) and djui_hud_world_pos_to_screen_pos(pos, out) then
-            local scale = -400 / out.z * djui_hud_get_fov_coeff()
+            local scale = -400 / out.z * fovCoeff
 
             -- collision nametags
             if scale >= 0 and gGlobalSyncTable.mhMode == 3 and m.playerIndex ~= 0 and gPlayerSyncTable[0].spectator ~= 1 and not no_wall_between_points(gLakituState.pos, pos) then
@@ -240,6 +246,9 @@ local function render_nametags()
                 local measure = djui_hud_measure_text(name) * scale * 0.5
                 
                 local alpha = (i == 0 and 255 or math.min(np.fadeOpacity << 3, 255)) * clampf(FADE_SCALE - scale, 0, 1)
+                if i ~= 0 and out.z < -gGlobalSyncTable.tagDist + 1000 then
+                    alpha = clamp((out.z + gGlobalSyncTable.tagDist) * 0.255, 0, alpha)
+                end
 
                 local exHealthScale = 1
                 djui_hud_print_outlined_text_interpolated(name, e.prevPos.x - measure, e.prevPos.y, e.prevScale,

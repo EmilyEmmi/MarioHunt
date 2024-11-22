@@ -1,4 +1,17 @@
 # Changelog
+## v2.7.3
+### Adjustments
+  - The power meter in spectator mode will no longer render if nametags are already showing the health
+  - Made /nametags dist actually do something again; it is about the about the amount of units the camera can be away before a nametag disappears
+    - 7000 by default if nametags are enabled
+    - Set to 0 to disable nametags
+    - Anything under 2000 isn't recommended
+### Fixes/backend changes
+  - Fixed saying "desync" causing random players to become hunter
+  - Fixed the Bowser cutscene and Eyerok not working in the presence of spectators
+  - Fixed nametags being rendered in the wrong spot in some scenarios
+  - Fixed the power meter in spectator mode rendering over other hud elements
+  - Made some optimizations to hopefully reduce lag spikes
 ## v2.7.2
 ### Adjustments:
   - Nametags were changed to match in-game nametag changes

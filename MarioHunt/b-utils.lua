@@ -310,7 +310,7 @@ function desync_fix_command(msg)
     local oldStars = sMario.totalStars or 0
     if oldTeam == 1 then
       local oldLives = sMario.runnerLives -- I wrote "runnerlives" instead before smh
-      sMario.runnerLives = -1
+      sMario.runnerLives = 100 -- No longer -1, because if it's -1, then it can make random people hunter...
       sMario.runnerLives = oldLives
     end
     sMario.team = -1

@@ -975,11 +975,11 @@ function update()
     end
   elseif mystery_popup_off() then
     djui_set_popup_disabled_override(true)
-    if network_player_set_override_location then
+    if network_player_set_override_location and gServerSettings.enablePlayersInLevelDisplay ~= 0 then
       for i=1,MAX_PLAYERS - 1 do
         network_player_set_override_location(NetP[i], trans("menu_unknown"))
       end
-    else
+    elseif not network_player_set_override_location then
       gServerSettings.enablePlayerList = 0
     end
     gServerSettings.enablePlayersInLevelDisplay = 0
@@ -3102,6 +3102,10 @@ function on_player_connected(m)
     local playerColor = network_get_player_text_color_string(np.localIndex)
     local name = playerColor .. np.name
     djui_chat_message_create(trans("connected", name))
+    if network_player_set_override_location then
+      network_player_set_override_location(np, trans("menu_unknown"))
+    end
+
     if playPopupSounds then
       play_sound(SOUND_GENERAL_COIN, gGlobalSoundSource)
     end
