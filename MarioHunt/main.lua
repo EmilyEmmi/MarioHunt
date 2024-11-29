@@ -967,6 +967,7 @@ function omm_disable_mode_for_minihunt(disable)
   end
 end
 
+local darknessFade = 1
 function update()
   if not didFirstJoinStuff then
     djui_set_popup_disabled_override(true)
@@ -999,22 +1000,27 @@ function update()
   end
 
   -- darkness sabo
-  if get_active_sabo() == 3 and sMario0.team == 1 and (not sMario0.dead) then
-    set_lighting_color(0, 40)
-    set_lighting_color(1, 40)
-    set_lighting_color(2, 60)
-    set_skybox_color(0, 0)
-    set_skybox_color(1, 0)
-    set_skybox_color(2, 0)
-    set_fog_color(0, 0)
-    set_fog_color(1, 0)
-    set_fog_color(2, 0)
-    set_fog_intensity(1.03)
-    set_vertex_color(0, 40)
-    set_vertex_color(1, 40)
-    set_vertex_color(2, 60)
-  elseif get_skybox_color(0) == 0 then
-    set_season_lighting(month, np0.currLevelNum)
+  local darknessOn = (get_active_sabo() == 3 and sMario0.team == 1 and (not sMario0.dead))
+  if darknessFade < 1 or darknessOn then
+    if darknessOn then
+      darknessFade = math.max(darknessFade - 0.04, 0)
+    else
+      darknessFade = math.min(darknessFade + 0.02, 1)
+    end
+    defaultLight = get_season_lighting(month, np0.currLevelNum)
+    set_lighting_color(0, lerp(40, defaultLight.lightColorR, darknessFade))
+    set_lighting_color(1, lerp(40, defaultLight.lightColorG, darknessFade))
+    set_lighting_color(2, lerp(60, defaultLight.lightColorB, darknessFade))
+    set_skybox_color(0, lerp(0, defaultLight.skyboxColorR, darknessFade))
+    set_skybox_color(1, lerp(0, defaultLight.skyboxColorG, darknessFade))
+    set_skybox_color(2, lerp(0, defaultLight.skyboxColorB, darknessFade))
+    set_fog_color(0, lerp(0, defaultLight.fogColorR, darknessFade))
+    set_fog_color(1, lerp(0, defaultLight.fogColorG, darknessFade))
+    set_fog_color(2, lerp(0, defaultLight.fogColorB, darknessFade))
+    set_fog_intensity(lerp(1.03, defaultLight.fogIntensity, darknessFade))
+    set_vertex_color(0, lerp(40, defaultLight.vertexColorR, darknessFade))
+    set_vertex_color(1, lerp(40, defaultLight.vertexColorG, darknessFade))
+    set_vertex_color(2, lerp(60, defaultLight.vertexColorB, darknessFade))
   end
 
   noSettingDisp = (not didFirstJoinStuff)
@@ -2387,6 +2393,10 @@ end
 
 -- double health mode
 local ommVanish = 255
+-- darkness sabo vars for interpolation
+local darknessPrevX = nil
+local darknessPrevY = nil
+local darknessPrevRectSize = nil
 function behind_hud_render()
   djui_hud_set_resolution(RESOLUTION_N64)
   djui_hud_set_font(FONT_HUD)
@@ -2410,7 +2420,7 @@ function behind_hud_render()
     djui_hud_set_color(255, 255, 50, 100)
     djui_hud_render_rect(0, 0, screenWidth + 10, screenHeight + 10)
     djui_hud_set_color(255, 255, 255, 255)
-  elseif sabo == 3 and sMario0.team == 1 and (not sMario0.dead) and (not actSelect) then
+  elseif (sabo == 3 and sMario0.team == 1 and (not sMario0.dead) and (not actSelect)) or darknessFade < 1 then
     local screenHeight = djui_hud_get_screen_height()
     local pos = {x = m0.pos.x, y = m0.pos.y + 80, z = m0.pos.z}
     local out = {x = 0, y = 0, z = 0}
@@ -2423,18 +2433,35 @@ function behind_hud_render()
     if out.z ~= 0 then
       rectSize = rectSize / out.z * -200
     end
+    if darknessFade then
+      rectSize = rectSize + 400*darknessFade
+    end
     djui_hud_set_color(0, 0, 0, 255)
+      if darknessPrevX == nil then
+        darknessPrevX = out.x
+        darknessPrevY = out.y
+        darknessPrevRectSize = rectSize
+      end
     local tex = TEX_SPOTLIGHT
     local spotCornerX = out.x - rectSize
     local spotCornerY = out.y - rectSize
     local spotCornerBX = out.x + rectSize
     local spotCornerBY = out.y + rectSize
-    djui_hud_render_texture(tex, spotCornerX, spotCornerY, rectSize/tex.width*2, rectSize/tex.height*2)
-    djui_hud_render_rect(0, 0, screenWidth + 10, spotCornerY)
-    djui_hud_render_rect(0, out.y + rectSize, screenWidth + 10, screenHeight + 10 - spotCornerBY)
-    djui_hud_render_rect(0, spotCornerY, spotCornerX, rectSize * 2)
-    djui_hud_render_rect(spotCornerBX, spotCornerY, screenWidth + 10 - spotCornerBX, rectSize * 2)
+    -- interp
+    local prevSpotCornerX = darknessPrevX - darknessPrevRectSize
+    local prevSpotCornerY = darknessPrevY - darknessPrevRectSize
+    local prevSpotCornerBX = darknessPrevX + darknessPrevRectSize
+    local prevSpotCornerBY = darknessPrevY + darknessPrevRectSize
+    djui_hud_render_texture_interpolated(tex, prevSpotCornerX, prevSpotCornerY, darknessPrevRectSize/tex.width*2, darknessPrevRectSize/tex.height*2, spotCornerX, spotCornerY, rectSize/tex.width*2, rectSize/tex.height*2)
+    djui_hud_render_rect_interpolated(0, 0, screenWidth + 10, prevSpotCornerY, 0, 0, screenWidth + 10, spotCornerY)
+    djui_hud_render_rect_interpolated(0, darknessPrevY + darknessPrevRectSize, screenWidth + 10, screenHeight + 10 - prevSpotCornerBY, 0, out.y + rectSize, screenWidth + 10, screenHeight + 10 - spotCornerBY)
+    djui_hud_render_rect_interpolated(0, prevSpotCornerY, prevSpotCornerX, darknessPrevRectSize * 2, 0, spotCornerY, spotCornerX, rectSize * 2)
+    djui_hud_render_rect_interpolated(prevSpotCornerBX, prevSpotCornerY, screenWidth + 10 - prevSpotCornerBX, darknessPrevRectSize * 2, spotCornerBX, spotCornerY, screenWidth + 10 - spotCornerBX, rectSize * 2)
     djui_hud_set_color(255, 255, 255, 255)
+    
+    darknessPrevX = out.x
+    darknessPrevY = out.y
+    darknessPrevRectSize = rectSize
   end
 
   local dispFlags = hud_get_value(HUD_DISPLAY_FLAGS)
@@ -3014,64 +3041,86 @@ function on_warp()
   localPrevAct = np0.currActNum
 end
 
--- set lighting
-function set_season_lighting(month, level)
+-- get lighting
+function get_season_lighting(month, level)
+  -- Default Lighting
+  local lightDir = 0
+  local overrideSkybox = -1
+  local overrideEnvfx = -1
+  local lightColorR = 255
+  local lightColorG = 255
+  local lightColorB = 255
+  local vertexColorR = 255
+  local vertexColorG = 255
+  local vertexColorB = 255
+  local skyboxColorR = 255
+  local skyboxColorG = 255
+  local skyboxColorB = 255
+  local fogColorR = 255
+  local fogColorG = 255
+  local fogColorB = 255
+  local fogIntensity = 1
+
   if noSeason or (month ~= 10 and month ~= 12) then
     if level == LEVEL_LOBBY then
-      set_lighting_dir(2, 300) -- dark?
-    else
-      set_lighting_dir(2, 0)
+      lightDir = 300 -- dark?
     end
-    set_override_skybox(-1)
-    set_override_envfx(-1)
-    set_lighting_color(0, 255)
-    set_lighting_color(1, 255)
-    set_lighting_color(2, 255)
-    set_vertex_color(0, 255)
-    set_vertex_color(1, 255)
-    set_vertex_color(2, 255)
-    set_skybox_color(0, 255)
-    set_skybox_color(1, 255)
-    set_skybox_color(2, 255)
-    set_fog_color(0, 255)
-    set_fog_color(1, 255)
-    set_fog_color(2, 255)
-    set_fog_intensity(1)
   elseif month == 10 then
-    set_lighting_dir(2, 500) -- dark?
-    set_override_skybox(BACKGROUND_HAUNTED)
-    set_override_envfx(-1)
-    set_lighting_color(0, 100) -- purple tint
-    set_lighting_color(1, 100) -- purple tint
-    set_lighting_color(2, 255)
-    set_vertex_color(0, 100)
-    set_vertex_color(1, 100)
-    set_vertex_color(2, 255)
-    set_skybox_color(0, 255)
-    set_skybox_color(1, 255)
-    set_skybox_color(2, 255)
-    set_fog_color(0, 100)
-    set_fog_color(1, 100)
-    set_fog_color(2, 255)
-    set_fog_intensity(1.02)
+    lightDir = 500 -- dark?
+    overrideSkybox = BACKGROUND_HAUNTED
+    lightColorR = 100 -- purple tint
+    lightColorG = 100 -- purple tint
+    vertexColorR = 100
+    vertexColorG = 100
+    fogColorR = 100
+    fogColorG = 100
+    fogIntensity = 1.02
   elseif month == 12 then
-    set_override_envfx(ENVFX_SNOW_NORMAL)
-    set_override_skybox(BACKGROUND_SNOW_MOUNTAINS)
-    set_lighting_dir(2, 0)
-    set_lighting_color(0, 200) -- blue tint
-    set_lighting_color(1, 255)
-    set_lighting_color(2, 255)
-    set_vertex_color(0, 200)
-    set_vertex_color(1, 255)
-    set_vertex_color(2, 255)
-    set_skybox_color(0, 255)
-    set_skybox_color(1, 255)
-    set_skybox_color(2, 255)
-    set_fog_color(0, 200)
-    set_fog_color(1, 255)
-    set_fog_color(2, 255)
-    set_fog_intensity(1)
+    overrideEnvfx = ENVFX_SNOW_NORMAL
+    overrideSkybox = BACKGROUND_SNOW_MOUNTAINS
+    lightColorR = 200 -- blue tint
+    vertexColorR = 200
+    fogColorR = 200
   end
+
+  return {
+    lightDir = lightDir,
+    overrideSkybox = overrideSkybox,
+    overrideEnvfx = overrideEnvfx,
+    lightColorR = lightColorR,
+    lightColorG = lightColorG,
+    lightColorB = lightColorB,
+    vertexColorR = vertexColorR,
+    vertexColorG = vertexColorG,
+    vertexColorB = vertexColorB,
+    skyboxColorR = skyboxColorR,
+    skyboxColorG = skyboxColorG,
+    skyboxColorB = skyboxColorB,
+    fogColorR = fogColorR,
+    fogColorG = fogColorG,
+    fogColorB = fogColorB,
+    fogIntensity = fogIntensity,
+  }
+end
+
+function set_season_lighting(month, level)
+  local lighting = get_season_lighting(month, level)
+  set_override_skybox(lighting.overrideSkybox)
+  set_override_envfx(lighting.overrideEnvfx)
+  set_lighting_dir(2, lighting.lightDir)
+  set_lighting_color(0, lighting.lightColorR) -- blue tint
+  set_lighting_color(1, lighting.lightColorG)
+  set_lighting_color(2, lighting.lightColorB)
+  set_vertex_color(0, lighting.vertexColorR)
+  set_vertex_color(1, lighting.vertexColorG)
+  set_vertex_color(2, lighting.vertexColorB)
+  set_skybox_color(0, lighting.skyboxColorR)
+  set_skybox_color(1, lighting.skyboxColorG)
+  set_skybox_color(2, lighting.skyboxColorB)
+  set_fog_color(0, lighting.fogColorR)
+  set_fog_color(1, lighting.fogColorG)
+  set_fog_color(2, lighting.fogColorB)
+  set_fog_intensity(lighting.fogIntensity)
 end
 
 -- replaces parts of a string with ".", and also removes color
