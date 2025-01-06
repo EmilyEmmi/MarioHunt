@@ -54,7 +54,7 @@ end
 -- This functions calculates where the crown should be placed
 function on_obj_render(o)
     if LITE_MODE then return end
-    if get_behavior_from_id(id_bhvMHCrown) ~= o.behavior then return end
+    if obj_has_behavior_id(o, id_bhvMHCrown) == 0 then return end
     if o.oBehParams == 0 then return end
     ---@type MarioState
     local m = gMarioStates[o.oBehParams - 1]
@@ -137,7 +137,6 @@ function on_obj_render(o)
     oGFX.animInfo.prevAnimPtr = mGFX.animInfo.prevAnimPtr
     oGFX.sharedChild.flags = mGFX.sharedChild.flags
     oGFX.sharedChild.extraFlags = mGFX.sharedChild.extraFlags]]
-    oGFX.shadowInvisible = true
     o.oPosX = oGFX.pos.x
     o.oPosY = oGFX.pos.y
     o.oPosZ = oGFX.pos.z

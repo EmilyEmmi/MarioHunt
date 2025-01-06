@@ -1,4 +1,36 @@
 # Changelog
+## v2.7.4
+### Additions
+  - Added some support for OneCalledRPG's "Unique Sub Area Names" mod
+    - Note that this still uncensors all locations in MysteryHunt - I didn't feel like fixing this
+  - Nametags now support the HOOK_ON_RENDER_NAMETAG hook
+### Adjustments
+  - **The HMC and BBH elevators will now automatically go down if there any any players at the bottom**
+    - This is to prevent camping at the top, notably at the Navigating The Toxic Maze star
+  - Sabotages may no longer be placed in the castle
+  - Added many visual improvements to the darkness sabotage, including interpolation for the spotlight (Squishy)
+  - Added visual improvements to the gas sabotage (Squishy)
+  - Added sound effect when the darkness sabotage is activated/deactivated
+  - Picking an object up normally is no longer in Faster Actions (dive picking up still is)
+  - Adjusted nametags again to match latest version
+  - Player list now displays "Bowser 1" for players in Bowser 1, etc.
+  - In B3313, the players list now displays the exact area a player is in, without any issues
+### Fixes/backend changes
+  - Fixed being able to access parallel universes
+  - Fixed void death routine being broken in some rom hacks
+  - Fixed script errors in spectator mode, maybe
+  - Fixed game crash with the players menu and japanese characters
+  - Fixed Character Select player list overlapping with normal one
+  - Fixed MysteryHunt death routine not functioning when OMM is enabled
+  - Fixed lives counter in OMM displaying "1" when 0 lives remain
+  - Fixed shadows on random objects getting disabled if a player with a crown exists
+  - Fixed spectators dying when spectating a player in Castle Grounds
+  - Fixed going OOB permanently breaking the minimap
+  - Disabling "Force Spectate" for a player in MysteryHunt will now properly revive the player
+  - Fixed spelling errors (EpikCool)
+  - The "Global Chat Time" menu option is no longer translated as "It's time for global chat" in Spanish
+  - "Press (button)!" prompt above bodies in MysteryHunt is now language-dependent
+  - **API CHANGE:** Added get_season_lighting (Squishy)
 ## v2.7.3
 ### Adjustments
   - The power meter in spectator mode will no longer render if nametags are already showing the health
@@ -678,7 +710,7 @@
   - Fixed script error when typing /hard with no arguments
   - Fixed reconnecting Runners getting their lives restored
   - Fixed black screen when switching to MiniHunt while in the castle
-  - Some fixes for snowman's head (CCM) and the Manta Ray have been added (Issac)
+  - Some fixes for snowman's head (CCM) and the Manta Ray have been added (Isaac)
   - Fixed runner timer being recalculated whenever a new runner is selected in Switch mode
   - Fixed double message bug when using Nicknames or Swear Filter
     - Note that Team Chat and roles are disabled when these are used

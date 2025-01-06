@@ -289,7 +289,7 @@ function mario_update_local(m)
 
     SVtp = 3
   elseif SVtp == 1 then
-    if GST.mhState ~= 1 and GST.mhState ~= 2 then
+    if (GST.mhState ~= 1 and GST.mhState ~= 2) or GST.mhMode == 3 then
       MSP.health = 0x880
     else
       MSP.health = Shealth or 0x880
@@ -492,8 +492,10 @@ function update_spectator_camera(m, s)
   vec3f_copy(LLS.pos, cData.pos)
   vec3f_copy(LLS.curPos, cData.pos)
   vec3f_copy(LLS.goalPos, cData.pos)
-  vec3f_copy(m.area.camera.pos, cData.pos)
-  m.area.camera.yaw = cData.yaw
+  if m.area.camera then
+    vec3f_copy(m.area.camera.pos, cData.pos)
+    m.area.camera.yaw = cData.yaw
+  end
 
   if not is_game_paused() then
     local x_invert = 1

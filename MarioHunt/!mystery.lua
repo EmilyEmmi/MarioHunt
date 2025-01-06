@@ -113,8 +113,8 @@ function spawn_my_corpse()
 end
 
 -- cause a sabotage; there are 3 types
-function start_sabotage(type)
-    if not sabo_valid() then return end
+function start_sabotage(type, force)
+    if not (sabo_valid() or force) then return end
     gGlobalSyncTable.saboActive = type
     gGlobalSyncTable.saboTimer = 0
     local model = E_MODEL_WATER_MINE
@@ -145,7 +145,7 @@ end
 
 -- can do sabotage
 function sabo_valid()
-    return not (gGlobalSyncTable.saboActive ~= 0 or gGlobalSyncTable.saboTimer ~= 0 or gGlobalSyncTable.mhMode ~= 3 or (gGlobalSyncTable.mhState ~= 1 and gGlobalSyncTable.mhState ~= 2) or gPlayerSyncTable[0].team == 1 or gPlayerSyncTable[0].dead or gMarioStates[0].action & ACT_FLAG_AIR ~= 0 or (gMarioStates[0].floor and is_hazard_floor(gMarioStates[0].floor.type)))
+    return not (gGlobalSyncTable.saboActive ~= 0 or gGlobalSyncTable.saboTimer ~= 0 or gGlobalSyncTable.mhMode ~= 3 or (gGlobalSyncTable.mhState ~= 1 and gGlobalSyncTable.mhState ~= 2) or gNetworkPlayers[0].currCourseNum == 0 or gPlayerSyncTable[0].team == 1 or gPlayerSyncTable[0].dead or gMarioStates[0].action & ACT_FLAG_AIR ~= 0 or (gMarioStates[0].floor and is_hazard_floor(gMarioStates[0].floor.type)))
 end
 
 -- get the active sabotage (not active for 10s)

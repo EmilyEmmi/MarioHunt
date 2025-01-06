@@ -21,12 +21,21 @@ function random_u16()
 end
 
 -- localize some functions
-local djui_chat_message_create, warp_to_level, warp_to_warpnode, tonumber, string_lower, mod_storage_save, mod_storage_load =
-    djui_chat_message_create, warp_to_level, warp_to_warpnode, tonumber, string.lower, mod_storage_save, mod_storage_load
+local djui_chat_message_create, warp_to_warpnode, tonumber, string_lower, mod_storage_save, mod_storage_load =
+    djui_chat_message_create, warp_to_warpnode, tonumber, string.lower, mod_storage_save, mod_storage_load
 
 function if_then_else(cond, if_true, if_false)
   if cond then return if_true end
   return if_false
+end
+
+-- temp fix for castle grounds warp bug
+real_warp_to_level = warp_to_level
+_G.warp_to_level = function(level, area, act)
+  if level == gLevelValues.entryLevel and area == 1 then
+    return warp_to_start_level() -- prevent instant death
+  end
+  return real_warp_to_level(level, area, act) -- prevent instant death
 end
 
 -- some debug stuff

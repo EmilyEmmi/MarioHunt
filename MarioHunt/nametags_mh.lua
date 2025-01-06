@@ -196,19 +196,14 @@ local function render_nametags()
 
     djui_hud_set_resolution(RESOLUTION_N64)
     local fovCoeff = djui_hud_get_fov_coeff() -- this is a very expensive calculation, so only run it once
-    if DEBUG_SAFE_SURFACE then
-        for i=0,100 do
-            local scale = -400 / 400 * djui_hud_get_fov_coeff()
-        end
-    end
 
     for i = if_then_else(gNametagsSettings.showSelfTag, 0, 1), (MAX_PLAYERS - 1) do
-        djui_hud_set_font(FONT_NORMAL)
+        djui_hud_set_font(FONT_SPECIAL)
         local m = gMarioStates[i]
         local np = gNetworkPlayers[i]
         local out = { x = 0, y = 0, z = 0 }
-        local pos = { x = m.marioObj.header.gfx.pos.x, y = m.pos.y + 230, z = m.marioObj.header.gfx.pos.z }
-        if np.currAreaSyncValid and active_player(m) ~= 0 and (not invalid_nametag_action[m.action]) and (m.playerIndex ~= 0 or m.action ~= ACT_FIRST_PERSON) and djui_hud_world_pos_to_screen_pos(pos, out) then
+        local pos = { x = m.marioBodyState.headPos.x, y = m.marioBodyState.headPos.y + 100, z = m.marioBodyState.headPos.z }
+        if np.currAreaSyncValid and active_player(m) ~= 0 and (not invalid_nametag_action[m.action]) and (m.playerIndex ~= 0 or m.action ~= ACT_FIRST_PERSON) and djui_hud_world_pos_to_screen_pos(m.marioObj.header.gfx.pos, out) and djui_hud_world_pos_to_screen_pos(pos, out) then
             local scale = -400 / out.z * fovCoeff
 
             -- collision nametags
@@ -218,57 +213,72 @@ local function render_nametags()
 
             local e = gStateExtras[i]
             if scale >= 0 then
-                if not e.inited then
-                    vec3f_copy(e.prevPos, out)
-                    e.prevScale = scale
-                    e.inited = true
-                end
-
                 local name = np.name
                 local vIndex = i
-                if disguiseMod then
-                    name = disguiseMod.getDisguisedName(np.globalIndex)
-                    vIndex = network_local_index_from_global(disguiseMod.getDisguisedIndex(np.globalIndex))
-                end
-                name = name_without_hex(name)
-                local color = { r = 162, g = 202, b = 234 }
-                local tag = ""
-
-                if showRoleColor and know_team(vIndex) then
-                    local dum, dum2, roleColor = mhApi.get_role_name_and_color(vIndex)
-                    color = roleColor
-                else
-                    local colorString = network_get_player_text_color_string(i)
-                    color.r, color.g, color.b = convert_color(colorString)
-                end
-                tag = get_tag(vIndex)
-
-                local measure = djui_hud_measure_text(name) * scale * 0.5
-                
-                local alpha = (i == 0 and 255 or math.min(np.fadeOpacity << 3, 255)) * clampf(FADE_SCALE - scale, 0, 1)
-                if i ~= 0 and out.z < -gGlobalSyncTable.tagDist + 1000 then
-                    alpha = clamp((out.z + gGlobalSyncTable.tagDist) * 0.255, 0, alpha)
+                local hookedString
+                for a,func in ipairs(on_nametags_render_hooks) do
+                    hookedString = func(i)
                 end
 
-                local exHealthScale = 1
-                djui_hud_print_outlined_text_interpolated(name, e.prevPos.x - measure, e.prevPos.y, e.prevScale,
-                    out.x - measure, out.y, scale, color.r, color.g, color.b, alpha, 0.25)
-                if tag ~= "" then
-                    local tagMeasure = djui_hud_measure_text(name_without_hex(tag)) * scale * 0.5
-                    djui_hud_print_outlined_text_interpolated_with_color(tag, e.prevPos.x - tagMeasure,
-                        e.prevPos.y - 32 * e.prevScale, e.prevScale, out.x - tagMeasure, out.y - 32 * scale, scale, alpha,
-                        0.25)
-                    exHealthScale = 1.3
-                end
+                if hookedString ~= "" then
+                    if hookedString then
+                        name = hookedString
+                        -- check if our name was changed to the same as another player; if so, set vIndex to that player
+                        for a=0,MAX_PLAYERS-1 do
+                            if name == name_without_hex(gNetworkPlayers[a].name) then
+                                vIndex = a
+                                break
+                            end
+                        end
+                    else
+                        name = name_without_hex(name)
+                    end
+                    local color = { r = 162, g = 202, b = 234 }
+                    local tag = ""
 
-                if m.playerIndex ~= 0 and gNametagsSettings.showHealth then
-                    djui_hud_set_color(255, 255, 255, alpha)
-                    local healthScale = 75 * scale
-                    local prevHealthScale = 75 * e.prevScale
-                    render_power_meter_interpolated_mariohunt(m.health,
-                        e.prevPos.x - (prevHealthScale * 0.5), e.prevPos.y - prevHealthScale * exHealthScale,
-                        prevHealthScale, prevHealthScale,
-                        out.x - (healthScale * 0.5), out.y - healthScale * exHealthScale, healthScale, healthScale, m.playerIndex)
+                    if showRoleColor and know_team(vIndex) then
+                        local dum, dum2, roleColor = mhApi.get_role_name_and_color(vIndex)
+                        color = roleColor
+                    else
+                        local colorString = network_get_player_text_color_string(i)
+                        color.r, color.g, color.b = convert_color(colorString)
+                    end
+                    tag = get_tag(vIndex)
+
+                    local measure = djui_hud_measure_text(name) * scale * 0.5
+                    out.y = out.y - 16 * scale
+                    
+                    local alpha = (i == 0 and 255 or math.min(np.fadeOpacity << 3, 255)) * clampf(FADE_SCALE - scale, 0, 1)
+                    if i ~= 0 and out.z < -gGlobalSyncTable.tagDist + 1000 then
+                        alpha = clamp((out.z + gGlobalSyncTable.tagDist) * 0.255, 0, alpha)
+                    end
+
+                    if not e.inited then
+                        vec3f_copy(e.prevPos, out)
+                        e.prevScale = scale
+                        e.inited = true
+                    end
+
+                    local exHealthScale = 1
+                    djui_hud_print_outlined_text_interpolated(name, e.prevPos.x - measure, e.prevPos.y, e.prevScale,
+                        out.x - measure, out.y, scale, color.r, color.g, color.b, alpha, 0.25)
+                    if tag ~= "" then
+                        local tagMeasure = djui_hud_measure_text(name_without_hex(tag)) * scale * 0.5
+                        djui_hud_print_outlined_text_interpolated_with_color(tag, e.prevPos.x - tagMeasure,
+                            e.prevPos.y - 32 * e.prevScale, e.prevScale, out.x - tagMeasure, out.y - 32 * scale, scale, alpha,
+                            0.25)
+                        exHealthScale = 1.3
+                    end
+
+                    if m.playerIndex ~= 0 and gNametagsSettings.showHealth then
+                        djui_hud_set_color(255, 255, 255, alpha)
+                        local healthScale = 75 * scale
+                        local prevHealthScale = 75 * e.prevScale
+                        render_power_meter_interpolated_mariohunt(m.health,
+                            e.prevPos.x - (prevHealthScale * 0.5), e.prevPos.y - prevHealthScale * exHealthScale,
+                            prevHealthScale, prevHealthScale,
+                            out.x - (healthScale * 0.5), out.y - healthScale * exHealthScale, healthScale, healthScale, m.playerIndex)
+                    end
                 end
             else
                 e.inited = false

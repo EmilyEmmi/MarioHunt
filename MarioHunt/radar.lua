@@ -62,7 +62,6 @@ ex_minimap[2] = { tex = nil, prevX = 0, prevY = 0 } -- overriden with "S" in hud
 ex_minimap[3] = { tex = TEX_HUD_DEMON, prevX = 0, prevY = 0 }
 ex_minimap[4] = { tex = TEX_HUD_TARGET, prevX = 0, prevY = 0 }
 
-levelSize = 8192
 defaultStarColor = { r = 255, g = 255, b = 92 } -- yellow
 
 -- also includes texture data for stats
@@ -138,10 +137,10 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
     local area = gNetworkPlayers[0].currAreaIndex
     if ROMHACK.minimap_data and ROMHACK.minimap_data[level * 10 + area] and ROMHACK.minimap_data[level * 10 + area][2] then
       levelSize = ROMHACK.minimap_data[level * 10 + area][2]
-    end
-
-    if pos.x > levelSize + 5 or pos.x < -levelSize - 5 or pos.z > levelSize + 5 or pos.z < -levelSize - 5 then -- adjust size if oob
-      levelSize = levelSize * 2
+    elseif not ROMHACK.ddd then
+      while pos.x > levelSize + 5 or pos.x < -levelSize - 5 or pos.z > levelSize + 5 or pos.z < -levelSize - 5 do -- adjust size if oob
+        levelSize = levelSize * 2
+      end
     end
     local xScaled = (pos.x / (levelSize * 2) + 0.5)
     local yScaled = (pos.z / (levelSize * 2) + 0.5)
@@ -706,10 +705,10 @@ function painting_overlays_and_mystery_misc(paintingValid)
       local area = np.currAreaIndex
       if ROMHACK.minimap_data and ROMHACK.minimap_data[level * 10 + area] and ROMHACK.minimap_data[level * 10 + area][2] then
         levelSize = ROMHACK.minimap_data[level * 10 + area][2]
-      end
-
-      if pos.x > levelSize + 5 or pos.x < -levelSize - 5 or pos.z > levelSize + 5 or pos.z < -levelSize - 5 then -- adjust size if oob
-        levelSize = levelSize * 2
+      elseif not ROMHACK.ddd then
+        while pos.x > levelSize + 5 or pos.x < -levelSize - 5 or pos.z > levelSize + 5 or pos.z < -levelSize - 5 do -- adjust size if oob
+          levelSize = levelSize * 2
+        end
       end
       local xScaled = (pos.x / (levelSize * 2) + 0.5)
       local yScaled = (pos.z / (levelSize * 2) + 0.5)
@@ -1020,10 +1019,10 @@ function render_player_minimap()
   local area = gNetworkPlayers[0].currAreaIndex
   if ROMHACK.minimap_data and ROMHACK.minimap_data[level * 10 + area] and ROMHACK.minimap_data[level * 10 + area][2] then
     levelSize = ROMHACK.minimap_data[level * 10 + area][2]
-  end
-
-  if pos.x > levelSize + 5 or pos.x < -levelSize - 5 or pos.z > levelSize + 5 or pos.z < -levelSize - 5 then -- adjust size if oob
-    levelSize = levelSize * 2
+  elseif not ROMHACK.ddd then
+    while pos.x > levelSize + 5 or pos.x < -levelSize - 5 or pos.z > levelSize + 5 or pos.z < -levelSize - 5 do -- adjust size if oob
+      levelSize = levelSize * 2
+    end
   end
   local xScaled = (pos.x / (levelSize * 2) + 0.5)
   local yScaled = (pos.z / (levelSize * 2) + 0.5)

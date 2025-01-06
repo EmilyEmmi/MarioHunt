@@ -104,6 +104,7 @@ _G.mhApi.render_power_meter = render_power_meter_mariohunt
 _G.mhApi.render_power_meter_interpolated = render_power_meter_interpolated_mariohunt
 _G.mhApi.apply_double_health = apply_double_health
 _G.mhApi.getActiveSabo = get_active_sabo
+_G.mhApi.get_season_lighting = get_season_lighting
 
 -- this gets the local player's current kill combo
 _G.mhApi.getKillCombo = get_kill_combo
@@ -141,4 +142,18 @@ _G.mhApi.chatModifyFunction = hide_the_truth
 -- newRunnerID is a global index containing the new runner (may be nil)
 _G.mhApi.onKill = function(killer,killed,runner,death,time,newRunnerID)
   -- does nothing unless you set it
+end
+
+-- override hook command itself to increase compatibility
+on_death_hooks = {}
+on_nametags_render_hooks = {}
+real_hook_event = hook_event
+_G.hook_event = function(hook, func)
+  if hook == HOOK_ON_DEATH then
+    table.insert(on_death_hooks, func)
+  elseif hook == HOOK_ON_NAMETAGS_RENDER then
+    table.insert(on_nametags_render_hooks, func)
+  else
+    real_hook_event(hook, func)
+  end
 end

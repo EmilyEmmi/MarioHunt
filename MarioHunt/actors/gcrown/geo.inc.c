@@ -3,7 +3,7 @@
 const GeoLayout gcrown_geo[] = {
 	GEO_NODE_START(),
 	GEO_OPEN_NODE(),
-		GEO_SHADOW(0, 180, 75),
+		GEO_SHADOW(0, 180, 0),
 		GEO_OPEN_NODE(),
 			GEO_SCALE(LAYER_FORCE, 16384),
 			GEO_OPEN_NODE(),

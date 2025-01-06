@@ -1,4 +1,4 @@
--- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#dcdcdc\\ (v2.7.2) !
+-- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#dcdcdc\\ (v2.7.4) !
 -- incompatible: gamemode nametags
 -- description: A gamemode based off of Beyond's concept. Hunters stop Runners from clearing the game!\n\nProgramming: EmilyEmmi, Blocky, Sunk, EmeraldLockdown, Sprinter05, Squishy, Agent X\n\nTranslations: KanHeaven, SonicDark, EpikCool, green, N64 Mario, PietroM, Skeltan, Blocky, N64, Mr. L-Ore\n\nSome graphics: LeoHaha, Key's Artworks, AquarriusAlex, RoxasYTB\n\"Shooting Star Summit\" port: pieordie1\n\nAlso thanks to: ColbyRayz!, SilverOrigins
 -- deluxe: true
@@ -10,6 +10,7 @@ menu = false
 mhHideHud = false
 expectedHudState = false                     -- for custom huds
 gGlobalSoundSource = { x = 0, y = 0, z = 0 } -- used for behaviors
+levelSize = 8192
 
 if not LITE_MODE then
   LEVEL_LOBBY = level_register('level_lobby_entry', COURSE_NONE, 'Lobby', 'lobby', 28000, 0x28, 0x28, 0x28)
@@ -143,75 +144,74 @@ gServerSettings.playerInteractions = PLAYER_INTERACTIONS_PVP
 gServerSettings.bubbleDeath = 0
 gServerSettings.skipIntro = 1
 gServerSettings.playerKnockbackStrength = 20
-gServerSettings.enablePlayerList = 1
 -- level settings for better experience
 gLevelValues.visibleSecrets = 1
 gLevelValues.previewBlueCoins = 1
 gLevelValues.respawnBlueCoinsSwitch = 1
 gLevelValues.extendedPauseDisplay = 1
 gLevelValues.hudCapTimer = 1
-gLevelValues.mushroom1UpHeal = 0 -- edited to heal 4 instead of 8
+gLevelValues.mushroom1UpHeal = 0  -- edited to heal 4 instead of 8
 gLevelValues.numCoinsToLife = 255 -- do NOT put this at 0.
 gLevelValues.showStarNumber = 1
 
-local gotStar = nil                                     -- what star we just got
-local died = false                                      -- if we've died (because on_death runs every frame of death fsr)
-local didFirstJoinStuff = false                         -- if all of the initial code was run (rules message, etc.)
-local didHudHook = false                                -- make sure hud hook is added last
-frameCounter = 120                                      -- frame counter over 4 seconds
-local cooldownCaps = 0                                  -- stores m.flags, to see what caps are on cooldown
-local regainCapTimer = 0                                -- timer for being able to recollect a cap
-local storeVanish = false                               -- temporarily stores the vanish cap for pvp purposes
-local campTimer                                         -- for camping actions (such as reading text or being in the star menu), nil means it is inactive
-warpCooldown = 0                                        -- to avoid warp spam
+local gotStar = nil                                       -- what star we just got
+local died = false                                        -- if we've died (because on_death runs every frame of death fsr)
+local didFirstJoinStuff = false                           -- if all of the initial code was run (rules message, etc.)
+local didHudHook = false                                  -- make sure hud hook is added last
+frameCounter = 120                                        -- frame counter over 4 seconds
+local cooldownCaps = 0                                    -- stores m.flags, to see what caps are on cooldown
+local regainCapTimer = 0                                  -- timer for being able to recollect a cap
+local storeVanish = false                                 -- temporarily stores the vanish cap for pvp purposes
+local campTimer                                           -- for camping actions (such as reading text or being in the star menu), nil means it is inactive
+warpCooldown = 0                                          -- to avoid warp spam
 local warpTree = {}
-local killTimer = 0                                     -- timer for kills in quick succession
-local killCombo = 0                                     -- kills in quick succession
-local attackedBy                                        -- global index of player that attacked last
-local attackedByObj                                     -- object id that attacked last
-local hitTimer = 0                                      -- timer for being hit by another player
-local localRunTime = 0                                  -- our run time is usually made local for less lag
-local neededRunTime = 0                                 -- how long we need to wait to leave this course
-local inHard = 0                                        -- what hard mode we started in (to prevent cheesy hard/extreme mode wins)
-local deathTimer = 900                                  -- for extreme mode
-local guardCooldown = 0                                 -- mysteryhunt spectators can guard players
-local localPrevCourse = 0                               -- for entrance popups
+local killTimer = 0                                       -- timer for kills in quick succession
+local killCombo = 0                                       -- kills in quick succession
+local attackedBy                                          -- global index of player that attacked last
+local attackedByObj                                       -- object id that attacked last
+local hitTimer = 0                                        -- timer for being hit by another player
+local localRunTime = 0                                    -- our run time is usually made local for less lag
+local neededRunTime = 0                                   -- how long we need to wait to leave this course
+local inHard = 0                                          -- what hard mode we started in (to prevent cheesy hard/extreme mode wins)
+local deathTimer = 900                                    -- for extreme mode
+local guardCooldown = 0                                   -- mysteryhunt spectators can guard players
+local localPrevCourse = 0                                 -- for entrance popups
 local localPrevAct = 0
-local lastObtainable = -1                               -- doesn't display if it's the same number
-local leader = false                                    -- if we're winning in minihunt
-local scoreboard = {}                                   -- table of everyone's score
-month = 0                                               -- the current month of the year, for holiday easter eggs
-local parkourTimer = 0                                  -- timer for parkour
-noSettingDisp = true                                    -- disables setting change display temporarily
-runnerTarget = -1                                       -- targetted runner with /target
-local actualHealthBeforeRender = 0x880                  -- used for custom huds
-local prevHealth = 0x880                                -- used to fix issue with warps and double health
-local halvedHealCounter = 0                             -- \
-local halvedHurtCounter = 0                             -- | double health related
-local prevCustomWedge = 0                               -- /
-prevSafePos = { x = 0, y = 0, z = 0, obj = nil }        -- used with voidDmg
-local cheatLocal = false                                -- used for races
-local localPlayTime = 0                                 -- used for tracking playtime
-miniRedCoinCollect = 0                                  -- tracks red coins in minihunt
-miniSecretCollect = 0                                   -- tracks secrets in minihunt
-local centerRulesTimer = 0                              -- important rules in center of screen
-local campaignRecordValid = false                       -- for solo minihunt campaign
-local hunterKickTimer = 0                               -- prevent camping in bowser levels
-local prevGameEnd = false                               -- prevent winning multiple times
+local lastObtainable = -1                                 -- doesn't display if it's the same number
+local leader = false                                      -- if we're winning in minihunt
+local scoreboard = {}                                     -- table of everyone's score
+month = 0                                                 -- the current month of the year, for holiday easter eggs
+local parkourTimer = 0                                    -- timer for parkour
+noSettingDisp = true                                      -- disables setting change display temporarily
+runnerTarget = -1                                         -- targetted runner with /target
+local actualHealthBeforeRender = 0x880                    -- used for custom huds
+local prevHealth = 0x880                                  -- used to fix issue with warps and double health
+local halvedHealCounter = 0                               -- \
+local halvedHurtCounter = 0                               -- | double health related
+local prevCustomWedge = 0                                 -- /
+prevSafePos = { x = 0, y = 0, z = 0, obj = nil }          -- used with voidDmg
+local cheatLocal = false                                  -- used for races
+local localPlayTime = 0                                   -- used for tracking playtime
+miniRedCoinCollect = 0                                    -- tracks red coins in minihunt
+miniSecretCollect = 0                                     -- tracks secrets in minihunt
+local centerRulesTimer = 0                                -- important rules in center of screen
+local campaignRecordValid = false                         -- for solo minihunt campaign
+local hunterKickTimer = 0                                 -- prevent camping in bowser levels
+local prevGameEnd = false                                 -- prevent winning multiple times
 local expectedLocation = { level = 0, area = 0, act = 0 } -- get around level desync
-local defaultTempo = 0                                  -- \ for mega bomb
-local lastTempoMulti = 1                                -- / for mega bomb
-local MEGA_BOMB_LENGTH = 180                            -- total time the mega bomb lasts, in seconds
+local defaultTempo = 0                                    -- \ for mega bomb
+local lastTempoMulti = 1                                  -- / for mega bomb
+local MEGA_BOMB_LENGTH = 180                              -- total time the mega bomb lasts, in seconds
 
-movesetEnabled = false                                  -- is true if using any other moveset
-local ACT_OMM_STAR_DANCE = nil                          -- the grab star action in OMM Rebirth (set later)
-local lastStarID = nil                                  -- the object id of the star we got; for OMM
-local lastStar = nil                                    -- what star we just got; for omm (gotStar is set to nil earlier)
-local ommRenameTimer = 0                                -- after someone gets the same kind of star, there is a timer until someone can have their star renamed on their end
+movesetEnabled = false                                    -- is true if using any other moveset
+local ACT_OMM_STAR_DANCE = nil                            -- the grab star action in OMM Rebirth (set later)
+local lastStarID = nil                                    -- the object id of the star we got; for OMM
+local lastStar = nil                                      -- what star we just got; for omm (gotStar is set to nil earlier)
+local ommRenameTimer = 0                                  -- after someone gets the same kind of star, there is a timer until someone can have their star renamed on their end
 
-DEBUG_SAFE_SURFACE = false                              -- spawns sparkles at safe floor
-DEBUG_NO_VICTORY = false                                -- prevents winning
-DEBUG_SHOW_PING = false                                 -- show ping in players list instead of role
+DEBUG_SAFE_SURFACE = false                                -- spawns sparkles at safe floor
+DEBUG_NO_VICTORY = false                                  -- prevents winning
+DEBUG_SHOW_PING = false                                   -- show ping in players list instead of role
 
 -- Converts string into a table using a determiner (but stop splitting after a certain amount)
 function split(s, delimiter, limit_)
@@ -453,6 +453,9 @@ function on_pvp_attack(attacker, victim)
     if remainingHealth <= 0xFF then
       play_sound(SOUND_GENERAL_BOWSER_BOMB_EXPLOSION, gGlobalSoundSource)
       set_camera_shake_from_hit(SHAKE_LARGE_DAMAGE)
+      if gGlobalSyncTable.mhMode == 3 and OmmEnabled then -- fix omm in mysteryhunt
+        OmmApi.omm_disable_feature("odysseyDeath", true)
+      end
     end
   end
 end
@@ -904,7 +907,12 @@ function on_death(m, nonStandard)
     return false
   end
 
-  return true
+  -- call custom death hooks
+  local result = true
+  for i, func in ipairs(on_death_hooks) do
+    result = func(m) or result
+  end
+  return result
 end
 
 function new_runner(includeLocal)
@@ -967,7 +975,11 @@ function omm_disable_mode_for_minihunt(disable)
   end
 end
 
+local gasFade = 1
+local darknessFade = 1
 function update()
+  local unknownString = trans("menu_unknown")
+  local censorNames = false
   if not didFirstJoinStuff then
     djui_set_popup_disabled_override(true)
     if m0.area.localAreaTimer > 90 then
@@ -975,46 +987,77 @@ function update()
     end
   elseif mystery_popup_off() then
     djui_set_popup_disabled_override(true)
-    if network_player_set_override_location and gServerSettings.enablePlayersInLevelDisplay ~= 0 then
-      for i=1,MAX_PLAYERS - 1 do
-        network_player_set_override_location(NetP[i], trans("menu_unknown"))
-      end
-    elseif not network_player_set_override_location then
-      gServerSettings.enablePlayerList = 0
-    end
-    gServerSettings.enablePlayersInLevelDisplay = 0
-    if not DEBUG_NO_VICTORY then
-      log_to_console("\n\n\n\n\nConsole is disabled to prevent cheating.\n\nSorry!\n\n")
-    end
+    censorNames = true
   else
-    if network_player_set_override_location and gServerSettings.enablePlayersInLevelDisplay == 0 then
-      for i=1,MAX_PLAYERS - 1 do
-        network_player_set_override_location(NetP[i], "")
-      end
-    else
-      gServerSettings.enablePlayerList = 1
-    end
-    gServerSettings.enablePlayersInLevelDisplay = 1
     djui_reset_popup_disabled_override()
   end
 
+  -- set location names
+  for i = 0, MAX_PLAYERS - 1 do
+    local np = NetP[i]
+    local customName = get_custom_level_name(np.currCourseNum, np.currLevelNum, np.currAreaIndex)
+    local trueName = real_get_level_name(np.currCourseNum, np.currLevelNum, np.currAreaIndex)
+    if censorNames and i ~= 0 then
+      network_player_set_override_location(NetP[i], unknownString)
+    elseif customName == trueName then
+      network_player_set_override_location(np, "")
+    else
+      network_player_set_override_location(np, customName)
+    end
+  end
+  
+  -- gas sabo
+  local gasOn = (get_active_sabo() == 2 and (not sMario0.dead))
+  if gasFade < 1 or gasOn then
+    if gasOn then
+      gasFade = math.max(gasFade - 0.01, 0)
+    else
+      gasFade = math.min(gasFade + 0.01, 1)
+    end
+    defaultLight = get_season_lighting(month, np0.currLevelNum)
+    set_lighting_color(0, lerp(255, defaultLight.lightColorR, gasFade))
+    set_lighting_color(1, lerp(255, defaultLight.lightColorG, gasFade))
+    set_lighting_color(2, lerp(50, defaultLight.lightColorB, gasFade))
+    set_skybox_color(0, lerp(255, defaultLight.skyboxColorR, gasFade))
+    set_skybox_color(1, lerp(255, defaultLight.skyboxColorG, gasFade))
+    set_skybox_color(2, lerp(50, defaultLight.skyboxColorB, gasFade))
+    set_fog_color(0, lerp(255, defaultLight.fogColorR, gasFade))
+    set_fog_color(1, lerp(255, defaultLight.fogColorG, gasFade))
+    set_fog_color(2, lerp(50, defaultLight.fogColorB, gasFade))
+    set_fog_intensity(lerp(1.05, defaultLight.fogIntensity, gasFade))
+    set_vertex_color(0, lerp(255, defaultLight.vertexColorR, gasFade))
+    set_vertex_color(1, lerp(255, defaultLight.vertexColorG, gasFade))
+    set_vertex_color(2, lerp(50, defaultLight.vertexColorB, gasFade))
+  end
+
   -- darkness sabo
-  if get_active_sabo() == 3 and sMario0.team == 1 and (not sMario0.dead) then
-    set_lighting_color(0, 40)
-    set_lighting_color(1, 40)
-    set_lighting_color(2, 60)
-    set_skybox_color(0, 0)
-    set_skybox_color(1, 0)
-    set_skybox_color(2, 0)
-    set_fog_color(0, 0)
-    set_fog_color(1, 0)
-    set_fog_color(2, 0)
-    set_fog_intensity(1.03)
-    set_vertex_color(0, 40)
-    set_vertex_color(1, 40)
-    set_vertex_color(2, 60)
-  elseif get_skybox_color(0) == 0 then
-    set_season_lighting(month, np0.currLevelNum)
+  local darknessOn = (get_active_sabo() == 3 and sMario0.team == 1 and (not sMario0.dead))
+  if darknessFade < 1 or darknessOn then
+    if darknessOn then
+      if darknessFade == 1 then
+        play_sound(SOUND_GENERAL_MOVING_PLATFORM_SWITCH, gGlobalSoundSource)
+      end
+      darknessFade = math.max(darknessFade - 0.04, 0)
+    else
+      if darknessFade == 0 then
+        play_sound(SOUND_GENERAL_MOVING_PLATFORM_SWITCH, gGlobalSoundSource)
+      end
+      darknessFade = math.min(darknessFade + 0.02, 1)
+    end
+    local defaultLight = get_season_lighting(month, np0.currLevelNum)
+    set_lighting_color(0, lerp(40, defaultLight.lightColorR, darknessFade))
+    set_lighting_color(1, lerp(40, defaultLight.lightColorG, darknessFade))
+    set_lighting_color(2, lerp(60, defaultLight.lightColorB, darknessFade))
+    set_skybox_color(0, lerp(0, defaultLight.skyboxColorR, darknessFade))
+    set_skybox_color(1, lerp(0, defaultLight.skyboxColorG, darknessFade))
+    set_skybox_color(2, lerp(0, defaultLight.skyboxColorB, darknessFade))
+    set_fog_color(0, lerp(0, defaultLight.fogColorR, darknessFade))
+    set_fog_color(1, lerp(0, defaultLight.fogColorG, darknessFade))
+    set_fog_color(2, lerp(0, defaultLight.fogColorB, darknessFade))
+    set_fog_intensity(lerp(1.03, defaultLight.fogIntensity, darknessFade))
+    set_vertex_color(0, lerp(40, defaultLight.vertexColorR, darknessFade))
+    set_vertex_color(1, lerp(40, defaultLight.vertexColorG, darknessFade))
+    set_vertex_color(2, lerp(60, defaultLight.vertexColorB, darknessFade))
   end
 
   noSettingDisp = (not didFirstJoinStuff)
@@ -1558,7 +1601,7 @@ function on_course_sync()
 
     print("My discord/mh ID is", discordID)
     sMario0.discordID = discordID
-    
+
     check_for_roles()
     if sMario0.placementASN and sMario0.placementASN <= 4 and sMario0.role and sMario0.role & 64 ~= 0 then
       network_send(false, {
@@ -1582,7 +1625,7 @@ function on_course_sync()
     sMario0.knownDead = false
     sMario0.dead = false
     sMario0.guardTime = 0
-    
+
     if GST.mhMode == 3 and (GST.mhState == 1 or GST.mhState == 2) then
       become_runner(sMario0)
       sMario0.dead = true
@@ -1595,7 +1638,7 @@ function on_course_sync()
       sMario0.knownDead = true
     elseif (GST.mhState == 1 or GST.mhState == 2) and (GST.mhMode ~= 0 or GST.spectateOnDeath) then
       local hunterExists = false
-      for i=1,MAX_PLAYERS-1 do
+      for i = 1, MAX_PLAYERS - 1 do
         if NetP[i].connected and PST[i].team ~= 1 and PST[i].spectator ~= 1 then
           hunterExists = true
           break
@@ -1608,7 +1651,7 @@ function on_course_sync()
 
     -- if anyone else has our id, it means we've disconnected but the other person hasn't updated yet
     if discordID ~= 0 and not network_is_server() then
-      for i=2,MAX_PLAYERS-1 do -- first is host, and the host will never disconnect
+      for i = 2, MAX_PLAYERS - 1 do -- first is host, and the host will never disconnect
         local sMario = PST[i]
         if NetP[i].connected and sMario.discordID == discordID and NetP[i].ping == 50 then
           if sMario.team == 1 then
@@ -2387,6 +2430,10 @@ end
 
 -- double health mode
 local ommVanish = 255
+-- darkness sabo vars for interpolation
+local darknessPrevX = nil
+local darknessPrevY = nil
+local darknessPrevRectSize = nil
 function behind_hud_render()
   djui_hud_set_resolution(RESOLUTION_N64)
   djui_hud_set_font(FONT_HUD)
@@ -2407,13 +2454,13 @@ function behind_hud_render()
   local sabo = get_active_sabo()
   if sabo == 2 then
     local screenHeight = djui_hud_get_screen_height()
-    djui_hud_set_color(255, 255, 50, 100)
+    djui_hud_set_color(255, 255, 50, 50*-(gasFade-1))
     djui_hud_render_rect(0, 0, screenWidth + 10, screenHeight + 10)
     djui_hud_set_color(255, 255, 255, 255)
-  elseif sabo == 3 and sMario0.team == 1 and (not sMario0.dead) and (not actSelect) then
+  elseif (sabo == 3 and sMario0.team == 1 and (not sMario0.dead) and (not actSelect)) or darknessFade < 1 then
     local screenHeight = djui_hud_get_screen_height()
-    local pos = {x = m0.pos.x, y = m0.pos.y + 80, z = m0.pos.z}
-    local out = {x = 0, y = 0, z = 0}
+    local pos = { x = m0.pos.x, y = m0.pos.y + 80, z = m0.pos.z }
+    local out = { x = 0, y = 0, z = 0 }
     djui_hud_world_pos_to_screen_pos(pos, out)
     --djui_chat_message_create(tostring(out.z))
     local rectSize = 400
@@ -2423,18 +2470,40 @@ function behind_hud_render()
     if out.z ~= 0 then
       rectSize = rectSize / out.z * -200
     end
+    if darknessFade then
+      rectSize = rectSize + 400 * darknessFade
+    end
     djui_hud_set_color(0, 0, 0, 255)
+    if darknessPrevX == nil then
+      darknessPrevX = out.x
+      darknessPrevY = out.y
+      darknessPrevRectSize = rectSize
+    end
     local tex = TEX_SPOTLIGHT
     local spotCornerX = out.x - rectSize
     local spotCornerY = out.y - rectSize
     local spotCornerBX = out.x + rectSize
     local spotCornerBY = out.y + rectSize
-    djui_hud_render_texture(tex, spotCornerX, spotCornerY, rectSize/tex.width*2, rectSize/tex.height*2)
-    djui_hud_render_rect(0, 0, screenWidth + 10, spotCornerY)
-    djui_hud_render_rect(0, out.y + rectSize, screenWidth + 10, screenHeight + 10 - spotCornerBY)
-    djui_hud_render_rect(0, spotCornerY, spotCornerX, rectSize * 2)
-    djui_hud_render_rect(spotCornerBX, spotCornerY, screenWidth + 10 - spotCornerBX, rectSize * 2)
+    -- interp
+    local prevSpotCornerX = darknessPrevX - darknessPrevRectSize
+    local prevSpotCornerY = darknessPrevY - darknessPrevRectSize
+    local prevSpotCornerBX = darknessPrevX + darknessPrevRectSize
+    local prevSpotCornerBY = darknessPrevY + darknessPrevRectSize
+    djui_hud_render_texture_interpolated(tex, prevSpotCornerX, prevSpotCornerY, darknessPrevRectSize / tex.width * 2,
+      darknessPrevRectSize / tex.height * 2, spotCornerX, spotCornerY, rectSize / tex.width * 2, rectSize / tex.height *
+      2)
+    djui_hud_render_rect_interpolated(0, 0, screenWidth + 10, prevSpotCornerY, 0, 0, screenWidth + 10, spotCornerY)
+    djui_hud_render_rect_interpolated(0, darknessPrevY + darknessPrevRectSize, screenWidth + 10,
+      screenHeight + 10 - prevSpotCornerBY, 0, out.y + rectSize, screenWidth + 10, screenHeight + 10 - spotCornerBY)
+    djui_hud_render_rect_interpolated(0, prevSpotCornerY, prevSpotCornerX, darknessPrevRectSize * 2, 0, spotCornerY,
+      spotCornerX, rectSize * 2)
+    djui_hud_render_rect_interpolated(prevSpotCornerBX, prevSpotCornerY, screenWidth + 10 - prevSpotCornerBX,
+      darknessPrevRectSize * 2, spotCornerBX, spotCornerY, screenWidth + 10 - spotCornerBX, rectSize * 2)
     djui_hud_set_color(255, 255, 255, 255)
+
+    darknessPrevX = out.x
+    darknessPrevY = out.y
+    darknessPrevRectSize = rectSize
   end
 
   local dispFlags = hud_get_value(HUD_DISPLAY_FLAGS)
@@ -2530,12 +2599,12 @@ function behind_hud_render()
       dispFlags = dispFlags | HUD_DISPLAY_FLAG_POWER
       hud_set_value(HUD_DISPLAY_FLAGS, dispFlags)
     end
-    if dispFlags & HUD_DISPLAY_FLAG_LIVES ~= 0 and ommHud and ommHud ~= 3 and ommHud ~= 0 then
+    if dispFlags & HUD_DISPLAY_FLAG_LIVES ~= 0 and ommHud and ommHud ~= 3 and ommHud ~= 0 and sMario0.team == 1 and sMario0.runnerLives and not sMario0.dead then -- omm lives counter
       x = 16
       y = 2
       render_player_head(0, x, y, 0.75, 0.75, true)
       x = x + 14
-      djui_hud_print_text(tostring(m0.numLives), x, y, 0.75)
+      djui_hud_print_text(tostring(sMario0.runnerLives), x, y, 0.75)
     end
   end
 end
@@ -2619,7 +2688,11 @@ function hunter_hud()
     local level = np.currLevelNum
     local area = np.currAreaIndex
     local act = np.currActNum
-    local name = get_custom_level_name(course, level, area)
+    local name = np.overrideLocation
+    if np.overrideLocation == nil or np.overrideLocation == "" then
+      name = get_custom_level_name(course, level, area)
+    end
+
     text = text .. name
     if act ~= 0 then
       text = text .. " #" .. act
@@ -2732,8 +2805,28 @@ function cap_color_text(text, limit)
   local slash = false
   local capped_text = ""
   local chars = 0
-  for i = 1, text:len() do
-    local char = text:sub(i, i)
+  local luaPoint = 0
+  while luaPoint < text:len() do
+    luaPoint = luaPoint + 1
+    local char = text:sub(luaPoint, luaPoint)
+
+    -- special characters are treated as multiple by lua: not doing this WILL cause game crashes!
+    if string.byte(char) >= 128 then
+      local foundEndChar = true
+      while string.byte(char, char:len()) >= 128 do
+        if luaPoint >= text:len() or char:len() >= 3 then -- 3 is the max, because the japanese characters are 3 lua characters long
+          foundEndChar = false
+          break
+        end
+        luaPoint = luaPoint + 1
+        char = char .. text:sub(luaPoint, luaPoint)
+      end
+      if foundEndChar then
+        luaPoint = luaPoint - 1
+        char = char:sub(1, -2)
+      end
+    end
+
     if char == "\\" then
       slash = not slash
     elseif not slash then
@@ -2834,7 +2927,7 @@ function get_specified_player(msg)
 end
 
 -- uses custom star names if aplicable
-local real_get_star_name = get_star_name
+real_get_star_name = get_star_name
 function get_custom_star_name(course, starNum)
   if ROMHACK.starNames then
     if GST.ee then
@@ -2851,10 +2944,11 @@ function get_custom_star_name(course, starNum)
 
   return real_get_star_name(course, starNum)
 end
+
 _G.get_star_name = get_custom_star_name -- This makes other mods use this function instead. Pretty cool!
 
 -- uses custom level names if applicable
-local real_get_level_name = get_level_name
+real_get_level_name = get_level_name
 function get_custom_level_name(course, level, area)
   if ROMHACK.levelNames and ROMHACK.levelNames[level * 10 + area] then
     return ROMHACK.levelNames[level * 10 + area]
@@ -2869,6 +2963,7 @@ function get_custom_level_name(course, level, area)
   end
   return real_get_level_name(course, level, area)
 end
+
 _G.get_level_name = get_custom_level_name -- This makes other mods use this function instead. Pretty cool!
 
 -- forces player out of invalid areas (lobby, star req, or minihunt star)
@@ -2905,12 +3000,12 @@ end
 
 -- Warp cooldown and such
 function on_warp()
+  levelSize = 8192
   if prevHealth <= 0x110 and prevHealth > 0xFF then -- prevent full heal when warping at low health
     m0.health = prevHealth
   end
   storeVanish = false
   prevSafePos = { x = m0.pos.x, y = m0.pos.y, z = m0.pos.z }
-  levelSize = 8192
   if romhackCam then
     set_camera_mode(m0.area.camera, CAMERA_MODE_ROM_HACK, 0)
   end
@@ -3014,64 +3109,86 @@ function on_warp()
   localPrevAct = np0.currActNum
 end
 
--- set lighting
-function set_season_lighting(month, level)
+-- get lighting
+function get_season_lighting(month, level)
+  -- Default Lighting
+  local lightDir = 0
+  local overrideSkybox = -1
+  local overrideEnvfx = -1
+  local lightColorR = 255
+  local lightColorG = 255
+  local lightColorB = 255
+  local vertexColorR = 255
+  local vertexColorG = 255
+  local vertexColorB = 255
+  local skyboxColorR = 255
+  local skyboxColorG = 255
+  local skyboxColorB = 255
+  local fogColorR = 255
+  local fogColorG = 255
+  local fogColorB = 255
+  local fogIntensity = 1
+
   if noSeason or (month ~= 10 and month ~= 12) then
     if level == LEVEL_LOBBY then
-      set_lighting_dir(2, 300) -- dark?
-    else
-      set_lighting_dir(2, 0)
+      lightDir = 300 -- dark?
     end
-    set_override_skybox(-1)
-    set_override_envfx(-1)
-    set_lighting_color(0, 255)
-    set_lighting_color(1, 255)
-    set_lighting_color(2, 255)
-    set_vertex_color(0, 255)
-    set_vertex_color(1, 255)
-    set_vertex_color(2, 255)
-    set_skybox_color(0, 255)
-    set_skybox_color(1, 255)
-    set_skybox_color(2, 255)
-    set_fog_color(0, 255)
-    set_fog_color(1, 255)
-    set_fog_color(2, 255)
-    set_fog_intensity(1)
   elseif month == 10 then
-    set_lighting_dir(2, 500) -- dark?
-    set_override_skybox(BACKGROUND_HAUNTED)
-    set_override_envfx(-1)
-    set_lighting_color(0, 100) -- purple tint
-    set_lighting_color(1, 100) -- purple tint
-    set_lighting_color(2, 255)
-    set_vertex_color(0, 100)
-    set_vertex_color(1, 100)
-    set_vertex_color(2, 255)
-    set_skybox_color(0, 255)
-    set_skybox_color(1, 255)
-    set_skybox_color(2, 255)
-    set_fog_color(0, 100)
-    set_fog_color(1, 100)
-    set_fog_color(2, 255)
-    set_fog_intensity(1.02)
+    lightDir = 500    -- dark?
+    overrideSkybox = BACKGROUND_HAUNTED
+    lightColorR = 100 -- purple tint
+    lightColorG = 100 -- purple tint
+    vertexColorR = 100
+    vertexColorG = 100
+    fogColorR = 100
+    fogColorG = 100
+    fogIntensity = 1.02
   elseif month == 12 then
-    set_override_envfx(ENVFX_SNOW_NORMAL)
-    set_override_skybox(BACKGROUND_SNOW_MOUNTAINS)
-    set_lighting_dir(2, 0)
-    set_lighting_color(0, 200) -- blue tint
-    set_lighting_color(1, 255)
-    set_lighting_color(2, 255)
-    set_vertex_color(0, 200)
-    set_vertex_color(1, 255)
-    set_vertex_color(2, 255)
-    set_skybox_color(0, 255)
-    set_skybox_color(1, 255)
-    set_skybox_color(2, 255)
-    set_fog_color(0, 200)
-    set_fog_color(1, 255)
-    set_fog_color(2, 255)
-    set_fog_intensity(1)
+    overrideEnvfx = ENVFX_SNOW_NORMAL
+    overrideSkybox = BACKGROUND_SNOW_MOUNTAINS
+    lightColorR = 200 -- blue tint
+    vertexColorR = 200
+    fogColorR = 200
   end
+
+  return {
+    lightDir = lightDir,
+    overrideSkybox = overrideSkybox,
+    overrideEnvfx = overrideEnvfx,
+    lightColorR = lightColorR,
+    lightColorG = lightColorG,
+    lightColorB = lightColorB,
+    vertexColorR = vertexColorR,
+    vertexColorG = vertexColorG,
+    vertexColorB = vertexColorB,
+    skyboxColorR = skyboxColorR,
+    skyboxColorG = skyboxColorG,
+    skyboxColorB = skyboxColorB,
+    fogColorR = fogColorR,
+    fogColorG = fogColorG,
+    fogColorB = fogColorB,
+    fogIntensity = fogIntensity,
+  }
+end
+
+function set_season_lighting(month, level)
+  local lighting = get_season_lighting(month, level)
+  set_override_skybox(lighting.overrideSkybox)
+  set_override_envfx(lighting.overrideEnvfx)
+  set_lighting_dir(2, lighting.lightDir)
+  set_lighting_color(0, lighting.lightColorR) -- blue tint
+  set_lighting_color(1, lighting.lightColorG)
+  set_lighting_color(2, lighting.lightColorB)
+  set_vertex_color(0, lighting.vertexColorR)
+  set_vertex_color(1, lighting.vertexColorG)
+  set_vertex_color(2, lighting.vertexColorB)
+  set_skybox_color(0, lighting.skyboxColorR)
+  set_skybox_color(1, lighting.skyboxColorG)
+  set_skybox_color(2, lighting.skyboxColorB)
+  set_fog_color(0, lighting.fogColorR)
+  set_fog_color(1, lighting.fogColorG)
+  set_fog_color(2, lighting.fogColorB)
+  set_fog_intensity(lighting.fogIntensity)
 end
 
 -- replaces parts of a string with ".", and also removes color
@@ -3102,9 +3219,7 @@ function on_player_connected(m)
     local playerColor = network_get_player_text_color_string(np.localIndex)
     local name = playerColor .. np.name
     djui_chat_message_create(trans("connected", name))
-    if network_player_set_override_location then
-      network_player_set_override_location(np, trans("menu_unknown"))
-    end
+    network_player_set_override_location(np, trans("menu_unknown"))
 
     if playPopupSounds then
       play_sound(SOUND_GENERAL_COIN, gGlobalSoundSource)
@@ -3121,8 +3236,6 @@ end
 function on_player_disconnected(m)
   if m.playerIndex == 0 then
     set_season_lighting(0, 0) -- otherwise, the skybox color doesn't reset
-    gServerSettings.enablePlayerList = 1
-    gServerSettings.enablePlayersInLevelDisplay = 1
     djui_reset_popup_disabled_override()
     return
   end
@@ -3280,7 +3393,6 @@ local faster_actions = {
   [ACT_FORWARD_GROUND_KB] = 1,
   [ACT_BACKWARD_GROUND_KB] = 1,
   [ACT_DIVE_PICKING_UP] = 3,
-  [ACT_PICKING_UP] = 1,
   [ACT_PICKING_UP_BOWSER] = 1,
   [ACT_HARD_FORWARD_GROUND_KB] = 1,
   [ACT_SOFT_FORWARD_GROUND_KB] = 1,
@@ -3514,8 +3626,7 @@ function mario_update(m)
       and not is_hazard_floor(m.floor.type) then
     if m.floor.object then
       local o = m.floor.object
-      local id = get_id_from_behavior(o.behavior)
-      if (o.oVelX == 0 and o.oVelY == 0 and o.oVelZ == 0) and id ~= id_bhvHiddenObject and id ~= id_bhvAnimatesOnFloorSwitchPress then
+      if (o.oVelX == 0 and o.oVelY == 0 and o.oVelZ == 0) and obj_has_behavior_id(o, id_bhvHiddenObject) ~= 0 and obj_has_behavior_id(o, id_bhvAnimatesOnFloorSwitchPress) ~= 0 then
         prevSafePos.obj = o
         prevSafePos.x = m.pos.x
         prevSafePos.y = o.oPosY + 200
@@ -3523,7 +3634,7 @@ function mario_update(m)
           prevSafePos.y = m.floorHeight
         end
         prevSafePos.z = m.pos.z
-        if id == id_bhvSeesawPlatform then
+        if obj_has_behavior_id(o, id_bhvSeesawPlatform) ~= 0 then
           prevSafePos.x = o.oPosX
           prevSafePos.z = o.oPosZ
         end
@@ -3548,13 +3659,19 @@ function mario_update(m)
     )
   end
 
-  -- make voiddmg work with omm
-  if OmmEnabled and m.playerIndex == 0 and (m.action & ACT_GROUP_CUTSCENE == 0) and
-      (not died) and m.health > 0xFF and m.floor and
-      (m.floor.type == SURFACE_DEATH_PLANE or m.floor.type == SURFACE_VERTICAL_WIND) and
-      m.pos.y - m.floorHeight <= 2048 then
-    on_death(m)
-    m.health = math.max(m.health, 0x100)
+  if OmmEnabled and m.playerIndex == 0 then
+    -- make voiddmg work with omm
+    if (m.action & ACT_GROUP_CUTSCENE == 0) and (not died) and m.health > 0xFF and m.floor and (m.floor.type == SURFACE_DEATH_PLANE or m.floor.type == SURFACE_VERTICAL_WIND) and m.pos.y - m.floorHeight <= 2048 then
+      on_death(m)
+      m.health = math.max(m.health, 0x100)
+    end
+
+    -- make mysteryhunt death work with omm
+    if gGlobalSyncTable.mhMode == 3 and (sMario.dead or (sMario.team == 1 and sMario.runnerLives == 0)) then
+      OmmApi.omm_disable_feature("odysseyDeath", true)
+    elseif m.hurtCounter == 0 then
+      OmmApi.omm_disable_feature("odysseyDeath", false)
+    end
   end
 
   -- update star counter in MiniHunt mode / handle challenge
@@ -3573,7 +3690,7 @@ function mario_update(m)
       end
     end
   end
-  
+
   if m.invincTimer > 2 then
     -- cut invincibility frames
     if GST.weak then
@@ -3738,7 +3855,7 @@ function mario_update(m)
   -- set descriptions
   local rolename, _, color = get_role_name_and_color(m.playerIndex)
   if DEBUG_SHOW_PING then
-    network_player_set_description(np, "Ping: "..tostring(np.ping), color.r, color.g, color.b, 255)
+    network_player_set_description(np, "Ping: " .. tostring(np.ping), color.r, color.g, color.b, 255)
   elseif GST.mhMode == 2 and frameCounter > 60 then
     network_player_set_description(np, trans_plural("stars", sMario.totalStars or 0), color.r, color.g, color.b, 255)
   elseif sMario.team == 1 and sMario.spectator ~= 1 and know_team(m.playerIndex) and frameCounter <= 60 then
@@ -3967,17 +4084,11 @@ function runner_update(m, sMario)
 
     -- prevent accessing PUs unless Any% is enabled
     if GST.starRun ~= -1 then
-      if m.pos.x > 32768 then
-        m.pos.x = m.pos.x - 32768
+      if m.pos.x > 32768 or m.pos.x < -32768 then
+        m.pos.x = (m.pos.x + 32768) % 65536 - 32768
       end
-      if m.pos.x < -32768 then
-        m.pos.x = m.pos.x + 32768
-      end
-      if m.pos.z > 32768 then
-        m.pos.z = m.pos.z - 32768
-      end
-      if m.pos.z < -32768 then
-        m.pos.z = m.pos.z + 32768
+      if m.pos.z > 32768 or m.pos.z < -32768 then
+        m.pos.z = (m.pos.z + 32768) % 65536 - 32768
       end
     end
 
@@ -5044,7 +5155,11 @@ function on_packet_runner_collect(data, self)
     leader, scoreboard = calculate_placement()
     local np = network_player_from_global_index(runnerID)
     local playerColor = network_get_player_text_color_string(np.localIndex)
-    local place = get_custom_level_name(data.course, data.level, data.area)
+    local place = np.overrideLocation
+    if np.overrideLocation == nil or np.overrideLocation == "" then
+      place = get_custom_level_name(data.course, data.level, data.area)
+    end
+
     if data.star then -- star
       local name = get_custom_star_name(data.course, data.star)
 
@@ -5175,7 +5290,7 @@ function on_packet_kill(data, self)
             local np = NetP[i]
             local sMario = PST[i]
             if np.connected and (not sMario.dead) and sMario.team == 1 then
-                runnerCount = runnerCount + 1
+              runnerCount = runnerCount + 1
             end
           end
           if runnerCount ~= 0 then

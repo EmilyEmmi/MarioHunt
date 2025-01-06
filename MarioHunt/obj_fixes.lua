@@ -155,6 +155,29 @@ local function custom_bobomb_buddy_cannon_loop(o)
 end
 hook_behavior_custom(id_bhvBobombBuddyOpensCannon, false, nil, custom_bobomb_buddy_cannon_loop)
 
+-- prevent elevator camping
+local function custom_elevator_loop(o)
+    -- check if there are any nearby players waiting at the bottom. If so, SEND THE ELEVATOR!
+    -- note that oElevatorUnkF4 is the elevator's bottom y position. oElevatorUnkFC is... I think the middle point?
+    local nearestM = nearest_mario_state_to_object(o)
+    if nearestM and nearestM.playerIndex == 0 and (o.oAction == 0 or (o.oAction == 3 and o.oTimer > 60)) and o.oElevatorUnk100 ~= 2 and o.oPosY > o.oElevatorUnkF4 then
+        if o.oAction == 3 then
+            log_to_console(tostring(o.oTimer))
+        end
+        for i=0,MAX_PLAYERS-1 do
+            local m = gMarioStates[i]
+            if is_player_active(m) ~= 0 and m.pos.y < o.oElevatorUnkFC and dist_between_object_and_point(m.marioObj, o.oPosX, o.oElevatorUnkF4, o.oPosZ) < 1000 then
+                o.oAction = 2
+                network_send_object(o, false)
+                break
+            end
+        end
+    end
+    bhv_elevator_loop()
+end
+hook_behavior_custom(id_bhvHmcElevatorPlatform, false, nil, custom_elevator_loop)
+hook_behavior_custom(id_bhvMeshElevator, false, nil, custom_elevator_loop)
+
 -- instant/faster cutscene, or radar
 function star_update(radar)
     if radar then
@@ -325,11 +348,10 @@ end
 
 E_MODEL_CAKE = ((not LITE_MODE) and smlua_model_util_get_id("mh_star_geo")) -- no more waiting for cake, just do logo star
 
-local sBehavior = get_behavior_from_id(id_bhvHiddenStarTrigger)
 local dontLoop = false
 function on_obj_set_model(o, model)
     if dontLoop then return end
-    if model == 0 and o.behavior == sBehavior then
+    if model == 0 and obj_has_behavior_id(o, id_bhvHiddenStarTrigger) ~= 0 then
         obj_set_model_extended(o, E_MODEL_PURPLE_MARBLE)
     end
 
