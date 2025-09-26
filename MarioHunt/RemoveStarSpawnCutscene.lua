@@ -22,6 +22,11 @@ function remove_timestop()
         if c.cutscene == CUTSCENE_ENTER_BOWSER_ARENA then
           local bowser = obj_get_first_with_behavior_id(id_bhvBowser)
           if bowser and bowser.oAction == 5 then
+            -- always give bowser 3 health when playing in other game areas
+            if gGlobalSyncTable.gameArea ~= 0 then
+              bowser.oHealth = 3
+            end
+            
             if bowser.oBehParams2ndByte == 0x01 then
               bowser.oAction = 13
             else
@@ -38,7 +43,7 @@ function remove_timestop()
         end
         c.cutscene = 0
         play_cutscene(c)
-    elseif m.invincTimer < 30 and c.cutscene ~= 0 and gGlobalSyncTable.mhState == 2 then
+    elseif m.invincTimer < 30 and c.cutscene ~= 0 and c.cutscene ~= CUTSCENE_PALETTE_EDITOR and c.cutscene ~= 0xFA and gGlobalSyncTable.mhState == 2 then -- 0xFA is character select's cutscene
         m.invincTimer = 30
     end
 end

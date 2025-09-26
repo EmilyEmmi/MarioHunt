@@ -2,7 +2,6 @@
 -- description: Nametags\nBy \\#ec7731\\Agent X\\#dcdcdc\\\n\nThis mod adds nametags to sm64ex-coop, this helps to easily identify other players without the player list, nametags can toggled on and off with \\#ffff00\\/nametag-distance 7000\\#dcdcdc\\ and \\#ffff00\\/nametag-distance 0\\#dcdcdc\\ respectively.\n\nThis version uses the MarioHunt API.
 
 local FADE_SCALE = 4
-
 if gServerSettings.nametags ~= 0 then
     gGlobalSyncTable.tagDist = 7000
 else
@@ -10,9 +9,8 @@ else
 end
 gServerSettings.nametags = 0
 
---local showHealth = true
 gNametagsSettings.showHealth = true
---local showSelfTag = false
+showHealth = gNametagsSettings.showHealth
 local showRoleColor = true
 
 local gStateExtras = {}
@@ -192,7 +190,7 @@ local invalid_nametag_action = {
 }
 
 local function render_nametags()
-    if gGlobalSyncTable.tagDist == 0 or (get_active_sabo() == 3 and gPlayerSyncTable[0].team == 1 and gPlayerSyncTable[0].spectator ~= 1) or (not gNametagsSettings.showSelfTag and network_player_connected_count() == 1) or not gNetworkPlayers[0].currAreaSyncValid or obj_get_first_with_behavior_id(id_bhvActSelector) then return end
+    if gGlobalSyncTable.tagDist == 0 or do_darkness_effect() or (not gNametagsSettings.showSelfTag and network_player_connected_count() == 1) or not gNetworkPlayers[0].currAreaSyncValid or obj_get_first_with_behavior_id(id_bhvActSelector) then return end
 
     djui_hud_set_resolution(RESOLUTION_N64)
     local fovCoeff = djui_hud_get_fov_coeff() -- this is a very expensive calculation, so only run it once
@@ -203,8 +201,8 @@ local function render_nametags()
         local np = gNetworkPlayers[i]
         local out = { x = 0, y = 0, z = 0 }
         local pos = { x = m.marioBodyState.headPos.x, y = m.marioBodyState.headPos.y + 100, z = m.marioBodyState.headPos.z }
-        if np.currAreaSyncValid and active_player(m) ~= 0 and (not invalid_nametag_action[m.action]) and (m.playerIndex ~= 0 or m.action ~= ACT_FIRST_PERSON) and djui_hud_world_pos_to_screen_pos(m.marioObj.header.gfx.pos, out) and djui_hud_world_pos_to_screen_pos(pos, out) then
-            local scale = -400 / out.z * fovCoeff
+        if np.currAreaSyncValid and active_player(m) ~= 0 and (not invalid_nametag_action[m.action]) and (m.playerIndex ~= 0 or m.action ~= ACT_FIRST_PERSON) and (not m.marioBodyState.mirrorMario) and m.marioBodyState.updateHeadPosTime == get_global_timer() and djui_hud_world_pos_to_screen_pos(pos, out) then
+            local scale = -300 / out.z * fovCoeff
 
             -- collision nametags
             if scale >= 0 and gGlobalSyncTable.mhMode == 3 and m.playerIndex ~= 0 and gPlayerSyncTable[0].spectator ~= 1 and not no_wall_between_points(gLakituState.pos, pos) then
@@ -218,6 +216,10 @@ local function render_nametags()
                 local hookedString
                 for a,func in ipairs(on_nametags_render_hooks) do
                     hookedString = func(i)
+                end
+                
+                if not charSelectExists then
+                    showHealth = gNametagsSettings.showHealth
                 end
 
                 if hookedString ~= "" then
@@ -270,7 +272,7 @@ local function render_nametags()
                         exHealthScale = 1.3
                     end
 
-                    if m.playerIndex ~= 0 and gNametagsSettings.showHealth then
+                    if m.playerIndex ~= 0 and showHealth then
                         djui_hud_set_color(255, 255, 255, alpha)
                         local healthScale = 75 * scale
                         local prevHealthScale = 75 * e.prevScale
@@ -318,7 +320,13 @@ local function on_show_health_command(msg)
         return true
     end
 
-    gNametagsSettings.showHealth = not gNametagsSettings.showHealth
+    if charSelectExists then
+        gNametagsSettings.showHealth = false
+        showHealth = not showHealth
+    else
+        gNametagsSettings.showHealth = not gNametagsSettings.showHealth
+        showHealth = gNametagsSettings.showHealth
+    end
     djui_chat_message_create("Show health status: " .. on_or_off(gNametagsSettings.showHealth))
     return true
 end

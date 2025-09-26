@@ -1,6 +1,6 @@
 <img src="logo.png" alt="MarioHunt" width="800"/>
 
-### v2.7.4 (view changelog [here](changelog.md))
+### v2.8 (view changelog [here](changelog.md))
 
 ## [Trailer](https://www.youtube.com/watch?v=hyuXu4Bzugs&ab_channel=N64Mario)
 
@@ -14,7 +14,7 @@ Runners have to complete the game, while Hunters must stop them.
 
 More information available at the [wiki](../../wiki) or in-game by reading signs.
 
-A mod for sm64ex-coop
+A mod for sm64coopdx
 <br/>
 <br/>
 <br/>
@@ -32,6 +32,8 @@ Menu framework created by **Blocky**
 
 MH Lobby logo and radar graphics created by **LeoHaha**
 
+Rules graphics created by **MaybeNotJohny**
+
 Spectator mod by **Sprinter05**
 
 Mute mod created by **Beard**
@@ -40,7 +42,7 @@ Also special thanks to **ColbyRayz!** and **Key's Artworks** for testing and sup
 <br/>
 <br/>
 <br/>
-Spanish Translation made with help from **KanHeaven**, **SonicDark**, **EpikCool**, and **green**
+Spanish Translation made with help from **KanHeaven**, **SonicDark**, **EpikCool**, **green**, and **TenmaAkie**
 
 German Translation made by **N64 Mario**
 
@@ -52,6 +54,8 @@ Italian translation made by **Mr.L-ore**
 
 Romania translation by **N64** (some translations provided by **EpikCool**)
 
+Dutch translation by **LALIEDABBE**
+
 If you would like to make changes or submit your own translation, check [here](wiki/lang.md) (does not exist yet) or inside lang.lua for details
 <br/>
 <br/>
@@ -61,7 +65,7 @@ Port of "Shooting Star Summit" by **pieordie1** [(here)](https://www.smwcentral.
 <br/>
 <br/>
 # HOW TO USE:
-Go to the [latest release](https://github.com/EmilyEmmi/MarioHunt/releases) and download **MarioHunt.zip** or (MarioHunt_Lite.zip for the Lite version). Extract it's contents to your **save file mod folder** (not in the base directory!). Read [this](https://github.com/djoslin0/sm64ex-coop/blob/coop/docs/lua/lua.md) to find where it is located.
+Go to the [latest release](https://github.com/EmilyEmmi/MarioHunt/releases) and download **MarioHunt.zip** or (MarioHunt_Lite.zip for the Lite version). Extract it's contents to your **save file mod folder** (not in the base directory!). You can access the folder in-game by going to Options -> Misc -> Open Appdata. You can also drag the .zip onto the game while in the mods menu.
 
 Open the menu with /mh or by holding L and pressing START. For information on how to play, check out the [wiki](../../wiki).
 <br/>

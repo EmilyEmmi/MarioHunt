@@ -1,4 +1,170 @@
 # Changelog
+## v2.8
+### Additions:
+  - Added the new "Game Area" option! It lets you limit the entire game to one area (for example setting it to Upper Floor starts everyone there, and only Upper Floor stages are accessible)
+    - The requirements for Star Doors are manually adjusted for a better experience, but Toad and Mips requirements remain unchanged.
+    - Cap stages will always be accessible through new locations if they weren't already available.
+      - Main Floor: Moat can be drained in Courtyard and then accessed normally, COTMC is across from SA
+      - Basement: TOTWC can be accessed by standing on the sun platform at 10 stars, located at the start.
+      - Upstairs: TOTWC sun platform is near WMOTR, VCUTM is across from SL, and COTMC is inside of the WDW town.
+      - Top Floor: TOTWC sun platform is near WMOTR, VCUTM and COTMC are inaccessible (since no stages here use those caps).
+    - Only available for certain rom hacks. In general, cap stages are hidden similarly to how they are in the original hack (for example, Star Road's cap stages are all inside of related stages). Documentation for all hacks that support this feature is planned in the future.
+  - "Double Runner Health" option is now "Double Health", which allows toggling double health for Runners, Hunters, OR everyone
+    - In MysteryHunt, only "Off" and "All" are available
+  - Added FIVE new options: *PvP Mode*, *Disable Player Collision*, *No Water Heal*, *Default Role*, and *Fix Invisible Walls* (!!!)
+    - PvP Mode: Works exactly like the server setting. Options are "Classic" and "Revamped". Mainly added so you can tell what the PvP mode is at the start of the game.
+    - Disable Player Collision: When this option is enabled, players can't bounce on each other or push each other around. They can still hurt each other, though!
+    - No Water Heal: Can be applied to Runners, Hunters OR everyone. The specified teams won't gain health when at the surface of water.
+      - In MysteryHunt, only "Off" and "All" are available
+      - Translations may be a little off due to this being added late in development
+    - Default Role: Which team players are assigned to when they join the game. Options are "Hunter" (default) and "Runner". Not available in MysteryHunt.
+    - Fix Invisible Walls: FINALLY!!! Removes most invisible walls from the game. This also fixes some other collision issues that shouldn't impact games too much, but if I missed something, you can always turn it off. ON by default, thankfully.
+      - More specifically, this adds a cap to ceiling hitboxes and fixes *Floor Overshadowing*. For those of you who have no idea what that means, just know that certain parts of geometry that were previously intangible will now function properly. This is easiest to observe with the spinning fire object in LLL.
+      - Not available in certain rom hacks (that have fixCollisionBugs enabled anyway)
+      - Not translated atm
+  - Added /gc, a command that lets you send messages that all players can see, even if you are dead
+    - Only available in MysteryHunt
+    - Only available for hosts and moderators
+  - /mh out now accepts a level as an argument ("6", "C0", and "castle" all refer to Inside Castle, for example), and kicks out players in that level Some other examples:
+    - "26" or "courtyard" for Castle Courtyard
+    - "16" or "grounds" for Castle Grounds
+    - "B1", "B2", "B3" for the Bowser arenas specifically (the levels themselves are BITDW, BITFS, and BITS)
+    - "C16", "C17", "C18" for Bowser levels AND the arenas
+    - Using it with no arguments picks the level you're currently in as usual.
+  - Added support for mod categories
+  - Added Dutch translation (LALIEDABBE)
+  - Added scroll support and middle click for mouse, and made touch support function correctly
+  - All sabotages in MysteryHunt now have unique textures for the radar (EpikCool)
+### Adjustments:
+  - Updated all languages (N64 Mario, TenmaAkie, Skeltan, Mr. L-ore, PietroM, N64YT, LALIEDABBE)
+  - Updated recolorable icons to match Dynamic Lives Icon v2.0 (unreleased).
+  - Recolorable icons now exist in the Lite version.
+  - **When "Nerf Vanish Cap" is enabled, the "Vanish" button is only used to protect against PVP attacks; otherwise, the vanish cap will now work even without holding the button.**
+  - **Players may no longer destroy Bowser Bombs with their body**
+  - **Reduced invulnerability frames after picking up Bowser by 1 second, but removed knockback when getting hit while holding Bowser**
+    - Also reduced invulnerability frames after throwing Bowser (After the action ends: 1.5 seconds -> 1 second)
+  - Removed Throwing Bowser from Faster Actions (it was previously 3 times as fast).
+  - **Reduced invulnerability frames when entering a level from 150 to 100 (-1.6s) and reduced invulnerability frames from 150 to 60 when entering from a warp door (-3s)**
+  - **Runners now receive boosted invulnerabilty frames on the water surface, but can't heal during invulnerability frames**
+  - Runners are now invulnerable during the pole grabbing animation and 1 second afterward
+  - If a Hunter enters a Bowser stage while no Runners are present, they get kicked out immediately after the frozen timer ends.
+    - If all Runners leave a Bowser stage, the Hunters are kicked out within 10 seconds instead of 30.
+    - HOWEVER, if a Runner enters the level, the frozen timer is reduced to 3 seconds.
+  - Runners entering a Bowser stage will now always have a leave timer of at least 30 seconds, unless that stage has already been beaten
+    - Doesn't apply in Star Mode, and the minimum will also be lower if the maximum run time is lower than 30 seconds
+  - **BITFS Elevator and BITS Arrow Platform now travel a bit faster (and return much faster) to reduce wait time**
+  - **You don't need to manually randomize Hunters at the end of games in MysteryHunt anymore!** Everyone's role is now reset to Runner at the end of the game, and starting a game with zero Hunters will automatically randomize Hunters based on the amount you last selected for "Randomize Hunters".
+    - To change this amount, simply select "Randomize Hunters" with the amount you'd like again.
+  - **The "On star collection" option now saves with MarioHunt, instead of always using the server setting.**
+    - Note that this also applies to the newly added "PvP Mode" option.
+  - **Carpets will now spawn duplicates, making it easier to move around in Rainbow Ride**
+  - **When on an arrow option in the menu (for example, when setting a numerical setting) you now confirm the option with A and THEN use left and right to adjust the number, rather than using left and right while hovering over the option**
+    - The old input style is available as an option under "Settings"
+  - Z or Right Click now work in the menu as alternatives to X
+  - Renamed "Settings" to "Preferences" to prevent confusion with "Game Settings"
+  - Banned the following spots for sabotages:
+    - On top of the PSS ending area
+    - On top of Whomp King
+    - Inside of where the Whomp's Fortress tower normally spawns if you aren't in act 1, it is not present, and acts are enabled
+    - Inside of the Jolly Roger Bay ship when not in act 1, and acts are enabled
+    - Steep, slippery surfaces (ex: roof on the towers in TOTWC, some slopes in CCM)
+  - **IMPORTANT CHANGE FOR MYSTERYHUNT!!! Hunters now have a kill cooldown, which is the same length as the grace period (default 20s)!**
+    - Kill cooldown activates when the victim dies, so there is a chance to get multiple kills at once. Also, Runners *don't* have this cooldown.
+    - Not translated atm
+  - Sabotage radars are now shown on the act select.
+  - Made it even harder for Hunters to camp Bowser stages, and removed exploits to avoid the kick timer
+  - In the 0 star category (on vanilla), the act select for DDD no longer appears, and the player immediately enters BITFS.
+  - Wing Mario Over The Rainbow can now be immediately exited if the wing cap isn't collected yet
+  - In Star Road, there is now a pipe placed over the cannon to Star Haven that takes you there instead
+  - /mh out now applies to all areas in a level (for example, all floors in the castle) rather than just the one the command is ran in
+  - New crown code- now, it remains regid on your player's head and works properly with animations
+    - Thanks to Twin Drive System and PeachyPeach for helping me figure this out!
+  - Adjusted nametags to match current version
+  - Removed soft knockback actions from Faster Actions
+  - Removed the "Romhack Cam" option, as it is obsolete as of coopDX v1.3
+  - Spectators can now see all players on the minimap in MysteryHunt
+  - The Toxic Gas sabotage no longer drains health while the invincibility timer is active
+  - Hunters will now have their health drained if they loiter around the Bowser In The Sky entrance
+    - Doesn't apply to MysteryHunt
+  - Made the "Press L!" prompt for reporting bodies/fixing sabotages more clear - it now either says "L - Report" or "L - Fix" depending on the situtation
+    - Of course, L is replaced by whatever button you assigned.
+  - Entering Bowser 3 without enough stars now teleports you back to BITS instead of Castle Grounds
+  - HMC and BBH elevators now only go faster while moving up
+    - The faster behavior introduced last update was actually a bug, but I decided to keep it for going upwards
+  - The tip for ground pound damage says "3" again
+  - Bubble respawn action no longer puts players on the very edge; instead, it tries to place players closer to the mainland like in Super Mario Odyssey
+  - Last safe position for the bubble respawn action is now tracked closer to the ground
+  - The action from exiting a painting via star collection is now canceled into Freefall Land instead of Idle
+    - This means that jumping immediately will make Mario double jump instead of normal jump
+  - L'il Penguin Lost is now blacklisted in MiniHunt by default
+  - Tuxie Race Down The Slide (Star Road) is no longer excluded in MiniHunt by default
+  - Tuxie Race Down The Slide (Star Road) is no longer ignored for requirements in Star Mode
+  - **Stars spawned from enemies and npcs will now automatically be given to whoever is closest to the enemy MiniHunt**
+    - Example: Defeating Big Bully will give the star to whoever is closest to the bully. Same goes for Klepto. Also applies to the PSS time star.
+  - If the Auto setting is enabled, the amount of runners/hunters will be adjusted when selecting certain presets
+  - Joining a game with all Runners no longer sets your role to Runner by default
+  - Crushing objects can now be the subject of kill messages (Whomp, Eyerok, etc.)
+  - Various objects were added as being kill message subjects
+  - Objects now only get credit for kills under specific conditions
+  - Disabling the ASN Crown role no longer disables the rainbow radar; the rainbow radar is now tied to the ASN Tourney Placement role
+  - Going through warps repeatedly now temporarily disables warp interactions rather than killing the player
+    - In addition, repeated warping now is detected by warping within 5 seconds instead of within 10 seconds
+  - The "Attempting to fix level desync..." now actually remembers the last warp node you used
+  - "Attempting to fix level desync..." no longer counts as a warp
+  - Moved death barrier in Lobby up by quite a bit, along with visual adjustments
+  - Re-added invulnerability frames to the lobby
+    - Note that the player is made "vanish" instead of invisible to counteract rendering issues
+  - Parkour record is no longer saved if Cheats are enabled
+  - Parkour record is now saved under "Moveset" when using a character with a CS moveset, or when using any custom action
+  - Rejoin detection now uses the coopnet ID by default, and only uses the discord ID if coopnet is inactive
+### Fixes/backend changes:
+  - Fixed the following issues with MysteryHunt that could spoil information:
+    - Fixed being able to *literally see everyone's role* in the lobby in MysteryHunt
+      - Hunters can still read roles unless Hunters Know Teammates is off, which is intended
+    - Fixed the console being readable in MysteryHunt
+    - Fixed being able to see who is in acts in the act select in MysteryHunt
+  - Fixed being able to get softlocked in MysteryHunt by getting pushed off during the death animation
+  - Fixed script errors+lag when spectating
+  - Fixed script error when attempting to randomize Runners while all players are Spectators
+  - Fixed script errors in the act select
+  - Fixed script error due to crowns not existing in the Lite version
+  - Fixed now being able to leave WDW Town if the star requirement was met
+  - Fixed issues with Runners losing more health in water than they should
+  - Fixed red coin/secret counters appearing as blank or "0" due to coopDX v1.3.2
+  - Fixed Bowser keys spawning early even if Bowser wasn't fully defeated yet if a new Runner entered the level
+  - Fixed being able to cancel star animations and the bubble action by saying "stuck" in chat
+  - Fixed being able to perform hands-free carraying by saying "stuck" in chat
+  - Spectators will no longer be chosen as new Runners if a Runner leaves the game in Swap Mode or MiniHunt
+  - Fixed Bowser's Sub not appearing in MiniHunt if Free Roam was previously enabled
+  - Fixed Hunters functioning like they do in MysteryHunt even in other modes (such as healing slow from water and being able to use Hard Mode)
+  - Fixed "???" being displayed in MysteryHunt in for star popups and endgame
+  - Fixed being invincible in the Character Select and Players menus
+  - Fixed various hud issues with Character Select
+  - Fixed "Nerf Vanish Cap" setting not saving or notifying of change
+  - Fixed unsaved changes prompt not appearing in the Auto Game menu
+  - Fixed menu text being offset as of coopDX v1.3
+  - Fixed the lights sabotage being active during the act select
+  - Fixed moveset parkour record being recorded as vanilla
+  - Fixed being able to target dead Runners with /target
+  - Fixed quicksand in SSL near the tox boxes and in Bowser's Slippery Swamp (Star Road) always instantly killing the player, even if Void DMG was not OHKO
+  - Fixed SM74 always using the main save slot and SM74 EE always using the alt save slot
+  - Using "exit course" in stages that lead to themselves no longer causes a softlock
+    - For example, Tower Of The East in SM74
+  - Fixed everyone getting warped to start of the lobby when desync fix is used
+  - Added type checks when loading settings from mod storage
+  - Vertical wind camp check now works while on a shell
+  - Fixed star doors getting out of sync
+  - Disabled access to the credits sequence to prevent bugs
+  - Changed how the leave timer syncs (shouldn't affect gameplay)
+  - Fixed some parts of the HUD not appearing when Character Select is enabled
+  - Fixed the map icon and bodies in MysteryHunt always using the default costume for CS characters
+  - The "Outline" option no longer works with Character Select to prevent script errors
+  - All synced timers now use a new syncing system, significantly reducing the amount of packets being sent
+  - Finally went and split each translation into its own file. The unused Russian translation has been moved outside of the public release for now.
+  - All crowns now use the same model, and change texture via o.oAnimState (this doesn't change their visuals at all)
+  - API Stuff:
+    - Added ROMHACK.noRadar and ROMHACK.noMinimap. Disables radar and minimap respectively.
+    - Added ROMHACK.resetFunc. Runs when "Reset Alt Save" is used to start a game. Note that this runs for all players.
 ## v2.7.4
 ### Additions
   - Added some support for OneCalledRPG's "Unique Sub Area Names" mod

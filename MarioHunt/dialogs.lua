@@ -326,7 +326,7 @@ If you don't want to be a\
 Runner, try letting the\
 host know. You can also\
 revoke your status by\
-reading for too long."))
+losing all of your lives."))
 
 changed_dialogs[066] = 1
 smlua_text_utils_dialog_replace(DIALOG_066,1,5,30,200, ("Mario, it's Peach!\
@@ -850,8 +850,23 @@ local skip = {
   [131] = 1,
 }
 
-function auto_skip(id)
+function on_dialog(id)
   if is_game_paused() then return end
+  -- override "Need key" dialog
+  if id == gBehaviorValues.dialogs.DoorNeedKeyDialog then
+    ---@type MarioState
+    local m = gMarioStates[0]
+    if m.action == ACT_READING_AUTOMATIC_DIALOG and m.marioObj.collidedObjInteractTypes & INTERACT_DOOR ~= 0 then
+      local neededStars = m.actionArg & 0xFF
+      local totalStars = neededStars + m.numStars
+      if totalStars ~= -1 and totalStars > gGlobalSyncTable.starRun then
+        totalStars = gGlobalSyncTable.starRun
+        neededStars = totalStars - m.numStars
+      end
+      return true, "You need " .. totalStars.." Stars (" ..neededStars.. 
+      "\nmore) to open this door."
+    end
+  end
   
   if changed_dialogs[id] then -- red dialog box
     set_dialog_override_color(255, 100, 100, 180, 255, 255, 255, 255)
@@ -906,4 +921,4 @@ function auto_skip(id)
 
   if skip[id] then return false end -- prevent softlock when paused and the dialog appears (coop bug)
 end
-hook_event(HOOK_ON_DIALOG, auto_skip)
+hook_event(HOOK_ON_DIALOG, on_dialog)

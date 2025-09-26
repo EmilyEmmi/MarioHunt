@@ -113,12 +113,17 @@ end
 function start_game(msg)
   -- count runners
   local runners = 0
+  local hunters = 0
   local nonSoloRunner = false
   for i = 0, (MAX_PLAYERS - 1) do
-    if gPlayerSyncTable[i].team == 1 and gNetworkPlayers[i].connected then
-      runners = runners + 1
-      if i ~= 0 then
-        nonSoloRunner = true
+    if gNetworkPlayers[i].connected and not gPlayerSyncTable[i].forceSpectate then
+      if gPlayerSyncTable[i].team == 1 then
+        runners = runners + 1
+        if i ~= 0 then
+          nonSoloRunner = true
+        end
+      else
+        hunters = hunters + 1
       end
     end
   end
@@ -148,6 +153,15 @@ function start_game(msg)
     return true
   end
 
+  if gGlobalSyncTable.mhMode == 3 and hunters <= 0 then
+    if runners <= 1 and (not DEBUG_NO_VICTORY) then
+      djui_chat_message_create(trans("must_have_one"))
+      return true
+    elseif not runner_randomize(gGlobalSyncTable.lastRandomRoles) then
+      return true
+    end
+  end
+
   local cmd = msg
   if cmd == "" then cmd = "none" end
   network_send_include_self(true, {
@@ -162,6 +176,52 @@ end
 function network_send_include_self(reliable, data)
   network_send(reliable, data)
   sPacketTable[data.id](data, true)
+end
+
+-- get who our current targetted runner is
+function get_targetted_runner()
+  local sMario0 = gPlayerSyncTable[0]
+  --[[ target is ignored if:
+    - The target index is not between 1 and MAX_PLAYERS (16)
+    - We're not a Hunter
+    - We're playing MiniHunt or MysteryHunt
+  ]]
+  if runnerTarget == nil or runnerTarget <= 0 or runnerTarget >= MAX_PLAYERS or gGlobalSyncTable.mhMode == 2 or gGlobalSyncTable.mhMode == 3 or sMario0.team == 1 then
+    return -1
+  end
+
+  -- Target is also ignored if they are not connected, not a runner, or dead
+  local np = gNetworkPlayers[runnerTarget]
+  local sMario = gPlayerSyncTable[runnerTarget]
+  if (not np.connected) or sMario.team ~= 1 or sMario.dead then
+    return -1
+  end
+  return runnerTarget
+end
+
+-- match time with other runners in this level
+function match_runner_time(index, neededRunTime_, localRunTime_)
+  local sMario = gPlayerSyncTable[index]
+  local np = gNetworkPlayers[index]
+  local neededRunTime, localRunTime = neededRunTime_, localRunTime_
+  for i = 1, (MAX_PLAYERS - 1) do
+    if (gPlayerSyncTable[i].team == 1 or gGlobalSyncTable.mhMode == 3) and gPlayerSyncTable[i].spectator ~= 1 and gNetworkPlayers[i].connected then
+      local theirNP = gNetworkPlayers[i] -- daft variable naming conventions
+      local theirSMario = gPlayerSyncTable[i]
+      if theirSMario.runTime and (theirNP.currLevelNum == np.currLevelNum) and (theirNP.currActNum == np.currActNum) and localRunTime < theirSMario.runTime then
+        local prevRunTime = localRunTime
+        localRunTime = theirSMario.runTime
+        neededRunTime, localRunTime = calculate_leave_requirements(sMario, localRunTime)
+        -- 30 seconds (or run time) minimum for bowser stages
+        local minTime = math.min(30 * 30, gGlobalSyncTable.runTime)
+        if (not gGlobalSyncTable.starMode) and neededRunTime - localRunTime < minTime
+        and (np.currCourseNum == COURSE_BITDW or np.currCourseNum == COURSE_BITFS or np.currCourseNum == COURSE_BITS) then
+          localRunTime = math.min(neededRunTime - minTime, prevRunTime)
+        end
+      end
+    end
+  end
+  return neededRunTime, localRunTime
 end
 
 function change_team_command(msg)
@@ -236,7 +296,7 @@ function add_runner(msg)
   for i = 0, (MAX_PLAYERS - 1) do
     local np = gNetworkPlayers[i]
     local sMario = gPlayerSyncTable[i]
-    if np.connected and (sMario.spectator ~= 1 or sMario.team == 1) then
+    if np.connected and ((sMario.spectator ~= 1 and not sMario.forceSpectate) or sMario.team == 1) then
       if sMario.team ~= 1 then
         if gGlobalSyncTable.mhMode == 3 or sMario.beenRunner == 0 then
           runners_available = runners_available + 1
@@ -296,11 +356,12 @@ end
 
 function runner_randomize(msg)
   local runners = tonumber(msg)
-  if (not msg) or msg == "" or msg == -1 or msg == "auto" then
+  if (not msg) or msg == "" or msg == "auto" then
     runners = -1 -- TBD
   elseif not (runners and runners == math.floor(runners)) then
     return false
   end
+  gGlobalSyncTable.lastRandomRoles = runners
 
   -- get current hunters
   local currPlayerIDs = {}
@@ -310,7 +371,7 @@ function runner_randomize(msg)
     local np = gNetworkPlayers[i]
     local sMario = gPlayerSyncTable[i]
     become_hunter(sMario)
-    if np.connected and sMario.spectator ~= 1 then
+    if np.connected and (sMario.spectator ~= 1 and not sMario.forceSpectate) then
       if gGlobalSyncTable.mhMode == 3 or sMario.beenRunner == 0 then
         runners_available = runners_available + 1
         table.insert(goodPlayerIDs, np.localIndex)
@@ -327,12 +388,12 @@ function runner_randomize(msg)
     runners = #currPlayerIDs + runners + 2
   end
 
-  if runners <= 0 then
+  if gGlobalSyncTable.mhMode == 3 and #currPlayerIDs <= runners then
     djui_chat_message_create(trans("must_have_one"))
-    return true
-  elseif gGlobalSyncTable.mhMode == 3 and #currPlayerIDs <= runners then
-    djui_chat_message_create(trans("must_have_one"))
-    return true
+    return (type(msg) ~= "number")
+  elseif runners <= 0 or #currPlayerIDs <= 0 then
+    djui_chat_message_create(trans("no_runners"))
+    return (type(msg) ~= "number")
   elseif runners_available < runners then -- if everyone has been a runner before, ignore recent status
     print("Not enough recent runners! Ignoring recent status")
     goodPlayerIDs = currPlayerIDs
@@ -499,6 +560,11 @@ function star_count_command(msg)
   if num and num >= -1 and num <= ROMHACK.max_stars and math.floor(num) == num then
     if gGlobalSyncTable.noBowser and num < 1 then
       return false
+    elseif gGlobalSyncTable.gameArea ~= 0 and ROMHACK.gameAreaData then
+      local data = ROMHACK.gameAreaData[gGlobalSyncTable.gameArea + 1]
+      if data and num > data.max_stars then
+        return false
+      end
     end
     gGlobalSyncTable.starRun = num
     if num ~= -1 then
@@ -628,9 +694,27 @@ function get_role_name_and_color(index)
   return roleName, colorString, color
 end
 
--- gets if the player should know this role; applies only in mysteryhunt
+-- gets if the player should know this role; only FALSE in mysteryhunt
 function know_team(index)
-  return gGlobalSyncTable.mhState == nil or gGlobalSyncTable.mhState >= 3 or gGlobalSyncTable.mhMode ~= 3 or index == 0 or (gPlayerSyncTable[0].team ~= 1 and gGlobalSyncTable.anarchy ~= 3) or gPlayerSyncTable[0].dead or (gGlobalSyncTable.confirmHunter and gPlayerSyncTable[index].knownDead)
+  return gGlobalSyncTable.mhState == nil or gGlobalSyncTable.mhState >= 3 or gGlobalSyncTable.mhMode ~= 3 or index == 0 or (gPlayerSyncTable[0].team ~= 1 and gGlobalSyncTable.anarchy ~= 3) or gPlayerSyncTable[0].dead or (gGlobalSyncTable.confirmHunter and gPlayerSyncTable[index].dead and gPlayerSyncTable[index].knownDead)
+end
+
+-- gets nearest alive runner to an object
+function nearest_runner_to_object(o)
+  local maxDist = -1
+  local nearest
+  for i=0,MAX_PLAYERS-1 do
+    local m = gMarioStates[i]
+    local sMario = gPlayerSyncTable[i]
+    if is_player_active(m) ~= 0 and sMario.spectator ~= 1 and sMario.team == 1 then
+      local dist = dist_between_objects(m.marioObj, o)
+      if maxDist < dist then
+        maxDist = dist
+        nearest = m
+      end
+    end
+  end
+  return nearest
 end
 
 function set_lobby_music(month)
@@ -688,8 +772,17 @@ function reset_camera_fix_bug(c)
   end
 end
 
+function set_bubble_respawn_action(m)
+  m.area.camera.cutscene = 0;
+  m.statusForCamera.action = m.action;
+  m.statusForCamera.cameraEvent = 0
+  soft_reset_camera_fix_bug(m.area.camera)
+  set_mario_action(m, ACT_MH_BUBBLE_RETURN, 0)
+  fade_volume_scale(0, 127, 15)
+end
+
 -- custom bubble action, with some code from the base game bubble action
-ACT_MH_BUBBLE_RETURN = allocate_mario_action(ACT_GROUP_CUTSCENE | ACT_FLAG_INTANGIBLE | ACT_FLAG_INVULNERABLE | ACT_FLAG_PAUSE_EXIT)
+ACT_MH_BUBBLE_RETURN = allocate_mario_action(ACT_GROUP_CUTSCENE | ACT_FLAG_INTANGIBLE | ACT_FLAG_PAUSE_EXIT)
 ---@param m MarioState
 function act_bubble_return(m)
   -- create bubble
@@ -724,6 +817,21 @@ function act_bubble_return(m)
     vec3f_copy(m.marioObj.header.gfx.pos, m.pos)
     vec3s_copy(m.marioObj.header.gfx.angle, m.faceAngle)
     return
+  end
+
+  -- place safe pos backwards from our last position so we don't spawn on the edge
+  if prevSafePos.doWalkBack then
+    local newX = prevSafePos.x - 300 * sins(prevSafePos.dir)
+    local newZ = prevSafePos.z - 300 * coss(prevSafePos.dir)
+    local newFloor = collision_find_floor(newX, prevSafePos.y + 30, newZ)
+    local oldFloor = m.floor
+    m.floor = newFloor
+    if newFloor and (prevSafePos.y - newFloor.lowerY) <= 250 and mario_floor_is_slippery(m) == 0 and not is_hazard_floor(newFloor.type) then
+      prevSafePos.x, prevSafePos.z = newX, newZ
+      prevSafePos.obj = newFloor.object
+    end
+    m.floor = oldFloor
+    prevSafePos.doWalkBack = false
   end
 
   local goToPos = { x = 0, y = 0, z = 0 }
@@ -761,7 +869,7 @@ function act_bubble_return(m)
   if m.actionTimer > 60 then
     vec3f_copy(m.pos, goToPos)
     m.forwardVel, m.vel.x, m.vel.y, m.vel.z = 0, 0, -60, 0
-    common_air_action_step(m, ACT_FREEFALL_LAND, MARIO_ANIM_GENERAL_FALL, 0) -- done to update floor
+    local floor = collision_find_floor(m.pos.x, m.pos.y, m.pos.z)
     if m.input & INPUT_NONZERO_ANALOG ~= 0 then
       m.forwardVel = 5
       m.faceAngle.y = m.intendedYaw
@@ -777,15 +885,22 @@ function act_bubble_return(m)
     m.invincTimer = 70
     m.marioObj.oIntangibleTimer = 0
 
-    if m.waterLevel > m.pos.y then
+    -- emergency
+    if floor == nil then
+      m.pos.x = m.spawnInfo.startPos.x
+      m.pos.y = m.spawnInfo.startPos.y
+      m.pos.z = m.spawnInfo.startPos.z
+      floor = collision_find_floor(m.pos.x, m.pos.y, m.pos.z)
+    end
+
+    if m.playerIndex == 0 and gGlobalSyncTable.mhMode == 3 and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2) and gPlayerSyncTable[m.playerIndex].dead then
+      spawn_my_corpse()
+      set_mario_action(m, ACT_SOFT_BONK, 0)
+    elseif m.waterLevel > m.pos.y then
       set_mario_action(m, ACT_WATER_IDLE, 0)
-    elseif is_hazard_floor(m.floor.type) then
-      local sMario = gPlayerSyncTable[m.playerIndex]
+    elseif floor and is_hazard_floor(floor.type) then
       local np = gNetworkPlayers[m.playerIndex]
-      if m.playerIndex == 0 and gGlobalSyncTable.mhMode == 3 and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2) and sMario.dead then
-        spawn_my_corpse()
-        set_mario_action(m, ACT_SOFT_BONK, 0)
-      elseif m.flags & MARIO_WING_CAP ~= 0 and np.currLevelNum == LEVEL_TOTWC then
+      if m.flags & MARIO_WING_CAP ~= 0 and np.currLevelNum == LEVEL_TOTWC then
         set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0)
       else
         set_mario_action(m, ACT_TRIPLE_JUMP, 0)
@@ -877,4 +992,107 @@ function djui_popup_create_mystery(msg, lines)
   else
     djui_popup_create(msg, lines)
   end
+end
+
+-- used to sync timers every second instead of on every frame
+local currGlobalTimer = {}
+local prevGlobalTimer = {}
+local currPlayerTimer = {}
+local prevPlayerTimer = {}
+for i=0,MAX_PLAYERS-1 do
+  currPlayerTimer[i] = {}
+  prevPlayerTimer[i] = {}
+end
+function handle_synced_timer(table, key, index, change_, min_, max, syncTime_, doSync_)
+  local currTimer = currGlobalTimer
+  local prevTimer = prevGlobalTimer
+  local doSync = network_is_server()
+  local change = change_ or -1
+  local min = min_ or 0
+  local syncTime = syncTime_ or 30
+  if table ~= gGlobalSyncTable then
+    currTimer = currPlayerTimer[index or 0]
+    prevTimer = prevPlayerTimer[index or 0]
+    table = table[index or 0]
+    doSync = (index == 0)
+  end
+  if doSync_ ~= nil then doSync = doSync_ end
+
+  if not currTimer[key] then
+    currTimer[key] = min
+    prevTimer[key] = min
+  end
+  
+  local prevValue = currTimer[key]
+  currTimer[key] = currTimer[key] + change
+  if currTimer[key] < min then
+    currTimer[key] = min
+  elseif max and currTimer[key] > max then
+    currTimer[key] = max
+  end
+
+  -- sync with new value
+  if table[key] and prevTimer[key] ~= table[key] then
+    currTimer[key] = table[key]
+    prevTimer[key] = table[key]
+  end
+  
+  -- don't send value if it didn't change
+  if prevValue == currTimer[key] then return currTimer[key] end
+
+  -- put value in table every syncTime frames (usually 1 second)
+  if doSync and currTimer[key] % syncTime == 0 then
+    table[key] = currTimer[key]
+    prevTimer[key] = currTimer[key]
+  end
+  return currTimer[key]
+end
+
+function get_synced_timer_value(table, key, index)
+  local currTimer = currGlobalTimer
+  local prevTimer = prevGlobalTimer
+  if table ~= gGlobalSyncTable then
+    currTimer = currPlayerTimer[index or 0]
+    prevTimer = prevPlayerTimer[index or 0]
+    table = table[index or 0]
+  end
+
+  if not currTimer[key] then
+    currTimer[key] = 0
+    prevTimer[key] = 0
+  end
+
+  -- sync with new value
+  if table[key] and prevTimer[key] ~= table[key] then
+    currTimer[key] = table[key]
+    prevTimer[key] = table[key]
+  end
+
+  return currTimer[key] or 0
+end
+
+-- set the default values for player synced tables. Set on disconnect and for everyone when we join
+function set_default_sync_values(sMario)
+  -- unassign stats
+  sMario.wins, sMario.hardWins, sMario.exWins, sMario.wins_standard, sMario.hardWins_standard, sMario.exWins_standard, sMario.wins_mys, sMario.hardWins_mys, sMario.exWins_mys, sMario.kills, sMario.maxStreak, sMario.maxStar, sMario.beenRunner, sMario.pRecordOmm, sMario.pRecordOther, sMario.parkourRecord, sMario.playtime =
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 599, 599, 599, 0
+  
+  sMario.totalStars = 0
+  sMario.pause = false
+  sMario.forceSpectate = false
+  sMario.spectator = 0
+  sMario.fasterActions = true
+  sMario.choseToLeave = false
+  sMario.inActSelect = false
+  sMario.guardTime = 0
+  sMario.killCooldown = 0
+  sMario.rejoinID = "-1"
+  sMario.placement = 9999
+  sMario.placementASN = 9999
+  sMario.fasterActions = true
+  sMario.role = 0
+  sMario.knownDead = true
+  sMario.dead = true
+  sMario.hard = 0
+  sMario.mute = false
 end

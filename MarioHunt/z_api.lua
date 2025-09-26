@@ -5,9 +5,7 @@ _G.mhExists = true -- use this to detect MarioHunt
 _G.mhApi = {}
 
 -- check mhSetup.lua for more info
-_G.mhApi.RomhackSetup = function()
-  return nil
-end
+--_G.mhApi.romhackSetup
 
 -- takes a local player index and returns 1 (runner) or 0 (hunter)
 _G.mhApi.getTeam = function(index)
@@ -71,7 +69,7 @@ _G.mhApi.isMenuOpen = is_menu_open
 -- used for the Limbokong's Proximity Vociechat version
 -- returns true if global talking is active (in lobby, or in mysteryhunt when global talk is on)
 _G.mhApi.isGlobalTalkActive = function()
-  return (gGlobalSyncTable.mhMode == 3 and (gGlobalSyncTable.maxGlobalTalk == 0 or gGlobalSyncTable.globalTalkTimer ~= 0 or gGlobalSyncTable.mhState ~= 2)) or (gGlobalSyncTable.mhState ~= 1 and gGlobalSyncTable.mhState ~= 2)
+  return (gGlobalSyncTable.mhMode == 3 and (gGlobalSyncTable.maxGlobalTalk == 0 or get_synced_timer_value(gGlobalSyncTable, "globalTalkTimer") ~= 0 or gGlobalSyncTable.mhState ~= 2)) or (gGlobalSyncTable.mhState ~= 1 and gGlobalSyncTable.mhState ~= 2)
 end
 
 -- used for the Limbokong's Proximity Vociechat version
@@ -108,6 +106,9 @@ _G.mhApi.get_season_lighting = get_season_lighting
 
 -- this gets the local player's current kill combo
 _G.mhApi.getKillCombo = get_kill_combo
+
+-- used for synced timers (in gGlobalSyncTable and gPlayerSyncTable); use this instead of reading the normal value
+_G.mhApi.get_synced_timer_value = get_synced_timer_value
 
 -- for mods that use HOOK_ON_CHAT_MESSAGE to cancel messages, set this value to that function (check mute.lua with api_stuff for an example)
 -- _G.mhApi.chatValidFunction

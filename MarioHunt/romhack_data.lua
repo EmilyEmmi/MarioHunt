@@ -28,7 +28,7 @@ local romhack_data = {           -- supported rom hack data
       [LEVEL_RR] = 50,
       [LEVEL_WMOTR] = 50,
       [LEVEL_BITS] = 70,
-      [LEVEL_BOWSER_3] = 120, -- NOTE: This is overridden by the default star run
+      [LEVEL_BOWSER_3] = 121, -- NOTE: This is overridden by the default star run
     },
     ddd = true,               -- pretty much only relevant for vanilla
     heartReplace = true,      -- replaces all hearts with 1ups
@@ -57,18 +57,15 @@ local romhack_data = {           -- supported rom hack data
       [103] = 1, -- In The Deep Freeze (too easy)
       [124] = 1, -- Mysterious Mountainside (too easy)
       [84] = 1,  -- Stand Tall On Four Pillars (too annoying)
-      [45] = 1,  -- Snowman's Lost His Head (inconsistant)
+      [45] = 1,  -- Snowman's Lost His Head (inconsistent)
       [12] = 1, -- Footrace With Koopa The Quick (takes FOREVER)
       [133] = 1, -- Rematch With Koopa The Quick (takes FOREVER)
       [56] = 1, -- Eye-To-Eye In The Secret Room (one-sided)
+      [42] = 1, -- L'il Penguin Lost (basically impossible tbh)
     },
 
-    -- this is a function run every frame for all players. This one in particular handles 0 star runs and minihunts in ttc
+    -- this is a function run every frame for all players. This one in particular ttc speed in minihunt
     special_run = function(m, gotStar)
-      local np = gNetworkPlayers[m.playerIndex]
-      if m.playerIndex == 0 and np.currLevelNum == LEVEL_DDD and gGlobalSyncTable.starRun == 0 and gGlobalSyncTable.mhMode ~= 2 then
-        warp_to_level(LEVEL_BITFS, 1, 0)
-      end
       if gGlobalSyncTable.mhMode == 2 and gGlobalSyncTable.gameLevel == LEVEL_TTC then
         if gGlobalSyncTable.getStar == 6 then
           set_ttc_speed_setting(3)
@@ -90,6 +87,215 @@ local romhack_data = {           -- supported rom hack data
       [221] = "Red Coin Acrobatics",
       [231] = "The Rainbow's Red Coins",
       [241] = "Swimming With The Coins",
+    },
+
+    -- information for the Game Area setting
+    gameAreaData = {
+      { -- default
+        entryLevel = LEVEL_CASTLE_GROUNDS,
+        entryNode = 0, -- uses default warp
+        exitCastleLevel = LEVEL_CASTLE,
+        exitCastleWarpNode = 0x1F,
+      },
+      {
+        name = "Main Floor",
+        entryLevel = LEVEL_CASTLE_GROUNDS,
+        entryNode = 0, -- uses default warp
+        exitCastleLevel = LEVEL_CASTLE,
+        exitCastleWarpNode = 0x1F,
+        default_stars = 15,
+        max_stars = 42,
+        bannedAreas = {
+          [62] = 1, -- Upper Floor
+          [63] = 1, -- Basement
+        },
+        doorCost = {
+          [8] = 15,
+        },
+        requirements = {
+          [LEVEL_COTMC] = 3,
+          [LEVEL_BITDW] = 15,
+          [LEVEL_BOWSER_1] = 121,
+        },
+        runner_victory = function(m)
+          return (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_1 | SAVE_FLAG_UNLOCKED_BASEMENT_DOOR)) ~= 0
+        end,
+        extraObject = {
+          [61] = { -- Main Floor
+            -- formatted as oid, model, x, y, z, warp level, warp area
+            {id_bhvWarp, E_MODEL_NONE, 2000, 819, -1700, 0, LEVEL_COTMC, 1},
+          },
+          [261] = { -- Courtyard
+            {id_bhvWaterLevelPillar, E_MODEL_CASTLE_WATER_LEVEL_PILLAR, 3300, 400, -2800},
+            {id_bhvWaterLevelPillar, E_MODEL_CASTLE_WATER_LEVEL_PILLAR, -3300, 400, -2800},
+          },
+        },
+        warpNodeOverride = {
+          [63] = { -- warps from COTMC
+            [0x34] = {LEVEL_CASTLE, 1, 0x27}, -- star
+            [0x66] = {LEVEL_CASTLE, 1, 0x28}, -- death
+          },
+        },
+      },
+      {
+        name = "Basement",
+        entryLevel = LEVEL_CASTLE,
+        entryNode = 0, -- uses default warp
+        entryArea = 3,
+        exitCastleLevel = LEVEL_CASTLE,
+        exitCastleArea = 3,
+        exitCastleWarpNode = 0,
+        ddd = true,
+        default_stars = 16,
+        max_stars = 34,
+        bannedAreas = {
+          [61] = 1, -- Main Floor
+          [62] = 1, -- Upper Floor
+        },
+        doorCost = {
+          [30] = 15,
+        },
+        requirements = {
+          [LEVEL_DDD] = 15,
+          [LEVEL_BITFS] = 16,
+          [LEVEL_BOWSER_2] = 121,
+        },
+        runner_victory = function(m)
+          return (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)) ~= 0
+        end,
+        extraObject = {
+          [63] = { -- Basement
+            -- formatted as oid, model, x, y, z, warp level, warp area
+            {id_bhvMHWingCapWarp, E_MODEL_TOTWC_ENTRANCE, -765, -1279, 2386, 0, LEVEL_TOTWC, 1},
+          },
+          [161] = { -- Grounds
+            -- pipe to basement (in case someone gets sent to grounds without moat drained)
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, 0, 803, -2800, 0, LEVEL_CASTLE, 2},
+          },
+        },
+        warpNodeOverride = {
+          [61] = { -- warps from TOTWC
+            [0x26] = {LEVEL_CASTLE, 3, 0x0A}, -- star
+            [0x23] = {LEVEL_CASTLE, 3, 0x0A}, -- death
+            [0x20] = {LEVEL_CASTLE, 3, 0x0A}, -- flying OOB
+          },
+          [161] = { -- warps from COTMC + Castle Death
+            [0x14] = {LEVEL_CASTLE, 3, 0x66}, -- falling in COTMC
+            [0x03] = {LEVEL_CASTLE, 3, 0x0A}, -- castle death
+          },
+        },
+      },
+      {
+        name = "Upstairs",
+        entryLevel = LEVEL_CASTLE,
+        entryNode = 1,
+        entryArea = 2,
+        exitCastleLevel = LEVEL_CASTLE,
+        exitCastleArea = 2,
+        exitCastleWarpNode = 1,
+        default_stars = 25,
+        max_stars = 49,
+        bannedAreas = {
+          [61] = 1, -- Main Floor
+          [63] = 1, -- Basement
+        },
+        requirements = {
+          [LEVEL_TTC] = 10,
+          [LEVEL_RR] = 10,
+          [LEVEL_WMOTR] = 10,
+          [LEVEL_BITS] = 48,
+        },
+        doorCost = {
+          [50] = 10,
+        },
+        extraObject = {
+          [62] = { -- Upper Floor
+            -- formatted as oid, model, x, y, z, warp level, warp area
+            {id_bhvMHWingCapWarp, E_MODEL_TOTWC_ENTRANCE, 1660, 2765, 6630, 0, LEVEL_TOTWC, 1},
+            {id_bhvWarpPipe, E_MODEL_NONE, 3550, 1408, 3447, 0, LEVEL_VCUTM, 1}, -- real pipe (invisible)
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, 5113, 1408, 3447, 0, 0, 0}, -- pipe in mirror
+          },
+          [112] = { -- Wet-Dry World
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, 1967, -2559, 2627, 0, LEVEL_COTMC, 1},
+          },
+          [161] = { -- Grounds
+            -- pipe to upper floor (in case someone gets sent to grounds)
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, 0, 803, -2800, 0, LEVEL_CASTLE, 3},
+          },
+        },
+        warpNodeOverride = {
+          [61] = { -- warps from TOTWC
+            [0x26] = {LEVEL_CASTLE, 2, 0x38}, -- star
+            [0x23] = {LEVEL_CASTLE, 2, 0x6D}, -- death
+            [0x20] = {LEVEL_CASTLE, 2, 0x38}, -- flying OOB
+          },
+          [63] = { -- warps from COTMC
+            [0x34] = {LEVEL_CASTLE, 2, 0x32}, -- star
+            [0x66] = {LEVEL_CASTLE, 2, 0x64}, -- death
+          },
+          [161] = { -- warps from WMOTR, VCUTM, and COTMC (+ castle death)
+            [0x0A] = {LEVEL_CASTLE, 2, 0x6D}, -- falling OOB in WMOTR (uses death warp instead)
+            [0x08] = {LEVEL_CASTLE, 2, 0x36}, -- star in VCUTM
+            [0x07] = {LEVEL_CASTLE, 2, 0x68}, -- death in VCUTM
+            [0x06] = {LEVEL_CASTLE, 2, 0x68}, -- falling in VCUTM
+            [0x14] = {LEVEL_CASTLE, 2, 0x64}, -- falling in COTMC
+            [0x03] = {LEVEL_CASTLE, 2, 0x01}, -- castle death
+          },
+        },
+      },
+      {
+        name = "Top Floor",
+        entryLevel = LEVEL_CASTLE,
+        entryNode = 53,
+        entryArea = 2,
+        exitCastleLevel = LEVEL_CASTLE,
+        exitCastleArea = 2,
+        exitCastleWarpNode = 53,
+        default_stars = 8,
+        max_stars = 17,
+        bannedAreas = {
+          [61] = 1, -- Main Floor
+          [63] = 1, -- Basement
+          [101] = 1, -- SL
+          [111] = 1, -- WDW
+          [361] = 1, -- TTM
+          [131] = 1, -- THI (Huge)
+          [132] = 1, -- THI (Tiny)
+          [181] = 1, -- VCUTM
+        },
+        doorCost = {
+          [70] = 16,
+        },
+        requirements = {
+          [LEVEL_TTC] = 0,
+          [LEVEL_RR] = 0,
+          [LEVEL_WMOTR] = 0,
+          [LEVEL_BITS] = 16,
+        },
+        extraObject = {
+          [62] = { -- Upper Floor
+            -- formatted as oid, model, x, y, z, warp level, warp area
+            {id_bhvMHWingCapWarp, E_MODEL_TOTWC_ENTRANCE, 1660, 2765, 6630, 0, LEVEL_TOTWC, 1},
+            {id_bhvPushableMetalBox, E_MODEL_METAL_BOX, -200, 2203, 4781, 0},
+            {id_bhvPushableMetalBox, E_MODEL_METAL_BOX, -973, 1153, 2621, 0},
+          },
+          [161] = { -- Grounds
+            -- pipe to upper floor (in case someone gets sent to grounds)
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, 0, 803, -2800, 0, LEVEL_CASTLE, 3, 53},
+          },
+        },
+        warpNodeOverride = {
+          [61] = { -- warps from TOTWC
+            [0x26] = {LEVEL_CASTLE, 2, 0x38}, -- star
+            [0x23] = {LEVEL_CASTLE, 2, 0x6D}, -- death
+            [0x20] = {LEVEL_CASTLE, 2, 0x38}, -- flying OOB
+          },
+          [161] = { -- warps from WMOTR (+ castle death)
+            [0x0A] = {LEVEL_CASTLE, 2, 0x6D}, -- falling OOB in WMOTR (uses death warp instead)
+            [0x03] = {LEVEL_CASTLE, 2, 0x67}, -- castle death
+          },
+        },
+      },
     },
 
     minimap_data = {
@@ -177,7 +383,7 @@ local romhack_data = {           -- supported rom hack data
       [COURSE_SL] = { 8, 8 | STAR_NOT_ACT_1, 8, 8, 8, 8, 8 },
       [COURSE_TTM] = { 8, 8 | STAR_NOT_ACT_1, 8 | STAR_NOT_ACT_1, 8 | STAR_NOT_ACT_1, 8, 8, 8 },
       [COURSE_TTC] = { 8, 8, 8, 8, 8, 8 | STAR_ACT_SPECIFIC, 8 },                                                         -- star 1 actually disappears in acts 5 and 6 (I could account for that but ehhh)
-      [COURSE_WDW] = { 8 | STAR_ACT_SPECIFIC | STAR_IGNORE_STARMODE, 8, 8, 8, 8, 8, 8 },                                  -- ignored in star mode because it's glitchy
+      [COURSE_WDW] = { 8 | STAR_ACT_SPECIFIC, 8, 8, 8, 8, 8, 8 },
       [COURSE_THI] = { 8, 8 | STAR_ACT_SPECIFIC, 8, 8, 8 | STAR_NOT_BEFORE_THIS_ACT, 8 | STAR_ACT_SPECIFIC | STAR_EXIT, 8 },
       [COURSE_RR] = { 8, 8, 8 | STAR_IGNORE_STARMODE | STAR_APPLY_NO_ACTS, 8, 8, 8 | STAR_EXIT | STAR_APPLY_NO_ACTS, 8 }, -- don't get trapped in In The Cage
       [COURSE_BITDW] = { 8, 0, 0, 8 | STAR_REPLICA },
@@ -196,7 +402,6 @@ local romhack_data = {           -- supported rom hack data
     mini_exclude = {
       [46] = 1,  -- The Other Entrance
       [205] = 1, -- Replica for Creepy Cap Cave
-      [111] = 1, -- Tuxie Race Down The Slide (glitchy)
     },
 
     special_run = function(m, gotStar)
@@ -235,6 +440,145 @@ local romhack_data = {           -- supported rom hack data
       [252] = "Bowser's Power Star",
     },
     replica_start = 121, -- replicas are considered at this star count
+
+    -- information for the Game Area setting (TODO: goals for other areas, access cap stages)
+    gameAreaData = {
+      { -- default
+        entryLevel = LEVEL_CASTLE_GROUNDS,
+        entryNode = 0, -- uses default warp
+        exitCastleLevel = LEVEL_CASTLE_GROUNDS,
+        exitCastleWarpNode = 128,
+
+        extraObject = {
+          [261] = {
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, -989, 3925, -1365, 0, LEVEL_CASTLE, 1}, -- pipe over cannon to Star Haven
+          },
+          [61] = {
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, 3400, 160, -2733, 0, LEVEL_CASTLE_COURTYARD, 1, 39}, -- Star Haven pipe to Star Leap Tower
+          },
+        }
+      },
+      {
+        name = "Courtyard",
+        entryLevel = LEVEL_CASTLE_GROUNDS,
+        entryNode = 0, -- uses default warp
+        exitCastleLevel = LEVEL_CASTLE_GROUNDS,
+        exitCastleWarpNode = 128,
+        default_stars = 20,
+        max_stars = 40,
+        bannedAreas = {
+          [261] = 1, -- Star-Leap Tower
+          [61] = 1, -- Star Haven
+        },
+        requirements = {
+          [LEVEL_BITDW] = 20,
+          [LEVEL_BOWSER_1] = 150,
+        },
+        runner_victory = function(m)
+          return (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_1 | SAVE_FLAG_UNLOCKED_BASEMENT_DOOR)) ~= 0
+        end,
+        extraObject = {
+          [241] = {
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, 4023, 1744, -6491, 0, LEVEL_TOTWC, 1}, -- pipe in SKR to wing cap
+          },
+        },
+        warpNodeOverride = {
+          [261] = { -- warps from TOTWC
+            [0x27] = {LEVEL_CASTLE_GROUNDS, 1, 0x24}, -- star
+            [0x28] = {LEVEL_CASTLE_GROUNDS, 1, 0x25}, -- death
+          },
+        },
+      },
+      {
+        name = "Lower Tower",
+        entryLevel = LEVEL_CASTLE_COURTYARD,
+        entryNode = 256,
+        exitCastleLevel = LEVEL_CASTLE_COURTYARD,
+        exitCastleWarpNode = 256,
+        default_stars = 20,
+        max_stars = 41,
+        bannedAreas = {
+          [161] = 1, -- Courtyard
+          [61] = 1, -- Star Haven
+        },
+        doorCost = {
+          [30] = 8, -- only 8 because there is no 10 star door texture
+          [40] = 20,
+        },
+        requirements = {
+          [LEVEL_DDD] = 8, -- Mad Musical Mess
+          [LEVEL_BITFS] = 20,
+          [LEVEL_BOWSER_2] = 150,
+        },
+        runner_victory = function(m)
+          return (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)) ~= 0
+        end,
+        extraObject = {
+          [71] = {
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, 6305, 3374, 4200, 0, LEVEL_COTMC, 1}, -- pipe in CCC to metal cap
+          },
+          [231] = {
+            {id_bhvWarp, E_MODEL_NONE, 2007, 1800, 1258, 0x14000000, LEVEL_TOTWC, 1}, -- warp in MMM to wing cap
+          },
+          [101] = {
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, -1847, 285, -4682, 0, LEVEL_VCUTM, 1}, -- pipe in MSP to vanish cap
+          },
+        },
+        warpNodeOverride = {
+          [161] = { -- warps from VCUTM and COTMC
+            [0x1B] = {LEVEL_CASTLE_COURTYARD, 1, 0x15}, -- cotmc star
+            [0x1C] = {LEVEL_CASTLE_COURTYARD, 1, 0x16}, -- cotmc death
+            [0x2A] = {LEVEL_CASTLE_COURTYARD, 1, 0x0C}, -- vcutm star
+            [0x2B] = {LEVEL_CASTLE_COURTYARD, 1, 0x0D}, -- vcutm death
+          },
+          [261] = { -- warps from TOTWC
+            [0x27] = {LEVEL_CASTLE_COURTYARD, 1, 0x12}, -- star
+            [0x28] = {LEVEL_CASTLE_COURTYARD, 1, 0x13}, -- death
+          },
+        },
+      },
+      {
+        name = "Upper Tower",
+        entryLevel = LEVEL_CASTLE_COURTYARD,
+        entryNode = 8,
+        exitCastleLevel = LEVEL_CASTLE_COURTYARD,
+        exitCastleWarpNode = 8,
+        default_stars = 20,
+        max_stars = 36,
+        bannedAreas = {
+          [161] = 1, -- Courtyard
+        },
+        doorCost = {
+          [65] = 10, -- only 8 because there is no 10 star door texture
+          [80] = 20,
+        },
+        requirements = {
+          [LEVEL_BITS] = 20,
+        },
+        extraObject = {
+          [261] = {
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, -989, 3925, -1365, 0, LEVEL_CASTLE, 1}, -- pipe over cannon to Star Haven
+          },
+          [61] = {
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, 3400, 160, -2733, 0, LEVEL_CASTLE_COURTYARD, 1, 39}, -- Star Haven pipe to Star Leap Tower
+          },
+          [141] = {
+            {id_bhvDoorWarp, E_MODEL_HMC_METAL_DOOR, -800, -774, 200, 0, LEVEL_VCUTM, 1}, -- door in factory to vanish cap
+          },
+          [131] = {
+            {id_bhvWarpPipe, E_MODEL_BITS_WARP_PIPE, -4676, -464, -2729, 0, LEVEL_COTMC, 1}, -- pipe in FFF to metal cap
+          },
+        },
+        warpNodeOverride = {
+          [161] = { -- warps from VCUTM and COTMC
+            [0x1B] = {LEVEL_CASTLE_COURTYARD, 1, 0x2A}, -- cotmc star
+            [0x1C] = {LEVEL_CASTLE_COURTYARD, 1, 0x2B}, -- cotmc death
+            [0x2A] = {LEVEL_CASTLE, 1, 0x06}, -- vcutm star
+            [0x2B] = {LEVEL_CASTLE, 1, 0x07}, -- vcutm death
+          },
+        },
+      },
+    },
 
     otherStarIds = (function()
       return { -- table of other objects to be marked as stars
@@ -672,6 +1016,96 @@ local romhack_data = {           -- supported rom hack data
       [COURSE_PSS] = 1, -- The Super Quiz
     },
 
+    gameAreaData = {
+      { -- default
+        entryLevel = LEVEL_CASTLE_GROUNDS,
+        entryNode = 0, -- uses default warp
+        exitCastleLevel = LEVEL_CASTLE_GROUNDS,
+        exitCastleWarpNode = 10,
+      },
+      {
+        name = "World 1",
+        entryLevel = LEVEL_BOB,
+        entryNode = 10,
+        exitCastleLevel = LEVEL_BOB,
+        exitCastleWarpNode = 10,
+        default_stars = -1,
+        max_stars = 11,
+        bannedAreas = {
+          [161] = 1, -- Castle Grounds
+          [71] = 1, -- 2-3 (prevent warp zone in 1-2)
+        },
+        runner_victory = function(m)
+          return (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_1 | SAVE_FLAG_UNLOCKED_BASEMENT_DOOR)) ~= 0
+        end,
+      },
+      {
+        name = "World 2",
+        entryLevel = LEVEL_CCM,
+        entryNode = 10,
+        exitCastleLevel = LEVEL_CCM,
+        exitCastleWarpNode = 10,
+        default_stars = -1,
+        max_stars = 16,
+        bannedAreas = {
+          [161] = 1, -- Castle Grounds
+          [221] = 1, -- 3-1 (prevent warp zone in 2-2)
+        },
+        runner_victory = function(m)
+          return (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR)) ~= 0
+        end,
+      },
+      {
+        name = "World 3",
+        entryLevel = LEVEL_LLL,
+        entryNode = 10,
+        exitCastleLevel = LEVEL_LLL,
+        exitCastleWarpNode = 10,
+        default_stars = -1,
+        max_stars = 16,
+        bannedAreas = {
+          [161] = 1, -- Castle Grounds
+          [261] = 1, -- Castle Courtyard
+          [141] = 1, -- 5-2 (prevent warp zone in 3-2)
+        },
+        runner_victory = function(m)
+          return (save_file_get_flags() & (SAVE_FLAG_HAVE_METAL_CAP)) ~= 0
+        end,
+      },
+      {
+        name = "World 4",
+        entryLevel = LEVEL_SL,
+        entryNode = 10,
+        exitCastleLevel = LEVEL_SL,
+        exitCastleWarpNode = 10,
+        default_stars = -1,
+        max_stars = 16,
+        bannedAreas = {
+          [161] = 1, -- Castle Grounds
+          [261] = 1, -- Castle Courtyard
+          [131] = 1, -- 5-1 (prevent warp zone in 4-1)
+        },
+        runner_victory = function(m)
+          return (save_file_get_flags() & (SAVE_FLAG_HAVE_VANISH_CAP)) ~= 0
+        end,
+      },
+      {
+        name = "World 5",
+        entryLevel = LEVEL_THI,
+        entryNode = 10,
+        exitCastleLevel = LEVEL_THI,
+        exitCastleWarpNode = 10,
+        default_stars = -1,
+        max_stars = 22,
+        bannedAreas = {
+          [161] = 1, -- Castle Grounds
+          [261] = 1, -- Castle Courtyard
+          [61] = 1, -- Castle
+          [291] = 1, -- 5-5
+        },
+      },
+    },
+
     runner_victory = function(m) -- red switch is after bowser
       if (save_file_get_flags() & SAVE_FLAG_HAVE_WING_CAP) ~= 0 and not gGlobalSyncTable.bowserBeaten then
         gGlobalSyncTable.bowserBeaten = true
@@ -887,6 +1321,7 @@ local romhack_data = {           -- supported rom hack data
     stalk = true,       -- the hack is confusing, so let people warp
     final = -1,
     noCapDefault = true,
+    checkAreaWarp = true,
 
     star_data = {}, -- filled when parsed
 
@@ -1578,6 +2013,7 @@ local romhack_data = {           -- supported rom hack data
     max_stars = 255,
     requirements = { [LEVEL_BOWSER_3] = 255, [LEVEL_ENDING] = 255 }, -- block off Bowser 3 until needed stars are collected
     parseStars = true,                                               -- automatically generate star list
+    checkAreaWarp = true,
 
     star_data = {},                                                  -- assume every secret stage has 1 star
 
@@ -1622,10 +2058,10 @@ function setup_hack_data(settingRomHack, initial, usingOMM)
     end
     for i, mod in pairs(gActiveMods) do
       if mod.enabled then
-        if not (mhApi and mhApi.romhackSetup) and mod.incompatible and string.find(mod.incompatible, "romhack") then   -- is a romhack
+        if not (mhApi and mhApi.romhackSetup) and incompatible_or_category(mod, "romhack") then   -- is a romhack
           romhack_file = mod.relativePath:gsub("ROMHACK - ", "")
           found_121 = false
-        elseif initial and not (usingOMM or movesetEnabled) and mod.incompatible and string.find(mod.incompatible, "moveset") then   -- is moveset
+        elseif initial and not (usingOMM or movesetEnabled) and incompatible_or_category(mod, "moveset") then   -- is moveset
           movesetEnabled = true
         elseif (not found_121) and (romhack_file == "vanilla") and string.find(mod.name, "121rst star") then                         -- 121rst star support
           found_121 = true
@@ -1693,17 +2129,35 @@ function setup_hack_data(settingRomHack, initial, usingOMM)
   else
     defaultStarColor = { r = 255, g = 255, b = 92 } -- yellow
   end
-
-  if initial and ROMHACK.otherStarIds then
-    local otherStarIds = ROMHACK.otherStarIds() or {}
-    for id, name in pairs(otherStarIds) do
-      star_ids[id] = name
-    end
+  if ROMHACK.noMiniMap then
+    showMiniMap = false
   end
-  if initial and ROMHACK.otherStarSources then
-    local otherStarSources = ROMHACK.otherStarSources() or {}
-    for id, data in pairs(otherStarSources) do
-      star_sources[id] = data
+  if ROMHACK.noRadar then
+    showRadar = false
+  end
+
+  if initial then
+    if ROMHACK.otherStarIds then
+      local otherStarIds = ROMHACK.otherStarIds() or {}
+      for id, name in pairs(otherStarIds) do
+        star_ids[id] = name
+      end
+    end
+    if ROMHACK.otherStarSources then
+      local otherStarSources = ROMHACK.otherStarSources() or {}
+      for id, data in pairs(otherStarSources) do
+        star_sources[id] = data
+      end
+    end
+    -- ONLY enable base fix collision bugs so that most vanilla tricks still work
+    if gLevelValues.fixCollisionBugs and gLevelValues.fixCollisionBugs ~= 0 then
+      disableWallFixOption = true
+    else
+      gLevelValues.fixCollisionBugs                 = bool_to_int(gGlobalSyncTable.invisWallFix)
+      gLevelValues.fixCollisionBugsRoundedCorners   = 0
+      gLevelValues.fixCollisionBugsFalseLedgeGrab   = 0
+      gLevelValues.fixCollisionBugsGroundPoundBonks = 0
+      gLevelValues.fixCollisionBugsPickBestWall     = 0
     end
   end
 
@@ -1744,13 +2198,26 @@ function setup_hack_data(settingRomHack, initial, usingOMM)
     gGlobalSyncTable.starRun = ROMHACK.default_stars
     gGlobalSyncTable.noBowser = ROMHACK.no_bowser or false
     gGlobalSyncTable.romhackFile = romhack_file
+    change_setting_default("allowStalk", gGlobalSyncTable.allowStalk)
+    change_setting_default("starRun", gGlobalSyncTable.starRun)
+    change_setting_default("noBowser", gGlobalSyncTable.noBowser)
   end
   return romhack_file
 end
 
+-- checks both mod.incompatible and mod.category
+function incompatible_or_category(mod, category)
+  if mod.category then
+    return mod.category == category
+  elseif mod.incompatible and string.find(mod.incompatible, category) then
+    return true
+  end
+  return false
+end
+
 -- uses level_script_parse to setup romhack data
 function parse_course_stars(course, level)
-  if level_is_vanilla_level(level) then
+  if gGlobalSyncTable.romhackFile ~= "vanilla" and level_is_vanilla_level(level) then
     print(level, "is vanilla", course)
     ROMHACK.star_data[course] = {}
     return
@@ -1777,9 +2244,10 @@ function parse_course_stars(course, level)
     PARSE_LEVEL = LEVEL_CASTLE_COURTYARD
     level_script_parse(PARSE_LEVEL, parse_stars)
   end
+
   local starCount = 0
   for i = 1, 7 do
-    if (PARSE_FOUND_STARS[i] or (i == 7 and course <= 15 and course > 0)) then
+    if (PARSE_FOUND_STARS[i] or (i == 7 and course <= 15 and course > 0 and gLevelValues.coinsRequiredForCoinStar ~= 255 and gLevelValues.coinsRequiredForCoinStar ~= 0)) then
       ROMHACK.star_data[course][i] = PARSE_FOUND_STARS[i] or 1 -- 100 coin star is always area 1
 
       if not ROMHACK.starNames[course * 10 + i] then
@@ -1816,6 +2284,20 @@ function parse_stars(area, bhvData, macroBhvIds, macroBhvArgs)
     end
   elseif area and area ~= 0 then
     PARSE_AREA = area
+    -- check for slide star
+    local surfaceTypeData = smlua_collision_util_find_surface_types(smlua_collision_util_get_level_collision(PARSE_LEVEL, PARSE_AREA))
+    for i, floorType in ipairs(surfaceTypeData) do
+      if floorType == SURFACE_TIMER_START then
+        PARSE_FOUND_STARS[gLevelValues.pssSlideStarIndex+1] = PARSE_AREA | STAR_APPLY_NO_ACTS
+        local custom_name = (gLevelValues.pssSlideStarTime//30) .. " Second Challenge (" .. (gLevelValues.pssSlideStarIndex+1) .. ")"
+        PARSE_STAR_NAMES[PARSE_COURSE * 10 + gLevelValues.pssSlideStarIndex+1] = custom_name
+        if PARSE_PRINT then
+          djui_chat_message_create(string.format("%s (C%d, L%d, A%d)", custom_name, PARSE_COURSE, PARSE_LEVEL, PARSE_AREA))
+          print(custom_name, PARSE_COURSE, PARSE_AREA)
+        end
+        break
+      end
+    end
   elseif bhvData then
     local starNum = 0
     local obj_id = bhvData.behavior
@@ -1898,7 +2380,7 @@ function parse_stars(area, bhvData, macroBhvIds, macroBhvArgs)
         PARSE_FOUND_STARS[starNum] = PARSE_AREA | STAR_APPLY_NO_ACTS
       else
         PARSE_FOUND_STARS[starNum] = PARSE_FOUND_STARS[starNum] & ~STAR_AREA_MASK
-        PARSE_FOUND_STARS[starNum] = PARSE_FOUND_STARS[starNum]| (STAR_MULTIPLE_AREAS << (PARSE_AREA - 1))
+        PARSE_FOUND_STARS[starNum] = PARSE_FOUND_STARS[starNum] | (STAR_MULTIPLE_AREAS << (PARSE_AREA - 1))
       end
 
       if mini_invalid and not PARSE_MINI_EXCLUDE[starNum] then
@@ -1916,8 +2398,9 @@ function parse_stars(area, bhvData, macroBhvIds, macroBhvArgs)
   end
 end
 
--- exteme edition support, and sets minihunt level as beginning
-function warp_beginning()
+-- exteme edition and game area support, and sets minihunt level as beginning
+function warp_beginning(returnInfo)
+  local warpLevel, warpArea, warpAct, warpNode = 0, 0, 0, -1
   warpCooldown = 0
   if gGlobalSyncTable.mhMode == 2 and gGlobalSyncTable.mhState ~= 0 then
     local correctAct = gGlobalSyncTable.getStar
@@ -1928,33 +2411,123 @@ function warp_beginning()
 
     if correctAct == 7 then correctAct = 6 end
     if course == 0 then correctAct = 0 end
-    return warp_to_level(gGlobalSyncTable.gameLevel, area, correctAct)
+    warpLevel, warpArea, warpAct = gGlobalSyncTable.gameLevel, area, correctAct
   elseif gGlobalSyncTable.mhState == 0 and LEVEL_LOBBY and not ROMHACK.noLobby then
     gMarioStates[0].health = 0x880
-    return warp_to_level(LEVEL_LOBBY, 1, 0) -- go to custom lobby!
+    warpLevel, warpArea, warpAct = LEVEL_LOBBY, 1, 0 -- go to custom lobby!
+  elseif entryArea ~= 1 or entryNode ~= 0 then
+    warpLevel, warpArea, warpAct = gLevelValues.entryLevel, entryArea, 0
+    warpNode = (entryNode == 0) and -1 or entryNode
   elseif gGlobalSyncTable.ee then
     gMarioStates[0].health = 0x880
-    return warp_to_level(gLevelValues.entryLevel, 2, 0)
+    warpLevel, warpArea, warpAct = gLevelValues.entryLevel, 2, 0
   else
     gMarioStates[0].health = 0x880
-    return warp_to_start_level()
+    if not returnInfo then
+      return warp_to_start_level()
+    else
+      warpLevel, warpArea, warpAct, warpNode = gLevelValues.entryLevel, 1, 0, 10
+      if is_vanilla_like() and warpLevel == LEVEL_CASTLE_GROUNDS then
+        warpNode = 3 -- death node
+      end
+    end
+  end
+
+  if warpLevel == 0 then return end
+
+  if not returnInfo then
+    if warpNode == -1 then
+      return warp_to_level(warpLevel, warpArea, warpAct)
+    else
+      return warp_to_warpnode(warpLevel, warpArea, warpAct, warpNode)
+    end
+  end
+  return warpLevel, warpArea, warpAct, warpNode
+end
+
+-- updates information when the game area is changed, such as the Exit To Castle level and such
+entryArea = 1
+entryNode = 0
+function update_game_area(area)
+  local data = ROMHACK and ROMHACK.gameAreaData and ROMHACK.gameAreaData[area+1]
+  if not data then return end
+
+  gLevelValues.entryLevel = data.entryLevel
+  entryNode = data.entryNode or 0
+  entryArea = data.entryArea or 1
+  gLevelValues.exitCastleArea = data.exitCastleArea or 1
+  gLevelValues.exitCastleLevel = data.exitCastleLevel
+  gLevelValues.exitCastleWarpNode = data.exitCastleWarpNode
+  -- load only the category setting
+  if network_is_server() then
+    local fileName = string.gsub(gGlobalSyncTable.romhackFile, " ", "_")
+    local toLoad = "starRun"
+    if area ~= 0 then
+      toLoad = tostring(area) .. "_" .. toLoad
+    end
+    if fileName ~= "vanilla" then
+      toLoad = fileName .. "_" .. toLoad
+    end
+    local starRun = tonumber(mod_storage_load(toLoad)) or data.default_stars or ROMHACK.default_stars or -1
+    gGlobalSyncTable.starRun = math.floor(starRun)
   end
 end
 
--- deletes all surfaces with certain values in hub worlds, to erase star doors and the cannon grate
--- it probably also erases some other stuff but oh well
+-- checks if ROMHACK.ddd is set, either for vanilla or LM64
+-- if checkDDD is true, it also checks if our game area has the ddd flag
+function is_vanilla_like(checkDDD)
+  if not (ROMHACK and ROMHACK.ddd) then return false end
+  if checkDDD and gGlobalSyncTable.gameArea ~= 0 then
+    return ROMHACK.gameAreaData and ROMHACK.gameAreaData[gGlobalSyncTable.gameArea+1] and ROMHACK.gameAreaData[gGlobalSyncTable.gameArea+1].ddd
+  end
+  return true
+end
+
+-- deletes certain objects when their star conditions are met
 function deleteStarRoadStuff(m)
-  local starsNeeded = gGlobalSyncTable.starRun
-  if (not gGlobalSyncTable.freeRoam) and (not starsNeeded or starsNeeded == -1 or starsNeeded > m.numStars) then return end -- only if have enough for run
+  local starCategory = gGlobalSyncTable.starRun or -1
+  --if (gGlobalSyncTable.gameArea ~= 2) and (not gGlobalSyncTable.freeRoam) and (starCategory == -1 or starCategory > m.numStars) then return end -- only if have enough for run
   local np = gNetworkPlayers[0]
   if m.playerIndex ~= 0 or np.currCourseNum ~= COURSE_NONE then return end                                           -- only for local and in castle
 
   local obj = obj_get_first(OBJ_LIST_SURFACE)
-
   while obj do
     local objID = get_id_from_behavior(obj.behavior)
-    if objID > id_bhv_max_count then
-      print("deleted", objID, (obj.oBehParams >> 24))
+    local starsNeeded = 1000
+    if objID == bhvSMSRStarDoor then
+      starsNeeded = (obj.oBehParams >> 24)
+    elseif objID == bhvSMSR30StarDoorWall then
+      starsNeeded = 0 -- always erase
+    elseif objID == bhvSMSRHiddenAt120Stars then
+      starsNeeded = 65
+      if gGlobalSyncTable.gameArea ~= 0 then
+        local data = ROMHACK and ROMHACK.gameAreaData and ROMHACK.gameAreaData[gGlobalSyncTable.gameArea + 1]
+        if data and data.doorCost and data.doorCost[starsNeeded] then
+          starsNeeded = data.doorCost[starsNeeded]
+        end
+      end
+    elseif objID == bhvMhCustomDoor then
+      -- adjust 30 star doors to actually be 30 star doors
+      if (obj.oBehParams >> 24) == 4 then
+        local newCount = 30
+        if gGlobalSyncTable.gameArea ~= 0 then
+          local data = ROMHACK and ROMHACK.gameAreaData and ROMHACK.gameAreaData[gGlobalSyncTable.gameArea + 1]
+          if data and data.doorCost and data.doorCost[newCount] then
+            newCount = data.doorCost[newCount]
+          end
+        end
+
+        obj.oBehParams = (obj.oBehParams & 0xFFFFFF) | (newCount << 24)
+        if newCount == 8 then
+          obj_set_model_extended(obj, E_MODEL_CASTLE_DOOR_1_STAR)
+        end
+      end
+    end
+    if starsNeeded ~= 1000 and starCategory ~= -1 and starsNeeded > starCategory then
+      starsNeeded = starCategory
+    end
+    if (starsNeeded ~= 1000 and (gGlobalSyncTable.freeRoam or m.numStars >= starsNeeded)) then
+      print("deleted", objID, get_behavior_name_from_id(objID), (obj.oBehParams >> 24))
       obj_mark_for_deletion(obj)
       return
     end

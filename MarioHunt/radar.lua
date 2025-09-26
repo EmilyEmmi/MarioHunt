@@ -16,6 +16,11 @@ TEX_RAD_TARGET = get_texture_info('target-mark')
 TEX_MAP_ARROW = get_texture_info('map-arrow')
 TEX_KEY = get_texture_info('key-mark')
 TEX_SPOTLIGHT = get_texture_info('spotlight')
+SABO_TARGET_TEX = {
+  get_texture_info('bomb_sabo_target'),
+  get_texture_info('tox_sabo_target'),
+  get_texture_info('dark_sabo_target'),
+}
 
 -- radars
 icon_radar = {}
@@ -122,6 +127,11 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
   local screenWidth = djui_hud_get_screen_width()
   local screenHeight = djui_hud_get_screen_height()
 
+  local validRunnerTarget = -1
+  if not isObj then
+    validRunnerTarget = get_targetted_runner()
+  end
+
   -- minimap render
   if showMiniMap and not is_game_paused() then
     local renderSize = 80
@@ -137,7 +147,7 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
     local area = gNetworkPlayers[0].currAreaIndex
     if ROMHACK.minimap_data and ROMHACK.minimap_data[level * 10 + area] and ROMHACK.minimap_data[level * 10 + area][2] then
       levelSize = ROMHACK.minimap_data[level * 10 + area][2]
-    elseif not ROMHACK.ddd then
+    elseif not is_vanilla_like() then
       while pos.x > levelSize + 5 or pos.x < -levelSize - 5 or pos.z > levelSize + 5 or pos.z < -levelSize - 5 do -- adjust size if oob
         levelSize = levelSize * 2
       end
@@ -161,7 +171,8 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
       mapData.prevX = renderX
       mapData.prevY = renderY
     elseif objType == "sabo" then
-      djui_hud_set_color(255, 0, 0, 255) -- red
+      djui_hud_set_color(255, 255, 255, 255)
+      tex = SABO_TARGET_TEX[gGlobalSyncTable.saboActive] or tex
     elseif isObj and objType == nil then
       local r, g, b = 255, 255, 255
       if OmmEnabled and month ~= 14 and ROMHACK and ROMHACK.ommColorStar then
@@ -197,7 +208,7 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
     local renderY = y + yScaled * renderSize - texWidthHalf * scale
 
     if not isObj then
-      render_player_head(m.playerIndex, renderX, renderY, scale, scale, LITE_MODE)
+      render_player_head(m.playerIndex, renderX, renderY, scale, scale)
 
       local playercolor = network_get_player_text_color_string(m.playerIndex)
       local r, g, b = convert_color(playercolor)
@@ -205,8 +216,9 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
       djui_hud_set_rotation(m.faceAngle.y, 0.5, 0.5)
       djui_hud_render_texture(TEX_MAP_ARROW, renderX - 8 * scale, renderY - 8 * scale, scale, scale)
       djui_hud_set_rotation(0, 0, 0)
-      if runnerTarget == m.playerIndex and gPlayerSyncTable[0].team ~= 1 then
-        r, g, b = get_radar_color(runnerTarget)
+      
+      if validRunnerTarget == m.playerIndex then
+        r, g, b = get_radar_color(validRunnerTarget)
         djui_hud_set_color(r, g, b, 200)
         djui_hud_render_texture(TEX_HUD_TARGET, renderX, renderY, scale, scale)
       end
@@ -248,7 +260,7 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
   local r, g, b = 0, 0, 0
   local tex = radarData.tex or TEX_STAR
   if not isObj then
-    if runnerTarget == m.playerIndex and gPlayerSyncTable[0].team ~= 1 then
+    if validRunnerTarget == m.playerIndex then
       tex = TEX_RAD_TARGET
     end
     r, g, b = get_radar_color(m.playerIndex)
@@ -276,7 +288,8 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
     tex = TEX_KEY
     r, g, b = 255, 194, 0
   elseif objType == "sabo" then
-    r, g, b = 255, 0, 0
+    r, g, b = 255, 255, 255
+    tex = SABO_TARGET_TEX[gGlobalSyncTable.saboActive] or tex
   else
     if ROMHACK.isMoonshine then
       tex = TEX_MOON
@@ -329,8 +342,8 @@ local maxStar = -1
 function render_radar_act_select()
   djui_hud_set_resolution(RESOLUTION_N64)
   djui_hud_set_font(FONT_RECOLOR_HUD)
-  local screenWidth = djui_hud_get_screen_width()
-  local screenHeight = djui_hud_get_screen_height()
+  --local screenWidth = djui_hud_get_screen_width()
+  --local screenHeight = djui_hud_get_screen_height()
 
   local alpha = 200
   local course = gNetworkPlayers[0].currCourseNum
@@ -358,6 +371,8 @@ function render_radar_act_select()
   end
 
   if gGlobalSyncTable.mhMode ~= 3 then
+    local validRunnerTarget = get_targetted_runner()
+
     for i = 1, (MAX_PLAYERS - 1) do
       local act = 0
       local np = gNetworkPlayers[i]
@@ -366,12 +381,12 @@ function render_radar_act_select()
         act = np.currActNum
 
         if act <= maxStar + 1 then
-          local dX = (139 - maxStar * 17 + act * 34) + djui_hud_get_screen_width() * 0.5 - 171
+          local dX = (-maxStar * 17 + act * 34) + djui_hud_get_screen_width() * 0.5 - 32
           local dY = 64
 
           local r, g, b = get_radar_color(i)
           local tex = TEX_RAD
-          if runnerTarget == i or gGlobalSyncTable.mhMode == 3 then
+          if validRunnerTarget == i then
             tex = TEX_RAD_TARGET
           end
 
@@ -379,16 +394,6 @@ function render_radar_act_select()
           local width = tex.width * scale
           dX = dX - width * 0.5
           dY = dY - width * 0.5
-          if dX > (screenWidth - width) then
-            dX = (screenWidth - width)
-          elseif dX < 0 then
-            dX = 0
-          end
-          if dY > (screenHeight - width) then
-            dY = (screenHeight - width)
-          elseif dY < 0 then
-            dY = 0
-          end
           djui_hud_set_color(r, g, b, alpha)
           djui_hud_render_texture(tex, dX, dY, scale, scale)
         end
@@ -397,24 +402,27 @@ function render_radar_act_select()
   else
     for act = 1, maxStar + 1 do
       local playerCountHere, isHunter = get_player_and_corpse_count(course, 0, 0, act)
-      if playerCountHere ~= 0 then
+      local saboLocation = get_sabo_location_table()
+      local saboHere = (get_active_sabo() ~= 0 and saboLocation.course == course and saboLocation.act == act)
+      if playerCountHere ~= 0 or saboHere then
         local dX = (139 - maxStar * 17 + act * 34) + djui_hud_get_screen_width() * 0.5 - 171
-        local dY = 64
+        local dY = 80
 
         local text = tostring(playerCountHere)
         local scale = 1
         local width = djui_hud_measure_text(text) * scale
         dX = dX - width * 0.5
         dY = dY - 32 * scale
-        if dX > (screenWidth - width) then
-          dX = (screenWidth - width)
-        elseif dX < 0 then
-          dX = 0
-        end
-        if dY > (screenHeight - width) then
-          dY = (screenHeight - width)
-        elseif dY < 0 then
-          dY = 0
+        if saboHere then
+          local tex = SABO_TARGET_TEX[gGlobalSyncTable.saboActive] or TEX_RAD_TARGET
+          local width = tex.width * scale
+          local dX = (-maxStar * 17 + act * 34) + djui_hud_get_screen_width() * 0.5 - 32
+          local dY = 64
+          dX = dX - width * 0.5
+          dY = dY - width * 0.5
+          djui_hud_set_color(255, 255, 255, alpha)
+          djui_hud_render_texture(tex, dX, dY, scale, scale)
+          if playerCountHere == 0 then return end
         end
         if isHunter then
           djui_hud_set_color(0, 255, 255, alpha)
@@ -428,7 +436,7 @@ function render_radar_act_select()
 end
 
 -- really great feature tbh (also used for mysteryhunt radars and L button prompt)
-local warpObjs = { id_bhvWarp, id_bhvWarpPipe, id_bhvDoorWarp, id_bhvFadingWarp, id_bhvWarp, id_bhvBooCage }
+local warpObjs = { id_bhvWarp, id_bhvWarpPipe, id_bhvDoorWarp, id_bhvFadingWarp, id_bhvWarp, id_bhvBooCage, id_bhvMHWingCapWarp }
 local progressRadar = {}
 local progressMinimap = {}
 function painting_overlays_and_mystery_misc(paintingValid)
@@ -458,7 +466,7 @@ function painting_overlays_and_mystery_misc(paintingValid)
         local pos = { x = o.oPosX, y = o.oPosY + 210, z = o.oPosZ }
         local out = { x = 0, y = 0, z = 0 }
         if dist_between_objects(m.marioObj, o) < 200 and djui_hud_world_pos_to_screen_pos(pos, out) then
-          local text = trans("press_report", buttonString[reportButton])
+          local text = trans("press_fix", buttonString[reportButton])
           local width = djui_hud_measure_text(text)
           djui_hud_print_text(text, out.x - width / 2, out.y, 1)
         end
@@ -466,12 +474,13 @@ function painting_overlays_and_mystery_misc(paintingValid)
     end
   end
 
-  -- we know that vanilla (and lm64) only have warps in the castle and HMC
-  if ROMHACK and ROMHACK.ddd and np.currCourseNum ~= 0 and np.currCourseNum ~= COURSE_HMC then return end
+  -- we know that vanilla (and lm64) only have warps in the castle and HMC (and WDW in the Upper Floor area)
+  if is_vanilla_like() and np.currCourseNum ~= 0 and np.currCourseNum ~= COURSE_HMC
+  and (gGlobalSyncTable.gameArea ~= 3 or np.currCourseNum ~= COURSE_WDW) then return end
 
   -- To get the paintings, we use this get_painting_warp_node()
   -- Since it requires that mario be above the painting, we set mario's floor type and floorheight temporarily
-  if ROMHACK and (ROMHACK.ddd or ROMHACK.name == "B3313") and np.currLevelNum == LEVEL_CASTLE then
+  if ROMHACK and (is_vanilla_like() or ROMHACK.name == "B3313") and np.currLevelNum == LEVEL_CASTLE and m.floor then
     local paintingValueTable = {
       gPaintingValues.bob_painting,
       gPaintingValues.ccm_painting,
@@ -496,31 +505,43 @@ function painting_overlays_and_mystery_misc(paintingValid)
     for i = 0, 14 do
       m.floor.type = i * 3 + SURFACE_PAINTING_WARP_D3
       local warpNode = get_painting_warp_node()
-      if warpNode and warpNode.destLevel ~= 0 and warpNode.destLevel ~= 164 then -- for some reason, ttm mountain slide uses 164 for the level? wtf
-        local course = level_to_course[warpNode.destLevel] or 0
+      local level = (warpNode and warpNode.destLevel) or 0
+      if level >= 128 then level = level - 128 end
+      if level ~= 0 then
+        local course = level_to_course[level] or 0
         if not (doneCourses[course] and donePaintings[i]) then
           doneCourses[course] = 1
           donePaintings[i] = 1 -- so thi huge is seperate
-          local level = warpNode.destLevel
           local area = warpNode.destArea
-          if i == 14 and np.currAreaIndex ~= 3 then -- rainbow ride HAD to be different (it uses hmc painting even though it's nowhere near the warp. Use hardcoded position)
-            local pos = { -3400, 3116, 5886 }
-            table.insert(warpList, { course, level, area, pos })
-          else
-            local painting = paintingValueTable[i + 1]
-            if painting then
-              local pos = { painting.posX, painting.posY, painting.posZ }
-              local yawRadians = painting.yaw * math.pi / 180
-              pos[1] = math.floor(pos[1] + math.cos(yawRadians) * painting.size * 0.5)
-              pos[2] = math.floor(pos[2] + painting.size)
-              pos[3] = math.floor(pos[3] - math.sin(yawRadians) * painting.size * 0.5)
-              if painting.pitch ~= 0 then -- applies only to hmc
-                local pitchRadians = painting.pitch * math.pi / 180
-                pos[1] = pos[1] + math.cos(pitchRadians) * painting.size * 0.5
-                pos[2] = pos[2] + painting.size * (math.cos(pitchRadians) - 1) + 100
-                pos[3] = pos[3] + math.sin(pitchRadians) * painting.size * 0.5
-              end
+          local valid = true
+          -- don't show if area is banned
+          if valid and gGlobalSyncTable.gameArea ~= 0 and ROMHACK and ROMHACK.gameAreaData then
+            local areaData = ROMHACK.gameAreaData[gGlobalSyncTable.gameArea+1]
+            if areaData and areaData.bannedAreas and areaData.bannedAreas[level * 10 + area] then
+              valid = false
+            end
+          end
+
+          if valid then
+            if i == 14 and np.currAreaIndex ~= 3 then -- rainbow ride HAD to be different (it uses hmc painting even though it's nowhere near the warp. Use hardcoded position)
+              local pos = { -3400, 3116, 5886 }
               table.insert(warpList, { course, level, area, pos })
+            else
+              local painting = paintingValueTable[i + 1]
+              if painting then
+                local pos = { painting.posX, painting.posY, painting.posZ }
+                local yawRadians = painting.yaw * math.pi / 180
+                pos[1] = math.floor(pos[1] + math.cos(yawRadians) * painting.size * 0.5)
+                pos[2] = math.floor(pos[2] + painting.size)
+                pos[3] = math.floor(pos[3] - math.sin(yawRadians) * painting.size * 0.5)
+                if painting.pitch ~= 0 then -- applies only to hmc
+                  local pitchRadians = painting.pitch * math.pi / 180
+                  pos[1] = pos[1] + math.cos(pitchRadians) * painting.size * 0.5
+                  pos[2] = pos[2] + painting.size * (math.cos(pitchRadians) - 1) + 100
+                  pos[3] = pos[3] + math.sin(pitchRadians) * painting.size * 0.5
+                end
+                table.insert(warpList, { course, level, area, pos, true })
+              end
             end
           end
         end
@@ -534,11 +555,11 @@ function painting_overlays_and_mystery_misc(paintingValid)
   if m.numStars >= gLevelValues.wingCapLookUpReq then
     local pos = { -1024, 150, 717 }
     local valid = true
-    if ROMHACK and ROMHACK.ddd then
+    if is_vanilla_like() then
       valid = (np.currLevelNum == LEVEL_CASTLE and np.currAreaIndex == 1) -- hard-coded pos
     else
       -- we don't know where the wing cap warp is; only display if mario is on the surface
-      if m.floor.type == SURFACE_LOOK_UP_WARP then
+      if m.floor and m.floor.type == SURFACE_LOOK_UP_WARP then
         pos = { m.pos.x, m.floorHeight + 300, m.pos.z }
       else
         valid = false
@@ -547,14 +568,15 @@ function painting_overlays_and_mystery_misc(paintingValid)
     if valid then
       local objWarpNode = area_get_warp_node(0xF2)
       local warpNode = objWarpNode and objWarpNode.node
-      if warpNode and warpNode.destLevel ~= 0 and warpNode.destLevel ~= 164 then -- for some reason, ttm mountain slide uses 164 for the level? wtf
-        local course = level_to_course[warpNode.destLevel] or 0
+      local level = (warpNode and warpNode.destLevel) or 0
+      if level >= 128 then level = level - 128 end
+      if level ~= 0 then
+        local course = level_to_course[level] or 0
         if not doneCourses[course] then
           doneCourses[course] = 1
-          local level = warpNode.destLevel
           local area = warpNode.destArea
 
-          table.insert(warpList, { course, level, area, pos })
+          table.insert(warpList, { course, level, area, pos, true })
         end
       end
     end
@@ -564,17 +586,43 @@ function painting_overlays_and_mystery_misc(paintingValid)
   for i, id in ipairs(warpObjs) do
     local o = obj_get_first_with_behavior_id(id)
     while o do
-      local nodeID = (o.oBehParams & 0x00FF0000) >> 16
-      local objWarpNode = area_get_warp_node(nodeID)
+      local nodeID = 0
+      local objWarpNode
+      if o.oBehParams2ndByte ~= 0xEA00 then
+        nodeID = (o.oBehParams >> 16) & 0xFF
+        objWarpNode = area_get_warp_node(nodeID)
+      else -- custom warp nodes
+        local level = (o.oBehParams >> 16) & 0xFF
+        local area = o.oBehParams & 0xFF
+        objWarpNode = {node = {destLevel = level, destArea = area}}
+      end
       local warpNode = objWarpNode and objWarpNode.node
-      if warpNode and warpNode.destLevel ~= 0 and warpNode.destLevel ~= 164 then -- for some reason, ttm mountain slide uses 164 for the level? wtf
-        local course = level_to_course[warpNode.destLevel] or 0
-        if not doneCourses[course] then
+      local level = (warpNode and warpNode.destLevel) or 0
+      local area = (warpNode and warpNode.destArea) or 0
+      if level >= 128 then level = level - 128 end
+      if o.oIntangibleTimer == 0 and level ~= 0 then
+        local course = level_to_course[level] or 0
+        local valid = (not doneCourses[course])
+        -- don't show if area is banned
+        if valid and gGlobalSyncTable.gameArea ~= 0 and ROMHACK and ROMHACK.gameAreaData then
+          local areaData = ROMHACK.gameAreaData[gGlobalSyncTable.gameArea+1]
+          if areaData and areaData.bannedAreas and areaData.bannedAreas[level * 10 + area] then
+            valid = false
+          end
+        end
+
+        if valid then
           doneCourses[course] = 1
-          local level = warpNode.destLevel
-          local area = warpNode.destArea
           local pos = { math.floor(o.oPosX), math.floor(o.oPosY + 300), math.floor(o.oPosZ) }
-          table.insert(warpList, { course, level, area, pos })
+          local onScreen = true
+          -- to prevent confusion, don't show radar for PSS inside of the JRB room
+          -- don't show radar for COTMC inside of the PSS room, either (when game area is main floor)
+          if is_vanilla_like() and np.currLevelNum == LEVEL_CASTLE and (warpNode.destLevel == LEVEL_PSS or warpNode.destLevel == LEVEL_COTMC) then
+            local wrongRoom = 7
+            if level == LEVEL_COTMC then wrongRoom = 4 end
+            onScreen = (m.currentRoom ~= wrongRoom)
+          end
+          table.insert(warpList, { course, level, area, pos, onScreen })
         end
       end
       o = obj_get_next_with_same_behavior_id(o)
@@ -612,7 +660,7 @@ function painting_overlays_and_mystery_misc(paintingValid)
       totalStars = 0
       for i, data in ipairs(star_data) do
         if data ~= 0 and (data & STAR_REPLICA == 0 or not ((ROMHACK.replica_start and m.numStars < ROMHACK.replica_start) or (ROMHACK.replica_func and not ROMHACK.replica_func(m.numStars)))) then
-          if not (ROMHACK and ROMHACK.name == "B3313") then
+          if not (ROMHACK and ROMHACK.checkAreaWarp) then
             fullStarTable = fullStarTable | (1 << (i - 1))
             totalStars = totalStars + 1
           else
@@ -705,7 +753,7 @@ function painting_overlays_and_mystery_misc(paintingValid)
       local area = np.currAreaIndex
       if ROMHACK.minimap_data and ROMHACK.minimap_data[level * 10 + area] and ROMHACK.minimap_data[level * 10 + area][2] then
         levelSize = ROMHACK.minimap_data[level * 10 + area][2]
-      elseif not ROMHACK.ddd then
+      elseif not is_vanilla_like() then
         while pos.x > levelSize + 5 or pos.x < -levelSize - 5 or pos.z > levelSize + 5 or pos.z < -levelSize - 5 do -- adjust size if oob
           levelSize = levelSize * 2
         end
@@ -813,7 +861,7 @@ function painting_overlays_and_mystery_misc(paintingValid)
       mapData.prevY = renderY
     end
 
-    if gGlobalSyncTable.mhMode == 3 or totalStars ~= 0 or exThingy ~= 0 or (ROMHACK and ROMHACK.name == "B3313") then
+    if warpData[5] and (gGlobalSyncTable.mhMode == 3 or totalStars ~= 0 or exThingy ~= 0 or (ROMHACK and ROMHACK.name == "B3313")) then
       djui_hud_set_resolution(RESOLUTION_N64)
       local out = { x = 0, y = 0, z = 0 }
       local scale = 0.68
@@ -1019,7 +1067,7 @@ function render_player_minimap()
   local area = gNetworkPlayers[0].currAreaIndex
   if ROMHACK.minimap_data and ROMHACK.minimap_data[level * 10 + area] and ROMHACK.minimap_data[level * 10 + area][2] then
     levelSize = ROMHACK.minimap_data[level * 10 + area][2]
-  elseif not ROMHACK.ddd then
+  elseif not is_vanilla_like() then
     while pos.x > levelSize + 5 or pos.x < -levelSize - 5 or pos.z > levelSize + 5 or pos.z < -levelSize - 5 do -- adjust size if oob
       levelSize = levelSize * 2
     end
@@ -1031,7 +1079,7 @@ function render_player_minimap()
   local renderY = y + yScaled * renderSize - 4.8
 
   djui_hud_set_color(255, 255, 255, 255)
-  render_player_head(0, renderX, renderY, 0.6, 0.6, LITE_MODE)
+  render_player_head(0, renderX, renderY, 0.6, 0.6)
 
   local playercolor = network_get_player_text_color_string(0)
   local r, g, b = convert_color(playercolor)
@@ -1045,7 +1093,7 @@ function get_radar_color(index)
   local r, g, b = 0, 0, 0
   local sMario = gPlayerSyncTable[index]
   local roles = sMario.role
-  if (sMario.placement ~= 1 or roles & 32 == 0) and (sMario.placementASN ~= 1 or roles & 128 == 0) then
+  if (sMario.placement ~= 1 or roles & 32 == 0) and (sMario.placementASN ~= 1 or roles & 64 == 0) then
     local playercolor = network_get_player_text_color_string(index)
     r, g, b = convert_color(playercolor)
   else -- rainbow radar
@@ -1109,134 +1157,3 @@ omm_star_colors = {
   [COURSE_TTC] = { r = 250, g = 182, b = 146 },
   [COURSE_RR] = { r = 241, g = 127, b = 237 },
 }
-
--- renders player head... with color!
-local PART_ORDER = {
-  SKIN,
-  HAIR,
-  CAP,
-}
-
-HEAD_HUD = (not LITE_MODE) and get_texture_info("hud_head_recolor")
-WING_HUD = (not LITE_MODE) and get_texture_info("hud_wing")
-GOLD_CROWN_HUD = get_texture_info("gcrown_hud")
-SILVER_CROWN_HUD = get_texture_info("scrown_hud")
-BRONZE_CROWN_HUD = get_texture_info("bcrown")
-
-local defaultIcons = {
-  [gTextures.mario_head] = true,
-  [gTextures.luigi_head] = true,
-  [gTextures.toad_head] = true,
-  [gTextures.waluigi_head] = true,
-  [gTextures.wario_head] = true,
-}
-
--- the actual head render function. (includes crown)
---- @param index integer
---- @param x integer
---- @param y integer
---- @param scaleX number
---- @param scaleY number
-function render_player_head(index, x, y, scaleX, scaleY, noSpecial, alwaysCap, alpha_)
-  local m = gMarioStates[index]
-  local np = gNetworkPlayers[index]
-
-  local alpha = alpha_ or 255
-  if (not noSpecial) and (m.marioBodyState.modelState & MODEL_STATE_NOISE_ALPHA) ~= 0 then
-    alpha = math.max(alpha - 155, 0) -- vanish effect
-  end
-
-  local noColorHead = false
-  if charSelectExists then
-    djui_hud_set_color(255, 255, 255, alpha)
-    local TEX_CS_ICON = charSelect.character_get_life_icon(index)
-    if TEX_CS_ICON and not defaultIcons[TEX_CS_ICON] then
-      djui_hud_render_texture(TEX_CS_ICON, x, y, scaleX / (TEX_CS_ICON.width * 0.0625),
-        scaleY / (TEX_CS_ICON.width * 0.0625))
-      noColorHead = true
-    elseif TEX_CS_ICON == nil then
-      djui_hud_set_font(FONT_HUD)
-      djui_hud_print_text("?", x, y, scaleX)
-      noColorHead = true
-    end
-  end
-  local isMetal = false
-  local capless = false
-
-  if (not noColorHead) and LITE_MODE then
-    noColorHead = true
-    djui_hud_render_texture(m.character.hudHeadTexture, x, y, scaleX, scaleY)
-  end
-
-  local tileY = m.character.type
-  if not noColorHead then
-    for i = 1, #PART_ORDER do
-      local color = { r = 255, g = 255, b = 255 }
-      if (not noSpecial) and (m.marioBodyState.modelState & MODEL_STATE_METAL) ~= 0 then -- metal
-        color = network_player_get_override_palette_color(np, METAL)
-        djui_hud_set_color(color.r, color.g, color.b, alpha)
-        isMetal = true
-
-        if (not (noSpecial or alwaysCap)) and m.marioBodyState.capState == MARIO_HAS_DEFAULT_CAP_OFF then
-          capless = true
-          djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, 7 * 16, tileY * 16, 16, 16) -- capless metal
-        else
-          djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, 5 * 16, tileY * 16, 16, 16)
-        end
-        break
-      end
-
-      local part = PART_ORDER[i]
-      if (not (noSpecial or alwaysCap)) and part == CAP and m.marioBodyState.capState == MARIO_HAS_DEFAULT_CAP_OFF then -- capless check
-        capless = true
-        part = HAIR
-      elseif tileY == 2 or tileY == 7 then
-        if part == CAP and capless then return end
-        tileY = 7          -- use alt toad
-        if part == HAIR then -- toad doesn't use hair except when cap is off
-          if (not (noSpecial or alwaysCap)) and m.marioBodyState.capState == MARIO_HAS_DEFAULT_CAP_OFF then
-            capless = true
-            part = HAIR
-          else
-            part = GLOVES
-          end
-        end
-      end
-      color = network_player_get_override_palette_color(np, part)
-
-      djui_hud_set_color(color.r, color.g, color.b, alpha)
-      if capless then
-        djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, 6 * 16, tileY * 16, 16, 16) -- render hair instead of cap
-      else
-        djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, (i - 1) * 16, tileY * 16, 16, 16)
-      end
-    end
-  end
-
-  if noColorHead then
-    djui_hud_set_color(255, 255, 255, alpha)
-    if (not noSpecial) and m.marioBodyState.capState == MARIO_HAS_WING_CAP_ON then
-      djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY) -- wing
-    end
-  elseif not isMetal then
-    djui_hud_set_color(255, 255, 255, alpha)
-    --djui_hud_render_texture(HEAD_HUD, x, y, scaleX, scaleY)
-    djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, (#PART_ORDER) * 16, tileY * 16, 16, 16)
-
-    if not capless then
-      djui_hud_render_texture_tile(HEAD_HUD, x, y, scaleX, scaleY, (#PART_ORDER + 1) * 16, tileY * 16, 16, 16) -- hat emblem
-      if (not noSpecial) and m.marioBodyState.capState == MARIO_HAS_WING_CAP_ON then
-        djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY)                                                -- wing
-      end
-    end
-  elseif m.marioBodyState.capState == MARIO_HAS_WING_CAP_ON then
-    djui_hud_set_color(109, 170, 173, alpha)                -- blueish green
-    djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY) -- wing
-  end
-
-  local ctex = get_crown_tex(index)
-  if ctex then
-    djui_hud_set_color(255, 255, 255, alpha)
-    djui_hud_render_texture(ctex, x, y - 12 * scaleY, scaleX, scaleY)
-  end
-end

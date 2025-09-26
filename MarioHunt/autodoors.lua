@@ -5,6 +5,19 @@ doorsCanClose = false
 doorsClosing = false
 
 ---@param o Object
+function set_new_cost(o)
+  if gGlobalSyncTable.gameArea ~= 0 then
+    local data = ROMHACK and ROMHACK.gameAreaData and ROMHACK.gameAreaData[gGlobalSyncTable.gameArea + 1]
+    if data and data.doorCost then
+      local starsNeeded = (o.oBehParams >> 24)
+      if data.doorCost[starsNeeded] then
+        o.oBehParams = o.oBehParams & 0x00FFFFFF | (data.doorCost[starsNeeded] << 24)
+      end
+    end
+  end
+end
+
+---@param o Object
 function door_loop(o)
   -- fixes for: replica comet, bbh back entrance, and underworld
   local m = gMarioStates[0]
@@ -19,13 +32,13 @@ function door_loop(o)
   if ROMHACK.isUnder then return end
 
   -- check if the door has enough stars to be opened
-  local starsNeeded = (o.oBehParams >> 24) or 0 -- this gets the star count
+  local starsNeeded = (o.oBehParams >> 24) -- this gets the star count
   if gGlobalSyncTable.freeRoam then
     starsNeeded = 0
   elseif gGlobalSyncTable.starRun and gGlobalSyncTable.starRun ~= -1 and gGlobalSyncTable.starRun <= starsNeeded then
     local np = gNetworkPlayers[0]
     starsNeeded = gGlobalSyncTable.starRun
-    if (np.currAreaIndex ~= 2) and ROMHACK.ddd == true then
+    if (np.currAreaIndex ~= 2) and is_vanilla_like(true) then
       starsNeeded = starsNeeded - 1
     end
   end
@@ -38,7 +51,7 @@ function door_loop(o)
     if o.oAction == 0 then
       -- if mario is close enough, set action to the custom open door action, 5
       if dist_between_objects(o, gMarioStates[0].marioObj) <= 400 then
-          o.oAction = 5
+        o.oAction = 5
       end
     end
   end
@@ -86,35 +99,28 @@ function door_loop(o)
 end
 
 function star_door_loop(o)
-    local m = gMarioStates[0]
-    local starsNeeded = (o.oBehParams >> 24) or 0 -- this gets the star count
-    if gGlobalSyncTable.freeRoam then
-      starsNeeded = 0
-    elseif gGlobalSyncTable.starRun and gGlobalSyncTable.starRun ~= -1 and gGlobalSyncTable.starRun <= starsNeeded then
-      local np = gNetworkPlayers[0]
-      starsNeeded = gGlobalSyncTable.starRun
-      if (np.currAreaIndex ~= 2) and ROMHACK.ddd == true then
-        starsNeeded = starsNeeded - 1
-      end
+  local partner = cur_obj_nearest_object_with_behavior(o.behavior) or o
+  local m = gMarioStates[0]
+  local starsNeeded = (o.oBehParams >> 24) or 0   -- this gets the star count
+  if gGlobalSyncTable.freeRoam then
+    starsNeeded = 0
+  elseif gGlobalSyncTable.starRun and gGlobalSyncTable.starRun ~= -1 and gGlobalSyncTable.starRun <= starsNeeded then
+    local np = gNetworkPlayers[0]
+    starsNeeded = gGlobalSyncTable.starRun
+    if (np.currAreaIndex ~= 2) and is_vanilla_like(true) then
+      starsNeeded = starsNeeded - 1
     end
-    if starsNeeded <= m.numStars and dist_between_objects(m.marioObj, o) <= 800 then
-        o.oIntangibleTimer = -1
-        if o.oAction == 0 then
-          o.oAction = 1
-          doorsClosing = false
-        elseif o.oAction == 3 and not doorsClosing then
-          o.oAction = 2
-        end
-        doorsCanClose = false
-    elseif o.oAction == 3 then
-        if doorsCanClose == false and not doorsClosing then
-          o.oAction = 2
-          doorsCanClose = true
-        else
-          doorsClosing = true
-        end
+  end
+
+  if starsNeeded <= m.numStars and (dist_between_objects(m.marioObj, o) <= 800 and dist_between_objects(m.marioObj, partner) <= 800) then
+    o.oIntangibleTimer = -1
+    if o.oAction == 0 then
+      o.oAction = 1
+    elseif o.oAction == 2 then
+      o.oTimer = 0
     end
+  end
 end
 
-hook_behavior(id_bhvDoor, OBJ_LIST_SURFACE, false, door_init, door_loop)
-hook_behavior(id_bhvStarDoor, OBJ_LIST_SURFACE, false, nil, star_door_loop)
+hook_behavior(id_bhvDoor, OBJ_LIST_SURFACE, false, set_new_cost, door_loop, "bhvMhCustomDoor")
+hook_behavior(id_bhvStarDoor, OBJ_LIST_SURFACE, false, set_new_cost, star_door_loop, "bhvMhCustomStarDoor")

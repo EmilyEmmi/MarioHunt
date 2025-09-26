@@ -8,7 +8,7 @@ local stored_sabo_obj_data = {}
 -- used with radar
 function get_player_and_corpse_count(course, level, area, act)
     local count = 0
-    local isB3313 = (ROMHACK and ROMHACK.name == "B3313")
+    local checkAreaWarp = (ROMHACK and ROMHACK.checkAreaWarp)
     local isHunter = gGlobalSyncTable.mhMode ~= 3 or (gPlayerSyncTable[0].team ~= 1 and (gGlobalSyncTable.anarchy ~= 3 or gPlayerSyncTable[0].spectator == 1)) -- if true, only show alive runners here
 
     for i = 1, MAX_PLAYERS - 1 do
@@ -16,7 +16,7 @@ function get_player_and_corpse_count(course, level, area, act)
         local sMario = gPlayerSyncTable[i]
         if np.connected and sMario.spectator ~= 1 and (not sMario.dead) and np.currCourseNum == course and (act == nil or np.currActNum == act) then
             local valid = true
-            if isB3313 and (level ~= np.currLevelNum or area ~= np.currAreaIndex) then
+            if checkAreaWarp and (level ~= np.currLevelNum or area ~= np.currAreaIndex) then
                 valid = false
             elseif (level == LEVEL_BOWSER_1 or level == LEVEL_BOWSER_2 or level == LEVEL_BOWSER_3) and level ~= np.currLevelNum then
                 valid = false
@@ -35,7 +35,7 @@ function get_player_and_corpse_count(course, level, area, act)
                 local sMario = gPlayerSyncTable[index]
                 if sMario.knownDead == false and sMario.spectator == 1 and data.course == course and (act == nil or data.act == act) then
                     local valid = true
-                    if isB3313 and (level ~= data.level or area ~= data.area) then
+                    if checkAreaWarp and (level ~= data.level or area ~= data.area) then
                         valid = false
                     elseif (level == LEVEL_BOWSER_1 or level == LEVEL_BOWSER_2 or level == LEVEL_BOWSER_3) and level ~= data.level then
                         valid = false
@@ -57,9 +57,17 @@ end
 
 hook_event(HOOK_CHARACTER_SOUND, on_character_sound)
 
+-- true if the game is active and we're alive
+-- controls appearance of popups and player list censoring
 function mystery_popup_off()
     return gGlobalSyncTable.mhMode == 3 and gPlayerSyncTable[0].spectator ~= 1 and gGlobalSyncTable.mhState ~= 0 and
         gGlobalSyncTable.mhState < 3
+end
+
+-- true if we're a hunter and the mode is not mysteryhunt
+function treat_as_hunter(index)
+    if gGlobalSyncTable.mhMode == 3 then return false end
+    return gPlayerSyncTable[index].team ~= 1
 end
 
 local player_model_table = {
@@ -78,7 +86,7 @@ function spawn_my_corpse()
     local np = gNetworkPlayers[0]
     local model = player_model_table[m.character.type] or E_MODEL_MARIO
     if charSelectExists then
-        local charTable = charSelect.character_get_current_table()
+        local charTable = charSelect.character_get_current_table(nil, charSelect.character_get_current_costume())
         model = (charTable and charTable.model) or model
     end
     local pose = m.marioObj.header.gfx.animInfo.animID
@@ -145,18 +153,53 @@ end
 
 -- can do sabotage
 function sabo_valid()
-    return not (gGlobalSyncTable.saboActive ~= 0 or gGlobalSyncTable.saboTimer ~= 0 or gGlobalSyncTable.mhMode ~= 3 or (gGlobalSyncTable.mhState ~= 1 and gGlobalSyncTable.mhState ~= 2) or gNetworkPlayers[0].currCourseNum == 0 or gPlayerSyncTable[0].team == 1 or gPlayerSyncTable[0].dead or gMarioStates[0].action & ACT_FLAG_AIR ~= 0 or (gMarioStates[0].floor and is_hazard_floor(gMarioStates[0].floor.type)))
+    -- Don't allow if sabotage is active, cooldown isn't over, game isn't active and on mysteryhunt, we're in the castle, we're not hunter, or we're dead
+    local saboTimer = get_synced_timer_value(gGlobalSyncTable, "saboTimer")
+    if gGlobalSyncTable.saboActive ~= 0 or saboTimer ~= 0 or gGlobalSyncTable.mhMode ~= 3 or (gGlobalSyncTable.mhState ~= 1 and gGlobalSyncTable.mhState ~= 2) or gNetworkPlayers[0].currCourseNum == 0 or gPlayerSyncTable[0].team == 1 or gPlayerSyncTable[0].dead then
+        return false
+    end
+
+    local m = gMarioStates[0]
+    -- disable if not on valid floor
+    if m.action & ACT_FLAG_AIR ~= 0 or m.floor == nil or is_hazard_floor(m.floor.type)
+    or (m.floor.normal.y < 0.8 and mario_floor_is_slippery(m) ~= 0) then
+        return false
+    end
+    
+    -- specific banned spots
+    if is_vanilla_like() then
+        local np0 = gNetworkPlayers[0]
+        if np0.currLevelNum == LEVEL_PSS and m.floorHeight == -2027 then
+            return false
+        elseif np0.currLevelNum == LEVEL_JRB and np0.currAreaIndex ~= 1 and np0.currActNum ~= 1 and gLevelValues.disableActs == 0 then
+            return false
+        elseif np0.currLevelNum == LEVEL_WF and np0.currActNum ~= 1 and gLevelValues.disableActs == 0 then
+            local o = obj_get_first_with_behavior_id(id_bhvTower)
+            if not o then
+                local dist = lateral_distance(m.marioObj, 0, 0)
+                if dist <= 500 then
+                    return false
+                end
+            end
+        end
+    end
+
+    -- banned objects
+    if m.floor and m.floor.object and obj_has_behavior_id(m.floor.object, id_bhvWhompKingBoss) ~= 0 then
+        return false
+    end
+    return true
 end
 
 -- get the active sabotage (not active for 10s)
 function get_active_sabo()
-    if (gGlobalSyncTable.mhMode == 3 and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2) and gGlobalSyncTable.saboTimer >= 300) then
+    if (gGlobalSyncTable.mhMode == 3 and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2) and get_synced_timer_value(gGlobalSyncTable, "saboTimer") >= 300) then
         return gGlobalSyncTable.saboActive
     end
     return 0
 end
 
--- gets where the object is (as a string)
+-- gets where the sabotage object is (as a string)
 function get_sabo_location()
     if not stored_sabo_obj_data.level then return "INVALID" end
     local text = get_custom_level_name(stored_sabo_obj_data.course, stored_sabo_obj_data.level, stored_sabo_obj_data.area)
@@ -164,6 +207,18 @@ function get_sabo_location()
         text = text .. " #" .. stored_sabo_obj_data.act
     end
     return text
+end
+
+-- -- gets where the sabotage object is (as a table)
+function get_sabo_location_table()
+    return stored_sabo_obj_data
+end
+
+-- checks if the local player should be affected by the darkness sabotage
+-- hunters and dead players are not affected
+function do_darkness_effect()
+    local sMario0 = gPlayerSyncTable[0]
+    return (get_active_sabo() == 3 and sMario0.team == 1 and (not sMario0.dead))
 end
 
 -- used for both the sabotage objects or corpses
@@ -230,6 +285,9 @@ function mh_corpse_loop(o)
         return
     end
 
+    if o.oFloor and o.oFloor.object then
+        apply_platform_displacement(o, o.oFloor.object)
+    end
     cur_obj_update_floor_and_walls()
     cur_obj_move_standard(-78)
     do_pose(o)
@@ -319,9 +377,12 @@ id_bhvSaboObj = hook_behavior(nil, OBJ_LIST_GENACTOR, true, sabo_obj_init, sabo_
 
 -- respawn corpses/sabo objs on enter
 function on_sync_valid()
-    if gGlobalSyncTable.mhMode ~= 3 or (gGlobalSyncTable.mhState ~= 1 and gGlobalSyncTable.mhState ~= 2) then
+    if (gGlobalSyncTable.mhMode ~= 3 or (gGlobalSyncTable.mhState ~= 1 and gGlobalSyncTable.mhState ~= 2)) then
         stored_corpse_data = {}
         stored_sabo_obj_data = {}
+        if network_is_server() then
+            gGlobalSyncTable.saboActive = 0
+        end
         return
     end
 
@@ -395,7 +456,7 @@ function on_packet_report_body(data, self)
 end
 
 function on_packet_mega_bomb(data, self)
-    gGlobalSyncTable.saboActive = 0 
+    gGlobalSyncTable.saboActive = 0
     gGlobalSyncTable.saboTimer = 90 * 30
     -- explode code
     local m = gMarioStates[0]

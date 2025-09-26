@@ -29,13 +29,15 @@ function if_then_else(cond, if_true, if_false)
   return if_false
 end
 
--- temp fix for castle grounds warp bug
-real_warp_to_level = warp_to_level
-_G.warp_to_level = function(level, area, act)
-  if level == gLevelValues.entryLevel and area == 1 then
-    return warp_to_start_level() -- prevent instant death
+-- checks if the object has any of the ids in the table
+-- note that it checks the keys and not the value
+function obj_has_behavior_id_in_list(o, list)
+  for id, name in pairs(list) do
+    if obj_has_behavior_id(o, id) ~= 0 then
+      return true
+    end
   end
-  return real_warp_to_level(level, area, act) -- prevent instant death
+  return false
 end
 
 -- some debug stuff
@@ -112,7 +114,7 @@ function quick_debug(msg)
     warp_to_level(LEVEL_BOB, 1, 1)
   elseif msg ~= "" and msg ~= "reset" then
     do_warp(msg)
-  else
+  elseif gGlobalSyncTable.gameArea == 0 then
     warp_to_level(LEVEL_BOB, 1, 1)
   end
 
@@ -178,6 +180,7 @@ function kill_bowser(msg)
   if bowser then
     bowser.oAction = 4
     bowser.oSubAction = 10
+    bowser.oPosX, bowser.oPosY, bowser.oPosZ = bowser.oHomeX, bowser.oHomeY, bowser.oHomeZ
     djui_chat_message_create("oh he ded")
   else
     djui_chat_message_create("There ain't no Bowser bro")
@@ -195,6 +198,46 @@ function get_location(msg)
     djui_chat_message_create(string.format("%s (C%d, L%d, A%d)", name, course, level, area))
     print(name, course, level, area)
   end
+  return true
+end
+
+function get_star_debug(msg)
+  local starsToGet = tonumber(msg) or 0
+  local gotStars = 0
+
+  local file = get_current_save_file_num() - 1
+  for course = 0, 25 do
+    local data = { 8, 8, 8, 8, 8, 8, 8 }
+    if gGlobalSyncTable.ee and ROMHACK.star_data_ee[course] then
+      data = ROMHACK.star_data_ee[course]
+    elseif ROMHACK.star_data[course] then
+      data = ROMHACK.star_data[course]
+    elseif course == 25 then
+      break
+    elseif course > 15 then
+      data = { 8 }
+    elseif course == 0 then
+      data = { 8, 8, 8, 8, 8 }
+    end
+    
+    for star = 1, 7 do
+      if data[star] and data[star] ~= 0 then
+        local saveFlags = save_file_get_star_flags(file, course - 1)
+        if saveFlags & (1 << (star - 1)) == 0 then
+          save_file_set_star_flags(file, course - 1, 1 << (star - 1))
+          gotStars = gotStars + 1
+        end
+      end
+      if gotStars >= starsToGet then
+        break
+      end
+    end
+
+    if gotStars >= starsToGet then
+      break
+    end
+  end
+  update_all_mario_stars()
   return true
 end
 
@@ -303,14 +346,17 @@ function desync_fix_command(msg)
   local oldStar = gGlobalSyncTable.getStar
   local oldMode = gGlobalSyncTable.mhMode
   local oldState = gGlobalSyncTable.mhState
+  --local oldArea = gGlobalSyncTable.gameArea
   gGlobalSyncTable.gameLevel = -1
   gGlobalSyncTable.getStar = -1
   gGlobalSyncTable.mhMode = -1
   gGlobalSyncTable.mhState = -1
+  --gGlobalSyncTable.gameArea = 0
   gGlobalSyncTable.gameLevel = oldLevel
   gGlobalSyncTable.getStar = oldStar
   gGlobalSyncTable.mhMode = oldMode
   gGlobalSyncTable.mhState = oldState
+  --gGlobalSyncTable.gameArea = oldArea
   for i = 1, (MAX_PLAYERS - 1) do
     local sMario = gPlayerSyncTable[i]
     local oldTeam = sMario.team or 0
@@ -330,20 +376,48 @@ function desync_fix_command(msg)
     sMario.spectator = oldSpectator
     sMario.dead = false
     sMario.dead = oldDead
+    on_packet_request_perm_objs({gIndex = i})
   end
   return true
 end
 
 function out_command(msg)
-  for i = 1, MAX_PLAYERS - 1 do
-    local m = gMarioStates[i]
-    if is_player_in_local_area(m) ~= 0 then
-      network_send_to(i, true, {
-        id = PACKET_GET_OUTTA_HERE,
-      })
+  local level = gNetworkPlayers[0].currLevelNum
+  local course = -1
+  local act = gNetworkPlayers[0].currActNum
+  if msg and msg ~= "" then
+    act = -1
+    level = tonumber(msg)
+    if string.sub(msg, 1, 1) == "c" then
+      course = tonumber(string.sub(msg, 2)) or -1
+      if course == 0 then -- make course 0 inside castle by default
+        course = -1
+        level = LEVEL_CASTLE
+      else
+        level = course_to_level[course]
+      end
+    end
+    if not level then
+      level = string_to_level[msg]
+      if not level then
+        return false
+      end
     end
   end
-  on_packet_get_outta_here({id = PACKET_GET_OUTTA_HERE}, true)
+
+  for i = MAX_PLAYERS - 1, 0, -1 do
+    local np = gNetworkPlayers[i]
+    if np.connected and (np.currLevelNum == level or np.currCourseNum == course) and (act == -1 or np.currActNum == act) then
+      if np.localIndex == 0 then
+        on_packet_get_outta_here({id = PACKET_GET_OUTTA_HERE, course = (course ~= -1)}, true)
+      else
+        network_send_to(i, true, {
+          id = PACKET_GET_OUTTA_HERE,
+          course = (course ~= -1),
+        })
+      end
+    end
+  end
   return true
 end
 
@@ -564,38 +638,66 @@ function complete_command(msg)
 end
 
 function render_power_meter_mariohunt(health, x, y, width, height, index)
-  if not apply_double_health(index or 0) then return hud_render_power_meter(health, x, y, width, height) end
+  local renderFunc = hud_render_power_meter
+  if charSelect and charSelect.character_render_health_meter then
+    renderFunc = function(health, x, y, width, height)
+      return charSelect.character_render_health_meter(index or 0, health, x, y, width, height)
+    end
+  end
+  
+  if not apply_double_health(index or 0) then return renderFunc(health, x, y, width, height) end
   local doubleHealth = 2 * health - 0xFF
   if health >= 0x500 then
-    hud_render_power_meter(doubleHealth - 0x801, x, y, width, height)
+    renderFunc(doubleHealth - 0x801, x, y, width, height)
     djui_hud_set_font(FONT_HUD)
     djui_hud_print_text("+8", x + width / 2, y + height / 2, math.min(width, height) / 64)
   else
-    hud_render_power_meter(doubleHealth, x, y, width, height)
+    renderFunc(doubleHealth, x, y, width, height)
   end
 end
 
-function render_power_meter_interpolated_mariohunt(health, prevX, prevY, prevWidth, prevHeight, x, y, width, height,
-                                                   index)
+function render_power_meter_interpolated_mariohunt(health, prevX, prevY, prevWidth, prevHeight, x, y, width, height, index)
+  local renderFunc = hud_render_power_meter_interpolated
+  if charSelect and charSelect.character_render_health_meter_interpolated then
+    renderFunc = function(health, prevX, prevY, prevWidth, prevHeight, x, y, width, height)
+      return charSelect.character_render_health_meter_interpolated(index or 0, health, prevX, prevY, prevWidth, prevHeight, x, y, width, height)
+    end
+  end
+
   if not apply_double_health(index or 0) then
-    return hud_render_power_meter_interpolated(health, prevX, prevY, prevWidth,
+    return renderFunc(health, prevX, prevY, prevWidth,
       prevHeight, x, y, width, height)
   end
   local doubleHealth = 2 * health - 0xFF
   if health >= 0x500 then
-    hud_render_power_meter_interpolated(doubleHealth - 0x801, prevX, prevY, prevWidth, prevHeight, x, y, width, height)
+    renderFunc(doubleHealth - 0x801, prevX, prevY, prevWidth, prevHeight, x, y, width, height)
     djui_hud_set_font(FONT_HUD)
     djui_hud_print_text_interpolated("+8", prevX + prevWidth / 2, prevY + prevHeight / 2,
       math.min(prevWidth, prevHeight) / 64, x + width / 2, y + height / 2, math.min(width, height) / 64)
   else
-    hud_render_power_meter_interpolated(doubleHealth, prevX, prevY, prevWidth, prevHeight, x, y, width, height)
+    renderFunc(doubleHealth, prevX, prevY, prevWidth, prevHeight, x, y, width, height)
   end
 end
 
-function apply_double_health(index)
+function apply_double_health(index, ignoreHard)
+  if gGlobalSyncTable.doubleHealth == 0 then return false end -- off
+
   local sMario = gPlayerSyncTable[index]
-  return sMario and gGlobalSyncTable.doubleHealth and (sMario.team == 1 or gGlobalSyncTable.mhMode == 3) and
-      (sMario.hard == nil or sMario.hard == 0) and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2)
+  if (not sMario) or sMario.spectator == 1 then return false end
+  if gGlobalSyncTable.mhMode ~= 3 then -- in mysteryhunt, double health applies to everyone
+    if gGlobalSyncTable.doubleHealth == 2 then -- hunters only
+      if sMario.team == 1 then return false end
+    elseif gGlobalSyncTable.doubleHealth ~= 3 then -- runners only (applies to 1 and all other values)
+      if sMario.team ~= 1 then return false end
+    end
+  end
+
+  if treat_as_hunter(index) then ignoreHard = true end
+  return (ignoreHard or sMario.hard == nil or sMario.hard == 0)
+end
+
+function lateral_distance(o, x, z)
+  return math.sqrt((o.oPosX - x) * (o.oPosX - x) + (o.oPosZ - z) * (o.oPosZ - z))
 end
 
 -- tip data
@@ -706,19 +808,21 @@ function render_tip(pickNew)
   djui_hud_print_text(text, x, y, scale)
 end
 
-function set_override_team_colors(np, team)
-  if not know_team(np.localIndex) then
+function set_override_team_colors(m)
+  if m.playerIndex ~= 0 and gGlobalSyncTable.mhMode ~= 3 and is_player_active(m) == 0 then return end
+  local np = gNetworkPlayers[m.playerIndex]
+  local sMario = gPlayerSyncTable[m.playerIndex]
+  local team = sMario.team
+  if not know_team(m.playerIndex) then
     network_player_reset_palette_custom(np)
     return
   end
-
-  local sMario = gPlayerSyncTable[np.localIndex]
+  
   if disguiseMod then
     local gIndex = disguiseMod.getDisguisedIndex(np.globalIndex)
     sMario = gPlayerSyncTable[network_local_index_from_global(gIndex)]
   end
 
-  local m = gMarioStates[np.localIndex]
   if team == 1 then
     -- azure
     local darkBlue = { r = 0x4f, g = 0x31, b = 0x8b }
@@ -726,9 +830,6 @@ function set_override_team_colors(np, team)
     if runnerAppearance ~= 4 and (runnerAppearance ~= 2 or m.marioBodyState.modelState & MODEL_STATE_METAL == 0) then
       network_player_reset_palette_custom(np)
       return
-    end
-    if charSelectExists then
-      charSelect.restrict_palettes(not (charSelect.is_menu_open()))
     end
 
     network_player_reset_palette_custom_part(np, GLOVES)
@@ -756,9 +857,6 @@ function set_override_team_colors(np, team)
     if hunterAppearance ~= 4 and (hunterAppearance ~= 2 or m.marioBodyState.modelState & MODEL_STATE_METAL == 0) then
       network_player_reset_palette_custom(np)
       return
-    end
-    if charSelectExists then
-      charSelect.restrict_palettes(not (charSelect.is_menu_open()))
     end
 
     network_player_reset_palette_custom_part(np, GLOVES)
@@ -791,9 +889,6 @@ function network_player_reset_palette_custom_part(np, part)
 end
 
 function network_player_reset_palette_custom(np)
-  if charSelectExists then
-    charSelect.restrict_palettes(false)
-  end
   if disguiseMod then
     local gIndex = disguiseMod.getDisguisedIndex(np.globalIndex)
     if gIndex ~= np.globalIndex then
@@ -806,7 +901,10 @@ function network_player_reset_palette_custom(np)
     end
   end
 
-  return network_player_reset_override_palette(np)
+  network_player_reset_override_palette(np)
+  if charSelect and charSelect.update_preset_palette then
+    charSelect.update_preset_palette(np)
+  end
 end
 
 -- main command
@@ -895,4 +993,5 @@ function setup_commands()
       DEBUG_SHOW_PING = not DEBUG_SHOW_PING
       return true
     end, true })
+  table.insert(marioHuntCommands, {"get", "getStar", get_star_debug, true})
 end

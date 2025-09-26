@@ -196,9 +196,9 @@ function bowser_course_red_coin_star_loop(o)
 end
 
 -- hooks
-id_bhvCusRedCoin = hook_behavior(id_bhvRedCoin, OBJ_LIST_LEVEL, true, red_coin_init, red_coin_loop, "redCoin")
-hook_behavior(id_bhvHiddenRedCoinStar, OBJ_LIST_LEVEL, true, hidden_red_coin_star_init, hidden_red_coin_star_loop, "hiddenRedCoinStar")
-hook_behavior(id_bhvBowserCourseRedCoinStar, OBJ_LIST_LEVEL, true, bowser_course_red_coin_star_init, bowser_course_red_coin_star_loop, "bowserCourseRedCoinStar")
+hook_behavior(id_bhvRedCoin, OBJ_LIST_LEVEL, true, red_coin_init, red_coin_loop, "bhvRedCoin")
+hook_behavior(id_bhvHiddenRedCoinStar, OBJ_LIST_LEVEL, true, hidden_red_coin_star_init, hidden_red_coin_star_loop, "bhhvHiddenRedCoinStar")
+hook_behavior(id_bhvBowserCourseRedCoinStar, OBJ_LIST_LEVEL, true, bowser_course_red_coin_star_init, bowser_course_red_coin_star_loop, "bhvBowserCourseRedCoinStar")
 
 -- desync secrets
 ---@param o Object
@@ -281,5 +281,5 @@ function hidden_star_loop(o)
     end
 end
 
-hook_behavior(id_bhvHiddenStar, OBJ_LIST_LEVEL, true, hidden_star_init, hidden_star_loop, "secret star")
-id_bhvSecrets = hook_behavior(id_bhvHiddenStarTrigger, OBJ_LIST_LEVEL, true, secret_init, secret_loop, "secret")
+hook_behavior(id_bhvHiddenStar, OBJ_LIST_LEVEL, true, hidden_star_init, hidden_star_loop, "bhvHiddenStar")
+hook_behavior(id_bhvHiddenStarTrigger, OBJ_LIST_LEVEL, true, secret_init, secret_loop, "bhvHiddenStarTrigger")

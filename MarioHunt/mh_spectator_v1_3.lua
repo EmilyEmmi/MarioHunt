@@ -46,6 +46,7 @@ local SVcan
 local SVtp = 0
 
 ACT_SPECTATE = ACT_BUBBLED--allocate_mario_action(ACT_GROUP_CUTSCENE)
+---@param m MarioState
 function act_spectate(m)                            -- doesn't do much other than set visibility
   m.marioObj.header.gfx.node.flags = m.marioObj.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
   local np = gNetworkPlayers[m.playerIndex]
@@ -58,6 +59,8 @@ function act_spectate(m)                            -- doesn't do much other tha
       vec3f_copy(m.pos, gMarioStates[0].pos)
     end
   end
+
+  vec3f_copy(m.marioObj.header.gfx.pos, {x = 0, y = 10000, z = 0})
 
   if SVtp == 0 and m.playerIndex == 0 and gPlayerSyncTable[0].spectator ~= 1 then
     set_mario_action(m, ACT_IDLE, 0)
@@ -352,7 +355,7 @@ function enable_spectator(m)
 end
 
 function render_spectated_power_meter()
-  if STP.spectator == 1 and (not is_menu_open()) and free_camera == 0 and MSI and (gGlobalSyncTable.tagDist == 0 or not gNametagsSettings.showHealth) then
+  if STP.spectator == 1 and (not is_menu_open()) and free_camera == 0 and MSI and (gGlobalSyncTable.tagDist == 0 or not showHealth) then
     djui_hud_set_resolution(RESOLUTION_N64)
     local screenWidth = djui_hud_get_screen_width()
     local xposh = screenWidth * 0.5 - 51
@@ -399,7 +402,7 @@ function spectated()
 
     local msglength = djui_hud_measure_text(text) / 2
     local xpos = xlength / 2 - msglength
-    local ypos = ylength / 24
+    local ypos = ylength - ylength / 6
 
     djui_hud_print_text(text, xpos, ypos, 1)
 
@@ -420,7 +423,7 @@ function spectated()
 
       local msglength3 = djui_hud_measure_text(text3) / 2 * 0.5
       local xpos3 = xlength / 2 - msglength3
-      local ypos3 = ylength / 10
+      local ypos3 = ylength - ylength / 5
 
       djui_hud_print_text(text3, xpos3, ypos3, 0.5)
     else
@@ -453,7 +456,7 @@ function spectate_valid_for_guard()
       local m = gMarioStates[i]
       local sMario = gPlayerSyncTable[i]
       local dist = dist_between_object_and_point(m.marioObj, cData.focus.x, cData.focus.y, cData.focus.z)
-      if is_player_active(m) == 0 or sMario.spectator == 1 or sMario.dead or sMario.team ~= STP.team or sMario.guardTime ~= 0 then
+      if is_player_active(m) == 0 or sMario.spectator == 1 or sMario.dead or sMario.team ~= STP.team or get_synced_timer_value(gPlayerSyncTable, "guardTime", i) ~= 0 then
         -- nothing
       elseif dist < maxDist then
         guard = i
@@ -479,7 +482,7 @@ function update_spectator_camera(m, s)
   vec3f_copy(LLS.curFocus, cData.focus)
   vec3f_copy(LLS.goalFocus, cData.focus)
   vec3f_copy(m.area.camera.focus, cData.focus)
-  if (m.currentRoom ~= s.currentRoom or voice_chat_enabled) and free_camera == 0 and m.area.localAreaTimer > 30 and (s.action ~= ACT_DEATH_EXIT) then
+  if s and (m.currentRoom ~= s.currentRoom or voice_chat_enabled) and free_camera == 0 and m.area.localAreaTimer > 30 and (s.action ~= ACT_DEATH_EXIT) then
     vec3f_copy(m.pos, s.pos)
   end
   LLS.posHSpeed = 0
@@ -492,7 +495,7 @@ function update_spectator_camera(m, s)
   vec3f_copy(LLS.pos, cData.pos)
   vec3f_copy(LLS.curPos, cData.pos)
   vec3f_copy(LLS.goalPos, cData.pos)
-  if m.area.camera then
+  if m.area.camera and m.area.camera.pos then
     vec3f_copy(m.area.camera.pos, cData.pos)
     m.area.camera.yaw = cData.yaw
   end
@@ -601,11 +604,12 @@ function spectate_command(msg)
     enable_spectator(m)
     return true
   elseif msg == "" then
-    if runnerTarget == -1 then
+    local validRunnerTarget = get_targetted_runner()
+    if validRunnerTarget == -1 then
       free_camera = 1
     else
       teamFocus = 1
-      spectateFocus = runnerTarget
+      spectateFocus = validRunnerTarget
       free_camera = 0
     end
     enable_spectator(m)
