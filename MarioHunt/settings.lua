@@ -7,6 +7,7 @@ settingsData = {
     { name = "starRun",         langName = "menu_category",          default = 70,      alwaysList = true, ignoreMini = true, showStart = true, romhackSave = true },
     { name = "gameArea",        langName = "menu_game_area",         default = 0,       showStart = true,  romhackSave = true, ignoreMini = true },
     { name = "freeRoam",        langName = "menu_free_roam",         default = false,   ignoreMini = true, showStart = true,  romhackSave = true },
+    { name = "actless",         langName = "menu_actless",           default = false,   ignoreMini = true, showStart = true,  romhackSave = true, default_3 = true },
     { name = "starSetting",     langName = "menu_star_setting",      default = gServerSettings.stayInLevelAfterStar, showStart = true,  alwaysList = true, ignoreMini = true },
     { name = "starStayOld",     langName = "menu_star_stay_old",     default = true,    showStart = true,  ignoreMini = true },
     { name = "pvpType",         langName = "menu_pvp_type",          default = gServerSettings.pvpType, showStart = true,  alwaysList = true },
@@ -15,6 +16,7 @@ settingsData = {
     { name = "runTime",         langName = "menu_time",              default = 7200,    default_2 = 9000,  alwaysList = true },
     { name = "spectateOnDeath", langName = "menu_spectate_on_death", default = false,   default_3 = true,  showStart = true },
     { name = "countdown",       langName = "menu_countdown",         default = 300,     default_3 = 600,   ignoreMini = true },
+    { name = "killCooldown",    langName = "menu_kill_cooldown",     default = 0,       mysOnly = true },
     { name = "maxShuffleTime",  langName = "menu_shuffle",           default = 0,       showStart = true },
     { name = "allowSpectate",   langName = "menu_allow_spectate",    default = true,    default_3 = false, forceMys = false },
     { name = "allowStalk",      langName = "menu_allow_stalk",       default = false,   default_3 = false, forceMys = false,  showStart = true, romhackSave = true },
@@ -45,6 +47,10 @@ function load_settings(prevMode, starOnly)
     if not network_is_server() then return end
 
     local loadRomHack = (not starOnly)
+    if prevMode then
+        if prevMode == GST.mhMode then return end
+        loadRomHack = false
+    end
 
     for i, settingData in ipairs(settingsData) do
         local setting = settingData.name
@@ -54,8 +60,6 @@ function load_settings(prevMode, starOnly)
         local append = ""
 
         if prevMode then
-            if prevMode == GST.mhMode then return end
-            loadRomHack = false
             local prevModeDefault = prevMode and settingData["default_" .. prevMode]
             if settingData.default == nil or (prevModeDefault == nil and currModeDefault == nil) then
                 toLoad = nil
@@ -408,8 +412,8 @@ function get_setting_as_string(index, value, listing)
             local minutes = (GST.stalkTimer // 1800)
             value = trans("on") .. string.format(" (%d:%02d)", minutes, seconds)
         end
-    elseif name == "menu_countdown" or name == "menu_stalk_timer" or name == "menu_shuffle" then
-        if name == "menu_shuffle" and value == 0 then
+    elseif name == "menu_countdown" or name == "menu_stalk_timer" or name == "menu_shuffle" or name == "menu_kill_cooldown" then
+        if (name == "menu_shuffle" or name == "menu_kill_cooldown") and value == 0 then
             value = false
         elseif name == "menu_countdown" then
             if value == 300 and listing then
@@ -539,10 +543,16 @@ function handle_backwards_compatibility()
 end
 
 -- changes default for setting, mainly for rom hacks
-function change_setting_default(setting, value)
+function change_setting_default(setting, value, instantApply)
     for i, oSetting in ipairs(settingsData) do
         if oSetting.name == setting then
             oSetting.default = value
+            if oSetting.default_3 ~= nil then
+                oSetting.default_3 = value
+            end
+            if instantApply and network_is_server() then
+                GST[setting] = value
+            end
             break
         end
     end
@@ -554,15 +564,15 @@ function on_setting_changed(tag, oldVal, newVal)
 
     local settingData = settingsData[tonumber(tag)]
     if not settingData then return end
-    local settingName = settingData.langName
-    if not settingName then
+    local setting = settingData.name
+    if not setting then
         return
-    elseif settingName == "menu_gamemode" then
+    elseif setting == "mhMode" then
         if oldVal == nil then return end
         return on_mode_changed(tag, oldVal, newVal)
     end
 
-    if (not noSettingDisp) and (settingName ~= "menu_star_setting" or not OmmEnabled) then
+    if (not noSettingDisp) and (setting ~= "starSetting" or not OmmEnabled) then
         local name, value, oldvalue
         name, value = get_setting_as_string(tonumber(tag), newVal)
         name, oldvalue = get_setting_as_string(tonumber(tag), oldVal)
@@ -578,33 +588,33 @@ function on_setting_changed(tag, oldVal, newVal)
         end
     end
 
-    if settingName == "menu_star_heal" then
+    if setting == "starHeal" then
         gLevelValues.starHeal = newVal
-    elseif settingName == "menu_star_setting" then
+    elseif setting == "starSetting" then
         gServerSettings.stayInLevelAfterStar = newVal
-    elseif settingName == "menu_pvp_type" then
+    elseif setting == "pvpType" then
         gServerSettings.pvpType = newVal
-    elseif settingName == "menu_invis_wall_fix" then
-        if oldVal ~= nil and not disableWallFixOption then
-            gLevelValues.fixCollisionBugs = bool_to_int(newVal)
-        end
-    elseif settingName == "menu_star_mode" then
+    elseif setting == "starMode" then
         noSettingDisp = true
         load_settings(nil, true)
-    elseif settingName == "menu_allow_stalk" then
+    elseif setting == "allowStalk" then
         if newVal ~= true then
             update_chat_command_description("stalk", "- " .. trans("command_disabled"))
         else
             update_chat_command_description("stalk", trans("stalk_desc"))
         end
-    elseif settingName == "menu_allow_spectate" then
+    elseif setting == "allowSpectate" then
         if newVal ~= true then
             update_chat_command_description("spectate", "- " .. trans("command_disabled"))
         else
             update_chat_command_description("spectate", trans("spectate_desc"))
         end
-    elseif settingName == "menu_game_area" then
+    elseif setting == "gameArea" then
         update_game_area(newVal)
+    elseif setting == "actless" then
+        if not disableActlessOption then
+            gLevelValues.disableActs = bool_to_int(newVal)
+        end
     end
 end
 

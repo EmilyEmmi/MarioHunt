@@ -314,10 +314,27 @@ function mario_update_local(m)
 end
 
 function mario_update(m)
+  if gPlayerSyncTable[m.playerIndex].spectator == 1 then
+    m.visibleToObjects = false
+  end
+
   if m.playerIndex == 0 then
     mario_update_local(m)
   end
 end
+
+function override_geometry_inputs(m)
+  -- prevent going OOB while in spectator
+  if m.playerIndex ~= 0 then return end
+  if gPlayerSyncTable[m.playerIndex].spectator ~= 1 then return end
+
+  local floorHeight, floor = find_floor(m.pos.x, m.pos.y, m.pos.z)
+  if not floor then
+    m.floor = get_water_surface_pseudo_floor()
+    return false
+  end
+end
+hook_event(HOOK_MARIO_OVERRIDE_GEOMETRY_INPUTS, override_geometry_inputs)
 
 function enable_spectator(m)
   local sMario = gPlayerSyncTable[m.playerIndex]
@@ -369,8 +386,11 @@ end
 function spectated()
   if hide_hud == 0 then
     local n = spectateFocus
+    local scale = 1
 
-    djui_hud_set_font(FONT_MENU)
+    if djui_hud_set_font_consider_lang(FONT_MENU) then
+      scale = 2
+    end
     djui_hud_set_resolution(RESOLUTION_DJUI)
     djui_hud_set_color(255, 255, 255, 255)
 
@@ -382,7 +402,7 @@ function spectated()
     if free_camera == 1 then
       text = trans("free_camera")
     elseif gNetworkPlayers[n].connected and gPlayerSyncTable[spectateFocus].spectator ~= 1 then
-      text = remove_color(gNetworkPlayers[n].name)
+      text = get_uncolored_string(gNetworkPlayers[n].name)
     else
       local oldI = n
       n = (n + (Rmax - 1)) % (Rmax - 1) + 1
@@ -392,27 +412,28 @@ function spectated()
       end
       if oldI ~= n then
         spectateFocus = n
-        text = remove_color(gNetworkPlayers[n].name)
+        text = get_uncolored_string(gNetworkPlayers[n].name)
       elseif not gNetworkPlayers[spectateFocus].connected then
         text = trans("empty", spectateFocus)
       else
-        text = remove_color(gNetworkPlayers[n].name)
+        text = get_uncolored_string(gNetworkPlayers[n].name)
       end
     end
 
-    local msglength = djui_hud_measure_text(text) / 2
+    local msglength = djui_hud_measure_text(text) * scale / 2
     local xpos = xlength / 2 - msglength
     local ypos = ylength - ylength / 6
 
-    djui_hud_print_text(text, xpos, ypos, 1)
+    djui_hud_print_text(text, xpos, ypos, scale)
 
     local text2 = trans("spectate_mode")
 
-    local msglength2 = djui_hud_measure_text(text2) / 2 * 0.5
+    scale = scale / 2
+    local msglength2 = djui_hud_measure_text(text2) * scale / 2
     local xpos2 = xlength / 2 - msglength2
     local ypos2 = ylength - ylength / 10
 
-    djui_hud_print_text(text2, xpos2, ypos2, 0.5)
+    djui_hud_print_text(text2, xpos2, ypos2, scale)
 
     MSP.health = 0x880
     STI = gPlayerSyncTable[spectateFocus]
@@ -421,11 +442,11 @@ function spectated()
 
       local text3 = trans("is_spectator")
 
-      local msglength3 = djui_hud_measure_text(text3) / 2 * 0.5
+      local msglength3 = djui_hud_measure_text(text3) * scale / 2
       local xpos3 = xlength / 2 - msglength3
       local ypos3 = ylength - ylength / 5
 
-      djui_hud_print_text(text3, xpos3, ypos3, 0.5)
+      djui_hud_print_text(text3, xpos3, ypos3, scale)
     else
       teamFocus = STI.team or 0
     end
@@ -501,14 +522,8 @@ function update_spectator_camera(m, s)
   end
 
   if not is_game_paused() then
-    local x_invert = 1
-    local y_invert = -1
-    if camera_config_is_free_cam_enabled() == camera_config_is_x_inverted() then
-      x_invert = -1
-    end
-    if camera_config_is_free_cam_enabled() and camera_config_is_y_inverted() then
-      y_invert = 1
-    end
+    local x_invert = (camera_config_is_x_inverted() and -1) or 1
+    local y_invert = (camera_config_is_y_inverted() and -1) or 1
 
     local mouseX = 0
     local mouseY = 0
@@ -547,9 +562,9 @@ function update_spectator_camera(m, s)
         --s.marioObj.header.gfx.node.flags = s.marioObj.header.gfx.node.flags | GRAPH_RENDER_INVISIBLE
       end
     else
-      cData.goalYaw = limit_angle(cData.goalYaw -
+      cData.goalYaw = limit_angle(cData.goalYaw +
         (0.6 * stickX - mouseX) * (x_invert * camera_config_get_x_sensitivity()))
-      cData.goalPitch = clamp(cData.goalPitch - (0.6 * stickY + mouseY) * (y_invert * camera_config_get_y_sensitivity()),
+      cData.goalPitch = clamp(cData.goalPitch + (0.6 * stickY + mouseY) * (y_invert * camera_config_get_y_sensitivity()),
         -0x3E00, 0x3E00)
 
       if (m.controller.buttonDown & L_TRIG) ~= 0 and free_camera == 0 and s.faceAngle.y then

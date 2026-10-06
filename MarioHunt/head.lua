@@ -12,8 +12,8 @@ local defaultColorData = {
     tex = get_texture_info("mario_head_recolor"),
     order = { SKIN, HAIR, CAP, FEATURE, FEATURE, NONE },
     order_capless = { SKIN, HAIR, NONE, FEATURE, NONE, HAIR },
-    metal_sheet_x = 5,         --\ Moves where the metal parts are reserved for legacy purposes
-    metal_capless_sheet_x = 7, --/
+    metal_sheet_x = 5,             --\ Moves where the metal parts are reserved for legacy purposes
+    metal_capless_sheet_x = 7,     --/
   },
   [CT_LUIGI] = {
     tex = get_texture_info("luigi_head_recolor"),
@@ -46,27 +46,7 @@ local defaultColorData = {
 }
 
 if not csColorData then
-  _G.csColorData = {
-    ["Toadette"] = {
-      tex = get_texture_info("toadette_head_recolor"),
-      order = { SKIN, CAP, GLOVES, FEATURE, NONE, NONE },
-      order_capless = { SKIN, NONE, NONE, FEATURE, NONE, HAIR },
-      metal_sheet_x = 5,
-      metal_capless_sheet_x = 7,
-    },
-    ["Peach"] = {
-      tex = get_texture_info("peach_head_recolor"),
-      order = { SKIN, HAIR, CAP, FEATURE, SHOES, FEATURE },
-      order_capless = { SKIN, HAIR, NONE, FEATURE, SHOES, NONE },
-      metal_sheet_x = 5,
-      metal_capless_sheet_x = 7,
-    },
-    ["Daisy"] = {
-      tex = get_texture_info("daisy_head_recolor"),
-      order = { SKIN, GLOVES, CAP, FEATURE, FEATURE, SHOES, HAIR },
-      order_capless = { SKIN, GLOVES, NONE, FEATURE, NONE, SHOES, HAIR },
-    },
-  }
+  _G.csColorData = {}
 end
 
 -- The actual head render function.
@@ -97,8 +77,8 @@ function render_player_head(index, x, y, scaleX, scaleY, noSpecial, alwaysCap, a
     djui_hud_set_color(255, 255, 255, alpha)
     djui_hud_render_texture(m.character.hudHeadTexture, x, y, scaleX, scaleY)
   elseif charSelectExists then
-    local charNum = charSelect.character_get_current_number(index)
-    local costume = charSelect.character_get_current_costume(index)
+    local charNum = charSelect.character_get_current_number(index) or 0
+    local costume = charSelect.character_get_current_costume(index) or 1
     thisIconColorData = csColorData[charNum]
     if thisIconColorData then
       if thisIconColorData[1] then
@@ -106,7 +86,7 @@ function render_player_head(index, x, y, scaleX, scaleY, noSpecial, alwaysCap, a
       end
     else
       local charTable = charSelect.character_get_full_table()[charNum]
-      thisIconColorData = charTable and csColorData[charTable.saveName]
+      thisIconColorData = charTable and csColorData[charTable.nickname or charTable.saveName]
     end
 
     if not thisIconColorData then
@@ -119,7 +99,9 @@ function render_player_head(index, x, y, scaleX, scaleY, noSpecial, alwaysCap, a
       end
 
       if (not isVanilla) then
-        if type(tex) == "string" then
+        if charSelect.render_life_icon_from_local_index then
+          charSelect.render_life_icon_from_local_index(index)
+        elseif type(tex) == "string" then
           djui_hud_set_font(FONT_RECOLOR_HUD)
           local charTable = charSelect.character_get_current_table(nil, costume)
           local color = { r = 255, g = 255, b = 255 }
@@ -154,7 +136,7 @@ function render_player_head(index, x, y, scaleX, scaleY, noSpecial, alwaysCap, a
       order = thisIconColorData.order_capless
     end
 
-    if (not noSpecial) and (m.marioBodyState.modelState & MODEL_STATE_METAL) ~= 0 then -- metal
+    if (not noSpecial) and (m.marioBodyState.modelState & MODEL_STATE_METAL) ~= 0 then     -- metal
       local color = network_player_get_override_palette_color(np, METAL)
       djui_hud_set_color(color.r, color.g, color.b, alpha)
       isMetal = true
@@ -191,21 +173,23 @@ function render_player_head(index, x, y, scaleX, scaleY, noSpecial, alwaysCap, a
   if (not noSpecial) and m.marioBodyState.capState == MARIO_HAS_WING_CAP_ON then
     djui_hud_set_color(255, 255, 255, alpha)
     if (not noColorHead) and isMetal then
-      djui_hud_set_color(109, 170, 173, alpha)              -- blueish green
+      djui_hud_set_color(109, 170, 173, alpha)                  -- blueish green
     end
-    djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY) -- wing
+    djui_hud_render_texture(WING_HUD, x, y, scaleX, scaleY)     -- wing
   end
 
-  -- MarioHunt's only addition- render the player's crown
-  local ctex = get_crown_tex(index)
-  if ctex then
+  -- MarioHunt's only addition- render the player's crown(s)
+  y = y - 12 * scaleY
+  local ctex = get_all_crown_textures(index)
+  for i, tex in ipairs(ctex) do
     djui_hud_set_color(255, 255, 255, alpha)
-    djui_hud_render_texture(ctex, x, y - 12 * scaleY, scaleX, scaleY)
+    djui_hud_render_texture(tex, x, y, scaleX, scaleY)
+    y = y - 5 * scaleY
   end
 end
 
 -- Adds a head for a CS character!
----@param char integer|string Character number or saveName. Number is recommended.
+---@param char integer|string Character number or nickname. Number is recommended.
 ---@param costume integer? Costume to apply this icon to. Set to 'nil' to apply to all costumes.
 ---@param tex TextureInfo Texture of the recolorable icon- use get_texture_info
 ---@param order table Order of palette colors for each layer, from left to right. FEATURE doesn't recolor and NONE doesn't render. Last two layers are reserved for METAL and METAL CAPLESS forms and will always use the METAL color.
@@ -223,19 +207,21 @@ function add_head_for_cs(char, costume, tex, order, order_capless, headWidth, he
   end
 
   local useTable = csColorData[char]
+  local newTable = false
   if not useTable then
+    newTable = true
     csColorData[char] = {}
     useTable = csColorData[char]
-  end
-  if costume then
-    csColorData[char][1] = {}
-    useTable = csColorData[char][1]
+    if costume then
+      csColorData[char][1] = {}
+      useTable = csColorData[char][1]
+    end
   end
 
-  if useTable then
-    print("Overwriting head for " .. tostring(char) .. ":" .. tostring(costume or "Any"))
-  else
+  if newTable then
     print("Creating head for " .. tostring(char) .. ":" .. tostring(costume or "Any"))
+  else
+    print("Overwriting head for " .. tostring(char) .. ":" .. tostring(costume or "Any"))
   end
 
   useTable.tex = tex
@@ -251,13 +237,14 @@ function add_head_for_cs(char, costume, tex, order, order_capless, headWidth, he
 end
 
 -- Base mod won't override other mods that implement this file.
-if origHudMod then return end
+if dynamicHudExists and origHudMod then return end
 _G.dynamicHudExists = true
-_G.dynamicHudIsOriginal =
-    origHudMod -- TRUE if we're using the original mod, and FALSE if we're using another mod that just implements this.
+_G.dynamicHudIsOriginal = origHudMod or
+false                                         -- TRUE if we're using the original mod, and FALSE if we're using another mod that just implements this.
 _G.dynamicHudAPI = {
   render_player_head = render_player_head,
   add_head_for_cs = add_head_for_cs,
   FEATURE = FEATURE,
   NONE = NONE,
+  VERSION = 2.0,
 }

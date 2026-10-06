@@ -10,7 +10,6 @@ TEX_STAR = get_texture_info('star-mark')
 TEX_BOX = get_texture_info('box-mark')
 TEX_COIN = get_texture_info('coin-mark')
 TEX_SECRET = get_texture_info('secret-mark')
-TEX_DEMON = get_texture_info('demon-mark')
 TEX_MOON = get_texture_info('moon-mark')
 TEX_RAD_TARGET = get_texture_info('target-mark')
 TEX_MAP_ARROW = get_texture_info('map-arrow')
@@ -38,14 +37,12 @@ end
 ex_radar = {}
 ex_radar[1] = { tex = TEX_COIN, prevX = 0, prevY = 0, prevScale = 0.6 }
 ex_radar[2] = { tex = TEX_SECRET, prevX = 0, prevY = 0, prevScale = 0.6 }
-ex_radar[3] = { tex = TEX_DEMON, prevX = 0, prevY = 0, prevScale = 0.6 }
-ex_radar[4] = { tex = TEX_RAD_TARGET, prevX = 0, prevY = 0, prevScale = 0.6 }
+ex_radar[3] = { tex = TEX_RAD_TARGET, prevX = 0, prevY = 0, prevScale = 0.6 }
 
 radar_store = {} -- used with objects
 
 -- minimap
 TEX_HUD_BOX = get_texture_info('exclamation_box_seg8_texture_08017628')
-TEX_HUD_DEMON = get_texture_info('hud_demon')
 TEX_HUD_TARGET = get_texture_info('hud_target')
 TEX_HUD_KEY_LEFT = get_texture_info('bowser_key_left_texture')
 TEX_HUD_KEY_RIGHT = get_texture_info('bowser_key_right_texture')
@@ -64,8 +61,7 @@ end
 ex_minimap = {}
 ex_minimap[1] = { tex = gTextures.coin, prevX = 0, prevY = 0 }
 ex_minimap[2] = { tex = nil, prevX = 0, prevY = 0 } -- overriden with "S" in hud font
-ex_minimap[3] = { tex = TEX_HUD_DEMON, prevX = 0, prevY = 0 }
-ex_minimap[4] = { tex = TEX_HUD_TARGET, prevX = 0, prevY = 0 }
+ex_minimap[3] = { tex = TEX_HUD_TARGET, prevX = 0, prevY = 0 }
 
 defaultStarColor = { r = 255, g = 255, b = 92 } -- yellow
 
@@ -117,8 +113,6 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
       pos.y = pos.y + 50
     elseif objType == "secret" then                   -- secrets have a misleading hitbox (although they aren't usually visible)
       pos.y = pos.y + 15
-    elseif objType == "demon" then                    -- 1ups also have a misleading hitbox
-      pos.y = pos.y + o.hitboxHeight
     elseif objType == "coin" or objType == "key" then -- these have their position centered at their bottom, so move up based on hitbox size
       pos.y = pos.y + o.hitboxHeight // 2
     end
@@ -264,7 +258,7 @@ function render_radar(m, radarData, mapData, isObj, objType, mapOnly)
       tex = TEX_RAD_TARGET
     end
     r, g, b = get_radar_color(m.playerIndex)
-  elseif objType == "box" or objType == "demon" then
+  elseif objType == "box" then
     r, g, b = 255, 255, 255 -- texture has color
     alpha = alpha - 100
     if alpha <= 0 then
@@ -436,18 +430,25 @@ function render_radar_act_select()
 end
 
 -- really great feature tbh (also used for mysteryhunt radars and L button prompt)
-local warpObjs = { id_bhvWarp, id_bhvWarpPipe, id_bhvDoorWarp, id_bhvFadingWarp, id_bhvWarp, id_bhvBooCage, id_bhvMHWingCapWarp }
+local warpObjs = { id_bhvWarp, id_bhvWarpPipe, id_bhvDoorWarp, id_bhvFadingWarp, id_bhvWarp, id_bhvBooCage, id_bhvMHWingCapWarp, id_bhvSparkleFadingWarp }
 local progressRadar = {}
 local progressMinimap = {}
 function painting_overlays_and_mystery_misc(paintingValid)
   local m = gMarioStates[0]
   local np = gNetworkPlayers[0]
-  local doneCourses = { [np.currCourseNum] = 1 }
+  local doneAreas = { [np.currCourseNum] = {} }
+  if ROMHACK and ROMHACK.checkAreaWarp then
+    doneAreas[np.currCourseNum][np.currAreaIndex] = 1
+  else
+    for i=1,8 do
+      doneAreas[np.currCourseNum][i] = 1
+    end
+  end
   local warpList = {}
 
   if (not gPlayerSyncTable[0].dead) and gGlobalSyncTable.mhMode == 3 and (gGlobalSyncTable.mhState == 1 or gGlobalSyncTable.mhState == 2) then
     djui_hud_set_resolution(RESOLUTION_N64)
-    djui_hud_set_font(FONT_CUSTOM_HUD)
+    djui_hud_set_font_consider_lang(FONT_CUSTOM_HUD)
     djui_hud_set_color(255, 255, 255, 255)
     local o = obj_get_first_with_behavior_id(id_bhvMHCorpse)
     while o do
@@ -456,7 +457,7 @@ function painting_overlays_and_mystery_misc(paintingValid)
       if dist_between_objects(m.marioObj, o) < 200 and djui_hud_world_pos_to_screen_pos(pos, out) then
         local text = trans("press_report", buttonString[reportButton])
         local width = djui_hud_measure_text(text)
-        djui_hud_print_text(text, out.x - width / 2, out.y, 1)
+        djui_hud_print_text_hud_font(text, out.x - width / 2, out.y, 1)
       end
       o = obj_get_next_with_same_behavior_id(o)
     end
@@ -468,7 +469,7 @@ function painting_overlays_and_mystery_misc(paintingValid)
         if dist_between_objects(m.marioObj, o) < 200 and djui_hud_world_pos_to_screen_pos(pos, out) then
           local text = trans("press_fix", buttonString[reportButton])
           local width = djui_hud_measure_text(text)
-          djui_hud_print_text(text, out.x - width / 2, out.y, 1)
+          djui_hud_print_text_hud_font(text, out.x - width / 2, out.y, 1)
         end
       end
     end
@@ -506,13 +507,14 @@ function painting_overlays_and_mystery_misc(paintingValid)
       m.floor.type = i * 3 + SURFACE_PAINTING_WARP_D3
       local warpNode = get_painting_warp_node()
       local level = (warpNode and warpNode.destLevel) or 0
-      if level >= 128 then level = level - 128 end
+      local area = (warpNode and warpNode.destArea) or 1
+      level = level & ~(WARP_CHECKPOINT)
       if level ~= 0 then
-        local course = level_to_course[level] or 0
-        if not (doneCourses[course] and donePaintings[i]) then
-          doneCourses[course] = 1
+        local course = get_level_course_num(level)
+        if not (doneAreas[course] and doneAreas[course][area] and donePaintings[i]) then
+          if not doneAreas[course] then doneAreas[course] = {} end
+          doneAreas[course][area] = 1
           donePaintings[i] = 1 -- so thi huge is seperate
-          local area = warpNode.destArea
           local valid = true
           -- don't show if area is banned
           if valid and gGlobalSyncTable.gameArea ~= 0 and ROMHACK and ROMHACK.gameAreaData then
@@ -525,7 +527,7 @@ function painting_overlays_and_mystery_misc(paintingValid)
           if valid then
             if i == 14 and np.currAreaIndex ~= 3 then -- rainbow ride HAD to be different (it uses hmc painting even though it's nowhere near the warp. Use hardcoded position)
               local pos = { -3400, 3116, 5886 }
-              table.insert(warpList, { course, level, area, pos })
+              table.insert(warpList, { course, level, area, pos, true })
             else
               local painting = paintingValueTable[i + 1]
               if painting then
@@ -569,12 +571,13 @@ function painting_overlays_and_mystery_misc(paintingValid)
       local objWarpNode = area_get_warp_node(0xF2)
       local warpNode = objWarpNode and objWarpNode.node
       local level = (warpNode and warpNode.destLevel) or 0
-      if level >= 128 then level = level - 128 end
+      local area = (warpNode and warpNode.destArea) or 1
+      level = level & ~(WARP_CHECKPOINT)
       if level ~= 0 then
-        local course = level_to_course[level] or 0
-        if not doneCourses[course] then
-          doneCourses[course] = 1
-          local area = warpNode.destArea
+        local course = get_level_course_num(level)
+        if not (doneAreas[course] and doneAreas[course][area]) then
+          if not doneAreas[course] then doneAreas[course] = {} end
+          doneAreas[course][area] = 1
 
           table.insert(warpList, { course, level, area, pos, true })
         end
@@ -586,11 +589,9 @@ function painting_overlays_and_mystery_misc(paintingValid)
   for i, id in ipairs(warpObjs) do
     local o = obj_get_first_with_behavior_id(id)
     while o do
-      local nodeID = 0
       local objWarpNode
       if o.oBehParams2ndByte ~= 0xEA00 then
-        nodeID = (o.oBehParams >> 16) & 0xFF
-        objWarpNode = area_get_warp_node(nodeID)
+        objWarpNode = area_get_warp_node_from_params(o)
       else -- custom warp nodes
         local level = (o.oBehParams >> 16) & 0xFF
         local area = o.oBehParams & 0xFF
@@ -599,10 +600,10 @@ function painting_overlays_and_mystery_misc(paintingValid)
       local warpNode = objWarpNode and objWarpNode.node
       local level = (warpNode and warpNode.destLevel) or 0
       local area = (warpNode and warpNode.destArea) or 0
-      if level >= 128 then level = level - 128 end
+      level = level & ~(WARP_CHECKPOINT)
       if o.oIntangibleTimer == 0 and level ~= 0 then
-        local course = level_to_course[level] or 0
-        local valid = (not doneCourses[course])
+        local course = get_level_course_num(level)
+        local valid = (not (doneAreas[course] and doneAreas[course][area]))
         -- don't show if area is banned
         if valid and gGlobalSyncTable.gameArea ~= 0 and ROMHACK and ROMHACK.gameAreaData then
           local areaData = ROMHACK.gameAreaData[gGlobalSyncTable.gameArea+1]
@@ -612,7 +613,8 @@ function painting_overlays_and_mystery_misc(paintingValid)
         end
 
         if valid then
-          doneCourses[course] = 1
+          if not doneAreas[course] then doneAreas[course] = {} end
+          doneAreas[course][area] = 1
           local pos = { math.floor(o.oPosX), math.floor(o.oPosY + 300), math.floor(o.oPosZ) }
           local onScreen = true
           -- to prevent confusion, don't show radar for PSS inside of the JRB room
@@ -1093,7 +1095,7 @@ function get_radar_color(index)
   local r, g, b = 0, 0, 0
   local sMario = gPlayerSyncTable[index]
   local roles = sMario.role
-  if (sMario.placement ~= 1 or roles & 32 == 0) and (sMario.placementASN ~= 1 or roles & 64 == 0) then
+  if (sMario.placement ~= 1 or roles & ROLE_PLACE_64T == 0) and (sMario.placementASN ~= 1 or roles & ROLE_PLACE_ASN == 0) and (sMario.placementMo3 ~= 1 or roles & ROLE_PLACE_MO3 == 0) then
     local playercolor = network_get_player_text_color_string(index)
     r, g, b = convert_color(playercolor)
   else -- rainbow radar
@@ -1134,7 +1136,7 @@ function get_radar_color(index)
       g = m
       b = z + m
     end
-    -- and we're doing this every frame. Thank god there's only two of these.
+    -- and we're doing this every frame. Thank god this is exclusive
   end
   return r, g, b
 end

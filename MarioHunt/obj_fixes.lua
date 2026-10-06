@@ -24,9 +24,7 @@ local function on_object_unload(o)
                 id_bhvBowserBomb,
                 E_MODEL_BOWSER_BOMB,
                 o.oPosX, o.oPosY, o.oPosZ,
-                function(bomb)
-                    bomb.oIntangibleTimer = 120
-                end
+                nil
             )
         end
     elseif obj_is_mushroom_1up(o) then
@@ -294,12 +292,13 @@ function star_update(radar)
     end
 end
 
--- Fix the water ring hitbox (Isaac)
+-- Fix the water ring hitbox (Isaac, edited)
 hook_behavior_custom(id_bhvMantaRayWaterRing, false, function(o)
-    o.oWaterRingScalePhaseX = (random_u16() & 0xFFF) + 0x1000
+    --[[o.oWaterRingScalePhaseX = (random_u16() & 0xFFF) + 0x1000
     o.oWaterRingScalePhaseY = (random_u16() & 0xFFF) + 0x1000
-    o.oWaterRingScalePhaseZ = (random_u16() & 0xFFF) + 0x1000
-    local dest = vec3f_rotate_zxy({ x = 0, y = 1, z = 0 },
+    o.oWaterRingScalePhaseZ = (random_u16() & 0xFFF) + 0x1000]]
+    local dest = { x = 0, y = 1, z = 0 }
+    vec3f_rotate_zxy(dest,
         {
             x = o.oFaceAnglePitch,
             y = o.oFaceAngleYaw,
@@ -369,9 +368,10 @@ function custom_tilt_platform_loop(o)
         end
     end
     
-    if gMarioStates[0].controller.buttonPressed & L_TRIG ~= 0 then
+    -- debug thing
+    --[[if gMarioStates[0].controller.buttonPressed & L_TRIG ~= 0 then
         o.oFaceAnglePitch = o.oFaceAnglePitch + 0x2000
-    end
+    end]]
 end
 
 hook_behavior_custom(id_bhvTiltingBowserLavaPlatform, false, nil, custom_tilt_platform_loop)
@@ -550,6 +550,165 @@ end
 
 --hook_event(HOOK_OBJECT_SET_MODEL, on_obj_set_model) -- done in main.lua
 
+function handle_actless_mode()
+    if gLevelValues.disableActs == 0 or not (ROMHACK and ROMHACK.actlessData and gGlobalSyncTable.actless) then return end
+
+    local actlessData = ROMHACK.actlessData[gNetworkPlayers[0].currLevelNum]
+    if not actlessData then return end
+    actlessData = actlessData[gNetworkPlayers[0].currAreaIndex]
+    if not actlessData then return end
+
+    -- set act to the earliest star we have not obtained yet
+    local m = gMarioStates[0]
+    local latestAct = 1
+    local file = get_current_save_file_num() - 1
+    local starFlags = save_file_get_star_flags(file, gNetworkPlayers[0].currCourseNum - 1)
+    while latestAct < 6 and starFlags & (1 << (latestAct - 1)) ~= 0 do
+        latestAct = latestAct + 1
+    end
+    local actFlag = (1 << (latestAct - 1))
+
+    local foundValidRule = {}
+    for i, data in ipairs(actlessData) do
+        local ids = data.id
+        if type(ids) ~= "table" then
+            ids = {ids}
+        end
+        for a, id in ipairs(ids) do
+            if type(id) == "string" then
+                id = _G[id] or -1
+            end
+            local o = obj_get_first_with_behavior_id(id)
+            while o do
+                local valid = true
+                if foundValidRule[o] then
+                    valid = false
+                elseif data.oBehParams and data.oBehParams ~= (o.oBehParams % 0x100000000) then
+                    valid = false
+                elseif data.oBehParams2ndByte and data.oBehParams2ndByte ~= o.oBehParams2ndByte then
+                    valid = false
+                elseif (id == id_bhvKingBobomb or id == id_bhvWhompKingBoss) and o.oAction >= 8 then -- don't disappear during death action
+                    valid = false
+                elseif data.oSyncID then
+                    if type(data.oSyncID) ~= "table" then
+                        valid = (o.oSyncID == data.oSyncID)
+                    else
+                        valid = false
+                        for b, syncID in ipairs(data.oSyncID) do
+                            if o.oSyncID == syncID then
+                                valid = true
+                                break
+                            end
+                        end
+                    end
+                end
+
+                if valid then
+                    foundValidRule[o] = 1
+                    -- Disappear if not valid, reappear if we are
+                    local doParticles = false
+                    local downWarp = false
+                    local doPosWarp = (id == id_bhvBobombBuddy or id == id_bhvBobombBuddyOpensCannon)
+                    if actFlag and data.acts & actFlag ~= 0 then
+                        if o.activeFlags & ACTIVE_FLAG_DORMANT ~= 0 then
+                            o.activeFlags = o.activeFlags & ~ACTIVE_FLAG_DORMANT
+                            o.header.gfx.node.flags = o.header.gfx.node.flags | GRAPH_RENDER_ACTIVE
+                            o.oInteractStatus = 0
+                            if doPosWarp then
+                                o.oPosY = o.oPosY - gLevelValues.floorLowerLimitMisc
+                            end
+                            doParticles = true
+
+                            -- push mario out of object
+                            if data.pushRadius and data.pushExtentY then
+                                local radius = data.pushRadius
+                                local marioRelY = math.abs(m.marioObj.oPosY - o.oPosY)
+                                if marioRelY < data.pushExtentY then
+                                    local marioDist = lateral_dist_between_objects(o, m.marioObj)
+                                    if marioDist < radius then
+                                        local angle = obj_angle_to_object(o, m.marioObj)
+                                        m.pos.x = o.oPosX + sins(angle) * radius
+                                        m.pos.z = o.oPosZ + coss(angle) * radius
+                                    end
+                                end
+                            end
+
+                            -- make the barrel/iris not dormant too if it exists
+                            if id == id_bhvCannon or id == id_bhvWaterBombCannon or id == id_bhvMrI then
+                                local c = obj_get_first(OBJ_LIST_DEFAULT)
+                                while c do
+                                    if c.parentObj == o then
+                                        c.activeFlags = c.activeFlags & ~ACTIVE_FLAG_DORMANT
+                                        c.header.gfx.node.flags = c.header.gfx.node.flags | GRAPH_RENDER_ACTIVE
+                                        c.oInteractStatus = 0
+                                        break
+                                    end
+                                    c = obj_get_next(c)
+                                end
+                            end
+                        end
+                    elseif o.activeFlags & ACTIVE_FLAG_DORMANT == 0 and (m.action ~= ACT_READING_NPC_DIALOG or m.usedObj ~= o) then
+                        doParticles = (o.header.gfx.node.flags & GRAPH_RENDER_ACTIVE ~= 0 and gMarioStates[0].area and gMarioStates[0].area.localAreaTimer > 5)
+                        o.activeFlags = o.activeFlags | ACTIVE_FLAG_DORMANT
+                        o.header.gfx.node.flags = o.header.gfx.node.flags & ~GRAPH_RENDER_ACTIVE
+                        --log_to_console(string.format("%s: %d, %08X, %d", get_behavior_name_from_id(id), o.oPosY, o.oBehParams, o.oSyncID))
+                        downWarp = doPosWarp
+
+                        -- make the barrel/iris dormant too if it exists
+                        if id == id_bhvCannon or id == id_bhvWaterBombCannon or id == id_bhvMrI then
+                            local c = obj_get_first(OBJ_LIST_DEFAULT)
+                            while c do
+                                if c ~= o and c.parentObj == o then
+                                    c.activeFlags = c.activeFlags | ACTIVE_FLAG_DORMANT
+                                    c.header.gfx.node.flags = c.header.gfx.node.flags & ~GRAPH_RENDER_ACTIVE
+                                    break
+                                end
+                                c = obj_get_next(c)
+                            end
+                        end
+                    end
+
+                    if doParticles and o.header.gfx.node.flags & GRAPH_RENDER_INVISIBLE == 0 and obj_get_model_id_extended(o) ~= E_MODEL_NONE then
+                        local info = obj_get_temp_spawn_particles_info(E_MODEL_MIST)
+                        info.behParam, info.count = 2, 8
+                        info.offsetY = 0
+                        info.forwardVelBase, info.forwardVelRange = 40, 5
+                        info.velYBase, info.velYRange = 30, 20
+                        info.gravity, info.dragStrength = 252, 30
+                        local size = data.pushRadius or 46
+                        info.sizeBase, info.sizeRange = size, (size / 20)
+                        for i=1,info.count do
+                            local scale = random_float() * (info.sizeRange * 0.1) + info.sizeBase * 0.1
+
+                            local x, y, z = o.oPosX, o.oPosY, o.oPosZ
+                            local particle = spawn_non_sync_object(id_bhvWhitePuffExplosion, E_MODEL_MIST, x, y, z, nil)
+                            if (not particle) then break end
+
+                            particle.oBehParams2ndByte = info.behParam
+                            particle.oMoveAngleYaw = random_u16()
+                            particle.oGravity = info.gravity
+                            particle.oDragStrength = info.dragStrength
+
+                            particle.oForwardVel = random_float() * info.forwardVelRange + info.forwardVelBase;
+                            particle.oVelY = random_float() * info.velYRange + info.velYBase;
+
+                            obj_scale_xyz(particle, scale, scale, scale);
+                        end
+                    end
+                    if downWarp then
+                        if o.oInteractType == INTERACT_POLE and m.interactObj == o then
+                            set_mario_action(m, ACT_SOFT_BONK, 0)
+                        end
+                        o.oPosY = o.oPosY + gLevelValues.floorLowerLimitMisc
+                    end
+                end
+
+                o = obj_get_next_with_same_behavior_id(o)
+            end
+        end
+    end
+end
+
 -- definitely a necessary feature
 obj_kill_names = {
     [id_bhvBowser] = "\\#ff1f1f\\Bowser",
@@ -619,6 +778,11 @@ obj_kill_names = {
     [id_bhvPokeyBodyPart] = "\\#f5d142\\Pokey",
     [id_bhvEnemyLakitu] = "\\#f5d142\\Lakitu",
     [id_bhvSpiny] = "\\#ff1f1f\\Spiny",
+    [id_bhvBubba] = "\\#f5d142\\Bubba",
+    [id_bhvSpindrift] = "\\#ff21c8\\Spindrift",
+    [id_bhvMoneybag] = "\\#00b464\\Moneybag",
+    [id_bhvMoneybagHidden] = "\\#00b464\\Moneybag",
+    [id_bhvJrbSlidingBox] = "\\#bd9d42\\Slide Box",
 }
 
 -- all DDD stuff
@@ -638,7 +802,17 @@ end
 
 ---@param o Object
 function custom_ddd_loop(o)
-    if (not gGlobalSyncTable.freeRoam) or (gGlobalSyncTable.mhMode == 2) then
+    if gGlobalSyncTable.mhMode == 2 then
+        if gGlobalSyncTable.getStar == 1 then
+            cur_obj_disable_rendering()
+        else
+            cur_obj_enable_rendering()
+            load_object_collision_model()
+        end
+        return
+    end
+
+    if (not gGlobalSyncTable.freeRoam) then
         bhv_bowsers_sub_loop()
         load_object_collision_model()
         return
@@ -654,6 +828,57 @@ end
 
 hook_behavior_custom(id_bhvBowsersSub, true, custom_ddd_sub_init, custom_ddd_loop)
 hook_behavior_custom(id_bhvBowserSubDoor, true, custom_ddd_door_init, custom_ddd_loop)
+
+---@param o Object
+function custom_ddd_pole_init(o)
+    o.oInteractType = INTERACT_POLE
+    obj_set_hitbox_radius_and_height(o, 80, 800)
+    o.oIntangibleTimer = 0
+    o.oFlags = o.oFlags | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
+
+    local prevActiveFlags = o.activeFlags
+    cur_obj_set_home_once()
+    bhv_ddd_pole_init()
+    o.activeFlags = prevActiveFlags -- Prevent deletion
+    o.hitboxDownOffset = 100
+    o.oDDDPoleMaxOffset = 100 * o.oBehParams2ndByte;
+    o.oDDDPoleVel = 10
+
+    local active = false
+    if gGlobalSyncTable.gameArea ~= 0 or gGlobalSyncTable.freeRoam then
+        local file = get_current_save_file_num() - 1
+        active = save_file_get_star_flags(file, COURSE_DDD - 1) & 1 ~= 0
+    else
+        active = (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR) ~= 0)
+    end
+
+    if not active then
+        o.oAction = 1
+        cur_obj_disable_rendering_and_become_intangible(o)
+    end
+end
+
+---@param o Object
+function custom_ddd_pole_loop(o)
+    if o.oAction ~= 0 then
+        local active = false
+        if gGlobalSyncTable.gameArea ~= 0 or gGlobalSyncTable.freeRoam then
+            local file = get_current_save_file_num() - 1
+            active = save_file_get_star_flags(file, COURSE_DDD - 1) & 1 ~= 0
+        else
+            active = (save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR) ~= 0)
+        end
+
+        if active then
+            cur_obj_enable_rendering_and_become_tangible(o)
+            o.oAction = 0
+        end
+    else
+        bhv_ddd_pole_update()
+    end
+end
+
+hook_behavior_custom(id_bhvDDDPole, true, custom_ddd_pole_init, custom_ddd_pole_loop)
 
 ---@param o Object
 function custom_ddd_warp_init(o)
@@ -698,71 +923,6 @@ hook_behavior_custom(id_bhvDddWarp, true, custom_ddd_warp_init, custom_ddd_warp_
 
 E_MODEL_MH_SPARKLE = ((not LITE_MODE) and smlua_model_util_get_id("mh_sparkle_geo")) or E_MODEL_SPARKLES
 
--- create the Green Demon object (built from 1up, obviously)
-E_MODEL_DEMON = ((not LITE_MODE) and smlua_model_util_get_id("demon_geo")) or E_MODEL_1UP
---- @param o Object
-function demon_init(o)
-  o.oFlags = o.oFlags | OBJ_FLAG_COMPUTE_ANGLE_TO_MARIO | OBJ_FLAG_UPDATE_GFX_POS_AND_ANGLE
-  obj_set_billboard(o)
-
-  cur_obj_set_hitbox_radius_and_height(30, 30)
-  o.oGraphYOffset = 30
-  bhv_1up_common_init()
-end
-
---- @param o Object
-function demon_loop(o)
-  o.oIntangibleTimer = 0
-
-  if o.oAction == 1 then
-    local demonStop = (m0.invincTimer > 0)
-    local demonDespawn = ((not demonOn) or sMario0.team ~= 1 or gGlobalSyncTable.mhState ~= 2)
-    demon_move_towards_mario(o)
-    if demonDespawn then
-      o.activeFlags = ACTIVE_FLAG_DEACTIVATED
-    elseif demonStop then
-      -- nothing
-    elseif dist_between_objects(o, m0.marioObj) > 5000 then -- clip at far distances
-      o.oVelX = o.oForwardVel * sins(o.oMoveAngleYaw);
-      o.oVelZ = o.oForwardVel * coss(o.oMoveAngleYaw);
-      obj_update_pos_vel_xz()
-      o.oPosY = o.oPosY + o.oVelY
-    else
-      object_step()
-    end
-  else
-    bhv_1up_hidden_in_pole_loop()
-  end
-end
-
---- @param o Object
-function demon_move_towards_mario(o)
-  local player = m0.marioObj
-  if (player) then
-    local sp34 = player.header.gfx.pos.x - o.oPosX;
-    local sp30 = player.header.gfx.pos.y + 120 - o.oPosY;
-    local sp2C = player.header.gfx.pos.z - o.oPosZ;
-    local sp2A = atan2s(math.sqrt(sqr(sp34) + sqr(sp2C)), sp30);
-
-    obj_turn_toward_object(o, player, 16, 0x1000);
-    o.oMoveAnglePitch = approach_s16_symmetric(o.oMoveAnglePitch, sp2A, 0x1000);
-
-    if obj_check_if_collided_with_object(o, player) ~= 0 then
-      play_sound(SOUND_GENERAL_COLLECT_1UP, gGlobalSoundSource) -- replace?
-      o.activeFlags = ACTIVE_FLAG_DEACTIVATED
-      m0.health = 0xFF                                          -- die
-    end
-  end
-  local vel = 30
-  if m0.waterLevel >= m0.pos.y then
-    vel = 15 -- half speed if mario is underwater
-  end
-  o.oVelY = sins(o.oMoveAnglePitch) * vel
-  o.oForwardVel = coss(o.oMoveAnglePitch) * vel
-end
-
-id_bhvGreenDemon = hook_behavior(nil, OBJ_LIST_LEVEL, false, demon_init, demon_loop)
-
 -- Wing cap warp that is only tangible when we meet the wing cap requirements
 E_MODEL_TOTWC_ENTRANCE = smlua_model_util_get_id("totwc_entrance_geo")
 function wing_cap_warp_init(o)
@@ -788,4 +948,18 @@ function wing_cap_warp_loop(o)
         cur_obj_become_intangible()
     end
 end
-id_bhvMHWingCapWarp = hook_behavior(nil, OBJ_LIST_LEVEL, false, wing_cap_warp_init, wing_cap_warp_loop)
+id_bhvMHWingCapWarp = hook_behavior(nil, OBJ_LIST_LEVEL, false, wing_cap_warp_init, wing_cap_warp_loop, "id_bhvMHWingCapWarp")
+
+function sparkle_fade_warp_init(o)
+    o.oInteractionSubtype = INT_SUBTYPE_FADING_WARP
+    o.oInteractType = INTERACT_WARP
+    o.oIntangibleTimer = 0
+    o.hitboxRadius = 85
+    o.hitboxHeight = 50
+end
+
+function sparkle_fade_warp_loop(o)
+    generate_yellow_sparkles(o.oPosX, o.oPosY, o.oPosZ, o.hitboxRadius)
+    bhv_fading_warp_loop()
+end
+id_bhvSparkleFadingWarp = hook_behavior(nil, OBJ_LIST_LEVEL, false, sparkle_fade_warp_init, sparkle_fade_warp_loop, "id_bhvSparkleFadingWarp")

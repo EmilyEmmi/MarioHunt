@@ -1,9 +1,9 @@
 --[[
 Hello! For those who are looking to translate:
 - PLEASE PLEASE PLEASE have more than a basic understanding of whatever language you're translating
-- Scroll down and copy one of the language tables (I would copy English, as it's always complete)
+- Copy one of the language files in the lang folder (I would copy English, as it's always complete)
 - Translate all of the things. Make sure you don't miss anything, unless stated.
-- Send the table (don't need the whole file) to me in some text style format (or do a pull request)
+- Send the file to me in either .txt or .lua format (or do a pull request)
 - Let me know who worked on it so I can provide proper credit
 - Also note that I may ask for more translations in the future
 
@@ -163,3 +163,11 @@ function on_mods_loaded()
   update_chat_command_description("mh", trans("mh_desc"))
 end
 hook_event(HOOK_ON_MODS_LOADED, on_mods_loaded)
+
+-- load all language files
+local langs = get_mod_files(get_active_mod(), "lang")
+for i,langFile in ipairs(langs) do
+  if langFile:sub(-4) == ".lua" then
+    require(langFile:sub(1, -5))
+  end
+end

@@ -9,7 +9,7 @@ function set_new_cost(o)
   if gGlobalSyncTable.gameArea ~= 0 then
     local data = ROMHACK and ROMHACK.gameAreaData and ROMHACK.gameAreaData[gGlobalSyncTable.gameArea + 1]
     if data and data.doorCost then
-      local starsNeeded = (o.oBehParams >> 24)
+      local starsNeeded = (o.oBehParams >> 24) & 0xFF
       if data.doorCost[starsNeeded] then
         o.oBehParams = o.oBehParams & 0x00FFFFFF | (data.doorCost[starsNeeded] << 24)
       end
@@ -32,7 +32,8 @@ function door_loop(o)
   if ROMHACK.isUnder then return end
 
   -- check if the door has enough stars to be opened
-  local starsNeeded = (o.oBehParams >> 24) -- this gets the star count
+  local starsNeeded = (o.oBehParams >> 24) & 0xFF -- this gets the star count
+  if starsNeeded > 182 then return end -- There are doors in Decades Later that are always blocked off
   if gGlobalSyncTable.freeRoam then
     starsNeeded = 0
   elseif gGlobalSyncTable.starRun and gGlobalSyncTable.starRun ~= -1 and gGlobalSyncTable.starRun <= starsNeeded then
@@ -101,7 +102,7 @@ end
 function star_door_loop(o)
   local partner = cur_obj_nearest_object_with_behavior(o.behavior) or o
   local m = gMarioStates[0]
-  local starsNeeded = (o.oBehParams >> 24) or 0   -- this gets the star count
+  local starsNeeded = (o.oBehParams >> 24) & 0xFF   -- this gets the star count
   if gGlobalSyncTable.freeRoam then
     starsNeeded = 0
   elseif gGlobalSyncTable.starRun and gGlobalSyncTable.starRun ~= -1 and gGlobalSyncTable.starRun <= starsNeeded then
@@ -112,10 +113,16 @@ function star_door_loop(o)
     end
   end
 
-  if starsNeeded <= m.numStars and (dist_between_objects(m.marioObj, o) <= 800 and dist_between_objects(m.marioObj, partner) <= 800) then
+  local dist = (o.oAction == 2 and 800) or 700
+  if starsNeeded <= m.numStars
+  and (lateral_dist_between_objects(m.marioObj, o) <= dist and math.abs(m.pos.y - o.oPosY - 450) < 600
+  and lateral_dist_between_objects(m.marioObj, partner) <= dist and math.abs(m.pos.y - partner.oPosY - 450) < 600) then
     o.oIntangibleTimer = -1
     if o.oAction == 0 then
       o.oAction = 1
+      if o.oTimer > 60 and not treat_as_hunter(0) then
+        gMarioStates[0].invincTimer = math.max(gMarioStates[0].invincTimer, 60) -- some invinc frames
+      end
     elseif o.oAction == 2 then
       o.oTimer = 0
     end

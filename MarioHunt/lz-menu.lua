@@ -143,10 +143,11 @@ function menu_reload()
     { name = ("preset_star_rush"), desc = "preset_star_rush_desc" },
     { name = ("preset_classic"),   desc = "preset_classic_desc" },
     { name = ("preset_asn"),       desc = "preset_asn_desc" },
+    { name = ("preset_mo3"),       desc = "preset_mo3_desc" },
     { name = ("menu_back") },
     { name = ("main_menu") },
     name = "presetMenu",
-    back = 9,
+    back = 10,
   }
 
   menuList["saboMenu"] = {
@@ -215,9 +216,10 @@ function menu_reload()
     { name = ("menu_run_lives"),         currNum = GST.runnerLives,          maxNum = 99,                                                            desc = ("lives_desc"),                                                 title = ("menu_settings") },
     { name = ("menu_time"),              currNum = GST.runTime // 30,        maxNum = 3600,                                                          desc = ("time_desc"),                                                  time = true },
     { name = ("menu_star_mode"),         option = GST.starMode,              desc = ("starmode_desc"),                                               invalid = (GST.mhMode == 2) },
-    { name = ("menu_category"),          currNum = GST.starRun,              maxNum = maxStars,                                                      minNum = (GST.noBowser and 1) or -1,                                   desc = ("category_desc"),                                    invalid = (GST.mhMode == 2) },
+    { name = ("menu_category"),          currNum = GST.starRun,              maxNum = maxStars,                                                      minNum = (GST.noBowser and 1) or -1,                                   desc = ("category_desc"),                                    invalid = (GST.mhMode == 2),                                                   xOption = true },
     { name = ("menu_defeat_bowser"),     option = not GST.noBowser,          invalid = (GST.mhMode == 2 or (ROMHACK and (ROMHACK.no_bowser ~= nil))) },
     { name = ("menu_free_roam"),         option = GST.freeRoam,              invalid = (GST.mhMode == 2),                                            desc = "menu_free_roam_desc" },
+    { name = ("menu_actless"),           option = GST.actless,               invalid = (GST.mhMode == 2 or disableActlessOption),                    desc = "menu_actless_desc" },
     { name = ("menu_game_area"),         currNum = GST.gameArea,             maxNum = maxGameArea,                                                   invalid = (maxGameArea <= 0 or GST.mhMode == 2),                       desc = "menu_game_area_desc",                                format = areaFormat },
     { name = ("menu_auto"),              option = (auto ~= 0),               desc = "auto_desc",                                                     xOption = true },
     { name = ("menu_shuffle"),           currNum = GST.maxShuffleTime // 30, maxNum = 600,                                                           time = true,                                                           desc = ("menu_shuffle_desc"),                                format = { "~" } },
@@ -240,13 +242,13 @@ function menu_reload()
     { name = ("menu_no_player_col"),     option = GST.noPlayerCol,           desc = ("menu_no_player_col_desc") },
     { name = ("menu_no_water_heal"),     currNum = GST.noWaterHeal,          maxNum = 3,                                                             format = { "~", "lang_runners", "lang_hunters", "lang_all" } },
     { name = ("menu_default_role"),      currNum = GST.defaultRole,          maxNum = 1,                                                             desc = ("menu_default_role_desc"),                                     invalid = (GST.mhMode == 3),                                 format = { "lang_hunters", "lang_runners" } },
-    { name = ("menu_invis_wall_fix"),    option = GST.invisWallFix,          desc = ("menu_invis_wall_fix_desc"),                                    invalid = disableWallFixOption },
+    { name = ("menu_invis_wall_fix"),    option = GST.invisWallFix,          desc = ("menu_invis_wall_fix_desc"),                                    invalid = (gLevelValues.fixCollisionBugs ~= 0) },
     { name = ("menu_blacklist"),         desc = ("blacklist_desc") },
     { name = ("menu_presets"), },
     { name = ("menu_back") },
     { name = ("main_menu") },
     name = "settingsMenu",
-    back = 32,
+    back = 33,
   }
   local settingsMenu = menuList["settingsMenu"]
   if GST.starMode and GST.mhMode ~= 2 then
@@ -255,14 +257,15 @@ function menu_reload()
   if GST.mhMode == 2 then
     settingsMenu[3] = { name = ("menu_first_timer"), option = GST.firstTimer, desc = ("menu_first_timer_desc"), }
   elseif GST.mhMode == 3 then
-    settingsMenu[11] = { name = ("menu_confirm_hunter"), option = GST.confirmHunter, desc = ("menu_confirm_hunter_desc"), }
-    settingsMenu[12] = { name = ("menu_hunters_win_early"), option = GST.huntersWinEarly, desc = ("menu_hunters_win_early_desc"), }
-    settingsMenu[13] = { name = ("menu_global_chat"), currNum = GST.maxGlobalTalk // 30, maxNum = 600, minNum = -1, time = true, format = { "~", "Always" }, desc = ("menu_global_chat_desc"), }
-    settingsMenu[15] = { name = ("menu_know_team"), option = (GST.anarchy ~= 3), desc = ("menu_know_team_desc"), }
-    settingsMenu[17].name = "menu_grace_period"
-    settingsMenu[17].desc = "menu_grace_period_desc"
-    settingsMenu[18] = { name = ("menu_double_health"), option = (GST.doubleHealth ~= 0), desc = ("menu_double_health_desc"), }
-    settingsMenu[27] = { name = ("menu_no_water_heal"), option = (GST.noWaterHeal ~= 0), }
+    settingsMenu[12] = { name = ("menu_confirm_hunter"), option = GST.confirmHunter, desc = ("menu_confirm_hunter_desc"), }
+    settingsMenu[13] = { name = ("menu_hunters_win_early"), option = GST.huntersWinEarly, desc = ("menu_hunters_win_early_desc"), }
+    settingsMenu[14] = { name = ("menu_global_chat"), currNum = GST.maxGlobalTalk // 30, maxNum = 600, minNum = -1, time = true, format = { "~", "Always" }, desc = ("menu_global_chat_desc"), }
+    settingsMenu[16] = { name = ("menu_know_team"), option = (GST.anarchy ~= 3), desc = ("menu_know_team_desc"), }
+    settingsMenu[18].name = "menu_grace_period"
+    settingsMenu[18].desc = "menu_grace_period_desc"
+    settingsMenu[19] = { name = ("menu_double_health"), option = (GST.doubleHealth ~= 0), desc = ("menu_double_health_desc"), }
+    settingsMenu[28] = { name = ("menu_no_water_heal"), option = (GST.noWaterHeal ~= 0), }
+    settingsMenu[29] = { name = ("menu_kill_cooldown"), currNum = GST.killCooldown // 30, minNum = 0, maxNum = 600, time = true, format = { "~" }, desc = ("menu_kill_cooldown_desc"), }
   end
 
   -- name gets overriden
@@ -294,20 +297,13 @@ function menu_reload()
     { name = ("menu_tc"),              option = (gPlayerSyncTable[0].teamChat or false), desc = ("menu_tc_desc"),           invalid = disable_chat_hook },
     { name = ("hard_mode"),            option = (gPlayerSyncTable[0].hard == 1),         desc = ("hard_info_short") },
     { name = ("extreme_mode"),         option = (gPlayerSyncTable[0].hard == 2),         desc = ("extreme_info_short") },
-    { name = ("menu_unknown"),         option = demonOn,                                 invalid = true,                    desc = ("menu_secret") },
     { name = ("menu_old_input"),       option = oldMenuInput,                            desc = ("menu_old_input_desc") },
     { name = ("menu_binds"),           desc = ("menu_binds_desc") },
     { name = ("menu_hide_roles"),      invalid = (get_true_roles() == 0),                desc = ("menu_hide_roles_desc") },
     { name = ("menu_back") },
     name = "playerSettingsMenu",
-    back = 20,
+    back = 19,
   }
-  local playerSettingsMenu = menuList["playerSettingsMenu"]
-  if demonOn or demonUnlocked then
-    playerSettingsMenu[16].name = ("menu_demon")
-    playerSettingsMenu[16].desc = ("menu_demon_desc")
-    playerSettingsMenu[16].invalid = false
-  end
 
   menuList["miscMenu"] = {
     { name = ("free_camera"),         title = ("menu_misc"),                                                                                            invalid = ((not GST.allowSpectate) or (gPlayerSyncTable[0].team == 1 and GST.mhState ~= 1 and GST.mhState ~= 2)), desc = ("menu_free_cam_desc") },
@@ -326,18 +322,20 @@ function menu_reload()
   local trueRoles = get_true_roles()
   local roles = gPlayerSyncTable[0].role or 0
   menuList["hideRolesMenu"] = {
-    { name = ("role_lead"),          title = ("menu_hide_roles"), option = (roles & 2 ~= 0),       invalid = (trueRoles & 2 == 0), color = true },
-    { name = ("role_dev"),           option = (roles & 4 ~= 0),   invalid = (trueRoles & 4 == 0),  color = true },
-    { name = ("role_trans"),         option = (roles & 8 ~= 0),   invalid = (trueRoles & 8 == 0),  color = true },
-    { name = ("role_cont"),          option = (roles & 16 ~= 0),  invalid = (trueRoles & 16 == 0), color = true },
-    { name = ("stat_placement"),     option = (roles & 32 ~= 0),  invalid = (trueRoles & 32 == 0) },
-    { name = ("stat_placement_asn"), option = (roles & 64 ~= 0),  invalid = (trueRoles & 64 == 0) },
-    { name = ("stat_crown"),         option = (roles & 128 ~= 0), invalid = (trueRoles & 128 == 0) },
+    { name = ("role_lead"),          option = (roles & ROLE_LEAD ~= 0),      invalid = (trueRoles & ROLE_LEAD == 0),  color = true, title = ("menu_hide_roles") },
+    { name = ("role_dev"),           option = (roles & ROLE_DEV ~= 0),       invalid = (trueRoles & ROLE_DEV == 0),   color = true },
+    { name = ("role_trans"),         option = (roles & ROLE_TRANS ~= 0),     invalid = (trueRoles & ROLE_TRANS == 0), color = true },
+    { name = ("role_cont"),          option = (roles & ROLE_CONT ~= 0),      invalid = (trueRoles & ROLE_CONT == 0),  color = true },
+    { name = ("stat_placement"),     option = (roles & ROLE_PLACE_64T ~= 0), invalid = (trueRoles & ROLE_PLACE_64T == 0) },
+    { name = ("stat_placement_asn"), option = (roles & ROLE_PLACE_ASN ~= 0), invalid = (trueRoles & ROLE_PLACE_ASN == 0) },
+    { name = ("stat_crown"),         option = (roles & ROLE_CROWN_ASN ~= 0), invalid = (trueRoles & ROLE_CROWN_ASN == 0) },
+    { name = ("stat_placement_mo3"), option = (roles & ROLE_PLACE_MO3 ~= 0), invalid = (trueRoles & ROLE_PLACE_MO3 == 0) },
+    { name = ("stat_crown_mo3"),     option = (roles & ROLE_CROWN_MO3 ~= 0), invalid = (trueRoles & ROLE_CROWN_MO3 == 0) },
     { name = ("menu_default") },
     { name = ("menu_back") },
     { name = ("main_menu") },
     name = "hideRolesMenu",
-    back = 9,
+    back = 11,
   }
 
   menuList["bindsMenu"] = {
@@ -401,8 +399,14 @@ function build_blacklist_course_menu()
   menuList["blacklistCourseMenu"] = {}
   local blacklistCourseMenu = menuList["blacklistCourseMenu"]
   local oneValid = false
-  for i = 1, 7 do
-    if valid_star(focusPlayerOrCourse, i, true, true) and (i ~= 7 or focusPlayerOrCourse > 15) then
+
+  local maxStar = 6
+  if ROMHACK.star_data and ROMHACK.star_data[focusPlayerOrCourse] then
+    maxStar = #ROMHACK.star_data[focusPlayerOrCourse]
+  end
+
+  for i = 1, maxStar do
+    if valid_star(focusPlayerOrCourse, i, true, true) and (i ~= 7 or focusPlayerOrCourse > 15 or gLevelValues.coinsRequiredForCoinStar == 0) then
       local valid = not (mini_blacklist[focusPlayerOrCourse * 10 + i])
       table.insert(blacklistCourseMenu, { name = get_custom_star_name(focusPlayerOrCourse, i), option = valid, star = i })
       if valid then oneValid = true end
@@ -544,7 +548,10 @@ function action_setup()
       function(option)
         option.option = not option.option
         GST.freeRoam = option.option
-        menu_reload()
+      end,
+      function(option)
+        option.option = not option.option
+        GST.actless = option.option
       end,
       function(option)
         GST.gameArea = option.currNum
@@ -674,7 +681,11 @@ function action_setup()
         end
       end,
       function(option)
-        GST.defaultRole = option.currNum
+        if GST.mhMode ~= 3 then
+          GST.defaultRole = option.currNum
+        else
+          GST.killCooldown = option.currNum * 30
+        end
       end,
       function(option)
         option.option = not option.option
@@ -850,10 +861,6 @@ function action_setup()
       end,
       function(option)
         option.option = not option.option
-        demonOn = option.option
-      end,
-      function(option)
-        option.option = not option.option
         oldMenuInput = option.option
         mod_storage_save("oldMenuInput", tostring(option.option))
       end,
@@ -898,72 +905,90 @@ function action_setup()
       function(option)
         option.option = not option.option
         if option.option then
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 2
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | ROLE_LEAD
         else
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~2
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~ROLE_LEAD
         end
         mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
       function(option)
         option.option = not option.option
         if option.option then
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 4
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | ROLE_DEV
         else
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~4
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~ROLE_DEV
         end
         mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
       function(option)
         option.option = not option.option
         if option.option then
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 8
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | ROLE_TRANS
         else
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~8
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~ROLE_TRANS
         end
         mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
       function(option)
         option.option = not option.option
         if option.option then
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 16
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | ROLE_CONT
         else
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~16
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~ROLE_CONT
         end
         mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
       function(option)
         option.option = not option.option
         if option.option then
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 32
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | ROLE_PLACE_64T
         else
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~32
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~ROLE_PLACE_64T
         end
         mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
       function(option)
         option.option = not option.option
         if option.option then
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 64
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | ROLE_PLACE_ASN
         else
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~64
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~ROLE_PLACE_ASN
         end
         mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
       function(option)
         option.option = not option.option
         if option.option then
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | 128
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | ROLE_CROWN_ASN
         else
-          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~128
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~ROLE_CROWN_ASN
+        end
+        mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
+      end,
+      function(option)
+        option.option = not option.option
+        if option.option then
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | ROLE_PLACE_MO3
+        else
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~ROLE_PLACE_MO3
+        end
+        mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
+      end,
+      function(option)
+        option.option = not option.option
+        if option.option then
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role | ROLE_CROWN_MO3
+        else
+          gPlayerSyncTable[0].role = gPlayerSyncTable[0].role & ~ROLE_CROWN_MO3
         end
         mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
       function()
-        gPlayerSyncTable[0].role = get_true_roles()
+        reset_roles()
         menu_reload()
         mod_storage_save("showRoles", tostring(gPlayerSyncTable[0].role))
       end,
-      function() menu_enter("playerSettingsMenu", 19) end,
+      function() menu_enter("playerSettingsMenu", 18) end,
       function() menu_enter(nil, 2) end,
     },
     presetMenu = {
@@ -1034,7 +1059,9 @@ function action_setup()
         GST.defaultRole = 1
       end,
       function()
-        GST.noBowser = false
+        if ROMHACK.no_bowser == nil then
+          GST.noBowser = false
+        end
         GST.allowStalk = false
         GST.starMode = true
         GST.runTime = 2
@@ -1059,13 +1086,19 @@ function action_setup()
         GST.defaultRole = 0
         GST.noPlayerCol = false
         GST.pvpType = gServerSettings.pvpType
+        if not disableActlessOption then
+          GST.actless = false
+        end
         -- Invis wall fix is not changed
       end,
       function()
         change_game_mode("normal", 0) -- normal mode
         GST.runnerLives = 1
-        GST.noBowser = true
+        if ROMHACK.no_bowser == nil then
+          GST.noBowser = true
+        end
         GST.freeRoam = true
+        GST.gameArea = 0
         GST.starRun = 120
         GST.allowStalk = false
         GST.allowSpectate = false
@@ -1081,13 +1114,57 @@ function action_setup()
         GST.starHeal = false
         GST.spectateOnDeath = true
         GST.maxShuffleTime = 0
-        GST.starSetting = 2
+        GST.starSetting = STAR_NON_STOP
         GST.defaultRole = 0
         GST.noPlayerCol = false
         GST.pvpType = PLAYER_PVP_CLASSIC
+        if not disableActlessOption then
+          GST.actless = false
+        end
         -- Invis wall fix is not changed
       end,
-      function() menu_enter("settingsMenu", 31) end,
+      function()
+        change_game_mode("normal", 0) -- normal mode
+        GST.runnerLives = 1
+        if ROMHACK.no_bowser == nil then
+          GST.noBowser = false
+        end
+        GST.freeRoam = false
+
+        GST.gameArea = math.random(1, 3) -- random game area
+        if GST.gameArea == 1 then
+          GST.starRun = 15
+        elseif GST.gameArea == 2 then
+          GST.starRun = 16
+        else
+          GST.starRun = 25
+        end
+        
+        GST.allowStalk = false
+        GST.allowSpectate = false
+        GST.starMode = false
+        GST.runTime = 7200
+        GST.weak = false
+        GST.anarchy = 0
+        GST.dmgAdd = 0
+        GST.nerfVanish = true
+        GST.countdown = 600
+        GST.doubleHealth = 0
+        GST.voidDmg = 3
+        GST.starHeal = true
+        GST.spectateOnDeath = true
+        GST.maxShuffleTime = 0
+        GST.starSetting = STAR_NON_STOP
+        GST.defaultRole = 0
+        GST.noPlayerCol = false
+        GST.showOnMap = 1
+        -- GST.pvpType = PLAYER_PVP_CLASSIC -- Not changed
+        GST.invisWallFix = true
+        if not disableActlessOption then
+          GST.actless = false
+        end
+      end,
+      function() menu_enter("settingsMenu", 32) end,
       function() menu_enter(nil, 2) end,
     },
     saboMenu = {
@@ -1138,7 +1215,7 @@ function action_setup()
         mod_storage_save("saboButton", tostring(saboButton))
         menu_reload()
       end,
-      function() menu_enter("playerSettingsMenu", 18) end,
+      function() menu_enter("playerSettingsMenu", 17) end,
       function() menu_enter(nil, 2) end,
     },
     autoMenu = {
@@ -1158,7 +1235,7 @@ function action_setup()
         auto_command(-option.currNum - 2)
         menu_reload()
       end,
-      function() menu_enter("settingsMenu", 8) end,
+      function() menu_enter("settingsMenu", 9) end,
       function() menu_enter(nil, 2) end,
     },
   }
@@ -1198,7 +1275,7 @@ function selectOption(option)
       blacklist_command(currMenu[option].action)
       menu_enter("blacklistMenu", option)
     elseif currMenu.back == option then
-      menu_enter("settingsMenu", 30)
+      menu_enter("settingsMenu", 31)
     else
       menu_enter()
     end
@@ -1261,7 +1338,7 @@ function handleMenu()
   handle_mouse()
 
   djui_hud_set_resolution(RESOLUTION_DJUI)
-  djui_hud_set_font(FONT_CUSTOM_HUD)
+  djui_hud_set_font_consider_lang(FONT_CUSTOM_HUD)
   local screenWidth = djui_hud_get_screen_width()
   local screenHeight = djui_hud_get_screen_height()
   -- apparently I designed this whole menu for 720p. Detect if this is greater than that and if so, adjust scale
@@ -1288,10 +1365,8 @@ function handleMenu()
     if option.name:sub(1, 7) == "PLAYER_" then
       textWidth = screenWidth * 0.7
     elseif option.course then
-      textWidth = djui_hud_measure_text(get_custom_level_name(option.course, course_to_level[option.course], 0)) *
+      textWidth = djui_hud_measure_text(get_custom_level_name(option.course, get_level_num_from_course_num(option.course), 0)) *
           textScale
-    elseif option.color then
-      textWidth = djui_hud_measure_text(remove_color(optionText)) * textScale
     else
       textWidth = djui_hud_measure_text(optionText) * textScale
     end
@@ -1375,18 +1450,17 @@ function handleMenu()
   local titleCenter = 0
   djui_hud_set_color(255, 255, 255, 255)
   if titleText == "PLAYER_S" then
-    djui_hud_set_font(FONT_RECOLOR_HUD) -- DX exclusive
+    djui_hud_set_font_consider_lang(FONT_RECOLOR_HUD) -- DX exclusive
     local np = gNetworkPlayers[focusPlayerOrCourse]
     if np and np.connected then
       local playerColor = network_get_player_text_color_string(focusPlayerOrCourse)
       titleText = playerColor .. np.name
       titleText = cap_color_text(titleText, PLAYER_NAME_CUTOFF)
-      --titleText = remove_color(np.name)
     else
       menu_enter("playerMenu", focusPlayerOrCourse + 1)
     end
 
-    local titleWidth = djui_hud_measure_text(remove_color(titleText))
+    local titleWidth = djui_hud_measure_text(titleText)
     local y = screenHeight * 0.03
     if titleWidth * titleScale > screenWidth * 0.8 then
       titleScale = screenWidth * 0.8 / (titleWidth + 20)
@@ -1394,11 +1468,10 @@ function handleMenu()
 
     titleCenter = (screenWidth - titleWidth * titleScale) / 2
 
-    djui_hud_print_text_with_color(titleText, titleCenter, y, titleScale)
-    --print_text_ex_hud_font(titleText, titleCenter, screenHeight * 0.03, titleScale)
+    djui_hud_print_text_hud_font(titleText, titleCenter, y, titleScale)
   else
     if titleText == "COURSE" then
-      titleText = get_custom_level_name(focusPlayerOrCourse, course_to_level[focusPlayerOrCourse], 0)
+      titleText = get_custom_level_name(focusPlayerOrCourse, get_level_num_from_course_num(focusPlayerOrCourse), 0)
     else
       titleText = trans(titleText)
     end
@@ -1409,9 +1482,9 @@ function handleMenu()
     end
 
     titleCenter = (screenWidth - titleWidth * titleScale) / 2
-    print_text_ex_hud_font(titleText, titleCenter, screenHeight * 0.03, titleScale)
+    djui_hud_print_text_hud_font(titleText, titleCenter, screenHeight * 0.03, titleScale)
   end
-  djui_hud_set_font(FONT_CUSTOM_HUD)
+  djui_hud_set_font_consider_lang(FONT_CUSTOM_HUD)
 
   for i, option in ipairs(currMenu) do
     local render = true
@@ -1462,17 +1535,12 @@ function handleMenu()
           optionText = trans("empty", index)
         end
       elseif option.course then
-        optionText = get_custom_level_name(option.course, course_to_level[option.course], 0)
+        optionText = get_custom_level_name(option.course, get_level_num_from_course_num(option.course), 0)
       else
         optionText = trans(optionText)
       end
 
-      local textWidth = 0
-      if option.color then
-        textWidth = djui_hud_measure_text(remove_color(optionText)) * textScale
-      else
-        textWidth = djui_hud_measure_text(optionText) * textScale
-      end
+      local textWidth = djui_hud_measure_text(optionText) * textScale
       local textX = (screenWidth - textWidth) / 2
 
       if roleText then textX = screenWidth * 0.2 end
@@ -1490,8 +1558,13 @@ function handleMenu()
         local allValid = true
         local oneValid = false
 
-        for i = 1, 7 do
-          if (i ~= 7 or option.course > 15) and valid_star(option.course, i, true, true) then
+        local maxStar = 6
+        if ROMHACK.star_data and ROMHACK.star_data[option.course] then
+          maxStar = #ROMHACK.star_data[option.course]
+        end
+
+        for i = 1, maxStar do
+          if (i ~= 7 or option.course > 15 or gLevelValues.coinsRequiredForCoinStar == 0) and valid_star(option.course, i, true, true) then
             if not mini_blacklist[option.course * 10 + i] then
               oneValid = true
             else
@@ -1519,19 +1592,21 @@ function handleMenu()
 
       if option.color then
         if option.option ~= false or roleText then
-          djui_hud_print_text_with_color(optionText, textX, optionY, textScale, textColor[4])
+          djui_hud_set_color(255, 255, 255, textColor[4])
+          djui_hud_print_text(optionText, textX, optionY, textScale)
         else
-          djui_hud_print_text(remove_color(optionText), textX, optionY, textScale)
+          djui_hud_print_text(get_uncolored_string(optionText), textX, optionY, textScale)
         end
       else
         djui_hud_print_text(optionText, textX, optionY, textScale)
       end
+
       if roleText then
-        textX = screenWidth * 0.8 - djui_hud_measure_text(remove_color(roleText)) * textScale
-        djui_hud_print_text_with_color(roleText, textX, optionY, textScale)
+        textX = screenWidth * 0.8 - djui_hud_measure_text(roleText) * textScale
+        djui_hud_print_text(roleText, textX, optionY, textScale)
       end
 
-      djui_hud_set_font(FONT_CUSTOM_HUD)
+      djui_hud_set_font_consider_lang(FONT_CUSTOM_HUD)
 
       -- allows selecting an option with the mouse
       if mouseIdleTimer < 2 then
@@ -1556,7 +1631,7 @@ function handleMenu()
       end
 
       -- print "z" or "r click"
-      if option.xOption and currentOption == i and (not option.invalid) and hoveringOption then
+      if option.xOption and currentOption == i and (not option.invalid) and hoveringOption and (not inArrowOption) then
         local x = textX + textWidth
         if option.name:sub(1, 7) == "PLAYER_" then
           x = textX + 30 * optionScale
@@ -1573,10 +1648,8 @@ function handleMenu()
 
       if option.currNum then
         local arrowScale = (5 * optionScale) / 3
-        local choiceWidth = (option.choiceWidth * optionScale - djui_hud_measure_text(option.choiceString) * optionScale) /
-            2
-        print_text_ex_hud_font(option.choiceString, textX + textWidth + choiceWidth + 15 * optionScale, optionY,
-          optionScale)
+        local choiceWidth = (option.choiceWidth * optionScale - djui_hud_measure_text(option.choiceString) * optionScale) / 2
+        djui_hud_print_text_hud_font(option.choiceString, textX + textWidth + choiceWidth + 15 * optionScale, optionY, optionScale)
         djui_hud_render_texture(TEX_MENU_ARROW, textX + textWidth + 8 * arrowScale,
           optionY + 2 + 8 * arrowScale, -arrowScale, -arrowScale)
         djui_hud_render_texture(TEX_MENU_ARROW, textX + textWidth + (option.choiceWidth + 20) * optionScale,
@@ -1767,15 +1840,14 @@ ruleEgg = false               -- if the easter egg has appeared
 local statOrder = { "wins_standard", "wins", "wins_mys", "kills",
   "maxStreak", "maxStar", "placement", "parkourRecord", "playtime" }
 local statOrder_alt1 = { "hardWins_standard", "hardWins", "hardWins_mys", nil, nil, nil, "placementASN", "pRecordOmm" }
-local statOrder_alt2 = { "exWins_standard", "exWins", "exWins_mys", nil, nil, nil, "placement", "pRecordOther" }
+local statOrder_alt2 = { "exWins_standard", "exWins", "exWins_mys", nil, nil, nil, "placementMo3", "pRecordOther" }
 
 local descOrder = { "stat_wins_standard", "stat_wins", "stat_wins_mys", "stat_kills", "stat_combo", "stat_mini_stars",
   "stat_placement", "stat_parkour_time", "stat_playtime" }
 local descOrder_alt1 = { "stat_wins_hard_standard", "stat_wins_hard", "stat_wins_hard_mys", nil, nil, nil,
-  "stat_placement_asn",
-  "stat_parkour_time_omm" }
-local descOrder_alt2 = { "stat_wins_ex_standard", "stat_wins_ex", "stat_wins_ex_mys", nil, nil, nil, nil,
-  "stat_parkour_time_other" }
+  "stat_placement_asn", "stat_parkour_time_omm" }
+local descOrder_alt2 = { "stat_wins_ex_standard", "stat_wins_ex", "stat_wins_ex_mys", nil, nil, nil,
+  "stat_placement_mo3", "stat_parkour_time_other" }
 
 function stats_table_hud()
   djui_hud_set_resolution(RESOLUTION_DJUI)
@@ -1794,12 +1866,12 @@ function stats_table_hud()
   djui_hud_render_rect(screenWidth * 0.1, 0, screenWidth * 0.8, screenHeight);
 
   -- title
-  djui_hud_set_font(FONT_CUSTOM_HUD)
+  djui_hud_set_font_consider_lang(FONT_CUSTOM_HUD)
   text = trans("menu_stats")
   width = djui_hud_measure_text(text) * 4 * scale
   x = (screenWidth - width) / 2
   djui_hud_set_color(255, 255, 255, 255);
-  print_text_ex_hud_font(text, x, 10, 4 * scale);
+  djui_hud_print_text_hud_font(text, x, 10, 4 * scale);
   djui_hud_set_font(FONT_NORMAL)
 
   -- "player"
@@ -1959,9 +2031,10 @@ function stats_table_hud()
 
       text = playerColor .. np.name .. "\\#ffffff\\"
       text = cap_color_text(text, PLAYER_NAME_CUTOFF)
-      width = djui_hud_measure_text(remove_color(text)) * scale
+      width = djui_hud_measure_text(text) * scale
       x = screenWidth * 0.1 + 150 * scale - width / 2
-      djui_hud_print_text_with_color(text, x, y, scale)
+      djui_hud_set_color(255, 255, 255, 255);
+      djui_hud_print_text(text, x, y, scale)
 
       x = screenWidth * 0.1 + 295 * scale
       space = (screenWidth * 0.8 - 420 * scale) / (#statOrder - 1)
@@ -1985,7 +2058,7 @@ function stats_table_hud()
           local minutes = time // 60 % 60
           text = string.format("%01d:%02d", minutes, seconds)
         else
-          if text == "0000" or (text == "9999" and (stat == "placement" or stat == "placementASN")) then
+          if text == "0000" or (text == "9999" and stat:sub(1, 9) == "placement") then
             djui_hud_set_color(100, 100, 100, 255)
           else
             djui_hud_set_color(255, 255, 255, 255)
@@ -2062,12 +2135,12 @@ function rules_menu_hud(forceSlide)
   djui_hud_render_rect(screenWidth * 0.1, 0, screenWidth * 0.8, screenHeight);
 
   -- title
-  djui_hud_set_font(FONT_CUSTOM_HUD)
+  djui_hud_set_font_consider_lang(FONT_CUSTOM_HUD)
   text = trans("menu_rules")
   width = djui_hud_measure_text(text) * 2 * scale
   x = (screenWidth - width) / 2
   djui_hud_set_color(255, 255, 255, 255);
-  print_text_ex_hud_font(text, x, 5 * scale, 2 * scale);
+  djui_hud_print_text_hud_font(text, x, 5 * scale, 2 * scale);
   djui_hud_set_font(FONT_NORMAL)
 
   -- all text
@@ -2238,21 +2311,21 @@ function rules_menu_hud(forceSlide)
   local LIMIT = 0
   while newline and LIMIT < 100 do
     local render = text:sub(1, newline - 1)
-    width = djui_hud_measure_text(remove_color(render)) * scale
+    width = djui_hud_measure_text(render) * scale
     while width > screenWidth * 0.8 and LIMIT < 100 do
       local spaceLoc = render:find(" ", 40) or 45
       local subrender = render:sub(1, spaceLoc - 1)
-      width = djui_hud_measure_text(remove_color(subrender)) * scale
+      width = djui_hud_measure_text(subrender) * scale
       x = (screenWidth - width) / 2
-      djui_hud_print_text_with_color(subrender, x, y, scale)
+      djui_hud_print_text(subrender, x, y, scale)
       y = y + 30 * scale
 
       render = render:sub(spaceLoc + 1)
-      width = djui_hud_measure_text(remove_color(render)) * scale
+      width = djui_hud_measure_text(render) * scale
       LIMIT = LIMIT + 1
     end
     x = (screenWidth - width) / 2
-    djui_hud_print_text_with_color(render, x, y, scale)
+    djui_hud_print_text(render, x, y, scale)
 
     if newline == text:len() + 1 then break end
     text = text:sub(newline + 1)
@@ -2705,9 +2778,13 @@ function menu_controls(m)
           play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource)
         end
       elseif pressed[5] then
-        inArrowOption = true
-        pressed[5] = false
-        play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource)
+        if option.invalid then
+          play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
+        else
+          inArrowOption = true
+          pressed[5] = false
+          play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource)
+        end
       end
     end
 
@@ -2722,7 +2799,7 @@ function menu_controls(m)
     elseif pressed[6] and currMenu.back then
       play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource)
       selectOption(currMenu.back)
-    elseif hoveringOption and pressed[7] then
+    elseif hoveringOption and pressed[7] and not inArrowOption then
       if currMenu.name == "playerMenu" and currentOption < #currMenu then
         if (not has_mod_powers(0)) or option.invalid then
           play_sound(SOUND_MENU_CAMERA_BUZZ, gGlobalSoundSource)
@@ -2735,8 +2812,13 @@ function menu_controls(m)
         play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource)
         local oneValid = false
 
-        for i = 1, 7 do
-          if (i ~= 7 or option.course > 15) and valid_star(option.course, i, true, true) then
+        local maxStar = 6
+        if ROMHACK.star_data and ROMHACK.star_data[option.course] then
+          maxStar = #ROMHACK.star_data[option.course]
+        end
+
+        for i = 1, maxStar do
+          if (i ~= 7 or option.course > 15 or gLevelValues.coinsRequiredForCoinStar == 0) and valid_star(option.course, i, true, true) then
             if not mini_blacklist[option.course * 10 + i] then
               oneValid = true
               break
@@ -2756,6 +2838,11 @@ function menu_controls(m)
         else
           auto_command(0)
         end
+      elseif currMenu.name == "settingsMenu" and option.name == "menu_category" then
+        play_sound(SOUND_MENU_CLICK_FILE_SELECT, gGlobalSoundSource)
+        star_count_command("default")
+        option.currNum = gGlobalSyncTable.starRun
+        option.savedNum = option.currNum
       end
     end
   end
@@ -2766,15 +2853,24 @@ function is_menu_open()
   return (menu or showingStats or showingRules)
 end
 
-function print_text_ex_hud_font(text, x, y, scale)
+function djui_hud_set_font_consider_lang(font)
+  if lang == "jp" then
+    djui_hud_set_font(FONT_SPECIAL)
+    return true
+  end
+  djui_hud_set_font(font)
+  return false
+end
+
+function djui_hud_print_text_hud_font(text, x, y, scale)
   if text == "~" then
     djui_hud_render_texture(gTextures.no_camera, x, y, scale, scale)
     return
-  else
-    djui_hud_set_font(FONT_CUSTOM_HUD)
-    djui_hud_print_text(text, x, y, scale)
-    return
+  elseif lang == "jp" then
+    y = y - 8 * scale
   end
+
+  djui_hud_print_text(text, x, y, scale)
 end
 
 --hook_event(HOOK_ON_HUD_RENDER, handleMenu)

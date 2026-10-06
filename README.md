@@ -1,6 +1,6 @@
 <img src="logo.png" alt="MarioHunt" width="800"/>
 
-### v2.8 (view changelog [here](changelog.md))
+### v2.8.1 (view changelog [here](changelog.md))
 
 ## [Trailer](https://www.youtube.com/watch?v=hyuXu4Bzugs&ab_channel=N64Mario)
 
@@ -38,7 +38,9 @@ Spectator mod by **Sprinter05**
 
 Mute mod created by **Beard**
 
-Also special thanks to **ColbyRayz!** and **Key's Artworks** for testing and support
+Decades Later romhack support by **Moldy64**
+
+Also special thanks to **ColbyRayz!**, **Key's Artworks** and **Moldy64** for testing and support
 <br/>
 <br/>
 <br/>
@@ -55,6 +57,8 @@ Italian translation made by **Mr.L-ore**
 Romania translation by **N64** (some translations provided by **EpikCool**)
 
 Dutch translation by **LALIEDABBE**
+
+Japanese translation by **Moldy64**
 
 If you would like to make changes or submit your own translation, check [here](wiki/lang.md) (does not exist yet) or inside lang.lua for details
 <br/>

@@ -97,6 +97,8 @@ function djui_hud_print_outlined_text_interpolated(text, prevX, prevY, prevScale
     local offset = 1 * (scale * 2)
     local prevOffset = 1 * (prevScale * 2)
 
+    djui_hud_set_text_color(r, g, b, 255)
+
     -- render outline
     djui_hud_set_color(r * outlineDarkness, g * outlineDarkness, b * outlineDarkness, a)
     djui_hud_print_text_interpolated(text, prevX - prevOffset, prevY, prevScale, x - offset, y, scale)
@@ -104,78 +106,12 @@ function djui_hud_print_outlined_text_interpolated(text, prevX, prevY, prevScale
     djui_hud_print_text_interpolated(text, prevX, prevY - prevOffset, prevScale, x, y - offset, scale)
     djui_hud_print_text_interpolated(text, prevX, prevY + prevOffset, prevScale, x, y + offset, scale)
     -- render text
-    djui_hud_set_color(r, g, b, a)
+    djui_hud_set_color(255, 255, 255, a)
     djui_hud_print_text_interpolated(text, prevX, prevY, prevScale, x, y, scale)
-    djui_hud_set_color(255, 255, 255, 255)
-end
 
--- for tags
--- removes color string
-local function remove_color(text, get_color)
-    local start = text:find("\\")
-    local next = 1
-    while (next ~= nil) and (start ~= nil) do
-        start = text:find("\\")
-        if start ~= nil then
-            next = text:find("\\", start + 1)
-            if next == nil then
-                next = text:len() + 1
-            end
-
-            if get_color then
-                local color = text:sub(start, next)
-                local render = text:sub(1, start - 1)
-                text = text:sub(next + 1)
-                return text, color, render
-            else
-                text = text:sub(1, start - 1) .. text:sub(next + 1)
-            end
-        end
-    end
-    return text
-end
-
-local function djui_hud_print_outlined_text_interpolated_with_color(text, prevX, prevY, prevScale, x, y, scale, alpha,
-                                                                    outlineDarkness)
-    local space = 0
-    local color = ""
-    local render = ""
-    text, color, render = remove_color(text, true)
-    local r, g, b, a = 255, 255, 255, alpha or 255
-    while render ~= nil do
-        if render ~= "" then
-            djui_hud_print_outlined_text_interpolated(render, prevX + space, prevY, prevScale, x + space, y, scale, r, g,
-                b, a, outlineDarkness);
-        end
-        r, g, b, a = convert_color(color)
-        a = alpha or a
-        space = space + djui_hud_measure_text(render) * scale
-        text, color, render = remove_color(text, true)
-    end
-    djui_hud_print_outlined_text_interpolated(text, prevX + space, prevY, prevScale, x + space, y, scale, r, g, b, a,
-        outlineDarkness);
-end
-
-local function name_without_hex(name)
-    local s = ''
-    local inSlash = false
-    for i = 1, #name do
-        local c = name:sub(i, i)
-        if c == '\\' then
-            inSlash = not inSlash
-        elseif not inSlash then
-            s = s .. c
-        end
-    end
-    return s
-end
-
-local function split(s)
-    local result = {}
-    for match in (s):gmatch(string.format("[^%s]+", " ")) do
-        table.insert(result, match)
-    end
-    return result
+    -- reset colors
+    djui_hud_reset_color();
+    djui_hud_reset_text_color();
 end
 
 local invalid_nametag_action = {
@@ -227,13 +163,11 @@ local function render_nametags()
                         name = hookedString
                         -- check if our name was changed to the same as another player; if so, set vIndex to that player
                         for a=0,MAX_PLAYERS-1 do
-                            if name == name_without_hex(gNetworkPlayers[a].name) then
+                            if get_uncolored_string(name) == get_uncolored_string(gNetworkPlayers[a].name) then
                                 vIndex = a
                                 break
                             end
                         end
-                    else
-                        name = name_without_hex(name)
                     end
                     local color = { r = 162, g = 202, b = 234 }
                     local tag = ""
@@ -241,19 +175,12 @@ local function render_nametags()
                     if showRoleColor and know_team(vIndex) then
                         local dum, dum2, roleColor = mhApi.get_role_name_and_color(vIndex)
                         color = roleColor
+                        name = get_uncolored_string(name)
                     else
                         local colorString = network_get_player_text_color_string(i)
                         color.r, color.g, color.b = convert_color(colorString)
                     end
                     tag = get_tag(vIndex)
-
-                    local measure = djui_hud_measure_text(name) * scale * 0.5
-                    out.y = out.y - 16 * scale
-                    
-                    local alpha = (i == 0 and 255 or math.min(np.fadeOpacity << 3, 255)) * clampf(FADE_SCALE - scale, 0, 1)
-                    if i ~= 0 and out.z < -gGlobalSyncTable.tagDist + 1000 then
-                        alpha = clamp((out.z + gGlobalSyncTable.tagDist) * 0.255, 0, alpha)
-                    end
 
                     if not e.inited then
                         vec3f_copy(e.prevPos, out)
@@ -261,18 +188,38 @@ local function render_nametags()
                         e.inited = true
                     end
 
-                    local exHealthScale = 1
-                    djui_hud_print_outlined_text_interpolated(name, e.prevPos.x - measure, e.prevPos.y, e.prevScale,
-                        out.x - measure, out.y, scale, color.r, color.g, color.b, alpha, 0.25)
-                    if tag ~= "" then
-                        local tagMeasure = djui_hud_measure_text(name_without_hex(tag)) * scale * 0.5
-                        djui_hud_print_outlined_text_interpolated_with_color(tag, e.prevPos.x - tagMeasure,
-                            e.prevPos.y - 32 * e.prevScale, e.prevScale, out.x - tagMeasure, out.y - 32 * scale, scale, alpha,
-                            0.25)
-                        exHealthScale = 1.3
+                    local width, height = djui_hud_measure_text(name)
+                    local currHalfWidth = width * scale * 0.5
+                    local currHalfHeight = height * scale * 0.5
+                    local currNametagPosY = out.y - currHalfHeight
+                    local prevHalfWidth = width * e.prevScale * 0.5
+                    local prevHalfHeight = height * e.prevScale * 0.5
+                    local prevNametagPosY = e.prevPos.y - prevHalfHeight
+                    
+                    local alpha = (i == 0 and 255 or math.min(np.fadeOpacity << 3, 255)) * clampf(FADE_SCALE - scale, 0, 1)
+                    if i ~= 0 and out.z < -gGlobalSyncTable.tagDist + 1000 then
+                        alpha = clamp((out.z + gGlobalSyncTable.tagDist) * 0.255, 0, alpha)
                     end
 
-                    if m.playerIndex ~= 0 and showHealth then
+                    local exHealthScale = 1
+                    djui_hud_print_outlined_text_interpolated(name, e.prevPos.x - prevHalfWidth, prevNametagPosY, e.prevScale,
+                        out.x - currHalfWidth, currNametagPosY, scale, color.r, color.g, color.b, alpha, 0.25)
+                    if tag ~= "" then
+                        local tagWidth, tagHeight = djui_hud_measure_text(tag)
+                        local currTagHalfWidth = tagWidth * scale * 0.5
+                        local currTagHalfHeight = tagHeight * scale * 0.5
+                        local currTagPosY = out.y - currTagHalfHeight - 32 * scale
+                        local prevTagHalfWidth = tagWidth * e.prevScale * 0.5
+                        local prevTagHalfHeight = tagHeight * e.prevScale * 0.5
+                        local prevTagPosY = e.prevPos.y - prevTagHalfHeight - 32 * scale
+
+                        djui_hud_print_outlined_text_interpolated(tag, e.prevPos.x - prevTagHalfWidth, prevTagPosY, e.prevScale,
+                            out.x - currTagHalfWidth, currTagPosY, scale, color.r, color.g, color.b, alpha, 0.25)
+                        exHealthScale = 1.5
+                    end
+
+                    if m.playerIndex ~= 0 and showHealth and (get_active_sabo() ~= 2
+                    or gPlayerSyncTable[0].team ~= 1 or gPlayerSyncTable[0].spectator == 1) then
                         djui_hud_set_color(255, 255, 255, alpha)
                         local healthScale = 75 * scale
                         local prevHealthScale = 75 * e.prevScale
@@ -356,7 +303,7 @@ local function on_color_command(msg)
 end
 
 local function on_nametags_command(msg)
-    local args = split(msg)
+    local args = split(msg, " ")
     if args[1] == "distance" or args[1] == "dist" then
         return on_distance_command(args[2])
     elseif args[1] == "show-health" then

@@ -4,7 +4,7 @@ local math_min, math_max, math_floor, math_ceil, math_abs, math_sqrt, coss, sins
     vec3f_dot, vec3f_mul, vec3f_dif, vec3f_length
 
 function u16(x)
-  x = (math_floor(x) & 0xFFFF)
+  local x = (math_floor(x) & 0xFFFF)
   if x < 0 then return x + 65536 end
   return x
 end
@@ -63,15 +63,14 @@ function do_warp(msg)
   local args = split(msg, " ")
   local level = tonumber(args[1])
   if args[1] and string.sub(args[1], 1, 1) == "c" then
-    level = course_to_level[tonumber(string.sub(args[1], 2))]
+    local course = tonumber(string.sub(args[1], 2))
+    level = (course and get_level_num_from_course_num(course))
   end
   if not level then
     level = string_to_level[args[1]] or 16
   end
   local area = tonumber(args[2]) or 1
-  local act = tonumber(args[3]) or
-      bool_to_int(gLevelValues.disableActs == 0 and level_to_course[level] and level_to_course[level] < 16 and
-        level_to_course[level] > 0)
+  local act = tonumber(args[3]) or bool_to_int(gLevelValues.disableActs == 0 and course_is_main_course(get_level_course_num(level)))
   local node = tonumber(args[4])
   if not node then
     djui_chat_message_create("Warping to level " .. level .. " area " .. area .. " act " .. act)
@@ -161,12 +160,12 @@ function get_all_stars(msg)
   local valid_star_table = generate_star_table(tonumber(msg), (msg ~= "mini"), (msg ~= "noreplica"))
   print("")
   for i, star in ipairs(valid_star_table) do
-    local act = star % 10
-    local course = star // 10
-    local starString = string.format("%s - %s (%d) (ID: %d)", get_custom_level_name(course, course_to_level[course], 1),
-      get_custom_star_name(course, act), act, star)
+    local course, act = star[1], star[2]
+    local id = course * 10 + act
+    local starString = string.format("%s - %s (%d) (ID: %d)", get_custom_level_name(course, get_level_num_from_course_num(course), 1),
+      get_custom_star_name(course, act), act, id)
     djui_chat_message_create(starString)
-    print(string.format("%-31s%-31s%-5s%-5s", get_custom_level_name(course, course_to_level[course], 1),
+    print(string.format("%-31s%-31s%-5s%-5s", get_custom_level_name(course, get_level_num_from_course_num(course), 1),
       get_custom_star_name(course, act), act, star))
   end
   djui_chat_message_create(#valid_star_table .. " stars total")
@@ -202,11 +201,17 @@ function get_location(msg)
 end
 
 function get_star_debug(msg)
-  local starsToGet = tonumber(msg) or 0
-  local gotStars = 0
+  local starsToGet = tonumber(msg) or 1
+  local reverse = (starsToGet < 0)
+  if starsToGet == 0 then return true end
 
   local file = get_current_save_file_num() - 1
-  for course = 0, 25 do
+  local course = gNetworkPlayers[0].currCourseNum - 1
+  local coursesDone = 0
+  while coursesDone <= 25 do
+    coursesDone = coursesDone + 1
+    course = (course + 1) % 26
+
     local data = { 8, 8, 8, 8, 8, 8, 8 }
     if gGlobalSyncTable.ee and ROMHACK.star_data_ee[course] then
       data = ROMHACK.star_data_ee[course]
@@ -220,20 +225,29 @@ function get_star_debug(msg)
       data = { 8, 8, 8, 8, 8 }
     end
     
-    for star = 1, 7 do
+    local actStart, actEnd, actCount = 1, 7, 1
+    if reverse then
+      actStart, actEnd, actCount = 7, 1, -1
+    end
+    for star = actStart, actEnd, actCount do
       if data[star] and data[star] ~= 0 then
         local saveFlags = save_file_get_star_flags(file, course - 1)
-        if saveFlags & (1 << (star - 1)) == 0 then
-          save_file_set_star_flags(file, course - 1, 1 << (star - 1))
-          gotStars = gotStars + 1
+        if (saveFlags & (1 << (star - 1)) == 0) ~= reverse then
+          if not reverse then
+            save_file_set_star_flags(file, course - 1, 1 << (star - 1))
+            starsToGet = starsToGet - 1
+          else
+            save_file_remove_star_flags(file, course - 1, 1 << (star - 1))
+            starsToGet = starsToGet + 1
+          end
         end
       end
-      if gotStars >= starsToGet then
+      if starsToGet == 0 then
         break
       end
     end
 
-    if gotStars >= starsToGet then
+    if starsToGet == 0 then
       break
     end
   end
@@ -326,7 +340,7 @@ function force_spectate_command(msg)
   if not playerID then return true end
 
   local sMario = gPlayerSyncTable[playerID]
-  local name = remove_color(np.name)
+  local name = get_uncolored_string(np.name)
   if sMario.forceSpectate or sMario.dead then
     sMario.forceSpectate = false
     sMario.dead = false
@@ -342,41 +356,21 @@ function force_spectate_command(msg)
 end
 
 function desync_fix_command(msg)
-  local oldLevel = gGlobalSyncTable.gameLevel
-  local oldStar = gGlobalSyncTable.getStar
-  local oldMode = gGlobalSyncTable.mhMode
-  local oldState = gGlobalSyncTable.mhState
-  --local oldArea = gGlobalSyncTable.gameArea
-  gGlobalSyncTable.gameLevel = -1
-  gGlobalSyncTable.getStar = -1
-  gGlobalSyncTable.mhMode = -1
-  gGlobalSyncTable.mhState = -1
-  --gGlobalSyncTable.gameArea = 0
-  gGlobalSyncTable.gameLevel = oldLevel
-  gGlobalSyncTable.getStar = oldStar
-  gGlobalSyncTable.mhMode = oldMode
-  gGlobalSyncTable.mhState = oldState
-  --gGlobalSyncTable.gameArea = oldArea
+  _set_sync_table_field(gGlobalSyncTable, "mhMode", gGlobalSyncTable.mhMode)
+  _set_sync_table_field(gGlobalSyncTable, "mhState", gGlobalSyncTable.mhState)
+  _set_sync_table_field(gGlobalSyncTable, "gameArea", gGlobalSyncTable.gameArea)
+  _set_sync_table_field(gGlobalSyncTable, "gameLevel", gGlobalSyncTable.gameLevel)
+  _set_sync_table_field(gGlobalSyncTable, "getStar", gGlobalSyncTable.getStar)
+  _set_sync_table_field(gGlobalSyncTable, "actless", gGlobalSyncTable.actless)
+
   for i = 1, (MAX_PLAYERS - 1) do
     local sMario = gPlayerSyncTable[i]
-    local oldTeam = sMario.team or 0
-    local oldSpectator = sMario.spectator or 0
-    local oldDead = sMario.dead or false
-    local oldStars = sMario.totalStars or 0
-    if oldTeam == 1 then
-      local oldLives = sMario.runnerLives -- I wrote "runnerlives" instead before smh
-      sMario.runnerLives = 100 -- No longer -1, because if it's -1, then it can make random people hunter...
-      sMario.runnerLives = oldLives
-    end
-    sMario.team = -1
-    sMario.team = oldTeam
-    sMario.totalStars = -1
-    sMario.totalStars = oldStars
-    sMario.spectator = 0
-    sMario.spectator = oldSpectator
-    sMario.dead = false
-    sMario.dead = oldDead
-    on_packet_request_perm_objs({gIndex = i})
+    _set_sync_table_field(sMario, "team", sMario.team)
+    _set_sync_table_field(sMario, "spectator", sMario.spectator)
+    _set_sync_table_field(sMario, "dead", sMario.dead)
+    _set_sync_table_field(sMario, "totalStars", sMario.totalStars)
+    _set_sync_table_field(sMario, "runnerLives", sMario.runnerLives)
+    on_packet_request_perm_objs({gIndex = network_global_index_from_local(i)})
   end
   return true
 end
@@ -394,7 +388,7 @@ function out_command(msg)
         course = -1
         level = LEVEL_CASTLE
       else
-        level = course_to_level[course]
+        level = get_level_num_from_course_num(course)
       end
     end
     if not level then
@@ -461,7 +455,7 @@ function blacklist_command(msg)
       local act = id % 10
       if not valid_star(course, act, false, true) then
         local starString = string.format("%s - %s (Course %d, Star %d)",
-          get_custom_level_name(course, course_to_level[course], 1), get_custom_star_name(course, act), course, act)
+          get_custom_level_name(course, get_level_num_from_course_num(course), 1), get_custom_star_name(course, act), course, act)
         djui_chat_message_create(starString)
       end
     end
@@ -473,8 +467,14 @@ function blacklist_command(msg)
     if not course then return false end
     if course < 1 or course > 24 then return false end
 
+    local maxStar = 6
+    if ROMHACK.star_data and ROMHACK.star_data[course] then
+      maxStar = #ROMHACK.star_data[course]
+    end
+
     if act then
-      if act < 1 or act > 7 then
+      if act < 1 or act >= maxStar
+      or (act == 7 and course <= 15 and gLevelValues.coinsRequiredForCoinStar ~= 0) then
         return false
       elseif not valid_star(course, act, false, true) then
         djui_chat_message_create(trans("blacklist_add_already"))
@@ -484,7 +484,7 @@ function blacklist_command(msg)
       mini_blacklist[starID] = 1
     else
       local allblacklist = true
-      for act = 1, 7 do
+      for act = 1, maxStar do
         if valid_star(course, act, false, true) then
           local starID = course * 10 + act
           mini_blacklist[starID] = 1
@@ -502,9 +502,9 @@ function blacklist_command(msg)
     local starString = ""
     if act then
       starString = string.format("%s - %s (Course %d, Star %d)",
-        get_custom_level_name(course, course_to_level[course], 1), get_custom_star_name(course, act), course, act)
+        get_custom_level_name(course, get_level_num_from_course_num(course), 1), get_custom_star_name(course, act), course, act)
     else
-      starString = string.format("%s (Course %d)", get_custom_level_name(course, course_to_level[course], 1), course)
+      starString = string.format("%s (Course %d)", get_custom_level_name(course, get_level_num_from_course_num(course), 1), course)
     end
     djui_chat_message_create(trans("blacklist_add", starString))
   elseif action == "remove" then
@@ -515,9 +515,15 @@ function blacklist_command(msg)
     if not course then return false end
     if course < 1 or course > 24 then return false end
 
+    local maxStar = 6
+    if ROMHACK.star_data and ROMHACK.star_data[course] then
+      maxStar = #ROMHACK.star_data[course]
+    end
+
     if act then
       local starID = course * 10 + act
-      if act < 1 or act > 7 then
+      if act < 1 or act >= maxStar
+      or (act == 7 and course <= 15 and gLevelValues.coinsRequiredForCoinStar ~= 0) then
         return false
       elseif valid_star(course, act, false, true) then
         djui_chat_message_create(trans("blacklist_remove_already"))
@@ -530,7 +536,7 @@ function blacklist_command(msg)
     else
       local allwhitelist = true
       local invalid = true
-      for act = 1, 7 do
+      for act = 1, maxStar do
         local starID = course * 10 + act
         local valid = valid_star(course, act, false, true)
         if (not valid) and mini_blacklist[starID] then
@@ -555,9 +561,9 @@ function blacklist_command(msg)
     local starString = ""
     if act then
       starString = string.format("%s - %s (Course %d, Star %d)",
-        get_custom_level_name(course, course_to_level[course], 1), get_custom_star_name(course, act), course, act)
+        get_custom_level_name(course, get_level_num_from_course_num(course), 1), get_custom_star_name(course, act), course, act)
     else
-      starString = string.format("%s (Course %d)", get_custom_level_name(course, course_to_level[course], 1), course)
+      starString = string.format("%s (Course %d)", get_custom_level_name(course, get_level_num_from_course_num(course), 1), course)
     end
     djui_chat_message_create(trans("blacklist_remove", starString))
   elseif action == "reset" then
@@ -743,9 +749,9 @@ local new_tips = { 1, 43, 46, 13, 42, 10, 11, 4, 5, 6, 7, 22 }
 local newTipProg = 0
 local chosenTip = 0
 function render_tip(pickNew)
-  djui_hud_set_font(FONT_MENU)
+  local isJP = djui_hud_set_font_consider_lang(FONT_MENU)
   djui_hud_set_color(255, 255, 255, 255)
-  local scale = 0.1
+  local scale = (isJP and 0.2) or 0.1
 
   if pickNew or chosenTip == 0 then
     if network_is_server() and gPlayerSyncTable[0].kills == 0 and gGlobalSyncTable.mhState == 0 then -- display certain tips for new hosts

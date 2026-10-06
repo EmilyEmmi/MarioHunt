@@ -60,6 +60,11 @@ _G.mhApi.become_hunter = function(index)
   return become_hunter(sMario)
 end
 
+_G.mhApi.get_last_attacker = get_last_attacker
+_G.mhApi.set_last_attacker = set_last_attacker
+_G.mhApi.get_last_attacker_obj = get_last_attacker
+_G.mhApi.set_last_attacker_obj = set_last_attacker
+
 -- returns a string, a color string, and a table, in that order
 _G.mhApi.get_role_name_and_color = get_role_name_and_color
 
@@ -103,11 +108,19 @@ _G.mhApi.render_power_meter_interpolated = render_power_meter_interpolated_mario
 _G.mhApi.apply_double_health = apply_double_health
 _G.mhApi.getActiveSabo = get_active_sabo
 _G.mhApi.get_season_lighting = get_season_lighting
+_G.mhApi.change_setting_default = change_setting_default
+
+_G.mhApi.ACT_MH_BUBBLE_RETURN = ACT_MH_BUBBLE_RETURN
+_G.mhApi.ACT_SPECTATE = ACT_SPECTATE
+
+_G.mhApi.id_bhvMHCrown = id_bhvMHCrown
+_G.mhApi.id_bhvMHWingCapWarp = id_bhvMHWingCapWarp
+_G.mhApi.id_bhvSparkleFadingWarp = id_bhvSparkleFadingWarp
 
 -- this gets the local player's current kill combo
 _G.mhApi.getKillCombo = get_kill_combo
 
--- used for synced timers (in gGlobalSyncTable and gPlayerSyncTable); use this instead of reading the normal value
+-- DEPRECATED: used to be required for synced timers (in gGlobalSyncTable and gPlayerSyncTable), but is no longer needed
 _G.mhApi.get_synced_timer_value = get_synced_timer_value
 
 -- for mods that use HOOK_ON_CHAT_MESSAGE to cancel messages, set this value to that function (check mute.lua with api_stuff for an example)
@@ -136,12 +149,12 @@ _G.mhApi.chatModifyFunction = hide_the_truth
 ]]
 
 -- this function is called when a kill or runner death occurs, or when a player fails to rejoin
--- killer and killed are both global indexes (both may be nil)
--- runner is TRUE if the killed player was a runner
--- death is TRUE if the killed player was on their last life as a runner
--- time is the killed player's run time
+-- attackGIndex and victimGIndex are both global indexes (both may be nil)
+-- isRunner is TRUE if the killed player was a runner
+-- lastLife is TRUE if the killed player was on their last life as a runner
+-- runTime is the killed player's run time
 -- newRunnerID is a global index containing the new runner (may be nil)
-_G.mhApi.onKill = function(killer,killed,runner,death,time,newRunnerID)
+_G.mhApi.onKill = function(attackGIndex,victimGIndex,isRunner,lastLife,runTime,newRunnerID)
   -- does nothing unless you set it
 end
 

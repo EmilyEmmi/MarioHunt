@@ -851,7 +851,6 @@ local skip = {
 }
 
 function on_dialog(id)
-  if is_game_paused() then return end
   -- override "Need key" dialog
   if id == gBehaviorValues.dialogs.DoorNeedKeyDialog then
     ---@type MarioState
@@ -859,6 +858,7 @@ function on_dialog(id)
     if m.action == ACT_READING_AUTOMATIC_DIALOG and m.marioObj.collidedObjInteractTypes & INTERACT_DOOR ~= 0 then
       local neededStars = m.actionArg & 0xFF
       local totalStars = neededStars + m.numStars
+      if totalStars > 182 then return end -- There are doors in Decades Later that are always blocked off
       if totalStars ~= -1 and totalStars > gGlobalSyncTable.starRun then
         totalStars = gGlobalSyncTable.starRun
         neededStars = totalStars - m.numStars
@@ -866,7 +866,9 @@ function on_dialog(id)
       return true, "You need " .. totalStars.." Stars (" ..neededStars.. 
       "\nmore) to open this door."
     end
+    return
   end
+  if is_game_paused() then return end
   
   if changed_dialogs[id] then -- red dialog box
     set_dialog_override_color(255, 100, 100, 180, 255, 255, 255, 255)

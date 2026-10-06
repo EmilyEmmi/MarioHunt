@@ -1,4 +1,67 @@
 # Changelog
+## v2.8.1
+### Additions:
+  - **Actless Mode**: Removes the act select! Unlike OMM's non stop mode, objectives will still be locked behind certain stars (for example, the Koopa the Quick race doesn't appear until King Bob-Omb has been defeated)
+    - On by default in MysteryHunt
+  - Kill Cooldown can now be adjusted seperately from Grace Period in MysteryHunt (defaults to OFF)
+  - You can now press Z, X, or Right Click on the Category option to reset it to the default
+    - The default is based on the selected Game Area
+  - Added Japanese translation (Moldy64)
+  - Added support for the romhack SM64 Decades Later (Moldy64)
+    - It's recommended to use Moldy's [MarioHunt fork](https://github.com/Moldy64/sm64-dl-hack-mh/tree/main) of the hack.
+  - Added all of the roles for the Mo3 Tournament
+    - If your role is not appearing, you likely did not give me a usable Discord or Coopnet ID
+### Adjustments:
+  - Updated nametags to match new in-game version
+  - Updated Dynamic Lives Icon to support API
+  - Reimplemented "Fix Invisible Walls"- now, it will only prevent exposed ceilings when not in water
+    - As a consequence, performing infinite wall kicks up corners is no longer possible, and performing the JRB cave clip will now warp you to top of the ceiling, for example. Some other clips that were made impossible are possible again (LLL spinning flamethrower, for example)
+  - Many adjustments to MysteryHunt:
+    - Hunters now know where their teammates are (unless "Hunters Know Teammates" is disabled)
+    - When a Hunter is killed, the message no longer states which player did so
+    - While the Toxic Gas sabotage is active, health bars are invisible to Runners. Hunters also cough despite not being affected.
+    - The guard cooldown is now always 30 seconds for Runners and 60 seconds for Hunters. HOWEVER, the time the guard lasts is now 10 / X, where X is the amount of spectators currently on that team (with a min of 1 second and max of 5 seconds)
+  - Runners (as well as Hunters in MysteryHunt) now get 2 seconds of invincibility when
+  opening a star door
+    - Also adjusted the range at which they open, so the main lobby star door won't open when entering the CCM room, for example
+  - **Hunters may no longer unlock key doors- a Runner must unlock it first**
+    - This doesn't apply in MysteryHunt, of course
+  - Pause anywhere is now forced on
+  - The console is disabled more cleanly
+  - Removed the notice for Hard/Extreme mode when getting enough wins
+  - Removed green demon mode (I don't think anyone will really miss this)
+  - The DDD poles now appear immediately if the key is collected
+    - If the area is set to Basement (or in Free Roam), the poles will appear when Board Bowser's Sub is collected. This makes collecting all stars in Basement only actually possible.
+  - Collecting a star that warps you somewhere different than the death warp now forces you out of the level, and creates a warp point for others to use
+  - The warp to Cavern of the Metal Cap in Wet-Dry World (when playing in the Upper Floor area) was changed to be a fading warp
+  - Moved the health bar up slightly for players with roles
+  - Added kill messages for Spindrift, Bubba, Moneybag, and Slide Box (JRB)
+    - Moneybag and Slide Box added by Moldy64
+### Fixes/backend changes:
+  - Changed spectator camera so that it should now match the player's X and Y invert settings
+  - Fixed the respawn action being able to move you OOB or inside of a wall
+  - Fixed respawning with 1 HP when dying in the castle when the game area was Basement or Upstairs
+    - Also fixed not healing when using Exit Course in Tower Of The Wing Cap when the game area was Basement
+  - Fixed players rejoining into a slot on Coopnet
+  - Fixed the progress overlay not appearing for Rainbow Ride
+  - Fixed the hitbox on the Manta Ray rings (the fix Isaac implemented needed its own fix)
+  - Fixed shells disappearing while riding them (they may still disappear visually)
+  - Fixed turning invisible if you got eaten by Bubba
+  - Removed a debug feature that allowed tilting the Bowser 2 Arena platform by pressing L
+  - Fixed recolorable icon bugs with Character Select v1.16
+  - Changed DJUI rendering to use features added in v1.5
+  - Romhack data is now split into multiple files, and their information is only loaded when necessary
+  - Fixed door messages saying that you need "-1 stars" sometimes if the category was set to Any%
+  - Fixed 49 star in Upper Floor being impossible (Bowser in the Sky wouldn't open)
+  - Fixed kills giving +12.5 HP instead of +8
+  - API Stuff:
+    - Added getters/setters for most recent attacker (both players and objects)
+    - Added custom objects to the API
+    - Exposed change_setting_default
+    - Some new romhack fields, mainly for So Retro, were added:
+      - Added ROMHACK.allowPUs, ROMHACK.ignoreStarsForTime, and ROMHACK.noSyncFix
+      - Added ROMHACK.generate_star_table to override the star table for MiniHunt
+      - Added ROMHACK.customBlackSave and ROMHACK.customBlackLoad for overriding the blacklist save/load functions
 ## v2.8
 ### Additions:
   - Added the new "Game Area" option! It lets you limit the entire game to one area (for example setting it to Upper Floor starts everyone there, and only Upper Floor stages are accessible)
@@ -36,7 +99,7 @@
   - Added scroll support and middle click for mouse, and made touch support function correctly
   - All sabotages in MysteryHunt now have unique textures for the radar (EpikCool)
 ### Adjustments:
-  - Updated all languages (N64 Mario, TenmaAkie, Skeltan, Mr. L-ore, PietroM, N64YT, LALIEDABBE)
+  - Updated all languages (N64 Mario, TenmaAkie, Skeltan, WaddlyLily, PietroM, N64YT, LALIEDABBE)
   - Updated recolorable icons to match Dynamic Lives Icon v2.0 (unreleased).
   - Recolorable icons now exist in the Lite version.
   - **When "Nerf Vanish Cap" is enabled, the "Vanish" button is only used to protect against PVP attacks; otherwise, the vanish cap will now work even without holding the button.**
@@ -289,7 +352,7 @@
     - Note that global chat won't work in MysteryHunt (you won't be able to hear everyone)
   - Added lives counter when using OMM Rebirth's hud
 ### Adjustments:
-  - Updated all languages! (EpikCool, N64-Mario, PietroM, Skeltan, N64yt, Mr. L-Ore)
+  - Updated all languages! (EpikCool, N64-Mario, PietroM, Skeltan, N64yt, WaddlyLily)
     - Tips are also now translated for Spanish, Portuguese, French, Romanian, and Italian
   - **1Ups now only heal 4 HP instead of 8**
     - Does not apply to Star Revenge 7.5
