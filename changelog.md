@@ -1,4 +1,20 @@
 # Changelog
+## v2.8.2
+### Additions:
+  - Implemented Actless support for Star Road (Moldy64)
+### Adjustments:
+  - Muted players can no longer use /tc or /gc
+  - Changes to Decades Later (Moldy64):
+    - Wiggler and King Bob-Omb no longer have reduced health if the Game Area is set to 1st Floor or 1st Basement respectively
+    - Made the koopa shell box disappear in Actless mode if Act 5 was not reached
+### Fixes/backend changes:
+  - Fixed the pipe in Castle Grounds when playing in the Basement game area not working
+  - Fixed the death land action resetting the camera for all players instead of just the local player
+    - Thanks to AntonioDaviInTheSourceCode for reporting this!
+  - Fixed new translations not loading if you didn't do a clean install
+    - There could be issues that appear in the future, so I recommend doing so anyway
+  - Fixed Mo3 roles for a few people
+  - Changed Bowser 2 platform failsafe to be more reliable
 ## v2.8.1
 ### Additions:
   - **Actless Mode**: Removes the act select! Unlike OMM's non stop mode, objectives will still be locked behind certain stars (for example, the Koopa the Quick race doesn't appear until King Bob-Omb has been defeated)
