@@ -347,7 +347,9 @@ function custom_tilt_platform_loop(o)
         -- store previous in unrelated variables
         o.oBobombBuddyBlinkTimer = o.oFaceAnglePitch
         o.oBobombBuddyCannonStatus = o.oFaceAngleRoll
-        if abs_angle_diff(0, o.oFaceAnglePitch) > 0x2000 or abs_angle_diff(0, o.oFaceAngleRoll) > 0x2000 then
+        -- Detect if this gets glitchy (occurs when Bowser's angle to centre changes dramatically)
+        local newAngleToCenter = atan2s(0 - bowser.oPosZ, 0 - bowser.oPosX)
+        if abs_angle_diff(newAngleToCenter, bowser.oBowserAngleToCentre) > 0x1000 then
             -- end tilt early
             bowser.oAction = 0
             o.oAction = 2
@@ -376,7 +378,7 @@ end
 
 hook_behavior_custom(id_bhvTiltingBowserLavaPlatform, false, nil, custom_tilt_platform_loop)
 
--- speeds up the arrow platform in BITS and the elevator and BITFS (same object, funnily enough)
+-- speeds up the arrow platform in BITS and the elevator in BITFS (same object, funnily enough)
 function custom_back_and_forth_platform_loop(o)
     if o.oActivatedBackAndForthPlatformVel ~= 0 then
         local platformType = ((o.oBehParams >> 16) & 0x0300) >> 8

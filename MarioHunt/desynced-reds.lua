@@ -1,4 +1,3 @@
-
 ---@param star Object
 ---@param obj Object
 ---@param x integer

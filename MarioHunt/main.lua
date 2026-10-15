@@ -1,4 +1,4 @@
--- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#\\ (v2.8.1) !
+-- name: ! \\#00ffff\\Mario\\#ff5a5a\\Hunt\\#\\ (v2.8.2) !
 -- incompatible: gamemode nametags
 -- category: gamemode
 -- description: A gamemode based off of Beyond's concept. Hunters stop Runners from clearing the game!\n\nProgramming: EmilyEmmi, Blocky, Sunk, EmeraldLockdown, Sprinter05, Squishy, Agent X\n\nTranslations: KanHeaven, SonicDark, EpikCool, green, TenmaAkie, N64 Mario, PietroM, Skeltan, Blocky, N64, WaddlyLily, Moldy64\n\nSome graphics: LeoHaha, Key's Artworks, AquarriusAlex, RoxasYTB, MaybeNotJohny\n\"Shooting Star Summit\" port: pieordie1\n\nAlso thanks to: ColbyRayz!, SilverOrigins, PeachyPeach, Twin Drive System, Moldy64
@@ -4662,13 +4662,14 @@ function before_set_mario_action(m, action)
   if action == ACT_EXIT_LAND_SAVE_DIALOG or action == ACT_DEATH_EXIT_LAND
   or (action == ACT_HARD_BACKWARD_GROUND_KB and m.action == ACT_SPECIAL_DEATH_EXIT)
   or (action == ACT_FREEFALL_LAND_STOP and m.action == ACT_UNUSED_DEATH_EXIT) then
-    m.area.camera.cutscene = 0
-    play_cutscene(m.area.camera) -- needed to fix toad bug
-    set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
     m.forwardVel = 0
     m.healCounter = 0x20
     if m.playerIndex == 0 then
       halvedHealCounter = 0x20
+      
+      m.area.camera.cutscene = 0
+      play_cutscene(m.area.camera) -- needed to fix toad bug
+      set_camera_mode(m.area.camera, m.area.camera.defMode, 1)
     end
 
     if action == ACT_EXIT_LAND_SAVE_DIALOG then
@@ -5100,6 +5101,9 @@ end
 function send_tc(msg)
   if mhApi.chatValidFunction and (mhApi.chatValidFunction(m0, msg) == false) then
     return false
+  elseif sMario0.mute then
+    djui_chat_message_create(trans("you_are_muted"))
+    return false
   end
 
   local myGlobalIndex = np0.globalIndex
@@ -5142,8 +5146,11 @@ function gc_command(msg)
   elseif GST.mhMode ~= 3 then
     djui_chat_message_create(trans("wrong_mode"))
     return true
+  elseif sMario0.mute then
+    djui_chat_message_create(trans("you_are_muted"))
+    return false
   end
-  
+
   send_gc(msg)
   return true
 end
@@ -5507,6 +5514,7 @@ function on_course_enter()
       sign = obj_get_next_with_same_behavior_id(sign)
     end
   end
+  
   if GST.mhState == 0 then -- and background music
     set_lobby_music(month)
     --play_music(0, custom_seq, 1)
@@ -5563,8 +5571,6 @@ function on_course_enter()
         (save_file_get_total_star_count(get_current_save_file_num() - 1, courseMin - 1, courseMax - 1))
     m0.prevNumStarsForDialog = m0.numStars
   end
-
-  
 end
 
 -- fix sm74 save jank

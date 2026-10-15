@@ -137,6 +137,17 @@ function lang_test(msg)
 end
 
 function on_mods_loaded()
+  -- if you didn't do a clean install, load the files again
+  if trans("place_mo3", nil, nil, "en") == "place_mo3" then
+    -- load all language files
+    local langs = get_mod_files(get_active_mod(), "lang")
+    for i,langFile in ipairs(langs) do
+      if langFile:sub(-4) == ".lua" then
+        require(langFile:sub(1, -5))
+      end
+    end
+  end
+
   -- this generates a list of available languages for the command description
   lang = "en"
   local lang_table = {}
